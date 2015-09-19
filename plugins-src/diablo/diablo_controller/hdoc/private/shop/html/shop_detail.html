@@ -1,0 +1,224 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  店铺详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/shop/shop_new')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;" x-ng-click="refresh()"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="row form-group">
+
+	    <div class="col-sm-12 col-md-12">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入店铺名称"
+			 x-ng-model="filter.number"></input>
+		  </div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div> 
+	    
+	  </div> 
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped table-hover
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>名称</th>
+		    <th>店长</th>
+		    <!-- <th>归属人</th> -->
+		    <th>地址</th>
+		    <th x-ng-show="authen_list_repo">所属仓库</th>
+		    <th>开张日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="shop in shops">
+		    <td>{{shop.order_id}}</td> 
+		    <td>{{shop.name}}</td> 
+		    <td x-ng-switch on="shop.shopowner">
+		      <span ng-switch-when="">暂无</span>
+		      <span ng-switch-default>{{shop.shopowner}}</span>
+		    </td>
+		    
+		    <!-- <td data-title="'经营人'"> -->
+		    <!--   <span>{{shop.owner}}</span> -->
+		    <!-- </td> -->
+		    
+		    <td>{{shop.address}}</td>
+		    <td x-ng-show="authen_list_repo" x-ng-switch on="shop.repo">
+		      <span ng-switch-when=undefined>暂无</span>
+		      <span ng-switch-default>{{shop.repo.name}}</span>
+		      <!-- {{shop.repo}} -->
+		    </td>
+		    <td>{{shop.open_date}}</td>
+
+		    <td class="col-md-2"> 
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="edit_shop(shop)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button>
+                      <button class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_shop(shop)">删除
+			<i class="glyphicon glyphicon-trash"></i></button>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="edit-shop.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button> 
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">店铺编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body--> 
+  <div class="modal-body">
+    <form class="form-horizontal" name="sForm" novalidate>
+      <div class="form-body">
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>名称</span>
+	      <div x-ng-class="{'has-error':sForm.name.$invalid
+			       && !sForm.name.$pristine
+			       || !params.check_shop(params.shop)}">
+	      <input class="form-control"
+		     name="name"
+		     type="text" required
+                     x-ng-model="params.shop.name"
+		     x-ng-minlength="2"
+		     x-ng-maxlength="16"></input>
+	      </div>
+	      <span class="input-group-addon bg-white fg-red">*</span> 
+	  </div> 
+	  <div>
+	    <span ng-show="sForm.name.$error.minlength
+			   || sForm.name.$error.maxlength">
+	      <span class="fg-red">请输入2-16个字符</span>
+	    </span>
+
+	    <span ng-show="!params.check_shop(params.shop)">
+	      <span class="fg-red">店铺名已存在，请重新输入</span>
+	    </span>
+	  </div>
+	  
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>地址</span>
+	      <input class="form-control"
+		     type="text" required
+                     x-ng-model="params.shop.address"></input>
+	      <span class="input-group-addon bg-white fg-red">*</span> 
+	  </div>
+	</div>
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>店长</span>
+	      <input class="form-control"
+		     name="shopowner"
+		     type="text"
+		     placeholder="请输入店长姓名"
+		     x-ng-model="params.shop.employee"
+		     typeahead-editable="false"
+		     typeahead="e as e.name for e in
+				params.employees|filter:$viewValue|limitTo:8"></input>
+	  </div>
+	  <div ng-show="sForm.shopowner.$invalid && !sForm.shopowner.$pristine">
+	    <span class="fg-red">请从下拉框中选择店长</span>
+	  </div>
+	</div>
+
+	<div x-ng-show="params.authen_list_repo" class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>仓库</span>
+	    <select class="form-control"
+		    x-ng-model="params.shop.repo"
+		    x-ng-options="r as r.name for r
+				  in params.repertories|filter:$viewValue|limitTo:8">
+	    </select>
+	  </div>
+	</div>
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="sForm.$invalid
+			   || !params.has_update(params.shop)
+			   || !params.check_shop(params.shop)"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>  
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,258 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  员工详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/employ_new')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-sm-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入员工姓名"
+			 x-ng-model="filter.number"></input>
+		  </div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-sm-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入员工联系方式"
+			 x-ng-model="filter.number"></input>
+		  </div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div> 
+
+	  </div> <!--END form-group-->
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped
+			    table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>工号</th>
+		    <th>名称</th>
+		    <th>性别</th>
+		    <th>职位</th>
+		    <th>联系方式</th>
+		    <th>联系地址</th>
+		    <th>入职日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="employ in employees">
+		    <td data-title="'序号'"
+			sortable="'id'">
+		      <span>{{employ.order_id}}</span>
+		    </td>
+
+		    <td data-title="'工号'">
+		      <span>{{employ.number}}</span>
+		    </td>
+		    
+		    <td data-title="'名称'">
+		      <span>{{employ.name}}</span>
+		    </td>
+
+		    <td>{{employ.sex.name}}</td>
+		    
+		    <td data-title="'职位'" ng-switch on={{employ.position}}>
+		      <span ng-switch-when=1>店长</span>
+		      <span ng-switch-when=2>普通员工</span>
+		    </td>
+		    
+		    <td data-title="'联系方式'">
+                      <span>{{employ.mobile}}</span>
+		    </td>
+
+		    <td data-title="'联系地址'">
+                      <span>{{employ.address}}</span>
+		    </td>
+
+		    <td data-title="'入职日期'">
+                      <span>{{employ.entry}}</span>
+		    </td>
+
+		    <td data-title="'操作'">
+		      <!-- <a class="btn btn-success btn-xs" -->
+		      <!-- 	 ng-click="goto_page('#/employ/employ_new')">新增 -->
+		      <!-- 	<i class="glyphicon glyphicon-plus"></i></a> -->
+		      <a class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="edit_employ(employ)">修改
+			<i class="glyphicon glyphicon-pencil"></i></a>
+                      <a href="" class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_employ(employ)">删除
+			<i class="glyphicon glyphicon-erase"></i></a>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="edit-employ.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button> 
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">员工编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body--> 
+  <div class="modal-body">
+    <form class="form-horizontal" name="eForm" novalidate>
+      <div class="form-body">
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>工号</span>
+	      <input class="form-control" type="text" readonly
+                     x-ng-model="params.employ.number"></input>
+	  </div>
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>姓名</span>
+	      <input class="form-control" type="text" required
+		     name="name"
+                     x-ng-model="params.employ.name"
+		     x-ng-pattern="params.pattern.name"></input>
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	  </div> 
+	  <div x-ng-show="eForm.name.$invalid && !eForm.name.$pristine">
+	    <span class="fg-red">请输入2到3个中文字符</span>
+	  </div>
+	  <div x-ng-show="params.check_exist(params.employ)">
+	    <span class="fg-red">该用户名已存在</span>
+	  </div> 
+	</div>
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>性别</span>
+	      <select class="form-control select-medium"
+			x-ng-model="params.employ.sex"
+			x-ng-options="s as s.name for s in params.sexes">
+		</select> 
+	  </div>
+	</div> 
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>手机</span>
+	      <input class="form-control"
+		     type="tel"
+		     name="mobile"
+		     type="text" required
+		     x-ng-pattern="params.pattern.mobile"
+		     placeholder="请输入手机号码"
+		     x-ng-model="params.employ.mobile"></input>
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="eForm.mobile.$invalid && ! eForm.mobile.$pristine">
+	    <span class="fg-red">请输入正确的手机号码</span>
+	   </div>
+	</div>
+
+	<div class="form-group"> 
+	  <div class="input-group">
+	    <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>地址</span>
+	    <div ng-class="{'has-error': eForm.address.$invalid
+			   && !eForm.address.$pristine}">
+	      <input type="text"
+		     class="form-control"
+		     name="address"
+		     required
+		     placeholder="请输入您的联系地址"
+		     x-ng-model="params.employ.address"
+		     x-ng-pattern="params.pattern.address"></input>
+	    </div>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div> 
+	  <div ng-show="eForm.address.$invalid && !eForm.address.$pristine">
+	    <span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	  </div> 
+	</div>
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="params.check_same(params.employ)
+			   || params.check_exist(params.employ)
+			   || eForm.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>  
+</script>
+
+
+
+
+
+
+
+
+

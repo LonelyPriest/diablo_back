@@ -1,0 +1,184 @@
+<!-- <\!--BEGIN header-\-> -->
+<!-- <div class="row"> -->
+<!--   <div class="col-md-12"> -->
+<!--     <ul class="page-breadcrumb breadcrumb"> -->
+<!--       <li> -->
+<!--         <i class="fa fa-home"></i> -->
+<!-- 	<a href="javascript:;">会员</a> -->
+<!--         <i class="fa fa-angle-right"></i> -->
+<!--       </li> -->
+<!--       <li> -->
+<!--         <a href="javascript:;">兑换积分</a> -->
+<!--       </li> -->
+<!--     </ul> -->
+<!--   </div> -->
+<!-- </div> <\!--END header-\-> -->
+
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  兑换积分
+	</div>		
+      </div>
+
+      <!--BEGIN  container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table tooblbar-->
+	<div class="table-toolbar">
+	</div> <!--END table tooblbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body form">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--BEGIN form--> 
+	    <form class="form-horizontal" name="memberScoreConsumedForm" novalidate>
+	      <!--BEGIN form body-->
+	      <div class="form-body">
+		<div class="form-group">
+		  <label class="col-md-3 control-label">手机号码</label>
+		  <div class="col-md-4">
+		    <input type="text" ng-show="isSelect" class="form-control" name="mobile" required
+			   x-ng-model="member.mobile"
+			   typeahead-on-select="on_selected($item, $model, $label)"
+			   typeahead="member as member.mobile for member in members | filter:{mobile:$viewValue} | limitTo:8"></input>
+		    <input type="text" ng-show="!isSelect" class="form-control" name="mobile" required
+			   x-ng-model="member.mobile"></input>
+		  </div>
+		  <div>
+		    <span style="color:red">*</span>
+		  </div>		  
+		</div>
+
+		<!--member Name-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">姓名</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="name"
+			   x-ng-model="member.name" readonly="true"></input>
+		  </div>		  
+		</div>
+
+		<!--sex-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">性别</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="sex"
+			   x-ng-model="member.sex" readonly="true"></input>		    
+		  </div>
+		</div>
+
+		<!--birthday-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">生日</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="birthday"
+			   x-ng-model="member.birthday" readonly="true"></input>
+		  </div>
+		</div>
+
+		<!--SLA-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">会员级别</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="sla"
+			   x-ng-model="member.sla" readonly="true"></input>
+		  </div>
+		</div>
+
+		<!--total score-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">总积分</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="total_score"
+			   x-ng-model="member.total_score" readonly="true"></input>
+		  </div>
+		</div>
+
+		<!--left score-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">剩余积分</label>
+		  <div class="col-md-4">
+		    <input type="text" class="form-control" name="left_score"
+			   x-ng-model="leftScore" readonly="true"></input>
+		  </div>
+		</div>
+		
+		<!--consumed score-->
+		<div class="form-group"
+		     ng-class="{'has-error': memberScoreConsumedForm.consumedScore.$invalid
+			       && !memberScoreConsumedForm.consumedScore.$pristine}">
+		  <label class="col-md-3 control-label">兑换积分</label>
+		  <div class="col-md-4">
+		    <input type="text"
+			   class="form-control"
+			   required
+			   ng-pattern="/^[1-9]*[1-9][0-9]*$/"
+			   placeholder="请输入需要兑换的积分数"
+			   name="consumedScore"
+			   x-ng-model="consumedScore"></input>
+		  </div>
+		  <div>
+		    <span style="color:red">*</span>
+		  </div>
+		  <div ng-show="memberScoreConsumedForm.consumedScore.$invalid
+				&& !memberScoreConsumedForm.consumedScore.$pristine
+				&& validConsumedScore">
+		    <span style="color:red">请输入大于0数字</span>
+		  </div>
+		  <div ng-show="!validConsumedScore">
+		    <span style="color:red">兑换积分大于用户已有积分</span>
+		  </div>
+		</div>
+		
+		<!--gift-->
+		<div class="form-group">
+		  <label class="col-md-3 control-label">兑换礼品</label>
+		  <div class="col-md-4">
+		    <textarea class="form-control" x-ng-model="gift"></textarea>
+		  </div>
+		</div>
+		
+		
+	      </div><!--END form body-->
+
+	      <!--BEGIN form action-->
+	      <div class="form-actions fluid">
+		<div class="col-md-offset-4 col-md-9">
+		  <button type="submit" class="btn blue"
+			  ng-disabled="memberScoreConsumedForm.$invalid"
+			  x-ng-click="consumed_score(member, consumedScore, gift)"
+			  data-dismiss="modal" data-toggle="modal"
+			  data-target="#scoreConsumedResponse">确认</button>
+		  <button type="button" class="btn default"
+			  data-dismiss="modal"
+			  x-ng-click="cancel_score_consumed()">取消</button>
+		</div>
+	      </div> <!--END form action-->
+	  
+	    </form><!--END form-->
+	  </div> <!--END panel-->
+	</div> <!--END portlet body form-->
+      </div> <!--END container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+<response-notify-dialog
+   response-dialog-id="scoreConsumedResponse"
+   success-title="兑换积分成功"
+   error-title="兑换积分失败"
+   success-info={{response_success_info}}
+   error-info={{response_error_info}}
+   response="member_consumed_response()"
+   after-close="after_response()">
+</response-notify-dialog>

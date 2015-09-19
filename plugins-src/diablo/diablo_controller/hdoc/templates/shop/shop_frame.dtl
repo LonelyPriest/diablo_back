@@ -1,0 +1,41 @@
+{% extends "../base_frame.dtl" %}
+
+{% block self_reference_js %}
+<!-- pinyin--> 
+<script src="/public/assets/pinyin/pinyin.js"          type="text/javascript"></script>
+
+<!-- right app -->
+<script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script>
+<script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
+
+<!-- filter -->
+<script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
+<!--employ-->
+<script src="/private/employ/javascript/employ_app.js" type="text/javascript"></script>
+<!--self-->
+<script src="/private/shop/javascript/shop_app.js"     type="text/javascript"></script>
+<script src="/private/shop/javascript/repertory.js"    type="text/javascript"></script>
+{% endblock %}
+
+
+
+{% block script_init %} 
+<script>
+    jQuery(document).ready(function() {
+	App.init(); // initlayout and core plugins
+	// var docElm = document.documentElement;
+	// if (docElm.requestFullscreen) {
+	//     docElm.requestFullscreen();
+	// }
+	// else if (docElm.mozRequestFullScreen) {
+	//     docElm.mozRequestFullScreen();
+	// }
+	// else if (docElm.webkitRequestFullScreen) {
+	//     docElm.webkitRequestFullScreen();
+	// }
+	// else if (docElm.msRequestFullscreen) {
+	//     docElm.msRequestFullscreen();
+	// }
+    });
+</script>
+{% endblock %}

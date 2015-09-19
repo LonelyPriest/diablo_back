@@ -1,0 +1,25 @@
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        19G  1.1G   17G   6% /
+proc               0     0     0    - /proc
+sysfs              0     0     0    - /sys
+none            4.0K     0  4.0K   0% /sys/fs/cgroup
+none               0     0     0    - /sys/fs/fuse/connections
+none               0     0     0    - /sys/kernel/debug
+none               0     0     0    - /sys/kernel/security
+udev            3.8G  4.0K  3.8G   1% /dev
+devpts             0     0     0    - /dev/pts
+tmpfs           771M  1.2M  770M   1% /run
+none            5.0M     0  5.0M   0% /run/lock
+none            3.8G  152K  3.8G   1% /run/shm
+none            100M   40K  100M   1% /run/user
+none               0     0     0    - /sys/fs/pstore
+/dev/sda10       47G   52M   45G   1% /opt
+/dev/sda2       4.6G  152M  4.2G   4% /boot
+/dev/sda5        94G  8.8G   81G  10% /home
+/dev/sda6       4.6G  9.7M  4.4G   1% /tmp
+/dev/sda7        19G  5.5G   13G  32% /usr
+/dev/sda8       9.3G  824M  8.0G  10% /var
+/dev/sda9       9.3G   22M  8.8G   1% /srv
+/dev/sda11       47G  204M   45G   1% /usr/local
+systemd            0     0     0    - /sys/fs/cgroup/systemd
+gvfsd-fuse         0     0     0    - /run/user/1000/gvfs

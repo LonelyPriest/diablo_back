@@ -1,0 +1,188 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+	<i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">帐户</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增商家帐户</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="accountAddForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member Name-->
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">帐号</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error': accountAddForm.account.$invalid
+				 && !accountAddForm.account.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="account"
+			   required
+			   placeholder="字母或下划线，不能以下划线开头或结尾"
+			   x-ng-model="account.name"
+			   x-ng-minlength="3"
+			   x-ng-maxlength="10"
+			   x-ng-pattern="/^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	      <div ng-show="accountAddForm.account.$error.minlength
+			    || accountAddForm.account.$error.maxlength">
+		<span style="color:red">帐号太短，请输入3-10个字符</span>
+	      </div> 
+	    </div>
+
+
+	    <div class="form-group"
+		 ng-class="{'has-error': accountAddForm.password.$invalid
+			   && !accountAddForm.password.$pristine}">
+	      <label class="col-sm-3 col-md-3 control-label">密码</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="password"
+			 class="form-control"
+			 name="password"
+			 required
+			 placeholder="请输入帐号密码，只能是数字，字母或下划线"
+			 x-ng-model="account.password"
+			 x-ng-minlength="6"
+			 x-ng-maxlength="10"
+			 x-ng-pattern="/^\w+$/"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	      <div ng-show="accountAddForm.password.$error.minlength
+			    || accountAddForm.password.$error.maxlength">
+		<span style="color:red">密码太短，请输入6-10个字符</span>
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">经营人</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="merchant"
+			 required
+			 placeholder="请输入商户经营者名称"
+			 x-ng-model="account.merchant"
+			 typeahead-editable="false"
+			 typeahead="merchant as merchant.name for merchant in
+				    merchants|filter:$viewValue|limitTo:8"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="accountAddForm.merchant.$invalid
+			    && !accountAddForm.merchant.$pristine">
+		<span style="color:red">商户只能从提示列表中选择</span>
+	      </div> 
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">手机号码</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text" readonly="true"
+			 name="mobile"
+			 required
+			 class="form-control"
+			 x-ng-model="account.merchant.mobile"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	    </div>
+
+	    <!--max_create-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">帐号限制</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error': accountAddForm.max_create.$invalid
+				 && !accountAddForm.max_create.$pristine}">
+		    <input type="text"
+			   name="max_create"
+			   placeholder="同时在线帐号数目，请输入1-99内的数字"
+			   required
+			   class="form-control"
+			   x-ng-pattern="/^[1-9][0-9]?$/"
+			   x-ng-model="account.max_create"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div> 
+	      </div>
+	       <div ng-show="accountAddForm.max_create.$invalid
+			      && !accountAddForm.max_create.$pristine">
+		 <span class="fg-red">请输入1-99之内的数字</span>
+	       </div>
+	    </div>
+
+	    <!--right-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">权限</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input class="form-control"
+			 name="role"
+			 required
+			 x-ng-model="account.role"
+			 type="text"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_role_select($item, $model, $label)"
+			 typeahead="role as role.name for role in
+				    roles|filter:$viewValue|limitTo:8"
+			 placeholder="请选择商家权限"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+		<div ng-show="show_role_tree">
+		  <role-tree  x-ng-model="roleTree"></role-tree>
+		</div>
+	      </div> 
+	    </div>
+
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-4">
+	      <span class="pull-right">
+		<button type="submit" class="btn btn-primary"
+			ng-disabled="accountAddForm.$invalid"
+			x-ng-click="new_account()">确定</button>
+		<button type="button" class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+		</span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row--> 
+
+
+
+
+
+
+

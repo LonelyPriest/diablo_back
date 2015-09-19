@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  积分兑换策略
+	</div>	
+	    
+	<div class="tools">
+	  <a class="reload" href="javascript:;" x-ng-click="reload()"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table ng-table="ruleMoneyToScoreTable"
+		     class="table table-bordered table-striped
+			    table-hover table-condensed table-advanced">
+		<tbody>
+		  <tr ng-repeat="rule in $data">
+		    <td data-title="'序号'"
+			sortable="'id'">
+		      <span>{{rule.id}}</span>
+		    </td>
+		  
+		    <td data-title="'消费金额'">
+		      <span>{{rule.money}}</span>
+		    </td>
+
+		    <td data-title="'兑换积分'">
+		      <span>{{rule.produced_score}}</span>
+		    </td>
+
+		    <td data-title="'操作'">
+                      <a class="btn btn-danger btn-xs"
+			 data-dismiss="modal" data-toggle="modal"
+			 data-target="#strategyModifyModal"
+			 ng-disabled="!can_modify()"
+			 x-ng-click="edit_member(member)">修改
+			<i class="fa fa-edit"></i></a>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

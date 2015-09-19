@@ -1,0 +1,1 @@
+-define(MAX_WAIT, 16#ffffffff).

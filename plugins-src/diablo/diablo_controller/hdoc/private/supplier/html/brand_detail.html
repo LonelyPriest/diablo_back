@@ -1,0 +1,113 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  品牌详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入品牌名称"
+			 x-ng-model="filter.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control"
+			 placeholder="请输入供应商名称"
+			 x-ng-model="filter.supplier"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div> 
+	  </div> <!--END form-group-->
+	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--BEGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--EBGIN table brand-->	    
+	      <table class="table table-bordered table-striped
+			    table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>品名</th>
+		    <th>供应商</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="b in brands">
+		    <td data-title="'序号'" sortable="'id'">
+		      <span>{{b.order_id}}</span>
+		    </td>
+
+		    <td data-title="'品名'">
+		      <span>{{b.name}}</span>
+		    </td>
+
+		    <td data-title="'供应商'">
+		      <div x-ng-switch on="b.supplier_id">
+			<span x-ng-switch-when=-1>暂无</span>
+			<span x-ng-switch-default>{{b.supplier}}</span>
+		      </div>
+		    </td>
+		    
+		    <td data-title="'操作'">
+		      <a class="btn btn green btn-xs"
+			 ng-click="goto_page('#/brand/brand_new')">关联
+			<i class="glyphicon glyphicon-transfer"></i></a>
+                      <a href="" class="btn btn-danger btn-xs"
+			 x-ng-click="delete_brand(b)">删除
+			<i class="glyphicon glyphicon-trash"></i></a>
+		    </td>
+		  </tr>
+		</tbody>
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+    </div>
+  </div>
+</div> <!--END row-->
+
+
+
+
+
+
+
+
+

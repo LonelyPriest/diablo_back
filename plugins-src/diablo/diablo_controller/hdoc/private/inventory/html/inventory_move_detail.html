@@ -1,0 +1,164 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  移仓详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-12 col-md-12">
+	      <div class="input-group">
+	  	<div class="input-cont">
+	  	  <input type="text" class="form-control" placeholder="请输入款号"
+	  		 x-ng-model="filter.style_number"></input>
+	  	</div>
+	  	<span class="input-group-btn">
+	  	  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	  </div> <!--END form-group-->
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <!-- <div class="panel panel-default"> -->
+	  <!--BEGIN inventory table-->
+	  <div class="table-responsive">
+	    <table ng-table="inventoryTable"
+		   class="table table-bordered table-striped
+			  table-hover table-condensed table-advanced">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>品名</th>
+	    	  <th>款号</th>
+		  <th>类别</th>
+		  <th>颜色</th>
+		  <th>定价</th>
+	    	  <th>折扣</th>
+		  <th>年度</th>
+		  <th>季节</th>
+		  <th>性别</th>
+		  <th>尺码</th>
+		  <th>数量</th>		
+		  <th>转出地</th>
+		  <th>供应商</th>
+		  <th>转入地</th>
+		  <th>数量</th>
+		  <th>状态</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      
+	      <tbody>
+		<tr x-ng-repeat="inv in $data">
+		  <td data-title="'序号'" sortable="'id'">
+		    <span>{{inv.order_id}}</span>
+		  </td>
+
+		  <td data-title="'品名'">
+		    <span>{{inv.brand}}</span>
+		  </td>
+		  
+		  <td data-title="'款号'">
+		    <span>{{inv.style_number}}</span>
+		  </td>
+		  
+		  <td data-title="'类别'">
+		    <span>{{inv.type}}</span>
+		  </td>
+
+		  <td data-title="'颜色'">
+		    <span>{{inv.color}}</span>
+		  </td>
+		  
+		  <td data-title="'定价'">
+		    <span>{{inv.plan_price}}</span>
+		  </td>
+		  
+		  <td data-title="'折扣'">
+		    <span>{{inv.discount}}</span>
+		  </td>
+
+		  <td data-title="'年度'">
+		    <span>{{inv.year}}</span>
+		  </td>
+		  
+		  <td data-title="'季节'">
+		    <span>{{seasons[inv.season]}}</span>
+		  </td>
+
+		  <td data-title="'性别'">
+		    <span>{{sexs[inv.sex]}}</span>
+		  </td>
+		  
+		  <td data-title="'尺码'">
+		    <span>{{inv.size}}</span>
+		  </td>
+		  
+		  <td data-title="'数量'">
+		    <span>{{inv.amount}}</span>
+		  </td>
+
+		  <td class="success" data-title="'转出地'">
+		    <span>{{to_shop_name(inv.source)}}</span>
+		  </td>
+		  
+		  <td data-title="'供应商'" ng-switch on="inv.supplier">
+		    <span ng-switch-when="null">暂无</span>
+		    <span ng-switch-default>{{inv.supplier}}</span>
+		  </td>		  
+
+		  <td class="danger" data-title="'转入地'">
+		    <span>{{to_shop_name(inv.target)}}</span>
+		  </td>
+
+		  <td class="info" data-title="'数量'">
+		    <span>{{inv.amount}}</span>
+		  </td>
+
+		  <td data-title="'状态'" x-ng-switch on=inv.state>
+		    <span class="fg-red" x-ng-switch-when=0>{{move_state[inv.state]}}</span>
+		    <span x-ng-switch-default>{{move_state[inv.state]}}</span>
+		  </td>
+		  
+		  <td data-title="'操作'">
+		    <a class="btn btn-xs red-stripe btn-success fg-white"
+		       x-ng-disabled="inv.state===1"
+		       x-ng-click="do_move(inv)">确认
+		      <i class="glyphicon glyphicon-save"></i></a>
+		    <!-- <a class="btn btn-xs bg-gray fg-white" -->
+		    <!--    x-ng-disabled="true" -->
+		    <!--    x-ng-click="cancel_move(inv)">取消 -->
+		    <!--   <i class="glyphicon glyphicon-remove"></i></a> -->
+		  </td>
+		  
+		</tr>
+	      </tbody>
+	      
+	    </table> <!--END inventory table-->
+	  </div>
+
+	  <!-- </div> <\!--END panel-\-> -->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="row">
+  
+  <div x-ng-if="pbase.pstyle===1" class="print-font text-center">
+    <h4><strong>{{p_shop.name}}</strong></h4>
+    <h5><strong>{{p_shop.address}}</strong></h5>
+
+    <p>单号：{{p_sale.rsn}}&nbsp;&nbsp;&nbsp;&nbsp;客户：{{p_sale.retailer}}&nbsp;&nbsp;&nbsp;&nbsp;
+      店员：{{p_sale.employee}}&nbsp;&nbsp;&nbsp;&nbsp;日期：{{p_sale.entry_date}}</p>
+
+    <table class="table table-bordered table-striped table-condensed table-advanced">
+      <thead>
+	<tr>
+	  <th class="text-center" x-ng-if="p.p_brand">品牌</th>
+	  <th class="text-center" x-ng-if="p.style_number">款号</th>
+	  <th class="text-center" x-ng-if="p.type">类型</th>
+	  <th class="text-center" x-ng-if="p.color">颜色</th>
+	  <th class="text-center" x-ng-if="p.size" x-ng-repeat="s in [1,2,3]">
+	    {{s}}
+	  </th>
+	  <!-- <th class="text-center" x-ng-if="p.size">尺码</th> -->
+	  <th class="text-center" x-ng-if="p.price">单价</th>
+	  <th class="text-center" x-ng-if="p.discount">折扣</th>
+	  <th class="text-center" x-ng-if="p.dprice">折后价</th>
+	  <th class="text-center" x-ng-if="p.count">数量</th>
+	  <th class="text-center" x-ng-if="p.calc">小计</th>
+	</tr>
+      </thead>
+    </table>
+
+
+  </div>
+  
+  
+</div>

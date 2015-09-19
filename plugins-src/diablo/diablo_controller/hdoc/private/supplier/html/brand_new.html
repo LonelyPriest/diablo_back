@@ -1,0 +1,100 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="fa fa-home"></i>
+	<a href="javascript:;">品牌</a>
+        <i class="fa fa-angle-right"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增品牌</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="brandAddForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member Name-->
+	    <div class="form-group"
+		 ng-class="{'has-error': brandAddForm.name.$invalid
+			   && !brandAddForm.name.$pristine}">
+	      <label class="col-xs-3 col-md-3 control-label">名称</label>
+	      <div class="col-xs-4 col-md-4">
+		<input class="form-control"
+		       name="name"
+		       type="text"
+		       required
+		       placeholder="请选择品牌名称"
+		       x-ng-model="brand.brand"
+		       typeahead-editable="false"
+	  	       typeahead="b as b.name for b in
+				  unConnectBrands|filter:{name:$viewValue}|limitTo:8"></input>
+	      </div>
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      
+	      <div ng-show="brandAddForm.name.$invalid && !brandAddForm.name.$pristine">
+		<span style="color:red">品牌必需从提示框中选择</span>
+	      </div>
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group"
+		 ng-class="{'has-error': brandAddForm.supplier.$invalid
+			   && !brandAddForm.supplier.$pristine}">
+	      <label class="col-xs-3 col-md-3 control-label">供应商</label>
+	      <div class="col-xs-4 col-md-4">
+		<input class="form-control"
+		       name="supplier"
+		       type="text"
+		       required
+		       x-ng-model="brand.supplier"
+		       placeholder="请选择供应商"
+		       typeahead-editable="false"
+	  	       typeahead="s as s.name for s in
+				  suppliers|filter:{name:$viewValue}|limitTo:8"></input>
+	      </div>
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      <div ng-show="brandAddForm.supplier.$invalid && !brandAddForm.supplier.$pristine">
+		<span style="color:red">供应商必须从下拉菜单选择</span>
+	      </div>
+	    </div>
+	    	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-xs-offset-4 col-xs-8 col-md-offset-4 col-md-8">
+	      <button type="submit" class="btn blue"
+		      ng-disabled="brandAddForm.$invalid"
+		      x-ng-click="connect_brand(brand)">确认</button>
+	      <button type="button" class="btn default"
+		      data-dismiss="modal"
+		      x-ng-click="cancel()">取消</button>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+
+
+
+
+

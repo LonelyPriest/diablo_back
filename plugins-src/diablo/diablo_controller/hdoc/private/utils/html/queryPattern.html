@@ -1,0 +1,24 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="input-group">
+      <div class="input-group-btn">
+      	<button type="button" class="btn">
+      	  <i class="glyphicon glyphicon-stats fg-red"></i></button>
+      </div>
+      <select class="form-control"
+      	      x-ng-options="pattern.chinese for pattern in pattern.matches"
+      	      x-ng-model="pattern.match">
+      </select>
+      <div class="input-group-btn">
+      	<button type="button" class="btn btn-success"
+		x-ng-disabled=" !filters || increment === filter.fields.length"
+		x-ng-click="add_filter()">
+      	  <i class="glyphicon glyphicon-plus"></i></button>
+      	<button type="button" class="btn btn-danger"
+		x-ng-click="del_filter()" x-ng-disabled="increment === 0">
+      	  <i class="glyphicon glyphicon-minus"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+

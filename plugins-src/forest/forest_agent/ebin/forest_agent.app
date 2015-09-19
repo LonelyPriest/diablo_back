@@ -1,0 +1,10 @@
+{application,forest_agent,
+             [{description,"kingsoft of forest deploy"},
+              {id,"forest_agent"},
+              {vsn,"1.0.0"},
+              {modules,[forest_agent,forest_gen_connection,forest_connection,
+                        forest_agent_sup,forest_action,forest_agent_error]},
+              {registered,[]},
+              {applications,[kernel,stdlib]},
+              {mod,{forest_agent,[]}},
+              {env,[{tcp_connector,{"10.20.96.160",63552}}]}]}.

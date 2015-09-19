@@ -1,0 +1,167 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  颜色详情
+	</div>	
+
+	<div class="actions"> 
+	  <button type="button" class="btn btn-success red-stripe"
+	  	  x-ng-click="new_color()">新增
+	    <i class="glyphicon glyphicon-plus"></i></button>
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div> 
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <div class="table-responsive">
+	    <!--BEGIN table--> 
+	    <table class="table table-bordered
+			  table-striped table-hover table-condensed">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>颜色</th>
+		  <th>基础色</th> 
+		  <th>说明</th>		  	    	  
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr ng-repeat="color in colors">
+		  <td>{{color.order_id}}</td>
+		  <td>{{color.name}}</td>
+		  <td>{{color.type}}</td>
+		  <td x-ng-switch on="color.remark">
+		      <span x-ng-switch-when="NULL">无</span>
+		      <span x-ng-switch-default>{{color.remark}}</span>
+		  </td>
+		  <td class="col-md-2">
+		    <span>
+		      <!-- <button type="button" class="btn btn-success btn-xs" -->
+		      <!-- 	      ng-click="new_color()">新增 -->
+		      <!-- 	<i class="glyphicon glyphicon-plus"></i></button> -->
+		      <button type="button" class="btn btn-warning btn-xs red-stripe"
+		    	      ng-click="modify_color(color)">修改
+			<i class="glyphicon glyphicon-edit"></i></button>
+		      <button class="btn btn-danger btn-xs green-stripe"
+		    	      x-ng-click="delete_color(color)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </span>
+		  </td>		  
+		</tr>
+		
+		<!-- <tr> -->
+		<!--   <td></td> -->
+		<!--   <td></td> -->
+		<!--   <td></td> -->
+		<!--   <td></td> -->
+		<!--   <td> -->
+		<!--     <button type="button" class="btn btn-success btn-xs" -->
+		<!--     	    ng-click="new_color()">新增 -->
+		<!--       <i class="glyphicon glyphicon-plus"></i></button> -->
+		<!--   </td> -->
+		<!-- </tr> -->
+	      </tbody>
+	    </table> <!--END table-->
+	  </div> <!--END table-responsive-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->      
+    </div> <!--END box purle-->
+  </div><!--END col-md-12-->
+</div>
+
+<script type="text/ng-template" id="new-color.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title"><span class="label label-sm label-primary">新增颜色</span></h4>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" name="newColorForm" novalidate>
+      <div class="form-body">
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>名称</span>
+	      <input class="form-control"
+		     name="name"
+		     type="text" 
+		     required
+		     placeholder="请输入名称"
+		     x-ng-model="params.color.name"
+		     x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]{1,3}$/"></input>
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="newColorForm.name.$invalid &&
+			 !newColorForm.name.$pristine">
+	    <span class="fg-red">汉字，字母，下划线或数字，不超过3个字符</span>
+	  </div>
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>类别</span>
+	      <select class="form-control"
+	      	      x-ng-model="params.color.type"
+	      	      x-ng-options="t as t.name for t in params.color.types"
+	      	      x-ng-init="params.color.type=params.color.types[0]">
+	      </select> 
+	  </div>
+	</div>
+	
+	<div class="form-group">
+	  <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>备注</span>
+	      <input class="form-control"
+		     name="remark"
+		     type="text" 
+		     placeholder="请输入备注"
+		     x-ng-model="params.color.remark"
+		     x-ng-pattern="/^[A-Za-z0-9-\u4e00-\u9fa5]+$/"></input>
+	  </div>
+	  <div ng-show="newColorForm.remark.$invalid &&
+			 ! newColorForm.remark.$pristine">
+	    <span class="fg-red">只能是汉字，字母，下划组或数字</span>
+	  </div>
+	</div>
+	
+      </div>
+    </form>
+  </div>
+
+  <!--BEGIN modal-footer-->
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="newColorForm.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+  <!--END modal-footer-->
+</script>
+
+
+

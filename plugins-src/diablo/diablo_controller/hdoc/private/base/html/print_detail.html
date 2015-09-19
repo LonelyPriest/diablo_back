@@ -1,0 +1,391 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  打印选项设置
+	</div>	
+
+	<div class="actions">
+	    <button type="button" class="btn btn-success red-stripe"
+	  	  x-ng-click="add_setting()">新增
+	      <i class="glyphicon glyphicon-plus"></i></button>
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh(select.shop)">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div> 
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="alert alert-warning" role="alert">
+	    <p>
+	      <span class="fg-red">注意：106列以上打印机建议尺码横打，其它建议尺码竖打</span>
+	    </p>
+	  </div>
+
+	  <div class="row form-group"> 
+	    <div class="col-sm-12 col-md-12">
+	      <select class="form-control"
+		      x-ng-model="select.shop"
+		      x-ng-change="select.setting=shop_setting(select.shop)"
+		      x-ng-options="s as s.name for s
+				    in shops|filter:$viewValue|limitTo:8"> 
+		</select> 
+	    </div>
+	    
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped table-hover
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>名称</th>
+		    <th>系统取值</th>
+		    <th>备注</th>
+		    <th>日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="s in select.setting">
+		    <td>{{s.order_id}}</td> 
+		    <td>{{s.cname}}</td>
+
+		    <td x-ng-switch on="s.ename">
+		      <span ng-switch-when="ptype">
+			{{print_types[s.value].cname}}
+		      </span>
+		      
+		      <span ng-switch-when="ptable">
+			{{yes_no[s.value].cname}} 
+		      </span>
+
+		      <span ng-switch-when="pretailer">
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		      <span ng-switch-when="pround">
+			{{yes_no[s.value].cname}}
+		      </span>
+		      
+		      <span ng-switch-when="ptrace_price">
+			{{yes_no[s.value].cname}}
+		      </span>
+		      
+		      <!--print format-->
+		      <span ng-switch-when="pformat">
+			<span>{{print_formats[s.value].cname}}</span> 
+		      </span>
+
+		      <span ng-switch-when="pim_print">
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		      <span ng-switch-when="qtypeahead">
+			{{prompt_types[s.value].cname}}
+		      </span>
+
+		      <!--default--> 
+		      <span ng-switch-default>{{s.value}}</span>
+		    </td>
+
+		    <td x-ng-switch on="s.remark">
+		      <span ng-switch-when="">暂无</span>
+		      <span ng-switch-default>{{s.remark}}</span>
+		    </td> 
+		    
+		    <td>{{s.entry_date}}</td>
+
+		    <td class="col-md-2"> 
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_setting(s)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button> 
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="add-setting.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">新增打印选项</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+  <div class="modal-body">
+    <form class="form-horizontal" name="pForm" novalidate>
+      <div class="form-body">
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>名称</span>
+	    <select class="form-control" required
+		    name="name"
+		    x-ng-model="params.setting.name"
+		    x-ng-options="n as n.cname for n in params.names">
+	    </select> 
+	  </div> 
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>取值</span>
+	    <span x-ng-switch on="params.setting.name.ename"> 
+	      <input x-ng-switch-when="phone1"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile">
+	      </input>
+	      <input x-ng-switch-when="phone2"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile">
+	      </input>
+	      <input x-ng-switch-default
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.comment">
+	      </input>
+	    </span>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
+	    <span class="fg-red">联系方式只能是手机或座机，备注不能包含特殊字符</span>
+	  </div>
+	</div> 
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-disabled="pForm.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning"
+	    x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="edit-setting.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">打印选项编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+  <div class="modal-body">
+    <form class="form-horizontal" name="pForm" novalidate>
+      <div class="form-body">
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>名称</span>
+	    <input type="text" readonly
+		   class="form-control"
+		   required
+		   x-ng-model="params.setting.cname"></input> 
+	  </div> 
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>取值</span>
+	    <span x-ng-switch on="params.setting.ename">
+	      
+	      <select x-ng-switch-when="ptype"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.ptypes"
+		      x-ng-init="params.setting.value=params.setting.ptypes[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="pformat"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.pformats"
+		      x-ng-init="params.setting.value=params.setting.pformats[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="ptable"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="pretailer"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="pround"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="ptrace_price"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="pim_print"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="y as y.cname for y in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <input x-ng-switch-when="qtime_start" type="text" class="form-control"
+		     placeholder="年-月-日"
+		     datepicker-popup="yyyy/MM/dd"
+		     is-open="params.qtime.isOpened"
+		     close-text="关闭"
+		     clear-text="清除"
+		     current-text="今天"
+		     show-weeks="false"
+		     x-ng-model="params.setting.value"></input>
+	      
+	      
+	      <select x-ng-switch-when="qtime_length"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.cname for t in params.setting.time_length",
+		      x-ng-init="params.setting.value=params.init_v">
+	      </select>
+
+	      <select x-ng-switch-when="qtypeahead"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="q as q.cname for q in params.setting.prompt_types"
+		      x-ng-init="params.setting.value=params.setting.prompt_types[params.setting.value]">
+	      </select>
+	      
+
+	      <input x-ng-switch-when="pum" type="text"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="/^\d+?/">
+	      </input> 
+	      
+	      <input x-ng-switch-when="phone1" type="text"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile">
+	      </input> 
+	      <input x-ng-switch-when="phone2" type="text"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile">
+	      </input>
+	      
+	      <input x-ng-switch-default
+		     class="form-control" type="text"
+		     required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.comment">
+	      </input>
+	    </span>
+	    
+	    <span x-ng-if="params.setting.ename==='qtime_start'"
+		  <span class="input-group-btn">
+		  <button type="button"
+			  class="btn btn-default"
+			  x-ng-click="params.qtime.isOpened=true;params.qtime.open_calendar($event)">
+		    <i class="glyphicon glyphicon-calendar"></i></button> 
+	    </span>
+		  
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	    
+	  </div>
+	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
+	    <span class="fg-red">
+	      0：打印，1：不打印； 
+	      联系方式只能是手机或座机，备注不能包含特殊字符</span>
+	  </div>
+	</div>
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-disabled="pForm.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning"
+	    x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

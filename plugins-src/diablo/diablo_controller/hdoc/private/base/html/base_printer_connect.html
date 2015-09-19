@@ -1,0 +1,167 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-sm-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">打印机</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">打印机绑定</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="printerForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">品牌</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <select class="form-control"
+			  x-ng-model="printer.brand"
+			  x-ng-options="b as b.remark for b in brands"></select>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div> 
+	      </div> 
+	    </div>
+
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">型号</label>
+	      <div class="col-sm-6 col-md-6">
+		<input class="form-control" type="text" readonly 
+		       x-ng-model="printer.brand.model"></input>
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">打印列数</label>
+	      <div class="col-sm-6 col-md-6">
+	    	<div class="input-group">
+	    	  <select class="form-control"
+	    		  x-ng-model="printer.column"
+	    		  x-ng-options="w for w in paper_columns"></select>
+	    	  <span class="input-group-addon bg-white fg-red">*</span>
+	    	</div>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">打印高度</label>
+	      <div class="col-sm-6 col-md-6">
+	    	<div class="input-group">
+	    	  <select class="form-control"
+	    		  x-ng-model="printer.height"
+	    		  x-ng-options="h for h in paper_heights"></select>
+	    	  <span class="input-group-addon bg-white fg-red">*</span>
+	    	</div>
+	      </div>
+	    </div>
+	    
+	    
+	    <!--Name-->
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">设备号</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="sn"
+			 required
+			 placeholder="请输入打印机序列号"
+			 x-ng-model="printer.sn"
+			 x-ng-pattern="/^[A-Za-z0-9\-]+$/"
+			 x-ng-maxlength="16"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div>
+	      </div>
+	      <div ng-show="printerForm.sn.$error.maxlength
+			    || !printerForm.sn.$pristine && printerForm.sn.$invalid">
+		<span class="fg-red">字母或数字，不超过16个字符</span>
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">接入码</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="key"
+			 required
+			 placeholder="请输入打印机接入码"
+			 x-ng-pattern="/^[A-Za-z0-9]+$/"
+			 x-ng-maxlength="16"
+			 x-ng-model="printer.key"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div>
+	      </div>
+	      <div ng-show="printerForm.key.$error.maxlength
+			    || !printerForm.key.$pristine && printerForm.key.$invalid">
+		<span class="fg-red">字母或数字，不超过16个字符</span>
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">云打印中心</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <select class="form-control"
+			  x-ng-model="printer.server"
+			  x-ng-options="s as s.name for s in servers"></select>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div>
+	      </div>
+	    </div> 
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">店铺或仓库</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 required
+			 class="form-control"
+			 name="shop"
+			 placeholder="请选择店铺或仓库"
+			 x-ng-model="printer.shop"
+			 typeahead-editable="false"
+			 typeahead="s as s.name for s in
+				    shops|filter:$viewValue|limitTo:8"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="!printerForm.shop.$pristine && printerForm.shop.$invalid">
+		<span class="fg-red">店铺必须从提示列表中选择</span>
+	      </div> 
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button class="btn btn-primary"
+			x-ng-disabled="printerForm.$invalid"
+			x-ng-click="new_printer()">确认</button>
+		<button class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->

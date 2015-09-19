@@ -1,0 +1,86 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+	<i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">角色</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增用户角色</a>
+      </li>
+    </ul> 
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="roleAddForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member SN-->
+	    <div class="form-group">
+	      <label class="col-md-3 control-label">名称</label>
+	      <div class="col-md-6">
+		<input class="form-control"
+		       type="text"
+		       name="rolename"
+		       required
+		       x-ng-minlength="4"
+		       x-ng-maxlength="16"
+		       placeholder="请输入角色名称，只能是汉字，数字或字母"
+		       x-ng-model="role.name"></input> 
+	      </div>
+	      <span class="fg-red">*</span>
+	      <div ng-show="roleAddForm.rolename.$error.minlength
+			      || roleAddForm.rolename.$error.maxlength">
+		  <span style="color:red">名称太短，请输入4-16位名称</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-md-3 control-label">权限</label>
+	      <div class="col-md-6">
+		<div x-ng-show="init_tree">
+		  <role-tree ng-model="userRoleTree"></role-tree>
+		</div>
+	      </div>
+	      <div style="color:red">*</div>
+	      <div x-ng-show="empty_role_right">
+		<span style="color:red">权限不能为空</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-md-3 control-label">描述</label>
+	      <div class="col-md-6">
+		<textarea class="form-control" x-ng-model="role.desc"></textarea>
+	      </div>
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button type="submit" class="btn btn-primary"
+			ng-disabled="roleAddForm.$invalid || empty_role_right"
+			x-ng-click="new_role()">确认</button>
+		<button type="button" class="btn btn-warning"
+			x-ng-click="cancel_new_role()">取消</button>
+	      </span>
+	    </div> 
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->

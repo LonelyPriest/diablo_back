@@ -1,0 +1,11 @@
+{application,knife,
+             [{description,"kingsoft knife"},
+              {id,"knife"},
+              {vsn,"1.0.0"},
+              {modules,[knife,knife_error_logger_file_h,knife_file,
+                        knife_sasl_report_file_h,knife_log,knife_plugins,
+                        knife_plugins_main,knife_control_main,knife_sup]},
+              {registered,[knife,knife_log]},
+              {applications,[kernel,stdlib]},
+              {mod,{knife,[]}},
+              {env,[{log_levels,[{default,debug}]}]}]}.

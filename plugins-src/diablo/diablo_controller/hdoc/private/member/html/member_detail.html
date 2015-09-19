@@ -1,0 +1,273 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>
+	  会员详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<div class="table-toolbar">
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    
+	    <div class="col-xs-4 col-md-4">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入手机号码"
+			 x-ng-model="filters.mobile"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-xs-4 col-md-4">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入用户姓名"
+			 x-ng-model="filters.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i></button>
+		</span>
+	      </div>
+	    </div>
+	    
+	    <div class="col-xs-4 col-md-4">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入会员号"
+			 x-ng-model="filters.number"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	    
+	    
+	  </div> <!--END form-group-->
+	  
+	  <!-- <span class="col-md-8"> -->
+	  <!-- 	<input type="text" class="form-control" placeholder="请输入用户姓名" -->
+	  <!-- 	       x-ng-model="filters.name" -->
+	  <!-- 	       typeahead="member as member.name for member in members | filter:{name:$viewValue} | limitTo:8"></input> -->
+	  <!-- </span> -->
+	  
+	</div>
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	    <!--BEGIN member table--> 
+	      <table ng-table="memberTable"
+		     class="table table-bordered table-responsive
+			    table-striped table-hover table-condensed table-advanced">
+		<tbody>
+		  <tr ng-repeat="member in $data">
+		    <td data-title="'序号'" sortable="'id'">
+		      <span>{{member.id}}</span>
+		    </td>
+		    
+		    <td data-title="'会员编号'">
+		      <span>{{member.number}}</span>
+		    </td>
+		    
+		    <td data-title="'姓名'">
+		      <span>{{member.name}}</span>
+		    </td>
+		    
+		    <td data-title="'性别'" ng-switch on={{member.sex}}>
+                      <span ng-switch-when=0>女</span>
+		      <span ng-switch-when=1>男</span>
+		    </td>
+
+		    <td data-title="'生日'">
+                      <span>{{member.birthday}}</span>
+		    </td>
+
+		    <td data-title="'手机号码'">
+                      <span>{{member.mobile}}</span>
+		    </td>
+		    
+		    <td data-title="'加入日期'">
+                      <span>{{member.entry_date}}</span>
+		    </td>
+
+		    <td data-title="'级别'" ng-switch on={{member.sla}}>
+                      <span ng-switch-when=0>普通</span>
+		      <span ng-switch-when=1>黄金</span>
+		      <span ng-switch-when=2>钻石</span>
+		    </td>
+
+		    <td data-title="'总积分'">
+                      <span>{{member.total_score}}</span>
+		    </td>
+
+		    <td data-title="'已消费积分'">
+                      <span>{{member.exchange_score}}</span>
+		    </td>
+		    
+		    <td data-title="'剩余积分'">
+                      <span>{{member.total_score - member.exchange_score}}</span>
+		    </td>
+
+		    
+		    <td data-title="'累计消费金额'">
+                      <span>{{member.total_balance}}</span>
+		    </td>
+		    
+		    <td data-title="'会员操作'">
+		      <a class="btn btn green btn-xs"
+			 ng-disabled="!can_new_member()"
+			 ng-click="goto_page('#/member/new_member')">新增
+			<i class="fa fa-pencil"></i></a>
+                      <a class="btn btn-primary btn-xs"
+			 data-dismiss="modal" data-toggle="modal"
+			 data-target="#memberEditModal"
+			 ng-disabled="!can_modify_member()"
+			 x-ng-click="edit_member(member)">修改
+			<i class="fa fa-edit"></i></a>
+                      <a href="" class="btn btn-danger btn-xs"
+			 data-dismiss="modal" data-toggle="modal"
+			 data-target="#memberDeleteSubmit"
+			 ng-disabled="!can_delete_member()"
+			 x-ng-click="set_delete_member(member)">删除
+			<i class="fa fa-trash-o"></i></a>
+		      <a href="" class="btn btn-info btn-xs"
+			 ng-click="goto_page('#/member/consumed_score/' + member.number)">兑换积分</a>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+	      </table> <!--END VM table-->
+	    </div>
+	      
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<div id="memberEditModal" class="modal fade" tabindex="-1"
+     data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h4 class="modal-title">会员编辑</h4>
+      </div>
+      
+      <!--BEGIN modal body-->
+      <div class="modal-body">
+	<!--BEING form-->
+	<form class="form-horizontal" name="memberEditForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    
+            <div class="form-group">
+              <label class="col-md-2 control-label">会员编号</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+                       data-ng-model="selectedEditMember.number"></input>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-2 control-label">姓名</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+                       data-ng-model="selectedEditMember.name"></input>
+              </div>
+            </div>
+
+	    <div class="form-group">
+              <label class="col-md-2 control-label">总积分</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+		       data-ng-model="selectedEditMember.total_score"></input>
+              </div>
+            </div>
+
+	    <div class="form-group">
+              <label class="col-md-2 control-label">已消费积分</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+		       data-ng-model="selectedEditMember.exchange_score"></input>
+              </div>
+            </div>
+
+	    <div class="form-group">
+              <label class="col-md-2 control-label">手机号码</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control"
+		       data-ng-model="selectedEditMember.mobile"></input>
+              </div>
+            </div>
+	    
+	  </div><!--END form body-->
+	</form><!--END form-->
+      </div><!--END modal body-->
+
+      <!--BEGIN modal-footer-->
+      <div class="modal-footer">
+	<div class="form-action fluid">
+          <button type="button" class="btn blue"
+		  data-toggle="modal" data-target="#memberEditResponse"
+		  x-ng-click="edit_member_request(selectedEditMember)">确认</button>
+          <button type="button" class="btn default" data-dismiss="modal">取消</button>
+	</div>
+      </div> <!--END modal-footer-->
+    </div> <!--END modal-content-->
+  </div> <!--END modal-dialog-->
+</div>
+
+<response-notify-dialog
+   response-dialog-id="memberEditResponse"
+   success-title="修改会员成功"
+   error-title="修改会员失败"
+   success-info={{response_success_info}}
+   error-info={{response_error_info}}
+   response="editMemberResponse()"
+   after-close="afterResponse()">
+</response-notify-dialog>
+
+<subbmit-notify-dialog
+   dialog-id="memberDeleteSubmit"
+   notify-title="删除会员"
+   notify-body="确认要删除该会员吗？"
+   target="#memberDeleteResponse"
+   subbmit-callback="member_delete_submit()">
+</subbmit-notify-dialog>
+
+<response-notify-dialog
+   response-dialog-id="memberDeleteResponse"
+   success-title="删除会员成功"
+   error-title="删除会员失败"
+   success-info={{response_success_delete_info}}
+   error-info={{response_error_delete_info}}
+   response="delete_response()"
+   after-close="after_delete_response()">
+</response-notify-dialog>
+
+
+
+
+

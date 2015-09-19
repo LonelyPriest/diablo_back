@@ -1,0 +1,313 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  零售商详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="new_retailer()">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="do_refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-12 col-ms-12 col-md-12">
+	      <div class="input-group">
+		<span class="input-group-addon bg-green">
+		  <i class="glyphicon glyphicon-hand-right fg-white"></i>
+		</span>
+		<input
+		   class="form-control"
+		   placeholder="支持名称/省/市/手机/地址查询"
+		   typeahead-editable="false"
+		   typeahead-on-select="on_select_retailer($item, $model, $label)"
+		   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20"
+		   x-ng-model="filter.name"></input>
+	      </div>
+	    </div>
+
+	    <!-- <div class="col-xs-6 col-md-6"> -->
+	    <!--   <div class="input-group"> -->
+	    <!-- 	<span class="input-group-addon bg-green"> -->
+	    <!-- 	  <i class="glyphicon glyphicon-hand-right fg-white"></i> -->
+	    <!-- 	</span> -->
+	    <!-- 	  <input type="text" class="form-control" placeholder="请输入零售商联系方式" -->
+	    <!-- 		 x-ng-model="filter.phone"></input> -->
+	    <!--   </div> -->
+	    <!-- </div> -->
+	    
+	  </div> <!--END form-group-->	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>名称</th>
+		    <th class="danger">欠款</th>
+		    <th>联系方式</th>
+		    <th>所在省（直辖市）</th>
+		    <th>所在城市市</th>
+		    <th>联系地址</th>
+		    <th>日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="r in filter_retailers">
+		    <td>{{r.order_id}}</td>
+		    <td>{{r.name}}</td>
+		    <td>{{r.balance}}</td>
+		    <td>{{r.mobile}}</td>
+		    <td>
+		      <div x-ng-switch on="r.pid">
+			<span x-ng-switch-when=-1>暂无</span>
+			<span x-ng-switch-default>{{r.province.name}}</span>
+		      </div>
+		    </td>
+		    <td>
+		      <div x-ng-switch on="r.cid">
+			<span x-ng-switch-when=-1>暂无</span>
+			<span x-ng-switch-default>{{r.city.name}}</span>
+		      </div>
+		    </td>
+		    <td>{{r.address}}</td>
+		    <td>{{r.entry_date}}</td>
+
+		    <td>
+		      <button class="btn btn-primary btn-xs red-stripe"
+			      x-ng-click="trans_info(r)">对帐
+			<i class="glyphicon glyphicon-leaf"></i></button>
+		      
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_retailer(r)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button>
+		      
+                      <button href="" class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_retailer(r)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </td>
+		  </tr>
+
+		  <tr x-ng-if="total_items!==0" class="bg-white">
+		    <td colspan="2"></td>
+		    <td class="fg-red">{{total_balance}}</td> 
+		    <td colspan="6"></td>
+		  </tr>
+		  
+		</tbody>
+
+		<tfoot>
+		  <tr> 
+		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
+		      <span class="pagination">
+			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
+			  共 {{total_items}} 项</span>
+		      </span>
+		      <pagination
+			 class="pull-right"
+			 total-items="total_items"
+			 items-per-page="items_perpage"
+			 num-pages="num_pages"
+			 max-size="max_page_size"
+			 boundary-links="true"
+			 previous-text="&lsaquo;" next-text="&rsaquo;"
+			 first-text="&laquo;" last-text="&raquo;"
+			 x-ng-model="current_page"
+			 x-ng-change="page_changed(current_page)"></pagination>
+		    </td>
+		  </tr>
+		</tfoot>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="update-wretailer.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title"><span class="label label-sm label-primary">零售商编辑</span></h4>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" name="rForm" novalidate> 
+      <div class="form-body">
+	<!--Name-->
+	<div class="form-group"> 
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>客户名称</span>
+	    <div x-ng-class="{'has-error': rForm.name.$invalid
+			     && !rForm.name.$pristine
+			     || params.check_exist(params.retailer)}">
+	      <input type="text"
+		     class="form-control"
+		     name="name"
+		     required
+		     placeholder="请输入零售商名称"
+		     x-ng-model="params.retailer.name"
+		     x-ng-pattern="params.pattern.name_address"></input>
+	    </div>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="params.check_exist(params.retailer)">
+	    <span class="fg-red">客户名称已存在，请重新输入</span>
+	  </div> 
+	  <div ng-show="rForm.name.$invalid && !rForm.name.$pristine">
+	    <span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	  </div> 
+	</div> 
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>帐户欠款</span>
+	    <input type="text" required
+		   class="form-control"
+		   name="balance"
+		   placeholder="默认为0，支持两位小数"
+		   x-ng-model="params.retailer.balance"
+		   x-ng-pattern="params.pattern.decimal_2"></input>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="rForm.balance.$invalid && !rForm.balance.$pristine">
+	    <span class="fg-red">请输入正确的数字，支持两位小数</span>
+	  </div> 
+	</div>
+
+	<!--mobile-->
+	<div class="form-group"> 
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>联系方式</span>
+	    <div x-ng-class="{'has-error': rForm.mobile.$invalid
+			     && !rForm.mobile.$pristine}">
+	      <input class="form-control"
+		     type="tel"
+		     name="mobile"
+		     required
+		     placeholder="请输入电话或手机号码"
+		     class="form-control"
+		     x-ng-model="params.retailer.mobile"
+		     x-ng-pattern="params.pattern.tel_mobile"></input>
+	    </div>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="rForm.mobile.$invalid && !rForm.mobile.$pristine">
+	    <span class="fg-red">请输入正确的电话或手机号码</span>
+	  </div>
+	</div> 
+
+	<!--province-->
+	<div class="form-group"> 
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>省/直辖市</span>
+	    <div x-ng-class="{'has-error': rForm.province.$invalid
+			     && !rForm.province.$pristine}">
+	      <input type="text"
+		     class="form-control"
+		     name="province"
+		     placeholder="请选择省份或直辖市" 
+		     x-ng-model="params.retailer.province"
+		     typeahead-editable="false"
+		     typeahead="p as p.name for p in
+				params.provinces|filter:$viewValue|limitTo:8"></input>
+	    </div>
+	  </div>
+	  <div x-ng-show="rForm.province.$invalid && !rForm.province.$pristine">
+	    <span class="fg-red">省或直辖市只能从列表选择</span>
+	  </div>
+	</div> 
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>所在城市</span>
+	    <input type="text"
+		   class="form-control"
+		   name="city" 
+		   placeholder="请输入省所对应的城市（直辖市无需输入）"
+		   x-ng-model="params.retailer.city"
+		   typeahead="c as c.name for c in
+			      params.cities|filter:$viewValue|limitTo:8"></input>
+	  </div> 
+	  <div ng-show="!rForm.city.$pristine && !params.check_city(params.retailer.city)">
+	    <span class="fg-red">请输入中文字符串</span>
+	  </div>
+	</div>
+
+	<div class="form-group"> 
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-hand-right fg-red"></i>联系地址</span>
+	      <div x-ng-class="{'has-error': rForm.address.$invalid
+			       && !rForm.address.$pristine}">
+		<input type="text"
+		       class="form-control"
+		       name="address"
+		       required
+		       placeholder="请输入您的联系地址"
+		       x-ng-model="params.retailer.address"
+		       x-ng-pattern="params.pattern.name_address"></input>
+	      </div>
+	      <span class="input-group-addon bg-white fg-red">*</span> 
+	    </div>
+	    
+	  <div ng-show="rForm.address.$invalid && !rForm.address.$pristine">
+	    <span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	  </div> 
+	</div>
+	
+      </div> 
+    </form>
+  </div>
+
+  <div class="modal-footer"> 
+    <button class="btn btn-primary"
+	    x-ng-disabled="params.check_same(params.retailer)
+			   || rForm.$invalid
+			   || params.check_exist(params.retailer)
+			   || !params.check_city(params.retailer.city)"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+</script>

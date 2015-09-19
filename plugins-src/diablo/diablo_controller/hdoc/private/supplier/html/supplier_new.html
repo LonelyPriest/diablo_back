@@ -1,0 +1,136 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="fa fa-home"></i>
+	<a href="javascript:;">供应商</a>
+        <i class="fa fa-angle-right"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增供应商</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="supplierAddForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member Name-->
+	    <div class="form-group">
+	      <label class="col-md-3 control-label">名称</label>
+	      <div class="col-md-4">
+		<input type="text"
+		       class="form-control"
+		       name="name"
+		       required
+		       placeholder="请输入供应商名称"
+		       x-ng-model="supplier.name"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="8"></input>		    
+	      </div>
+	      
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      <div ng-show="supplierAddForm.name.$error.minlength">
+		<span style="color:red">供应商名称太短，请输入2-8个字符</span>
+	      </div>
+	      <div ng-show="supplierAddForm.name.$error.maxlength">
+		<span style="color:red">供应商名称太长，请输入2-8个字符</span>
+	      </div>
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group"
+		 ng-class="{'has-error': supplierAddForm.mobile.$invalid
+			   && !supplierAddForm.mobile.$pristine}">
+	      <label class="col-md-3 control-label">联系方式</label>
+	      <div class="col-md-4">
+		<input type="text"
+		       name="mobile"
+		       required
+		       ng-pattern="/^\d{3,4}\d{7,8}$/"
+		       placeholder="请输入电话或手机号码"
+		       class="form-control"
+		       x-ng-model="supplier.mobile"></input>
+	      </div>
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      <div ng-show="supplierAddForm.mobile.$invalid && !supplierAddForm.mobile.$pristine">
+		<span style="color:red">请输入正确的电话或手机号码</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-md-3 control-label">联系地址</label>
+	      <div class="col-md-4">
+		<input type="text"
+		       class="form-control"
+		       name="address"
+		       required
+		       placeholder="请输入您的联系地址"
+		       x-ng-model="supplier.address"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="20"></input>		    
+	      </div>
+	      
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      <div ng-show="supplierAddForm.address.$error.minlength">
+		<span style="color:red">名称太短，请输入2-20个字符</span>
+	      </div>
+	      <div ng-show="supplierAddForm.address.$error.maxlength">
+		<span style="color:red">名称太长，请输入2-20个字符</span>
+	      </div>
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-9">
+	      <button type="submit" class="btn blue"
+		      ng-disabled="supplierAddForm.$invalid"
+		      x-ng-click="new_supplier()"
+		      data-dismiss="modal" data-toggle="modal"
+		      data-target="#supplierAddResponse">提交</button>
+	      <button type="button" class="btn default"
+		      data-dismiss="modal"
+		      x-ng-click="cancel()">取消</button>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+<response-notify-dialog
+   response-dialog-id="supplierAddResponse"
+   success-title="新增供应商成功"
+   error-title="新增供应商失败"
+   success-info={{response_success_info}}
+   error-info={{response_error_info}}
+   response="newSupplierResponse()"
+   after-close="afterResponse()">
+</response-notify-dialog>
+
+
+
+
+
+
+
+

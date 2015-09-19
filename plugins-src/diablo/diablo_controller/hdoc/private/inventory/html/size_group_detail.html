@@ -1,0 +1,343 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-th-list"></i>
+	  尺码组详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;" x-ng-click="refresh()"></a>
+	</div>
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <div class="table-responsive">
+	    <!--BEGIN table--> 
+	    <table class="table table-bordered
+			  table-striped table-hover table-condensed">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>名称</th>
+		  <th>尺码I</th>
+	    	  <th>尺码II</th>
+		  <th>尺码III</th>
+		  <th>尺码IV</th>
+		  <th>尺码V</th>
+		  <th >尺码VI</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr ng-repeat="group in size_group">
+		  <td>{{group.order_id}}</td>
+		  <td>{{group.name}}</td>
+		  
+		  <td data-title="'尺码I'">
+		    <span ng-if="!group.$editable">{{group.si}}</span>
+		    <form name="form.si" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.si.name.$invalid
+				     && !form.si.name.$pristine}">
+			<input class="form-control table-select" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.si"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式S/26" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码II'">
+		    <span ng-if="!group.$editable">{{group.sii}}</span>
+		    <form name="form.sii" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.sii.name.$invalid
+				     && !form.sii.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.sii"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式M/27" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码I'">
+		    <span ng-if="!group.$editable">{{group.siii}}</span>
+		    <form name="form.siii" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.siii.name.$invalid
+				     && !form.siii.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.siii"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式L/28" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码IV'">
+		    <span ng-if="!group.$editable">{{group.siv}}</span>
+		    <form name="form.siv" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.siv.name.$invalid
+				     && !form.siv.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.siv"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XL/29" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码V'">
+		    <span ng-if="!group.$editable">{{group.sv}}</span>
+		    <form name="form.sv" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.sv.name.$invalid
+				     && !form.sv.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.sv"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XXL/30" </input>
+			       </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码VI'">
+		    <span ng-if="!group.$editable">{{group.svi}}</span>
+		    <form name="form.svi" ng-if="group.$editable">
+		      <div ng-class="{'has-error':
+				     form.svi.name.$invalid
+				     && !form.svi.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="modify_group.svi"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XXXL/31" </input>
+			       </div>
+		    </form>
+		  </td>
+		  
+		  
+		  <td data-title="'操作'">
+		    <span ng-if="group.$editable && !group.$new">
+		      <button class="btn btn-info btn-xs"
+			      ng-disabled="form.si.$invalid
+					   || form.sii.$invalid
+					   || form.siii.$invalid
+					   || form.siv.$invalid
+					   || form.sv.$invalid
+					   || form.svi.$invalid"
+		    	      ng-click="do_modify(group)">保存
+			<i class="glyphicon glyphicon-saved"></i></button>
+		      <button class="btn btn-primary btn-xs"
+			      ng-click="group.$editable=false">取消
+			<i class="glyphicon glyphicon-remove"></i></button>
+		    </span>
+		    
+		    <span ng-if="!group.$editable">
+		      <button type="button" class="btn btn-warning btn-xs"
+		    	      ng-click="group.$editable=true; pre_modify(group)">修改
+			<i class="glyphicon glyphicon-edit"></i></button>
+		      <button class="btn red btn-xs"
+		    	      x-ng-click="del_group(group)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </span>
+		  </td>
+		  
+		</tr>
+
+		<!--new size group-->
+		<tr>
+		  <td data-title="'序号'"></td>
+
+		  <td>
+		    <form name="form.name" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error': form.name.$invalid
+				     && !form.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.name"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="尺码组名称" </input>
+		      </div>
+		    </form>
+		  </td>
+		  
+		  <td data-title="'尺码I'">
+		    <form name="form.si" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.si.name.$invalid
+				     && !form.si.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.si"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式S/26" </input>
+		      </div>
+		    </form>
+		  </td>
+
+
+		  <td data-title="'尺码II'">
+		    <form name="form.sii" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.sii.name.$invalid
+				     && !form.sii.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.sii"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式M/27" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码I'">
+		    <form name="form.siii" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.siii.name.$invalid
+				     && !form.siii.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.siii"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式L/28" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码IV'">
+		    <form name="form.siv" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.siv.name.$invalid
+				     && !form.siv.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.siv"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XL/29" </input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码V'">
+		    <form name="form.sv" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.sv.name.$invalid
+				     && !form.sv.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.sv"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XXL/30" </input>
+			       </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'尺码VI'">
+		    <form name="form.svi" ng-if="group_new.$editable">
+		      <div ng-class="{'has-error':
+				     form.svi.name.$invalid
+				     && !form.svi.name.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       name="name"
+			       x-ng-maxlength="10"
+			       x-ng-model="group_new.svi"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="格式XXXL/31" </input>
+			       </div>
+		    </form>
+		  </td>
+		  
+		  
+		  <td class="col-md-2" data-title="'操作'">
+		    <span ng-if="group_new.$new && !group_new.$editable">
+		      <button class="btn green btn-xs"
+			      ng-click="group_new.$new=false; group_new.$editable=true">新增
+			<i class="glyphicon glyphicon-plus"></i></button>
+		    </span>
+		    
+		    <span ng-if="!group_new.$new && group_new.$editable">
+		      <button class="btn btn-info btn-xs"
+			      ng-disabled="form.name.$invalid
+					   || form.si.$invalid
+					   || form.sii.$invalid
+					   || form.siii.$invalid
+					   || form.siv.$invalid
+					   || form.sv.$invalid
+					   || form.svi.$invalid"
+		    	      ng-click="add_group(group_new)">保存
+			<i class="glyphicon glyphicon-saved"></i></button>
+		      <button class="btn btn-primary btn-xs"
+			      ng-click="group_new.$new=true; group_new.$editable=false">取消
+			<i class="glyphicon glyphicon-remove"></i></button>
+		    </span>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table> <!--END table-->
+	  </div> <!--END table-responsive-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->      
+    </div> <!--END box purle-->
+  </div><!--END col-md-12-->
+</div>
+
+
+
+
+
+
+

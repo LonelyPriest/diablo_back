@@ -1,0 +1,266 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  尺码组详情
+	</div>	
+
+	<div class="actions"> 
+	  <button type="button" class="btn btn-success red-stripe"
+	  	  x-ng-click="new_size()">新增
+	    <i class="glyphicon glyphicon-plus"></i></button>
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <div class="table-responsive">
+	    <!--BEGIN table--> 
+	    <table class="table table-bordered
+			  table-striped table-hover table-condensed">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>名称</th>
+		  <th>尺码I</th>
+	    	  <th>尺码II</th>
+		  <th>尺码III</th>
+		  <th>尺码IV</th>
+		  <th>尺码V</th>
+		  <th>尺码VI</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr ng-repeat="g in size_group">
+		  <td>{{g.order_id}}</td> 
+		  <td>{{g.name}}</td> 
+		  <td>{{g.si}}</td> 
+		  <td>{{g.sii}}</td> 
+		  <td>{{g.siii}}</td> 
+		  <td>{{g.siv}}</td> 
+		  <td>{{g.sv}}</td> 
+		  <td>{{g.svi}}</td>
+
+		  <td> 
+		    <span ng-if="!group.$editable">
+		      <button type="button" class="btn btn-warning btn-xs red-stripe"
+		    	      ng-click="do_modify(g)">修改
+			<i class="glyphicon glyphicon-edit"></i></button>
+		      <button class="btn btn-danger btn-xs green-stripe"
+		    	      x-ng-click="do_delete(g)">删除
+			<i class="glyphicon glyphicon-trash"></i></button>
+		    </span>
+		  </td>
+		  
+		</tr> 
+	      </tbody>
+	    </table> <!--END table-->
+	  </div> <!--END table-responsive-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->      
+    </div> <!--END box purle-->
+  </div><!--END col-md-12-->
+</div>
+
+<script type="text/ng-template" id="new-size.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title"><span class="label label-sm label-primary">新增尺码组</span></h4>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" name="newSizeForm" novalidate>
+      <div class="form-body">
+	
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">名称</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group"> 
+	      <input class="form-control" type="text"
+		     required
+		     name="name"
+		     placeholder="请输入尺码名称"
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.name"
+		     x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]+$/"</input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.name.$invalid && !newSizeForm.name.$pristine">
+	    <span class="fg-red">请输入汉字，字母，下划线或数字</span>
+	  </div>
+	</div>
+
+	<!--SI-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码I</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group"> 
+	      <input class="form-control" type="text"
+		     name="si"
+		     placeholder="请输入尺码I"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.si"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.si.$invalid && !newSizeForm.si.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'si', params.size.si)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div>
+
+	<!--SII-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码II</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group">
+	      
+	      <input class="form-control" type="text"
+		     name="sii"
+		     placeholder="请输入尺码II"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.sii"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.sii.$invalid && !newSizeForm.sii.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'sii', params.size.sii)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div>
+
+	<!--SIII-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码III</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group">
+	      <input class="form-control" type="text"
+		     name="siii"
+		     placeholder="请输入尺码III"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.siii"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.siii.$invalid && !newSizeForm.siii.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'siii', params.size.siii)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div>
+
+
+	<!--SIV-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码IV</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group"> 
+	      <input class="form-control" type="text"
+		     name="siv"
+		     placeholder="请输入尺码IV"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.siv"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.siv.$invalid && !newSizeForm.siv.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'siv', params.size.siv)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div>
+
+	<!--SV-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码V</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group"> 
+	      <input class="form-control" type="text"
+		     name="sv"
+		     placeholder="请输入尺码IV"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.sv"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div> 
+	  <div ng-show="newSizeForm.sv.$invalid && !newSizeForm.sv.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'sv', params.size.sv)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div>
+
+	<!--SVI-->
+	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">尺码VI</label>
+	  <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group">
+	      
+	      <input class="form-control" type="text"
+		     name="svi"
+		     placeholder="请输入尺码VI"
+		     capitalize
+		     x-ng-maxlength="10"
+		     x-ng-model="params.size.svi"
+		     x-ng-pattern="pattern.size"></input> 
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div>
+	  </div>
+	  <div ng-show="newSizeForm.svi.$invalid && !newSizeForm.svi.$pristine">
+	    <span class="fg-red">请输入1-3个字母或数字</span>
+	  </div>
+	  <div ng-show="!params.check_same(params.size, 'svi', params.size.svi)">
+	    <span class="fg-red">尺码已存在，请重新输入</span>
+	  </div>
+	</div> 
+	
+      </div>
+    </form>
+  </div>
+
+  <!--BEGIN modal-footer-->
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="newSizeForm.$invalid || !params.valid_group(params.size)"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+  <!--END modal-footer-->
+</script>

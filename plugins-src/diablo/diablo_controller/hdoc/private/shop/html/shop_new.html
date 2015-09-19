@@ -1,0 +1,151 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">店铺</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增店铺</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="sForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">名称</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div x-ng-class="{'has-error':sForm.name.$invalid
+				   && !sForm.name.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="name"
+			   required
+			   placeholder="请输入店铺名称"
+			   x-ng-model="shop.name"
+			   x-ng-pattern="name_address_pattern"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div> 
+	      </div> 
+	      <div ng-show="sForm.name.$invalid && !sForm.name.$pristine">
+		<span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	      </div> 
+	    </div>
+
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div x-ng-class="{'has-error':sForm.address.$invalid
+				   && !sForm.address.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="address"
+			   required
+			   placeholder="请输入店铺地址"
+			   x-ng-model="shop.address"
+			   x-ng-pattern="name_address_pattern"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="sForm.address.$invalid && !sForm.address.$pristine">
+		<span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	      </div> 
+	    </div> 
+	    
+	    <!--open date-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">开张日期</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 required
+			 placeholder="年/月/日"
+			 datepicker-popup="yyyy/MM/dd"
+			 is-open="isOpened"
+			 close-text="关闭"
+			 clear-text="清除"
+			 current-text="今天"
+			 show-weeks="false"
+			 x-ng-model="shop.openDate"></input>
+		  <span class="input-group-btn">
+		    <button type="button" class="btn btn-default" ng-click="open_calendar($event)">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	    </div>
+
+	    <!--shop owner-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">店长</label>
+	      <div class="col-sm-6 col-md-6">
+		<input type="text" class="form-control"
+		       placeholder="请选择店长，默认为空"
+		       x-ng-model="shop.shopowner"
+		       typeahead="e as e.name for e in
+				  employees|filter:$viewValue|limitTo:8">
+		</input>
+	      </div>
+	    </div>
+
+	    <!--repo-->
+	    <div x-ng-show="authen_list_repo" class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">所属仓库</label>
+	      <div class="col-sm-6 col-md-6">
+		<select class="form-control"
+			x-ng-model="shop.repo"
+			x-ng-options="r as r.name for r
+				      in repertories|filter:$viewValue|limitTo:8">
+		  <option value="">==请选择仓库，默认为空==<option>
+		</select>
+	      </div>
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid"> 
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button type="submit" class="btn btn-primary"
+			ng-disabled="sForm.$invalid"
+			x-ng-click="new_shop()">确定</button>
+		<button type="button" class="btn btn-warning"
+			x-ng-click="cancel_new_shop()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+
+
+
+
+
+

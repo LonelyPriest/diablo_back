@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Determine where this script is really located (if this script is
+# invoked from another script, this is the location of the caller)
+SCRIPT_PATH="$0"
+
+while [ -h "$SCRIPT_PATH" ] ; do
+    FULL_PATH=`readlink -f $SCRIPT_PATH 2>/dev/null`
+    if [ "$?" != "0" ]; then
+      REL_PATH=`readlink $SCRIPT_PATH`
+      if expr "$REL_PATH" : '/.*' > /dev/null; then
+        SCRIPT_PATH="$REL_PATH"
+      else
+        SCRIPT_PATH="`dirname "$SCRIPT_PATH"`/$REL_PATH"
+      fi
+    else
+      SCRIPT_PATH=$FULL_PATH
+    fi
+done
+
+SCRIPT_DIR=$(cd $(dirname ${SCRIPT_PATH}); pwd)
+KNIFE_HOME="${SCRIPT_DIR}/.."
+
+ERL=%FINAL_ROOTDIR%
+
+CONFIG_FILE=${KNIFE_HOME}/conf
+LOG_BASE=${KNIFE_HOME}/log
+MNESIA_BASE=${KNIFE_HOME}/mnesia
+ENABLED_PLUGINS_FILE=${KNIFE_HOME}/enabled_plugins
+PLUGINS_DIR="${KNIFE_HOME}/plugins"
+
+[ "x" = "x$HOSTNAME" ] && HOSTNAME=`env hostname`
+NODENAME=knife@${HOSTNAME%%.*}
+
+## Common defaults
+SERVER_ERL_ARGS="+K true +A30 +P 1048576"
+
+## Get configuration variables from the configure environment file
+## [ -f ${CONF_ENV_FILE} ] && . ${CONF_ENV_FILE}

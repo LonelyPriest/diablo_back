@@ -1,0 +1,120 @@
+#!/bin/bash
+
+. `dirname $0`/knife-env
+
+if [ $# -lt 1 ]; then
+    echo "usage: $(basename $0) [controller|proxy|agent] <option>"
+    exit 1
+fi
+
+SUBSYSTEM=$1
+
+case ${SUBSYSTEM} in
+    controller)
+	echo "start to start controller ..."
+	;;
+    proxy)
+	echo "start to start proxy ..."
+	;;
+    agent)
+	echo "start to start agent ..."
+	;;
+    *)
+	echo "unkown subsystem ${SUBSYSTEM}"
+	echo "usage: $(basename $0) [controller|proxy|agent] <option>"
+	exit 1
+	;;
+esac
+
+shift 1
+
+SYS_PREFIX=$(cd $(dirname $0); cd ..; pwd)
+
+## Set default values
+CONFIG_FILE=${SYS_PREFIX}/conf
+LOG_BASE=${SYS_PREFIX}/log
+MNESIA_BASE=${SYS_PREFIX}/mnesia
+
+CONF_ENV_FILE=${SYS_PREFIX}/knife-env.conf
+
+
+##--- Set environment vars knife_<var_name> to defaults if not set
+[ "x" = "x$KNIFE_NODENAME" ] && KNIFE_NODENAME=${SUBSYSTEM}-${NODENAME}
+[ "x" = "x$KNIFE_SERVER_ERL_ARGS" ] && KNIFE_SERVER_ERL_ARGS=${SERVER_ERL_ARGS}
+[ "x" = "x$KNIFE_CONFIG_FILE" ] && KNIFE_CONFIG_FILE=${CONFIG_FILE}
+[ "x" = "x$KNIFE_LOG_BASE" ] && KNIFE_LOG_BASE=${LOG_BASE}
+[ "x" = "x$KNIFE_MNESIA_BASE" ] && KNIFE_MNESIA_BASE=${MNESIA_BASE}
+[ "x" = "x$KNIFE_SERVER_START_ARGS" ] && KNIFE_SERVER_START_ARGS=${SERVER_START_ARGS}
+
+[ "x" = "x$KNIFE_MNESIA_DIR" ] && KNIFE_MNESIA_DIR=${MNESIA_DIR}
+[ "x" = "x$KNIFE_MNESIA_DIR" ] && KNIFE_MNESIA_DIR=${KNIFE_MNESIA_BASE}/${KNIFE_NODENAME}
+
+[ "x" = "x$KNIFE_PID_FILE" ] && KNIFE_PID_FILE=${PID_FILE}
+[ "x" = "x$KNIFE_PID_FILE" ] && KNIFE_PID_FILE=${KNIFE_MNESIA_DIR}.pid
+
+## Log rotation
+[ "x" = "x$KNIFE_LOGS" ] && KNIFE_LOGS=${LOGS}
+[ "x" = "x$KNIFE_LOGS" ] && KNIFE_LOGS="${KNIFE_LOG_BASE}/${KNIFE_NODENAME}.log"
+[ "x" = "x$KNIFE_SASL_LOGS" ] && KNIFE_SASL_LOGS=${SASL_LOGS}
+[ "x" = "x$KNIFE_SASL_LOGS" ] && KNIFE_SASL_LOGS="${KNIFE_LOG_BASE}/${KNIFE_NODENAME}-sasl.log"
+
+[ "x" = "x$KNIFE_PLUGINS_EXPAND_DIR" ] && KNIFE_PLUGINS_EXPAND_DIR=${PLUGINS_EXPAND_DIR}
+[ "x" = "x$KNIFE_PLUGINS_EXPAND_DIR" ] && KNIFE_PLUGINS_EXPAND_DIR=${KNIFE_MNESIA_BASE}/${KNIFE_NODENAME}-plugins-expand
+
+[ "x" = "x$KNIFE_ENABLED_PLUGINS_FILE" ] && KNIFE_ENABLED_PLUGINS_FILE=${ENABLED_PLUGINS_FILE}
+
+[ "x" = "x$KNIFE_PLUGINS_DIR" ] && KNIFE_PLUGINS_DIR=${PLUGINS_DIR}
+
+KNIFE_START_KNIFE=
+## [ "x" = "x$KNIFE_ALLOW_INPUT" ] && KNIFE_START_KNIFE=" -noinput"
+[ "x" = "x$KNIFE_NODE_ONLY" ] && KNIFE_START_KNIFE="$KNIFE_START_KNIFE -s knife boot "
+
+## set -x
+case "$(uname -s)" in
+  CYGWIN*) 
+        ;;
+    *)
+        # When -detached is passed, we don't write the pid, since it'd be the
+        # wrong one
+        detached=""
+        for opt in "$@"; do
+            if [ "$opt" = "-detached" ]; then
+                detached="true"
+            fi
+        done
+        if [ $detached ]; then
+            echo "Warning: PID file not written; -detached was passed." 1>&2
+        else
+            mkdir -p $(dirname ${KNIFE_PID_FILE});
+            echo $$ > ${KNIFE_PID_FILE}
+        fi
+esac
+
+KNIFE_EBIN_ROOT="${KNIFE_HOME}/ebin"
+
+KNIFE_CONFIG_ARG=
+[ -f "${KNIFE_CONFIG_FILE}.config" ] && KNIFE_CONFIG_ARG="-config ${KNIFE_CONFIG_FILE}"
+
+ERL_LIBS=${KNIFE_HOME}/deps \
+    exec \
+    ${ERL} \
+    -pa ${KNIFE_EBIN_ROOT} \
+    ${KNIFE_START_KNIFE} \
+    -sname ${KNIFE_NODENAME} \
+    -boot start_sasl \
+    ${KNIFE_CONFIG_ARG} \
+    +W w \
+    ${KNIFE_SERVER_ERL_ARGS} \
+    -sasl errlog_type error \
+    -sasl sasl_error_logger false \
+    -knife error_logger '{file,"'${KNIFE_LOGS}'"}' \
+    -knife sasl_error_logger '{file,"'${KNIFE_SASL_LOGS}'"}' \
+    -knife enabled_plugins_file "\"$KNIFE_ENABLED_PLUGINS_FILE\"" \
+    -knife plugins_dir "\"$KNIFE_PLUGINS_DIR\"" \
+    -knife plugins_expand_dir "\"$KNIFE_PLUGINS_EXPAND_DIR\"" \
+    -os_mon start_cpu_sup false \
+    -os_mon start_disksup false \
+    -os_mon start_memsup false \
+    -mnesia dir "\"${KNIFE_MNESIA_DIR}\"" \
+    ${KNIFE_SERVER_START_ARGS} \
+    "$@"

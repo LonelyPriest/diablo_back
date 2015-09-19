@@ -1,0 +1,9 @@
+<div class="actions">
+  <button type="button" class="btn btn-success"
+	  x-ng-disabled=" !filters || increment === filter.fields.length"
+	  x-ng-click="add_filter()">
+    <i class="glyphicon glyphicon-plus"></i></button>
+  <button type="button" class="btn btn-danger"
+	  x-ng-click="del_filter()" x-ng-disabled="increment === 0">
+    <i class="glyphicon glyphicon-minus"></i></button> 
+</div>

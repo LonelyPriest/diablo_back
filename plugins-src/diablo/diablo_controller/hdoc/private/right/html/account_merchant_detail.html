@@ -1,0 +1,216 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  帐户详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  ng-click="goto_page('#/account_merchant/account_new')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <div class="input-group">
+	    <div class="input-cont">
+	      <input type="text" class="form-control" placeholder="请输入帐户名称"
+		     x-ng-model="filter.name"></input>
+	    </div>
+	    <span class="input-group-btn">
+	      <button type="button" class="btn green">
+	  	<i class="m-icon-swapright m-icon-white"></i>
+	    </span>
+	  </div>  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped
+			    table-hover table-condensed table-advanced table-responsive">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>帐号</th>
+		    <th>商户</th>
+		    <th>经营人</th>
+		    <th>帐号类型</th>
+		    <th>允许在线人数</th>
+		    <th>帐号说明</th>
+		    <th>操作</th>
+		  </tr>
+		</th>
+		<tbody>
+		  <tr ng-repeat="account in accounts">
+		    <td>{{account.order_id}}</td>
+		    
+		    <td>{{account.name}}</td>
+		    
+		    <td>{{account.merchant}}</td>
+		    
+		    <td>{{account.owner}}</td>
+		    
+		    <td>{{accountDesc[account.type]}}</td>
+
+		    <td>
+		      <div x-ng-switch on="account.max_create">
+			<span x-ng-switch-when="-1">不涉及</span>
+			<span x-ng-switch-default>{{account.max_create}}</span>
+		      </div>
+		    </td>
+		    
+		    <td>{{roleDesc[account.type]}}</td>
+		    
+		    <td class="col-md-3"> 
+		      <button class="btn btn-primary btn-xs red-stripe" 
+                         x-ng-click="right_detail(account)">查看
+                        <i class="glyphicon glyphicon-eye-open"></i></button>
+		      
+		      <button class="btn btn-warning btn-xs red-stripe"
+			 ng-click="update_account(account)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button>
+		      
+                      <button href="" class="btn btn-xs btn-danger green-stripe"
+			 x-ng-click="pre_delete(account)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+	      </table> <!--END account table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="account_merchant_detail.html">
+
+  <div class="modal-body">
+    <!--BEING form-->
+    <form class="form-horizontal">
+      <!--BEGIN form body-->
+      <div class="form-body"> 
+	<div class="form-group">
+          <role-tree ng-model="rightTree"></role-tree>
+        </div> 
+      </div><!--END form body-->
+    </form><!--END form-->
+  </div>
+
+
+  <!--BEGIN modal-footer-->    
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="cancel()">确认</button>
+    <!-- <button class="btn btn-warning" x-ng-click="cancel()">取消</button> -->
+  </div>
+  
+  <!--END modal-footer-->
+</script>
+
+<script type="text/ng-template" id="account_merchant_edit.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">修改帐户</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+
+  <div class="modal-body">
+    <!--BEING form-->
+    <form class="form-horizontal" name="editForm">
+      <!--BEGIN form body-->
+      <div class="form-body">
+	
+	<div class="form-group">
+          <label class="col-md-3 control-label">帐号</label>
+          <div class="col-md-4">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.account.name"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">类型</label>
+          <div class="col-md-4">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.account.type"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">经营人</label>
+          <div class="col-md-4">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.account.owner"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">权限</label>
+          <div class="col-md-4"
+	       ng-class="{'has-error':editForm.right.$invalid
+	 		 && !editForm.right.$pristine}">
+	    <input type="text"
+		   class="form-control"
+		   name="right"
+                   data-ng-model="params.account.role"
+		   typeahead-editable="false"
+		   typeahead="r as r.name for r in
+			      params.roles|filter:$viewValue|limitTo:8"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">帐号描述</label>
+          <div class="col-md-4">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.account.desc"></input>
+          </div>
+        </div>
+
+	
+	
+      </div><!--END form body-->
+    </form><!--END form-->
+  </div>
+
+
+  <!--BEGIN modal-footer-->    
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+  <!--END modal-footer-->
+</script>

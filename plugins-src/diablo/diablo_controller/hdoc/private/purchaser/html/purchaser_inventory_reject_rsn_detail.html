@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  退货明细
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/record/inventory_new')">入库单
+	    <i class="glyphicon glyphicon-plus"></i></button>
+	  
+	  <button type="button" class="btn btn-danger green-stripe"
+		  x-ng-click="goto_page('#/record/inventory_reject')">退货单
+	    <i class="glyphicon glyphicon-plus"></i></button>
+	  
+	  <!-- <button type="button" class="btn btn-warning" -->
+	  <!-- 	  x-ng-click="goto_page('#/wsale/new_wsale_detail')">开单详情 -->
+	  <!--   <i class="glyphicon glyphicon-leaf"></i></button> -->
+	  
+	  <button type="button" class="btn blue red-stripe reload"
+		  x-ng-click="do_search(default_page)">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<div class="table-toolbar">
+	  
+	  <div class="row">
+            <div class="col-md-4">
+              <time-search
+                 glyphicon="glyphicon glyphicon-arrow-left fg-red"
+                 time="time.start_time" ok="do_search(default_page)"></time-search>
+            </div>
+
+            <div class="col-md-4">
+              <time-search
+                 glyphicon="glyphicon glyphicon-arrow-right fg-red"
+                 time="time.end_time" ok="do_search(default_page)"></time-search>
+            </div>
+	    
+            <div class="col-md-4">
+              <query-pattern ng-model="match"
+                             filters="filters"
+                             filter="filter">
+	      </query-pattern>
+            </div>
+	  </div>
+
+	  <query-group filters="filters"
+	  	       prompt="prompt"
+	  	       ok="do_search(default_page)"></query-group>
+	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th class="danger">单号</th>
+		    <th>款号</th>
+		    <th>品牌</th>
+		    <!-- <th>颜色</th> -->
+		    <!-- <th>数量</th> -->
+		    <!-- <th>折扣</th> -->
+		    <!-- <th>价格</th> -->
+		    <th>数量</th>
+		    <th>店铺</th>
+		    <th>厂商</th>
+		    <th>日期</th> 
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="inv in inventories">
+		    <td>{{inv.order_id}}</td>
+		    <td>{{inv.rsn}}</td>
+		    <td>{{inv.style_number}}</td>
+		    <td>{{inv.brand.name}}</td>
+		    <!-- <td>{{inv.color}}</td> -->
+		    <!-- <td>{{inv.total}}</td>  -->
+		    <!-- <td>{{inv.fdiscount}}</td> -->
+		    <!-- <td>{{inv.fprice}}</td> -->
+		    <td>{{inv.amount}}</td>
+		    <td>{{inv.shop.name}}</td>
+		    <td>{{inv.firm.name}}</td>
+		    <td>{{inv.entry_date}}</td>
+		    <td>
+		      <a class="btn btn-primary red-stripe btn-xs"
+			 x-ng-disabled="inv.free==0"
+		    	 x-ng-click="rsn_detail(inv)">
+			明细<i class="glyphicon glyphicon-leaf"></i></a>
+		    </td>
+		  </tr> 
+		</tbody>
+
+		<tfoot>
+		  <tr>
+		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
+		      <span class="pagination">
+		  	<span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		  	  共 {{total_items}} 项</span>
+		      </span>
+		      <pagination class="pull-right"
+		  		  total-items="total_items"
+		  		  items-per-page="items_perpage"
+		  		  num-pages="num_pages"
+		  		  max-size="max_page_size"
+		  		  boundary-links="true"
+		  		  previous-text="&lsaquo;" next-text="&rsaquo;"
+		  		  first-text="&laquo;" last-text="&raquo;"
+		  		  x-ng-model="current_page"
+		  		  x-ng-init="current_page=default_page"
+		  		  x-ng-change="page_changed()"></pagination>
+		    </td>
+		  </tr>
+		</tfoot>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="rsn-detail.html"> 
+  <div class="modal-body">
+    
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td x-ng-repeat="s in params.sizes" x-ng-switch on="s">
+	      <span x-ng-switch-when="0">均码</span>
+	      <span x-ng-switch-default>{{s}}</span>
+	    </td>
+	    <td class="col-dm-1 success">合计</td>
+	  </tr>
+	  <tr x-ng-repeat="c in params.colors">
+	    <td class="col-md-1" x-ng-switch on="c.cid">
+	      <span x-ng-switch-when=0>均色</span>
+	      <span x-ng-switch-default>{{c.cname}}</span>
+	    </td>
+	    <td class="col-md-1" x-ng-repeat="s in params.sizes">
+	      {{params.get_amount(c.cid, s, params.amounts).count}} 
+	    </td>
+	    <td class="col-md-1 warning">{{params.total}}</td>
+	  </tr>
+	</tbody> 
+      </table>
+    </div><!--END table-responsive-->
+    <image x-ng-show="params.path"
+	   class="img-responsive img-thumbnail"
+	   ng-src="{{params.path}}"></image> 
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <!-- <button class="btn btn-warning" x-ng-click="cancel()">取消</button> -->
+  </div>  
+</script>

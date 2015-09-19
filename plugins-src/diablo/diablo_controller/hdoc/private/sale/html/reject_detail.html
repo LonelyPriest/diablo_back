@@ -1,0 +1,149 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>
+	  退货详情
+	</div>
+
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入AD号"
+			 x-ng-model="filters.sn"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+		    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入款号"
+			 x-ng-model="filters.style_number"></input>
+		</div>
+		  <span class="input-group-btn">
+		    <button type="button" class="btn green">
+		      <i class="m-icon-swapright m-icon-white"></i>
+		  </span>
+	      </div>
+	    </div>
+	  </div> <!--END form-group-->
+
+	</div> <!--END table-toolbar-->
+
+	<!--BEGN portlet body-->
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table-->
+	      <table class="table table-bordered table-striped
+			    table-condensed table-advanced" ng-table="saleTable">
+		<tbody>
+		  <tr ng-repeat="detail in $data">
+		    <td data-title="'序号'"
+			sortable="'id'">
+		      <span>{{detail.order_id}}</span>
+		    </td>
+
+		    <td data-title="'流水号'"
+		    	sortable="'id'">
+		      <span>{{detail.running_no}}</span>
+		    </td>
+
+		    <td data-title="'AD号'">
+		      <span>{{detail.sn}}</span>
+		    </td>
+
+		    <td data-title="'品名'">
+		      <span>{{detail.brand}}</span>
+		    </td>
+
+		    <td data-title="'款号'">
+		      <span>{{detail.style_number}}</span>
+		    </td>
+
+		    <td data-title="'类别'">
+		      <span>{{detail.type}}</span>
+		    </td>
+
+		    <td data-title="'颜色'">
+		      <span>{{detail.color}}</span>
+		    </td>
+
+		    <td data-title="'定价'">
+		      <span>{{detail.plan_price}}</span>
+		    </td>
+
+		    <td data-title="'折扣'">
+		      <span>{{detail.discount}}</span>
+		    </td>
+
+		    <td data-title="'年度'">
+		      <span>{{detail.year}}</span>
+		    </td>
+
+		    <td data-title="'季节'">
+		      <span>{{season[detail.season]}}</span>
+		    </td>
+
+		    <td data-title="'性别'">
+		      <span>{{sex[detail.sex]}}</span>
+		    </td>
+
+		    <td data-title="'尺码'">
+		      <span>{{detail.size}}</span>
+		    </td>
+
+		    <td data-title="'数量'">
+		      <span>{{detail.amount}}</span>
+		    </td>
+
+		    <td data-title="'退货日期'">
+		      <span>{{detail.reject_date}}</span>
+		    </td>
+
+		    <td data-title="'导购员'">
+		      <span>{{detail.employe}}</span>
+		    </td>
+
+		    <td data-title="'供应商'" ng-switch on="detail.supplier">
+		      <span ng-switch-when="null">暂无</span>
+		      <span ng-switch-default>{{detail.supplier}}</span>
+		    </td>
+
+		    <td data-title="'店铺'">
+		      <span>{{detail.shop_name}}</span>
+		    </td>
+
+		  </tr>
+		</tbody>
+
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+
+    </div>
+  </div>
+</div>

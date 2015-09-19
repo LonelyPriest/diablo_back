@@ -1,0 +1,442 @@
+<script type="text/ng-template" id="sale_header.html">
+  <span>请选择</span>
+</script>
+
+<!--BEGIN header-->
+<!-- <div class="row"> -->
+<!--   <div class="col-md-12">     -->
+<!--     <ul class="page-breadcrumb breadcrumb"> -->
+<!--       <li> -->
+<!--         <i class="fa fa-home"></i> -->
+<!-- 	<a href="javascript:;">销售</a> -->
+<!--         <i class="fa fa-angle-right"></i> -->
+<!--       </li> -->
+<!--       <li> -->
+<!--         <a href="javascript:;">销售</a> -->
+<!--       </li> -->
+<!--     </ul> -->
+<!--   </div> -->
+<!-- </div> <\!--END header-\-> -->
+
+<!--BEGIN row -->
+<div class="row hidden-print">
+  <div class="col-xs-6 col-sm-6 col-md-6">
+    <!--BEGIN portlet box-->
+    <div class="portlet box yellow">
+      <!--BEGIN portlet title-->
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  <span>销售</span>
+	</div>
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div> <!--END portlet title-->
+
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-6 col-sm-6 col-md-6">
+	      <div class="input-group">
+	  	<div class="input-cont">
+	  	  <select class="form-control"
+			  x-ng-model="selectedShop"
+			  x-ng-options="s as s.name for s in allowedShops">
+		  </select>
+	  	</div>
+	  	<span class="input-group-btn">
+	  	  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	    
+	    <div class="col-xs-6 col-sm-6 col-md-6">
+	      <div class="input-group">
+	  	<div class="input-cont">
+	  	  <input type="text" class="form-control" placeholder="请输入款号"
+			 x-ng-model="selectedStyleNumber"
+			 typeahead-editable="false"
+			 typeahead-on-select="onSelect($item, $model, $label)"
+	  		 typeahead="s.style_number for s in
+				    style_numbers|filter:{style_number:$viewValue}|limitTo:8"></input>
+	  	</div>
+	  	<span class="input-group-btn">
+	  	  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	    
+	  </div> <!--END form-group-->
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN inventory table-->
+	  <div class="table-responsive">
+	    <table class="table table-bordered table-striped text-center
+			  table-hover table-condensed table-advanced table-responsive">
+	      <thead>
+		<tr class="text-center">
+		  <th class="text-center">请选择</th>
+		  <th class="text-center">AD号</th>
+		  <th class="text-center">款号</th>
+		  <th class="text-center">颜色</th>
+		  <th class="text-center">类别</th>
+		  <th class="text-center">定价</th>
+		  <th class="text-center">折扣</th>
+		  <th class="text-center">尺码</th>
+		  <th class="text-center">数量</th>
+		  <th class="text-center">购买数量</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr x-ng-repeat="inv in inventories">
+		  <td header="'sale_header.html'">
+		    <input ng-show="inv.amount > 0"
+			   type="checkbox" ng-click="clearSelected()"
+			   checklist-model="buy_inventories.invs"
+			   checklist-value="inv"></input>
+		  </td>
+
+		  <td data-title="'AD号'">
+		    <span>{{inv.sn}}</span>
+		  </td>
+		  
+		  <td data-title="'款号'">
+		    <span>{{inv.style_number}}</span>
+		  </td>
+		  
+		  <td data-title="'颜色'">
+		    <span>{{inv.color}}</span>
+		  </td>
+
+		  <td data-title="'类别'">
+		    <span>{{inv.type}}</span>
+		  </td>
+		  
+		  
+		  <td data-title="'定价'">
+		    <span>{{inv.plan_price}}</span>
+		  </td>
+		  
+		  <td data-title="'折扣'">
+		    <span>{{inv.discount}}</span>
+		  </td>
+		  
+		  <td data-title="'尺码'">
+		    <span>{{inv.size}}</span>
+		    <!-- <span ng-switch-when=0>{{sizes[0]}}</span> -->
+		    <!-- <span ng-switch-when=1>{{sizes[1]}}</span> -->
+		    <!-- <span ng-switch-when=2>{{sizes[2]}}</span> -->
+		    <!-- <span ng-switch-when=3>{{sizes[3]}}</span> -->
+		    <!-- <span ng-switch-when=4>{{sizes[4]}}</span> -->
+		    <!-- <span ng-switch-when=5>{{sizes[5]}}</span> -->
+		  </td>
+		  
+		  <td data-title="'数量'">
+		    <span>{{inv.amount}}</span>
+		  </td>
+
+		  <td data-title="'购买数量'">
+		    <span ng-show="inv.amount == 0" readonly="">0</span>
+		    <select ng-show="inv.amount > 0" class="form-control table-select" 
+			    x-ng-model="inv.buy_amount" ng-init="show_range(inv)"
+			    x-ng-options="n for n in inv.select_range">
+		    </select>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table> <!--END inventory table-->
+	  </div> <!--END table responsive-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+    </div> <!--END portlet box-->
+  </div> <!--END com-md-6 -->
+
+  <!--BEGIN col-md-6-->
+  <div class="col-xs-6 col-sm-6 col-md-6 hidden-print">
+    <div class="portlet box red">
+      <!--BEGIN portlet title-->
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  <span>结算</span>
+	</div>
+      </div> <!--END portlet title-->
+      <!--BEGN portlet-body form-->
+      <div class="portlet-body">	
+	<div class="row form-group">
+	  <div class="col-sm-6 col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon"><i class="icon-group fg-crimson"></i>会员</span>
+  	      <form name="form.member">
+  		<input type="text"
+  		       class="form-control"
+  		       name="mobile"
+  		       placeholder="请输入会员电话号码"
+  		       x-ng-model="payment.member"
+  		       typeahead-editable="false"
+  		       typeahead="member as member.mobile
+  				  for member in members|filter:{mobile:$viewValue}|limitTo:8"></input>
+  		<div ng-show="form.member.mobile.$invalid && !form.member.mobile.$pristine">
+  		  <span class="fg-red">电话号码必须从下拉菜单选择</span>
+  		</div>
+  	      </form>
+	    </div>
+	  </div>
+	  
+	  <div class="col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-user fg-crimson"></i>导购员
+  		<i class="glyphicon glyphicon-star fg-red"></i></span>
+  	      <select class="form-control"
+  		      required
+  		      x-ng-model="payment.direction"
+  		      x-ng-options="e as e.name for e in employees">
+  	      </select>
+	    </div>
+	  </div>
+	</div><!--END row-->
+
+
+	<div class="row form-group">
+	  <div class="col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon"><i class="icon-yen fg-red"></i>应付</span>
+  	      <input class="form-control"
+  		     type="text" readonly
+  		     x-ng-model="payment.total_price"></input>
+	    </div>
+	  </div>
+	  
+	  <div class="col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon">
+		<i class="glyphicon glyphicon-eye-open fg-red"></i>支付方式
+  		<i class="glyphicon glyphicon-star fg-red"></i></span>
+	      <select class="form-control"
+  		      required
+  		      x-ng-model="payment.payment_type"
+  		      x-ng-options="style.name for style in paymentStyle">
+	      </select>
+	    </div>
+	  </div>
+	</div><!--END row-->
+
+	<div class="row form-group">
+	  <div class="col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon"><i class="icon-yen fg-red"></i>实付
+		<i class="glyphicon glyphicon-star fg-red"></i></span>
+  	      <form name="form.balance">
+		<input class="form-control"
+		       name="balance" type="text"
+		       required
+		       ng-pattern="/^[0-9]*[0-9]$/"
+		       x-ng-model="payment.balance"></input>
+		<span ng-show="form.balance.balance.$invalid && !form.balance.balance.$pristine">
+		  <span class="col-md-offset-4 fg-red">请输入大于0的数字</span>
+		</span>
+  	      </form>
+	    </div>
+	  </div>
+	  
+	  <div class="col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon"><i class="icon-yen fg-red"></i>找零</span>
+	      <input class="form-control"
+		     type="text" readonly ng-pulsate
+		     x-ng-model="payment.left_balance"></input>
+	    </div>
+	  </div>
+	</div><!--END row-->
+
+	<div class="row form-group">
+	  <div class="col-xs-6 col-sm col-md-6">
+	    <div class="input-group">
+  	      <span class="input-group-addon"><i class="icon-comment fg-blue"></i>备注</span>
+	      <textarea class="form-control" rows="2"
+	    		type="text"
+	    		x-ng-model="payment.desc"></textarea>
+	    </div>
+	  </div>
+	  
+	  <div class="col-xs-6 col-sm-6 col-md-6">
+	    <div class="input-group">
+	      <!-- <span class="input-group-addon"> -->
+	      <!-- 	<i class="glyphicon glyphicon-ok"></i>结算</span> -->
+	      <button type="submit" class="btn btn-lg bg-green"
+	    	      ng-disabled="form.member.$invalid
+	    			   || form.balance.balance.$pristine
+	    			   || form.balance.$invalid
+	    			   || disable_calculate()"
+	    	      x-ng-click="calculate(payment.balance)">
+		<i class="glyphicon glyphicon-ok"></i>结算
+	      </button>
+	    </div>
+	  </div>
+	</div><!--END row-->
+
+  	
+      </div> <!--END portlet-body form-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-6-->
+  
+</div>
+
+<div class="row">
+  <div class="col-xs-6 col-xs-offset-6 col-md-6 col-md-offset-6 hidden-print">
+    <!--BEGIN portlet box-->
+    <div class="portlet box green">
+      <!--BEGIN portlet title-->
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  <span>购买详情</span>
+	</div>
+      </div> <!--END portlet title-->
+
+      <!--BEGIN portlet body-->
+      <div class="portlet-body">
+	<div class="table-responsive">
+	  <table class="table table-bordered table-striped
+			table-hover table-condensed table-advanced table-responsive">
+	    <thead>
+	      <tr>
+		<th class="text-center">AD号</th>
+		<th class="text-center">款号</th>
+		<th class="text-center">颜色</th>
+		<th class="text-center">类别</th>
+		<th class="text-center">定价</th>
+		<th class="text-center">折扣</th>
+		<th class="text-center">尺码</th>
+		<th class="text-center">购买数量</th>
+		<th class="text-center">折后价</th>
+		<!-- <th class="text-center">应付</th> -->
+		<th class="text-center">导购员</th>
+	      </tr>
+	    </thead>
+	    <tbody class="text-center">
+	      <tr x-ng-repeat="inv in buy_inventories.invs">
+		<td data-title="'AD号'">
+		  <span>{{inv.sn}}</span>
+		</td>
+		<td data-title="'款号'">
+		  <span>{{inv.style_number}}</span>
+		</td>
+		
+		<td data-title="'颜色'">
+		  <span>{{inv.color}}</span>
+		</td>
+
+		<td data-title="'类别'">
+		  <span>{{inv.type}}</span>
+		</td>
+		
+		<td data-title="'定价'">
+		  <span>{{inv.plan_price}}</span>
+		</td>
+		
+		<td data-title="'折扣'">
+		  <span>{{inv.discount}}</span>
+		</td>
+		
+		<td data-title="'尺码'">
+		  <span>{{inv.size}}</span>
+		</td>
+		
+		<td data-title="'购买数量'">
+		  <span>{{inv.buy_amount}}</span>
+		</td>
+
+		<td data-title="'折后价'">
+		  <span>{{inv.plan_price * inv.discount * inv.buy_amount / 100}}</span>
+		</td>
+
+		<td data-title="'导购员'">
+		  <span>{{payment.direction.name}}</span>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table> <!--END buy info table-->
+	</div> <!--END table responsive-->
+      </div> <!--END portlet body-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-6-->
+  
+</div>
+
+<!--BEGIN row-->
+<div class="row">
+  
+</div><!--END row-->
+
+<script type="text/ng-template" id="saleResponse.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title">
+      <span x-ng-if="success">{{title}}</span>
+      <span x-ng-if="!success" class="label label-sm label-danger">{{title}}</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+
+  <div class="modal-body">{{body}}</div>
+
+
+  <!--BEGIN modal-footer-->
+  
+  <div class="modal-footer" x-ng-if="success">
+    <button class="btn blue" x-ng-click="print()">打印</button>
+    <button class="btn default" x-ng-click="cancel()">取消</button>
+  </div>
+
+  <div class="modal-footer" x-ng-if="!success">
+    <button class="btn blue" x-ng-click="cancel()">确认</button>
+  </div>
+  
+  <!--END modal-footer-->
+</script>
+
+
+<!-- <div class="row visible-print-inline text-left"> -->
+<div class="row visible-print-inline text-left">
+  <p class="print-font">
+    购买清单</br>
+    店铺：{{selectedShop.name}}</br>
+    日期：{{current_time()|date: 'yyyy-MM-dd HH:mm:ss'}}
+  </p>
+  <p class="print-font" x-ng-repeat="inv in buy_inventories.invs">
+    商品名称：{{inv.type}}</br>
+    AD号：{{inv.sn}}</br>
+    款号：{{inv.style_number}}</br>
+    颜色：{{inv.color}}</br>
+    尺码：{{inv.size}}</br>
+    定价：{{inv.plan_price}}</br>
+    折扣：{{inv.discount}}</br>
+    数量：{{inv.buy_amount}}</br>
+  </p>
+</p>
+
+<p class="print-font">
+  应付：{{payment.total_price}}</br>
+  实付：{{payment.balance}}</br>
+  找零：{{payment.left_balance}}</br>
+</p>
+
+<p class="print-font">
+  导购员：{{payment.direction.name}}</br>
+  流水号：{{running_no}}
+</p>
+</div>

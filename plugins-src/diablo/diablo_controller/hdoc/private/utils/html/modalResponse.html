@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <button class="close" x-ng-click="cancel()" type="button">
+    <span aria-hidden="true">&times;</span>
+    <span class="sr-only"></span>
+  </button>
+  
+  <h4 class="modal-title">
+    <span x-ng-if="success" class="label label-sm label-primary">{{title}}</span>
+    <span x-ng-if="!success" class="label label-sm label-danger">{{title}}</span>
+  </h4>
+</div>
+
+<div class="modal-body">{{body}}</div>
+
+<!--BEGIN modal-footer-->
+<div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确定</button>
+    <button class="btn btn-warning"
+	    x-ng-show="show_cancel" 
+	    x-ng-click="cancel()">取消</button>
+</div> <!--END modal-footer-->

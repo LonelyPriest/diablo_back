@@ -1,0 +1,90 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-sm-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">打印机</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增打印机</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="pForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--类型-->
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">品牌</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <select class="form-control"
+			  x-ng-model="printer.brand"
+			  x-ng-options="b as b.chinese for b in brands"
+			  x-ng-init="printer.brand=brands[0]"></select> 
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div> 
+	      </div> 
+	    </div>
+
+	    <div class="form-group"> 
+	      <label class="col-sm-3 col-md-3 control-label">型号</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input class="form-control"
+			 name="model"
+			 placeholder="LQ630"
+			 capitalize 
+			 x-ng-model="printer.model"
+			 x-ng-pattern="pattern.model"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div> 
+	      </div>
+	      <div ng-show="!pForm.model.$pristine && pForm.model.$invalid">
+		<span class="fg-red">请输入字母，数字</span>
+	      </div>
+	    </div>
+
+	    <!-- <div class="form-group">  -->
+	    <!--   <label class="col-sm-3 col-md-3 control-label">列宽</label> -->
+	    <!--   <div class="col-sm-6 col-md-6"> -->
+	    <!-- 	<div class="input-group"> -->
+	    <!-- 	  <select class="form-control" -->
+	    <!-- 		  x-ng-model="printer.column" -->
+	    <!-- 		  x-ng-options="w for w in paper_columns" -->
+	    <!-- 		  x-ng-init="printer.column=paper_columns[0]"></select> -->
+	    <!-- 	  <span class="input-group-addon bg-white fg-red">*</span>  -->
+	    <!-- 	</div>  -->
+	    <!--   </div>  -->
+	    <!-- </div>  -->
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button class="btn btn-primary"
+			x-ng-disabled="pForm.$invalid"
+			x-ng-click="new_printer()">确认</button>
+		<button class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->

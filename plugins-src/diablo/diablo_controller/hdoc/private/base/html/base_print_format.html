@@ -1,0 +1,180 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  打印格式
+	</div>	
+
+	<div class="actions"> 
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div> 
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="alert alert-warning" role="alert">
+	    <p>
+	      <span class="fg-blue">打印宽度之和不能超过真实打印宽度。</span>
+	      <span class="fg-red">注意：打印机设置横打时，尺码长度为尺码宽度 * 尺码个数</span>
+	    </p>
+	    <p>
+	      <span class="fg-red">
+		特别注意：手与尺码选项不能同时选；尺码组名称与尺码不能同时选！！</span>
+	    </p>
+	  </div>
+
+	  <div class="row form-group"> 
+	    <div class="col-sm-12 col-md-12">
+	      <select class="form-control"
+		      x-ng-model="select.shop"
+		      x-ng-change="select.pformat=shop_format(select.shop)"
+		      x-ng-options="s as s.name for s
+				      in shops|filter:$viewValue|limitTo:8">
+		  <!-- <option value=""> -->
+		  <!--     == 请选择店铺或仓库，默认所有配置相同 == -->
+		  <!-- <option> -->
+		</select> 
+	    </div> 
+	  
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped table-hover
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>名称</th>
+		    <th>是否打印</th>
+		    <th>打印宽度</th>
+		    <th>日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr x-ng-repeat="f in select.pformat">
+		    <td>{{f.order_id}}</td>
+		    <td>{{print_fields[f.name]}}</td>
+		    <td>
+		      <span x-ng-switch on="f.print">
+			  <span ng-switch-when="1">是</span>
+			  <span ng-switch-when="0">否</span>
+		      </span>
+		    </td>
+		    <td>{{f.width}}</td>
+		    <td>{{f.entry_date}}</td>
+
+		    <td class="col-md-2"> 
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_printer_format(f)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button> 
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="update-print-format.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">打印格式编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+  <div class="modal-body">
+    <form class="form-horizontal" name="fForm" novalidate>
+      <div class="form-body">
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>名称</span>
+	    <input type="text" readonly
+		   class="form-control"
+		   required
+		   x-ng-model="params.fields[params.pformat.name]"></input> 
+	  </div> 
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>打印</span>
+	    <select class="form-control"
+		    type="text"
+		    x-ng-model="params.pformat.print"
+		    x-ng-change="params.change_format(params.pformat)"
+		    x-ng-options="a as a.name for a in params.actions"></select>
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div> 
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>宽度</span>
+	    <input class="form-control"
+		   type="text"
+		   name="width"
+		   x-ng-model="params.pformat.width"
+		   x-ng-pattern="/^\d{1,2}$/">
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="fForm.width.$invalid && !fForm.width.$pristine">
+	    <span class="fg-red">请输入1-2位数字</span>
+	  </div>
+	</div>
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="fForm.$invalid || params.check_same(params.pformat)"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning"
+	    x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

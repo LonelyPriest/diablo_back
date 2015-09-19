@@ -1,0 +1,392 @@
+<div class="row">
+  <div class="portlet box purple">
+    <div class="portlet-title">
+      <div class="caption">
+	<i class="fa fa-reorder"></i>
+	库存审核
+      </div>	
+      
+      <div class="tools">
+	<a class="reload" href="javascript:;"></a>
+      </div>
+    </div>
+    
+    <!--BEGIN table container-->
+    <div class="portlet-body util-btn-margin-bottom-5">
+      <!--BEGIN table-toolbar-->
+      <div class="table-toolbar">
+	<!-- <div class="row form-group"> -->
+	<!--   <div class="col-xs-12 col-md-12"> -->
+	<!--     <div class="input-group"> -->
+	<!--       <span class="input-group-addon bg-green"> -->
+	<!-- 	<i class="glyphicon glyphicon-circle-arrow-right fg-white"></i>尺码组 -->
+	<!--       </span> -->
+	<!--       <select class="form-control" -->
+	<!-- 	      x-ng-model="selectedSizeGroup" -->
+	<!-- 	      x-ng-options="g as g.order_id for g in size_group"> -->
+	<!--       </select> -->
+	<!--     </div> -->
+	<!--   </div> -->
+	<!-- </div> -->
+      </div> <!--END table-toolbar-->
+      
+      <!--BEGN portlet body--> 
+      <div class="portlet-body">
+	<!--BEGIN alert-->
+	  <div ng-show="check_error" class="alert alert-danger" role="alert">
+	    <span>审核失败：{{check_error_info}}<span>
+	  </div>
+	  <!--BEGIN table--> 
+	  <!-- <table ng-table column-offset="3" -->
+	  <!-- 	 class="table table-bordered -->
+	  <!-- 		table-striped table-hover table-condensed"> -->
+	  <div class="table-responsive" style="overflow-x:auto">
+	    <table class="table table-bordered table-striped table-hover table-condensed">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <!-- <th>AD号</th> -->
+		  <th class="danger">品名</th>
+		  <th class="warning">款号</th> 
+		  <th>类别</th>
+		  <!-- <th class="info">颜色</th> -->
+		  <th class="danger">进价</th>
+		  <th>定价</th>
+	    	  <th>折扣</th>
+		  <th>性别</th>
+		  <th>季节</th> 
+		  <th>年度</th>
+		  <!-- <th>次数</th> -->
+		  <!-- <th>尺码组</th> -->
+		  <!-- <th ng-repeat="g in selectedSizeGroup.sizes"> -->
+		  <!--   {{format_size_name(g)[0]}}<br>{{format_size_name(g)[1]}} -->
+		  <!-- </th> -->
+		  <th>数量</th>
+		  <th class="info">供应商</th>	    	
+		  <th>店铺</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr ng-repeat="inv in inventories">
+		  <td>{{inv.order_id}}</td>
+		  
+		  <!-- <td data-title="'AD号'" sortable="'id'"> -->
+		  <!--   <span>{{inv.sn}}</span> -->
+		  <!-- </td> -->
+
+		  <!--brand-->
+		  <td class="col-md-1 col-sm-1">
+		    <span>{{inv.brand}}</span>
+		    <!-- <span ng-if="!inv.$editable">{{inv.brand}}</span> -->
+		    <!-- <form name="inv.form.brand" ng-if="inv.$editable"> -->
+		    <!--   <div ng-class="{'has-error': inv.form.brand.$invalid -->
+		    <!-- 		     && !inv.form.brand.$pristine}"> -->
+		    <!-- 	<input class="form-control" type="text" -->
+		    <!-- 	       required -->
+		    <!-- 	       x-ng-model="inv.check_brand" -->
+		    <!-- 	       x-ng-init="inv.check_brand=inv.brand" -->
+		    <!-- 	       popover-placement="top" -->
+		    <!-- 	       popover-trigger="focus" -->
+		    <!-- 	       popover="品牌名只能从提示框选择" -->
+		    <!-- 	       typeahead-editable="false" -->
+		    <!-- 	       typeahead-on-select="on_select_brand($item, $model, $label)" -->
+		    <!-- 	       typeahead="b as b.name for b in -->
+		    <!-- 			  prompt_brands|filter:{name:$viewValue}|limitTo:8"></input> -->
+		    <!--   </div> -->
+		    <!-- </form> -->
+		  </td>
+
+		  <!--sytle-number-->
+		  <td>
+		    <span>{{inv.style_number}}</span>
+		    <!-- <span ng-if="!inv.$editable">{{inv.style_number}}</span> -->
+		    <!-- <form name="inv.form.number" ng-if="inv.$editable"> -->
+		    <!--   <div ng-class="{'has-error': -->
+		    <!-- 		     inv.form.number.$invalid -->
+		    <!-- 		     && !inv.form.number.$pristine}"> -->
+		    <!-- 	<input class="form-control" type="text" -->
+		    <!-- 	       required -->
+		    <!-- 	       x-ng-pattern="/^[A-Za-z0-9]+$/" -->
+		    <!-- 	       x-ng-maxlength="10" -->
+		    <!-- 	       x-ng-model="inv.check_style_number" -->
+		    <!-- 	       x-ng-init="inv.check_style_number=inv.style_number" -->
+		    <!-- 	       popover-placement="top" -->
+		    <!-- 	       popover-trigger="focus" -->
+		    <!-- 	       popover="请输入款号，只能是字母或数字" -->
+		    <!-- 	       typeahead="n for n in -->
+		    <!-- 			  prompt_numbers|filter:$viewValue|limitTo:8"></input> -->
+		    <!--   </div> -->
+		    <!-- </form> -->
+		  </td>
+
+		  <!--type-->
+		  <td>
+		    <span ng-if="!inv.$editable">{{inv.type}}</span>
+		    <form name="inv.form.type" ng-if="inv.$editable">
+		      <div ng-class="{'has-error': inv.form.type.$invalid
+		    		   && !inv.form.type.$pristine}">
+		        <input class="form-control" type="text"
+		    	       required
+		    	       x-ng-model="inv.check_type"
+			       x-ng-init="inv.check_type=get_type(inv.type)"
+		    	       popover-placement="top"
+		    	       popover-trigger="focus"
+		    	       popover="请输入类别"
+		    	       typeahead="t as t.name for t in
+		    			  prompt_types|filter:$viewValue|limitTo:8"></input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <!--color-->
+		  <!-- <td> -->
+		  <!--   <span ng-if="!inv.$editable">{{inv.color}}</span> -->
+		  <!--   <form name="inv.form.color" ng-if="inv.$editable"> -->
+		  <!--     <div ng-class="{'has-error': inv.form.color.$invalid -->
+		  <!-- 		     && !inv.form.color.$pristine}"> -->
+		  <!-- 	<input class="form-control" type="text" -->
+		  <!-- 	       required -->
+		  <!-- 	       x-ng-model="inv.check_color" -->
+		  <!-- 	       popover-placement="right" -->
+		  <!-- 	       popover-trigger="focus" -->
+		  <!-- 	       popover="颜色只能从提示框选择" -->
+		  <!-- 	       typeahead-editable="false" -->
+		  <!-- 	       typeahead="c as c.name for c in -->
+		  <!-- 			  prompt_colors|filter:{name:$viewValue}|limitTo:8"></input> -->
+		  <!--     </div> -->
+		  <!--   </form> -->
+		  <!-- </td> -->
+
+		  <!--origine price-->
+		  <td>
+		    <span ng-if="!inv.$editable">{{inv.org_price}}</span>
+		    <form name="inv.form.org_price" ng-if="inv.$editable">
+		      <div ng-class="{'has-error': inv.form.org_price.$invalid
+				     && !inv.form.org_price.$pristine}">
+			<input class="form-control input-xsmall" type="text"
+			       required
+			       x-ng-pattern="/^([0-9]*(\.\d+)?)$/"
+			       x-ng-maxlength="6"
+			       x-ng-model="inv.check_org_price"
+			       x-ng-init="inv.check_org_price=to_s(inv.org_price)"
+			       popover-placement="right"
+			       popover-trigger="focus"
+			       popover="请输入６位以内的整数"></input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <!--plan price-->
+		  <td>
+		    <span ng-if="!inv.$editable">{{inv.plan_price}}</span>
+		    <form name="inv.form.price" ng-if="inv.$editable">
+		      <div ng-class="{'has-error': inv.form.price.$invalid
+		    		   && !inv.form.price.$pristine}">
+		        <input class="form-control input-xsmall" type="text"
+		    	       required
+		    	       x-ng-pattern="/^\d+$/"
+		    	       x-ng-maxlength="6"
+		    	       x-ng-model="inv.check_plan_price"
+			       x-ng-init="inv.check_plan_price=to_s(inv.plan_price)"
+		    	       popover-placement="top"
+		    	       popover-trigger="focus"
+		    	       popover="请输入６位以内的整数"></input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <!--discount-->
+		  <td>
+		    <span ng-if="!inv.$editable">{{inv.discount}}</span>
+		    <form name="inv.form.discount" ng-if="inv.$editable">
+		      <div ng-class="{'has-error': inv.form.discount.$invalid
+		    		     && !inv.form.discount.$pristine}">
+		        <input class="form-control input-xsmall" type="text"
+		    	     required
+		    	       x-ng-pattern="/^\d+$/"
+		    	       x-ng-maxlength="3"
+		    	       x-ng-minlength="2"
+		    	       x-ng-model="inv.check_discount"
+			       x-ng-init="inv.check_discount=to_s(inv.discount)"
+		    	       popover-placement="right"
+		    	       popover-trigger="focus"
+		    	       popover="请输入２位整数，无折扣请输入100">
+		      </div>
+		    </form>
+		  </td>
+
+		  <!--sex-->
+		  <td>
+		    <span>{{sex[inv.sex]}}</span>
+		  </td>
+
+		  <!--season-->
+		  <td>
+		    <span>{{season[inv.season]}}</span>
+		    <!-- <div ng-if="inv.$editable"> -->
+		    <!--   <select class="form-control input-xxsmall table-select" -->
+                    <!--           x-ng-model="checked_inventory.season" -->
+                    <!--           x-ng-options="season for season in seasons"> -->
+                    <!--   </select> -->
+		    <!-- </div> -->
+		  </td>
+		  
+		  <!--year-->
+		  <td>
+		    <span>{{inv.year}}</span>
+		    <!-- <form name="form.yearForm" ng-if="inv.$editable"> -->
+		    <!--   <div ng-class="{'has-error': -->
+		    <!-- 		     form.yearForm.year.$invalid -->
+		    <!-- 		     && !form.yearForm.year.$pristine}"> -->
+		    <!-- 	<input class="form-control input-xsmall" type="text" -->
+		    <!-- 	       required -->
+		    <!-- 	       name="year" -->
+		    <!-- 	       x-ng-pattern="/^(\d{4})/" -->
+		    <!-- 	       x-ng-maxlength="4" -->
+		    <!-- 	       x-ng-model="checked_inventory.year" -->
+		    <!-- 	       popover-placement="right" -->
+		    <!-- 	       popover-trigger="focus" -->
+		    <!-- 	       popover="格式yyyy"></input> -->
+		    <!--   </div> -->
+		    <!-- </form> -->
+		  </td> 
+
+		  <!-- <td class="warning" data-title="'审核次数'"> -->
+		  <!--   <span>{{inv.check_num}}</span> -->
+		  <!-- </td> -->
+
+		  <!--size group-->
+		  <!-- <td class="success"> -->
+		  <!--   <span>{{get_group(inv.size_group)}}</span> -->
+		  <!-- </td> -->
+
+		  <!--amount-->
+		  <td>{{inv.total}}</td>
+
+		  <!--supplier-->
+		  <td class="col-md-1 col-sm-1">
+		    <div ng-if="!inv.$editable" x-ng-switch on="inv.supplier_id">
+		      <span x-ng-switch-when=-1>暂无</span>
+		      <span x-ng-switch-default>{{inv.supplier}}</span>
+		    </div>
+		    <div ng-if="inv.$editable">
+		      {{get_supplier(inv.brand_id).supplier}}
+                    </div>
+		  </td>
+
+		  <!--shop-->
+		  <td class="col-md-1 col-sm-1">{{inv.shop}}</td>
+
+		  <td data-title="'操作'">
+		    <span ng-if="!inv.$editable">
+		      <button class="btn btn-success btn-xs"
+			      x-ng-disabled="inv.$checked"
+			      x-ng-click="inv.$editable=true">审核
+			<i class="glyphicon glyphicon-check"></i></button>
+		      
+		      <button class="btn btn-info btn-xs" ng-if="inv.$checked"
+			      x-ng-click="inventory_detail(inv)">查看
+			<i class="glyphicon glyphicon-eye-open"></i></button>
+		    </span>
+
+		    <span ng-if="inv.$editable">
+		      <button class="btn btn-primary btn-xs"
+		    	      x-ng-click="check_inventory(inv)">明细
+		    	<i class="glyphicon glyphicon-eye-open"></i></button>
+		      <button class="btn btn-warning btn-xs"
+		    	      ng-click="inv.$editable=false">取消
+		    	<i class="glyphicon glyphicon-remove"></i></button>
+		    </span>
+		    
+		    <!-- <span ng-if="!inv.$editable"> -->
+		    <!--   <button type="button" class="btn btn-warning btn-xs" -->
+		    <!-- 	      ng-click="inv.$editable=true">修改 -->
+		    <!-- 	<i class="glyphicon glyphicon-edit"></i></button> -->
+		    <!--   <button class="btn red btn-xs" -->
+		    <!-- 	      ng-click="inv.$editable=true;delete_inv(inv)">删除 -->
+		    <!-- 	<i class="glyphicon glyphicon-trash"></i></button> -->
+		    <!-- </span> -->
+		  </td>
+		</tr>
+	      </tbody>
+	      <!-- <tfoot> -->
+	      <!-- 	<tr> -->
+	      <!-- 	  <td colspan="21"> -->
+	      <!-- 	    <pagination class="pull-right" ng-model="current_page"></pagination> -->
+	      <!-- 	  </td> -->
+	      <!-- 	</tr> -->
+	      <!-- </tfoot> -->
+	    </table> <!--END table-->	    
+	  </div> <!-- END table responsive-->
+      </div> <!--END portlet body-->
+    </div> <!--END table container-->      
+  </div>
+</div>
+
+<script type="text/ng-template" id="inventory-check.html">
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td class="info text-center" x-ng-repeat="s in params.sizes">{{s}}</td>
+	  </tr>
+	  <tr x-ng-repeat="c in params.colors">
+	    <td class="text-center col-md-1 col-sm-1">
+	      <span class="input-small">{{c.cname}}</span></td>
+	    <td class="col-md-1 col-sm-1" x-ng-repeat="s in params.sizes">
+	      <input class="form-control text-center table-select"
+	      	     x-ng-model="amount.count"
+	      	     x-ng-init="amount=params.get_amount(c.cid, s, params.amounts)"></input>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">保存</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="inventory-detail.html">
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td class="info text-center" x-ng-repeat="s in params.sizes">{{s}}</td>
+	  </tr>
+	  <tr x-ng-repeat="c in params.colors">
+	    <td class="text-center col-md-1 col-sm-1">
+	      <span class="input-small">{{c.cname}}</span></td>
+	    <td class="col-md-1 col-sm-1" x-ng-repeat="s in params.sizes">
+	      {{params.get_amount(c.cid, s, params.amounts).count}} 
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确定</button>
+    <!-- <button class="btn btn-warning" x-ng-click="cancel()">取消</button> -->
+  </div>
+</script>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,160 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">员工</a>
+        <i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增员工</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="form" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--member Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">姓名</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error':form.name.$invalid
+				 && !form.name.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="name"
+			   required
+			   placeholder="请输入员工姓名"
+			   x-ng-model="employ.name"
+			   x-ng-pattern="name_pattern"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div> 
+	      </div>
+	      
+	      <div ng-show="form.name.$invalid && !form.name.$pristine">
+		  <span class="fg-red">请输入2到3个中文字符</span>
+	      </div> 
+	    </div>
+
+	    <!--sex-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">性别</label>
+	      <div class="col-sm-6 col-md-6">
+		<select class="form-control select-medium"
+			x-ng-model="employ.sex"
+			x-ng-options="s as s.name for s in sexes"
+			x-ng-init="employ.sex=sexes[0]">
+		</select>
+	      </div>
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">手机号码</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error': form.mobile.$invalid
+				 && !form.mobile.$pristine}">
+		    <input type="tel"
+			   name="mobile"
+			   required
+			   ng-pattern="mobile_pattern"
+			   placeholder="请输入手机号码"
+			   class="form-control"
+			   x-ng-model="employ.mobile"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      
+	      <div ng-show="form.mobile.$invalid && !form.mobile.$pristine">
+		<span class="fg-red">请输入正确的手机号码</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error': form.address.$invalid
+				 && !form.address.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="address"
+			   required
+			   placeholder="请输入您的联系地址"
+			   x-ng-model="employ.address"
+			   x-ng-pattern="address_pattern"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      
+	      <div ng-show="form.address.$invalid && !form.address.$pristine">
+		<span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	      </div> 
+	    </div>
+
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">入职日期</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text" class="form-control" required
+			 placeholder="年/月/日"
+			 datepicker-popup="yyyy/MM/dd"
+			 is-open="isOpened"
+			 close-text="关闭"
+			 clear-text="清除"
+			 current-text="今天"
+			 show-weeks="false"
+			 x-ng-model="employ.entry"></input>
+		  <span class="input-group-btn">
+		    <button type="button" class="btn btn-default" ng-click="open_calendar($event)">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	    </div>
+
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+	      <button type="submit" class="btn btn-primary"
+		      ng-disabled="form.$invalid"
+		      x-ng-click="new_employ()">确定</button>
+	      <button type="button" class="btn btn-warning"
+		      x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+
+
+
+
+
+

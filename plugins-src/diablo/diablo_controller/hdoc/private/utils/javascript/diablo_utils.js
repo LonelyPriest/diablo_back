@@ -1,0 +1,758 @@
+var diabloUtils = angular.module("diabloUtils", []);
+
+diabloUtils.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+});
+
+
+diabloUtils.directive('ngPulsate', function () {
+    return {
+	restrict: 'AE',
+	link: function(scope, element, attrs){
+	    element.pulsate({
+                color: "#bf1c56"
+            });
+	}
+    }
+});
+
+
+diabloUtils.directive('capitalize', function() {
+   return {
+       require: 'ngModel',
+       link: function(scope, element, attrs, modelCtrl) {
+           var capitalize = function(inputValue) {
+               if(inputValue == undefined) inputValue = '';
+               var capitalized = inputValue.toUpperCase();
+               if(capitalized !== inputValue) {
+		   modelCtrl.$setViewValue(capitalized);
+		   modelCtrl.$render();
+               }         
+               return capitalized;
+           }
+
+           modelCtrl.$parsers.push(capitalize);
+           capitalize(scope[attrs.ngModel]);  // capitalize initial value
+       }
+   };
+});
+
+diabloUtils.directive('ngModelOnblur', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        priority: 1, // needed for angular 1.2.x
+        link: function(scope, elm, attr, ngModelCtrl) {
+            if (attr.type === 'radio' || attr.type === 'checkbox') return;
+
+            elm.unbind('input').unbind('keydown').unbind('change');
+            elm.bind('blur', function() {
+                scope.$apply(function() {
+                    ngModelCtrl.$setViewValue(elm.val());
+                });         
+            });
+        }
+    };
+});
+
+diabloUtils.directive('stickUpTable', function () {
+    return {
+	restrict: 'AE',
+	link: function(scope, element, attrs){
+	    // console.log(element);
+	    // element.stickyTableHeaders();
+	    element.stickUp({
+		topMargin: null,
+		zIndex: 10,
+		onStick: function(settings) {},
+		unStick: function(settings) {}
+	    })
+	}
+    }
+});
+
+diabloUtils.directive('queryGroup', function () {
+    return {
+	restrict: 'AE',
+	templateUrl: '/private/utils/html/queryGroup.html',
+	replace: true,
+	transclude: true,
+	scope: {
+	    filters:      '=', 
+	    prompt:       '=',
+	    ok:  '&'
+	},
+	
+	link: function(scope, element, attrs){
+	    // console.log(scope);
+	    // scope.$watch('filters', function(newValue, oldValue){
+	    // 	// console.log(newValue);
+	    // 	// console.log(oldValue);
+		
+	    // })
+
+	    // console.log(scope.prompt);
+
+	    scope.change_field = function(field){
+		// console.log(field);
+		field.value = undefined;
+	    };
+	}
+    }
+});
+
+diabloUtils.directive('queryPattern', function () {
+    return {
+	restrict: 'AE',
+	templateUrl: '/private/utils/html/queryPattern.html',
+	replace: true,
+	transclude: true,
+	require: "ngModel",
+	scope:{
+	    filters:  '=',
+	    filter:   '='
+	},
+	link: function(scope, element, attr, ngModel){
+	    // console.log(scope);
+	    // pattern
+	    scope.pattern = {};
+	    scope.pattern.matches = [{op:"and", chinese:"匹配所有"}
+				     // {op:"or",  chinese:"匹配任意一个"}
+				    ];
+	    scope.pattern.match = scope.pattern.matches[0];
+
+	    ngModel.$setViewValue(scope.pattern.match);
+	    scope.$watch('pattern.match', function(newValue, oldValue){
+		if (angular.equals(newValue, oldValue)) return;
+		
+		ngModel.$setViewValue(newValue);
+	    });
+
+	    scope.increment = 0;
+	    // add a filter
+	    scope.add_filter = function(){
+		// console.log("add_filter...");
+		scope.filters[scope.increment] = angular.copy(scope.filter);
+		// use first as default field
+		scope.filters[scope.increment].field
+		    = scope.filters[scope.increment].fields[scope.increment];
+		scope.increment++;
+	    };
+
+	    // delete a filter
+	    scope.del_filter = function(){
+		scope.filters.splice(-1, 1);
+		scope.increment--; 
+	    };
+	    
+	}
+    }
+});
+
+
+diabloUtils.directive('addDeleteFilter', function () {
+    return {
+	restrict: 'AE',
+	templateUrl: '/private/utils/html/add-delete-filter.html',
+	replace: true,
+	transclude: true,
+	// require: "ngModel",
+	scope:{
+	    filters:  '=',
+	    filter:   '=',
+	},
+	link: function(scope, element, attr){
+	    scope.increment = 0;
+	    // add a filter
+	    scope.add_filter = function(){
+		// console.log("add_filter...");
+		scope.filters[scope.increment] = angular.copy(scope.filter);
+		// use first as default field
+		scope.filters[scope.increment].field
+		    = scope.filters[scope.increment].fields[scope.increment];
+		scope.increment++;
+	    };
+
+	    // delete a filter
+	    scope.del_filter = function(){
+		scope.filters.splice(-1, 1);
+		scope.increment--; 
+	    };
+	}
+    } 
+});
+
+diabloUtils.directive('timeSearch', function (){
+    return {
+	restrict: 'AE',
+	templateUrl: '/private/utils/html/timeSearch.html',
+	replace: true,
+	transclude: true,
+	scope: {
+	    glyphicon: '@',
+	    time:      '=',
+	    ok:        '&'
+	},
+	
+	link: function(scope, element, attrs){
+	    scope.open_calendar = function(event){
+		event.preventDefault();
+		event.stopPropagation();
+		scope.opened = true;
+	    };
+
+	    // scope.time = $.now();
+	}
+    }
+});
+
+diabloUtils.service("diabloUtilsService", function($modal){
+    // response dialog
+    this.response = function(result, title, body, scope){
+	return $modal.open({
+	    templateUrl: '/private/utils/html/modalResponse.html',
+	    controller: 'diabloDialogCtrl',
+	    backdrop: 'false',
+	    // scope: scope,
+	    resolve:{
+		message: function(){
+		    return {
+			success     :result,
+			title       :title,
+			body        :body,
+			show_cancel :false,
+		    }
+		}
+	    }
+	})
+    };
+
+    this.response_with_callback = function(result, title, body, scope, callback){
+	return $modal.open({
+	    templateUrl: '/private/utils/html/modalResponse.html',
+	    controller: 'diabloDialogCtrl',
+	    backdrop: 'false',
+	    // backdrop: 'static',
+	    // scope: scope,
+	    resolve:{
+		message: function(){
+		    return {
+			success     :result,
+			title       :title,
+			body        :body,
+			callback    :callback,
+			show_cancel :false,
+		    }
+		}
+	    }
+	})
+    };
+
+    this.request = function(title, body, callback, params, scope){
+	return $modal.open({
+	    templateUrl: '/private/utils/html/modalResponse.html',
+	    controller: 'diabloDialogCtrl',
+	    backdrop: 'false',
+	    scope: scope,
+	    resolve:{
+		message: function(){
+		    return {
+			success :false,
+			title   :title,
+			body    :body,
+			callback:callback,
+			params  :params
+		    }
+		}
+	    }
+	})
+    };
+
+    this.edit_with_modal = function(templateUrl, size, callback, scope, params){
+	return $modal.open({
+	    templateUrl: templateUrl,
+	    controller: 'diabloEditDialogCtrl',
+	    // backdrop: 'static',
+	    backdrop: 'false',
+	    size:  size,
+	    scope: scope,
+	    resolve:{
+		message: function(){
+		    return {
+			callback:callback,
+			params: params
+		    }
+		}
+	    }
+	})
+    };
+});
+
+diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, message){
+    // console.log($scope);
+    console.log($modalInstance);
+    console.log(message);
+    $scope.success = message.success;
+    $scope.title = message.title;
+    $scope.body  = message.body;
+
+    $scope.show_cancel = angular.isDefined(message.show_cancel) ? message.show_cancel : true;
+    
+    $scope.cancel = function(){
+	$modalInstance.dismiss('cancel');
+    };
+
+    $scope.ok = function() {
+	$modalInstance.dismiss('ok');
+	if (angular.isDefined(message.callback) && typeof(message.callback) === "function"){
+	    var callback = message.callback;
+	    if (angular.isDefined(message.params)){
+		callback(message.params)
+	    } else{
+		callback();
+	    }
+	}	    
+    };
+});
+
+
+diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, message){
+    // console.log($scope);
+    // console.log($modalInstance);
+    console.log(message);
+
+    // $scope.out = {};
+    var callback = message.callback;
+    $scope.params = angular.copy(message.params);
+    // console.log($scope.params);
+        
+    $scope.cancel = function(){
+	$modalInstance.dismiss('cancel');
+    };
+
+    $scope.ok = function() {
+	$modalInstance.dismiss('ok');
+	if (angular.isDefined(callback) && typeof(callback) === "function"){
+	    callback($scope.params);
+	}	    
+    };
+});
+
+// =============================================================================
+// @desc :$q.all([
+//          promise(rightService.list_role)(),
+//          promise(rightService.list_account_right, account)()
+// ]).then
+// =============================================================================
+
+diabloUtils.service("diabloPromise", function($q){
+    this.promise = function(callback, params){
+	return function(){
+	    var deferred = $q.defer();
+	    callback(params).then(function(data){
+		// console.log(data);
+		deferred.resolve(data);
+	    });
+	    return deferred.promise;
+	}
+    }
+});
+
+diabloUtils.service("diabloPagination", function(){
+    var _pageData = null;
+    var _itemsPerpage = null;
+    var _index = [];
+    
+    this.set_data = function(data){
+	_pageData = data;
+    };
+
+    this.get_data = function(){
+	return _pageData;
+    }
+
+    this.set_items_perpage = function(items){
+	_itemsPerpage = items;
+    };
+
+    this.get_length = function(){
+	return _pageData.length;
+    };
+
+    this.get_itmes_perpage = function(){
+	return _itemsPerpage;
+    };
+    
+    this.get_page = function(currentPage){
+	var begin = (currentPage - 1) * _itemsPerpage;
+	var end = begin + _itemsPerpage > this.get_length()
+	    ? (this.get_length()) : begin + _itemsPerpage;
+	
+	// console.log(begin);
+	// console.log(end);
+	// console.log(_pageData.slice(begin, end));
+	
+	// _index = [];
+	// for (var i=begin; i<end; i++){
+	//     _index.push(i);
+	// }
+	// return _index;
+	return _pageData.slice(begin, end);
+    };
+});
+
+
+diabloUtils.directive('diabloItmesPerpage', function(diabloPagination) {
+    return {
+	restrict: 'AE',
+	template: '<ul class="pagination" x-ng-repeat="p in [5, 10, 25, 50]">'
+	    + '<li><a href="javascript:;" x-ng-click="change(p)">{{p}}</a></li>'
+	    + '</ul>',
+	replace: true,
+	transclude: true,
+	scope:{
+	    afterChange: '&'
+	},
+	
+	link: function(scope, element, attr){
+	    scope.change = function(p){
+		// console.log(p);
+		diabloPagination.set_items_perpage(p);
+		if (diabloPagination.get_data() !== null){
+		    scope.afterChange();
+		}
+	    }
+	    
+	    scope.pages = [5, 10, 25, 50];
+	    diabloPagination.set_items_perpage(scope.pages[0]);
+	    // scope.change(scope.pages[0]);
+	    
+	}
+    }
+});
+
+
+diabloUtils.directive('xlsfileUpload', function () {
+    return {
+	restrict: 'AE',
+	template: '<span class="btn btn-success fileinput-button">'
+	    + '<span>{{name}}</span><i class="glyphicon glyphicon-import"></i>'
+	    +'<input id="xlf" type="file"></input>'
+	    +'</span>',
+	// template: '<input id="xlf" type="file"></input>',
+	replace: true,
+	transclude: true,
+	scope: {
+	    name: '@'
+	},
+	
+	link: function(scope, element, attrs){
+    	    var XW = {
+    		/* worker message */
+    		msg: 'xls',
+    		/* worker scripts */
+    		// rABS:   '/public/assets/js-xls/xlsworker2.js',
+    		// norABS: '/public/assets/js-xls/xlsworker1.js',
+    		noxfer: '/public/assets/js-xls/xlsworker.js'
+    	    };
+	    
+    	    function xw(data, cb) {
+    		xw_noxfer(data, cb);
+    	    };
+
+    	    function fixdata(data) {
+    		var o = "", l = 0, w = 10240;
+    		for(; l<data.byteLength/w; ++l){
+    		    o+=String.fromCharCode.apply(null,new Uint8Array(data.slice(l*w,l*w+w)));
+    		}
+		
+    		o+=String.fromCharCode.apply(null, new Uint8Array(data.slice(l*w)));
+    		return o;
+    	    };
+
+    	    function process_wb(wb) {
+    		XLS.SSF.load_table(wb.SSF);
+    		var output = to_json(wb);
+    		// var output = JSON.stringify(to_json(wb), 2, 2);
+    		console.log(output);
+    		//console.log("output", new Date());
+    	    };
+
+    	    function to_json(workbook) {
+    		var result = {};
+    		workbook.SheetNames.forEach(function(sheetName) {
+    		    var roa = XLS.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+    		    if(roa.length > 0){
+    			result[sheetName] = roa;
+    		    }
+    		});
+    		return result;
+    	    };
+
+    	    function xw_noxfer(data, cb) {
+    		var worker = new Worker(XW.noxfer);
+    		worker.onmessage = function(e) {
+    		    switch(e.data.t) {
+    		    case 'ready': break;
+    		    case 'e': console.error(e.data.d); break;
+    		    case XW.msg: cb(JSON.parse(e.data.d)); break;
+    		    }
+    		};
+    		var arr = btoa(fixdata(data));
+    		worker.postMessage({d:arr, b:false});
+    	    }
+
+	        	    
+    	    var handleFile = function(e){
+    		console.log(e);
+    		var file = e.target.files[0];
+    		var reader = new FileReader();
+    		reader.onload = function(e){
+    		    // console.log(e);
+    		    var data = e.target.result;;
+    		    // console.log(data);
+    		    xw(data, process_wb);
+    		}
+    		reader.readAsArrayBuffer(file);
+    	    };
+
+	    var xlf = document.getElementById('xlf');
+    	    if(xlf.addEventListener){
+		xlf.addEventListener('change', handleFile, false);
+	    }
+	}
+    }
+});
+
+diabloUtils.directive('defaultImg', function () {
+        return{
+            restrict: 'AE',
+            // template: '<canvas width="800" height="400"></canvas>',
+            template:'<img ng-src={{default_img}}></img>', 
+            replace: true,
+            transclude: true,
+            scope: {
+		// styleNumber: '=',
+		// brand:       '=',
+		// type:        '=',
+		// total:       '='
+            },
+
+            link: function(scope, element, attrs){
+		scope.default_img =
+		    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAB4CAYAAAB1ovlvAAAFeUlEQVR4Xu2Zr1MjQRCF5wRgwIABhUKhUGBQYMCA4a/EgAEDCgMGMGBQYMAQAwbMXfVWTWoz2c2vq8rrVH8x3CXZ7dfvfendmf3T6XT+Jl44IHLgDwCKnKds5QAAAoLUAQCU2k9xAIQBqQMAKLWf4gAIA1IHAFBqP8UBEAakDgCg1H6KAyAMSB0AQKn9FAdAGJA6AIBS+ykOgDAgdQAApfZTHABhQOoAAErtpzgAwoDUAQCU2k9xAIQBqQMAKLWf4gAIA1IHAFBqP8UBEAakDgCg1H6KAyAMSB0AQKn9FAdAGJA6AIBS+ykOgDAgdQAApfZTHABhQOoAAErtpzgAwoDUAQCU2k9xAIQBqQMAKLWf4gAIA1IHAFBqP8UBEAakDgCg1H6KAyAMSB0AQKn9FAdAGJA6AIBS+ykOgDAgdQAApfZTHABhQOoAAErtpzgAwoDUAQCU2k9xAIQBqQMAKLWf4m4AfH9/T09PT2l/f78xla+vr3R6eprsr73m5+fT8fFxWltb6/v+xcVFenl5qd7f2NhIh4eH3e9YnbOzs/T7+5uWlpbSyclJda7z8/Nkn9nLvm/H1V/D9Nl36+e2/+/s7KTt7e2x9EVDUgrgz89PT/AlLDkMC9agMjAycHd3d+n+/r4PQvve9/d3Ojo6qg43sBYXF/sgLM9nWq6vr9Pu7m4Fpr1G1WffNT32AzKg7Xj7AVxdXU2kLxKEUgDrRluAn5+fPaDkzw2WlZWVnmmS4VhfX+++3xR6nko2WetTraxnx3Y6ncaJlQFr09f0A2nSMo6+KBDODID50lgPpgSzPv0WFhZ6plg5Be1SbtNxb28vLS8vVxPMLpf5uBKAQT+QQZ+VevN0HqYPAKfswLAJ+PHx0b281S+PW1tb1WRrmoj1CVoGX59qeTKW932jTOhBdevHT6JvyhFIys3EBGxyxi5nDw8P1b2eTZO8SNnc3Oy7jJb3Z/l8+Ribjvk8bSm0/UDqdW2S2hTOr/oiZBJ9EiKmXHQmAbQwLy8v08HBQXfBMGnABtbr6+t/Azg3N1fdp+YVd3nvOam+KfMw9XIzB2ATfObaJAHnc9niolykjHoPmOuurq72LaDqcNu2j20jjTOhp06DoOBMAdgGX/2esL4qHnYPaJdwA+ft7W3oFBzlElzu+dltws3NTc9e4zj6BDxMveTMADgIvkGg5Zv/plXw4+Njte+Xp5j9u20h0gZg2/lNUx1A2xscZ5U+dRJEBWcCwKZN4jz1np+fk62Ec+Dl5m/bPmCefvWN7UH3gsO2Yeqb0DnL8v6SfcB+yt0A2DQdslyDyu6dysduTZvHozwJsYmXp1+5Im6bgoP0Na2m28AfRZ9oGEnKSgEsH3VlB/IzWvtbPgMuXWp6bjvoWbBNpdvb2+o0eZuk1NH2fpO+/F55jkmfVUsoEBaVAijsm9JOHABAJ0FElQGAUZN30jcAOgkiqgwAjJq8k74B0EkQUWUAYNTknfQNgE6CiCoDAKMm76RvAHQSRFQZABg1eSd9A6CTIKLKAMCoyTvpGwCdBBFVBgBGTd5J3wDoJIioMgAwavJO+gZAJ0FElQGAUZN30jcAOgkiqgwAjJq8k74B0EkQUWUAYNTknfQNgE6CiCoDAKMm76RvAHQSRFQZABg1eSd9A6CTIKLKAMCoyTvpGwCdBBFVBgBGTd5J3wDoJIioMgAwavJO+gZAJ0FElQGAUZN30jcAOgkiqgwAjJq8k74B0EkQUWUAYNTknfQNgE6CiCoDAKMm76RvAHQSRFQZABg1eSd9A6CTIKLKAMCoyTvpGwCdBBFVBgBGTd5J3wDoJIioMgAwavJO+gZAJ0FElQGAUZN30jcAOgkiqgwAjJq8k77/Aa0A9u1tG0GmAAAAAElFTkSuQmCC"; 
+            }
+        }
+});
+
+diabloUtils.directive('drawDefaultImg', function () {
+    return{
+        restrict: 'AE',
+        // template: '<canvas width="800" height="400"></canvas>',
+        template: '<canvas></canvas>',
+        replace: true,
+        transclude: true,
+        // require: "ngModel",
+        scope: {
+            // orgImage: '=',
+	    // options: '='
+        },
+
+        link: function(scope, element, attrs){
+	    // set default width and height
+	    
+	    var height = 120;
+	    var width  = 160;
+	    element.attr("width", width);
+            element.attr("height", height);
+	    
+            var ctx = element.get(0).getContext("2d");
+	    ctx.fillStyle="rgba(238,238,238,1)";
+	    ctx.fillRect(0, 0, width, height);
+	    
+	    ctx.fillStyle = "rgba(127, 127, 127, 1)";
+	    ctx.font = "20px sans-serif";
+	    ctx.textAlign = "start"
+            ctx.textBaseline = 'top';
+	    ctx.fillText("120X160", 30, 50);
+
+	    w = element.get(0).toDataURL("image/png");
+	    console.log(w);
+
+	    // var context = ctx;
+	    // context.fillStyle = "#EEEEFF";
+            // context.fillRect(0,0,400,300);
+            // context.fillStyle = "#00f";
+            // context.font = "italic 30px sans-serif";
+            // context.textBaseline = 'top';
+            // var txt="fill示例文字"
+            // context.fillText(txt, 0, 0);
+        }
+    }
+});
+
+
+diabloUtils.directive('imageDraw', function ($q) {
+    function postLinkFn (scope, element, attrs){
+	console.log(scope);
+	var ctx = element.get(0).getContext("2d");
+
+	scope.$watch("orgImage.image", function(newValue, oldValue){
+	    if (angular.isUndefined(newValue)
+		|| angular.equals(newValue, oldValue)){
+		return;
+	    };
+
+	    var options = scope.options; 
+	    // var maxHeight = options ? options.maxHeight : 150;
+	    // var maxWidth = options ? options.maxWidth : 200;
+	    var quality = options ? options.quality : 0.5;
+	    // var type = options ? options.type : 'image/jpg';
+
+	    var orgImage = scope.orgImage.image;
+	    // console.log(orgImage);
+	    var height = 120;
+	    var width  = 160;
+	    // var height = orgImage.height;
+	    // var width = orgImage.width;
+
+	    // console.log(height, width, quality);
+
+	    // if (width > height) {
+	    // 	if (width > maxWidth) {
+	    // 	    height = Math.round(height *= maxWidth / width);
+	    // 	    width = maxWidth;
+	    // 	}
+	    // } else {
+	    // 	if (height > maxHeight) {
+	    // 	    width = Math.round(width *= maxHeight / height);
+	    // 	    height = maxHeight;
+	    // 	}
+	    // }
+
+	    console.log(height, width, quality);
+	    
+            element.attr("width", width);
+            element.attr("height", height);
+
+	    //draw image on canvas
+	    ctx.drawImage(orgImage, 0, 0, width, height); 
+	    // get the data from canvas as 70% jpg (or specified type). 
+	    scope.orgImage.dataUrl = element.get(0).toDataURL("image/png", quality);
+	})
+    };
+    
+    return{
+        restrict: 'AE',
+        // template: '<canvas width="800" height="400"></canvas>',
+        template: '<canvas></canvas>',
+        replace: true,
+        transclude: true,
+        // require: "ngModel",
+        scope: {
+            orgImage: '=',
+	    options: '='
+        },
+
+        compile: function(element, attrs){
+            return postLinkFn;
+        }
+    }
+});
+
+diabloUtils.directive('imageUpload', function ($q) {
+    'use strict'
+
+    var URL = window.URL || window.webkitURL; 
+    
+    var createImage = function(url, callback) {
+	var image = new Image();
+	image.onload = function() {
+	    callback(image);
+	};
+	image.src = url;
+    };
+
+    var fileToDataURL = function (file) {
+	// console.log(file);
+	var deferred = $q.defer();
+	var reader = new FileReader(); 
+	reader.readAsDataURL(file);
+	
+	reader.onload = function (e) {
+	    deferred.resolve(e.target.result);
+	};
+	return deferred.promise;
+    };
+    
+    return {
+	restrict: 'AE',
+	template: '<span class=\"btn btn-primary btn-file\">'
+	    +'<i class="glyphicon glyphicon-arrow-right"></i>'
+	    // +'<i class="glyphicon glyphicon-minus"></i>'
+	    +'<input type="file" accept="image/*"></input>'
+	    +'</span>',
+	replace: true,
+	transclude: true,
+	scope: {
+	    image: '=',
+	    maxHeight: '@?',
+	    maxWidth: '@?',
+	    quality: '@?',
+	    type: '@?'
+	},
+	
+	link: function(scope, element, attrs){
+	    var doResizing = function(imageResult, callback) {
+		createImage(imageResult.url, function(image) {
+		    console.log(image);
+		    // var dataURL = resizeImage(image, scope);
+		    // imageResult.resized = {
+		    // 	dataURL: dataURL,
+		    // 	type: dataURL.match(/:(.+\/.+);/)[1],
+		    // };
+		    imageResult.image = image; 
+		    callback(imageResult);
+		});
+	    };
+
+	    var applyScope = function(imageResult) {
+		scope.$apply(function() {
+		    console.log(imageResult);
+		    scope.image = imageResult;
+		});
+	    };
+	    
+	    angular.element('.btn-file :file').bind('change', function(evt){
+		// console.log(evt); 
+		var file = evt.target.files[0];
+		// console.log(file);
+		if (angular.isDefined(file)) {
+		    var imageResult = {
+			file: file,
+			url:  URL.createObjectURL(file)
+		    };
+
+		    fileToDataURL(file).then(function (dataURL) {
+			// imageResult.dataURL = dataURL; 
+		    });
+
+		    
+		    doResizing(imageResult, function(imageResult) {
+			applyScope(imageResult);
+		    });
+		} 
+	    }) 
+	}
+    }
+});

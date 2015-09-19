@@ -1,0 +1,83 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  服务器详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/server/new')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<!-- <div class="table-toolbar">  -->
+	<!-- </div> <\!--END table-toolbar-\-> -->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th class="text-center">序号</th>
+		    <th class="text-center success">服务器名称</th>
+		    <th class="text-center info">服务器地址</th>
+		    <th class="text-center">日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="s in servers">
+		    <td class="text-center">{{s.id}}</td>
+		    <td class="text-center">{{s.name}}</td>
+		    <td class="text-center">{{s.path}}</td>
+		    <td class="text-center">{{s.entry_date}}</td> 
+
+		    <td class="col-md-2"> 
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_server(s)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button>
+                      <button href="" class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_server(s)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </td>
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+

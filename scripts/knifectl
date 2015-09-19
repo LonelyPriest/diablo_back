@@ -1,0 +1,43 @@
+#!/bin/sh
+
+. `dirname $0`/knife-env
+
+if [ $# -lt 1 ]; then
+    echo "usage: $(basename $0) [controller|proxy|agent] <option>"
+    exit 1
+fi
+
+SUBSYSTEM=$1
+
+case ${SUBSYSTEM} in
+    controller)
+	;;
+    proxy)
+	;;
+    agent)
+	;;
+    *)
+	echo "unkown subsystem ${SUBSYSTEM}"
+	echo "usage: $(basename $0) [controller|proxy|agent] <option>"
+	exit 1
+	;;
+esac
+
+shift 1
+
+[ "x" = "x$KNIFE_NODENAME" ] && KNIFE_NODENAME=${SUBSYSTEM}-${NODENAME}
+[ "x" = "x$KNIFE_CTL_ERL_ARGS" ] && KNIFE_CTL_ERL_ARGS=${CTL_ERL_ARGS}
+
+##--- End of overridden <var_name> variables
+
+KNIFE_EBIN_ROOT="${KNIFE_HOME}/ebin"
+
+ERL_LIBS=${KNIFE_HOME}/deps \
+exec ${ERL} \
+    -pa ${KNIFE_EBIN_ROOT} \
+    -noinput \
+    -hidden \
+    -sname knifectl$$ \
+    -s knife_control_main \
+    -nodename $KNIFE_NODENAME \
+    -extra "$@"

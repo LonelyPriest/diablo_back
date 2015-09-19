@@ -1,0 +1,131 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">银行卡</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增银行卡</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box blue">      
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="form" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">开户姓名</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="name"
+			 required
+			 placeholder="请输入开户行姓名"
+			 x-ng-model="card.name"
+			 x-ng-pattern="/^[\u4e00-\u9fa5]+$/"
+			 x-ng-maxlength="4"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	      <div ng-show="form.name.$invalid && !form.name.$pristine
+			    || from.name.$error.maxlength">
+		<span class="fg-red">请输入中文，不能超过4个字符</span>
+	      </div>
+	    </div>
+	    
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">卡号</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="no"
+			 required
+			 placeholder="请输入银行卡号"
+			 x-ng-model="card.no"
+			 x-ng-pattern="/^[0-9' ']+$/"
+			 x-ng-maxlength="23"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	      <div ng-show="form.no.$invalid && !form.no.$pristine
+			    || from.no.$error.maxlength">
+		<span style="color:red">请输入数字串，可输入空格，最长23位</span>
+	      </div>
+	    </div>
+
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">开户行</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 name="card"
+			 required
+			 placeholder="请输入开户行名称，如建设很行"
+			 x-ng-model="card.bank"
+			 x-ng-pattern="/^[\u4e00-\u9fa5]+$/"></input>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	      <div ng-show="form.card.$invalid && !form.card.$pristine">
+		<span class="fg-red">请输入中文字符串</span>
+	      </div>
+	    </div>
+
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">备注</label>
+	      <div class="col-sm-6 col-md-6">
+		<input type="text"
+		       class="form-control"
+		       name="remark"
+		       placeholder="请输入备注信息"
+		       x-ng-model="card.remark"
+		       x-ng-pattern="/^[\u4e00-\u9fa5A-Za-z0-9]+$/"></input> 
+	      </div>
+	      <div ng-show="form.remark.$invalid && !form.remark.$pristine">
+		<span class="fg-red">请输入中文，字母或数字</span>
+	      </div>
+	    </div> 
+
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid"> 
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button type="submit" class="btn btn-primary"
+			ng-disabled="form.$invalid"
+			x-ng-click="new_card()">确定</button>
+		<button type="button" class="btn btn-warning"
+			x-ng-click="cancel_new_card()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+
+
+
+
+
+

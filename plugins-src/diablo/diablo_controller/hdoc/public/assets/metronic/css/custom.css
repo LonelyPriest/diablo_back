@@ -1,0 +1,97 @@
+/* here you can put your own css to customize and override the theme */
+
+
+.header .navbar-brand {
+  display: inline-block;
+  margin-top: -1px;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  width: 160px;
+}
+
+
+.page-sidebar .sidebar-toggler {
+  margin-top: 15px;
+  margin-left: 115px;
+}
+
+/*** IE 8 Fixes ***/
+/***
+Page sidebar
+***/
+
+.ie8 .page-sidebar {
+  width: 160px;
+  float: left;
+  position: relative;
+  margin-left: -100%;
+}
+
+.ie8 .page-content { 
+    margin-left: 160px; 
+    margin-top: 0px;
+    min-height: 760px; 
+    padding: 25px 20px 20px 20px;
+ }
+
+/***
+    Page sidebar
+    ***/
+.page-sidebar {
+    width: 160px;
+    float: left;
+    position: relative;
+    margin-right: -100%;
+}
+
+
+/***
+    Page content
+    ***/
+.page-content { 
+    margin-left: 160px; 
+    margin-top: 0px;
+    min-height: 760px; 
+    padding: 25px 20px 20px 20px;
+}
+
+
+.page-sidebar-fixed .footer {
+    margin-left: 160px;
+    background-color: #fff;
+    padding: 8px 20px 5px 20px;
+}
+
+
+/*
+ * sidebar-menu hover
+ */
+.page-sidebar-closed .page-sidebar-menu > li:hover {
+    width: 156px !important;
+    position: relative !important;
+    z-index: 2000;
+    display: block !important;
+}
+
+.page-sidebar-closed .page-sidebar-menu > li:hover > .sub-menu {  
+    width: 120px;
+    position: absolute;
+    z-index: 2000;
+    left: 36px;
+    margin-top: 0;
+    top: 100%;
+    display: block !important;
+}
+
+
+.page-sidebar-closed .page-sidebar-menu > li:hover > .sub-menu > li > .sub-menu,
+.page-sidebar-closed .page-sidebar-menu > li:hover > .sub-menu > li > .sub-menu > li > .sub-menu {
+    width: 120px;
+}
+
+ul.page-sidebar-menu > li.active > a {
+    background: none !important;
+    border-top-color: transparent !important;
+    color: #ffffff;
+}

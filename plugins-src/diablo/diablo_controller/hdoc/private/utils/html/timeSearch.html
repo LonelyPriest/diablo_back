@@ -1,0 +1,23 @@
+<div class="input-group">
+  <span class="input-group-btn">
+    <button type="button" class="btn">
+      <i class={{glyphicon}}></i></button>
+  </span>
+  <input type="text" class="form-control"
+	 placeholder="年/月/日"
+	 datepicker-popup="yyyy/MM/dd"
+	 is-open="opened"
+	 close-text="关闭"
+	 clear-text="清除"
+	 current-text="今天"
+	 show-weeks="false"
+	 x-ng-model="time"></input>
+  <span class="input-group-btn">
+    <button type="button" class="btn btn-default"
+	    x-ng-click="open_calendar($event)">
+      <i class="glyphicon glyphicon-calendar"></i></button>
+    <button type="button" class="btn btn-success"
+	    x-ng-disabled="!time" x-ng-click="ok()">
+      <i class="glyphicon glyphicon-ok"></i></button>
+  </span> 
+</div>

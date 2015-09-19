@@ -1,0 +1,185 @@
+<div class="row">
+  <div x-ng-repeat="f in filters">
+    <div class="col-md-6 col-sm-12">
+      <div class="input-group">
+	<div class="input-group-btn">
+	  <button type="button" class="btn">
+	    <i class="glyphicon glyphicon-hand-right fg-red"></i></button>
+	</div>
+	<select class="form-control"
+		x-ng-options="f.chinese for  f in f.fields"
+		x-ng-change="change_field(f)"
+		x-ng-model="f.field">
+	</select>
+
+	<div class="input-group-btn">
+	  <button type="button" class="btn">
+	    <i class="glyphicon glyphicon-chevron-right fg-red"></i></button>
+	</div>
+
+	<div x-ng-switch on="f.field.name">
+	  <!-- <span x-ng-switch-when="style_number"> -->
+	  <!--   <input type="text" class="form-control" placeholder="请输入款号" -->
+	  <!-- 	   x-ng-model="f.value" -->
+	  <!-- 	   typeahead-editable="false" -->
+	  <!-- 	   typeahead="s for s in prompt.style_number|filter:$viewValue|limitTo:8"></input> -->
+	  <!-- </span> -->
+
+	  <span x-ng-switch-when="style_number">
+	    <div class="has-feedback">
+	      <input type="text" class="form-control" placeholder="请输入款号"
+		     x-ng-model="f.value"
+		     typeahead-editable="false"
+		     typeahead-wait-ms="300"
+		     typeahead-loading="loading"
+		     typeahead-on-select="prompt.on_select_style_number($item, $model, $label)"
+	  	     typeahead="s for s in prompt.style_number($viewValue)|limitTo:8">
+	      <span x-ng-show="loading">
+		<i class="icon-spinner icon-spin icon-2x
+			  form-control-feedback"></i>
+	      </span>
+	    </div>
+	  </span>
+	  
+	  <span x-ng-switch-when="brand">
+	    <input type="text" class="form-control" placeholder="请输入品名"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="b as b.name for b in prompt.brand|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="type">
+	    <input type="text" class="form-control" placeholder="请输入类别"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="t as t.name for t in prompt.type|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="sell_type">
+	    <input type="text" class="form-control" placeholder="请输入销售类别"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="st as st.name for st in
+			      prompt.sell_type|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="purchaser_type">
+	    <input type="text" class="form-control" placeholder="请输入采购类别"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="pt as pt.name for pt in
+			      prompt.purchaser_type|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="color">
+	    <input type="text" class="form-control" placeholder="请输入颜色"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="c as c.name for c in prompt.color|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="year">
+	    <input type="text" class="form-control" placeholder="请选择年度"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="y for y in prompt.year|filter:$viewValue|limitTo:8"></input>
+	    <!-- <input type="text" class="form-control" placeholder="请输入年度" -->
+	    <!-- 	   x-ng-maxlength="4" -->
+	    <!-- 	   x-ng-minlength="4" -->
+	    <!-- 	   x-ng-pattern="/^2[0][1-9][0-9]$/" -->
+	    <!-- 	   x-ng-model="f.value"></input> -->
+	  </span>
+
+	  <span x-ng-switch-when="has_pay">
+	    <input type="text" class="form-control" placeholder="请选择实付方式（>0或<0）"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="p as p.name for p in prompt.has_pay|filter:$viewValue|limitTo:8"></input>
+	    <!-- <input type="text" class="form-control" placeholder="请输入年度" -->
+	    <!-- 	   x-ng-maxlength="4" -->
+	    <!-- 	   x-ng-minlength="4" -->
+	    <!-- 	   x-ng-pattern="/^2[0][1-9][0-9]$/" -->
+	    <!-- 	   x-ng-model="f.value"></input> -->
+	  </span>
+
+	  <span x-ng-switch-when="season">
+	    <input type="text" class="form-control" placeholder="请输入季节"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in prompt.season|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="size">
+	    <input type="text" class="form-control" placeholder="请输入尺码"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="c for c in prompt.size|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="shop">
+	    <input type="text" class="form-control" placeholder="请输入店铺"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in
+			      prompt.shop|filter:$viewValue|limitTo:8"></input>
+	  </span>
+
+	  <span x-ng-switch-when="supplier">
+	    <input type="text" class="form-control" placeholder="请输入供应商"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in
+			      prompt.supplier|filter:$viewValue|limitTo:8"></input>	  
+	  </span>
+	  
+	  <span x-ng-switch-when="running_no">
+	    <input type="text" class="form-control" placeholder="请输入流水号"
+		   x-ng-model="f.value"></input>
+	  </span>
+
+	  <span x-ng-switch-when="employ">
+	    <input type="text" class="form-control" placeholder="请输入店员"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+		   typeahead="s as s.name for s in
+			      prompt.employee|filter:$viewValue|limitTo:8"></input>
+	  </span>
+	  
+	  <span x-ng-switch-when="rsn">
+	    <form name="rForm">
+	      <div ng-class="{'has-error':rForm.$invalid && !rForm.$pristine}">
+		<input type="text" class="form-control" placeholder="请输入单号"
+		       x-ng-model="f.value"
+		       x-ng-pattern="/^[A-Za-z0-9\-]+$/"></input>
+	      </div>
+	    </form>
+	  </span>
+
+	  <span x-ng-switch-when="firm">
+	    <input type="text" class="form-control" placeholder="请输入厂商"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in
+			      prompt.firm|filter:$viewValue|limitTo:8"></input>	  
+	  </span>
+	  
+	  <span x-ng-switch-when="retailer">
+	    <input type="text" class="form-control" placeholder="请输入零售商"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+		   typeahead="s as s.name for s in
+			      prompt.retailer|filter:$viewValue|limitTo:8"></input>
+	  </span> 
+	  
+	</div> 
+	
+	<div class="input-group-btn">
+	  <button type="button" class="btn btn-success"
+		  x-ng-disabled="!f.value" x-ng-click="ok()">
+	    <i class="glyphicon glyphicon-ok"></i></button>
+	</div>
+	
+      </div> 
+    </div> 
+  </div>
+</div>

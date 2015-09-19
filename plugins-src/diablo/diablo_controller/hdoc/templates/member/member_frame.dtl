@@ -1,0 +1,58 @@
+{% extends "../base_frame.dtl" %}
+
+{% comment %}
+
+{% block sidebar_menu %}
+{{sidebar}}
+{% endblock %}
+
+{% endcomment %}
+
+
+{% comment %}
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+	<i class="fa fa-home"></i>
+	<a href="/virtual_machine">会员管理</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+      <h3 class="page-title">
+	<font color="red">constructor...</font>
+      </h3>
+    </div>
+</div>
+
+{% endblock %}
+{% endcomment %}
+
+{% block self_reference_js %}
+%% <script src="/private/utils/javascript/diablo_utils.js"   type="text/javascript"></script>
+<script src="/private/utils/javascript/subbmit_notify.js" type="text/javascript"></script>
+<script src="/private/utils/javascript/table_utils.js"    type="text/javascript"></script>
+
+<!--about right-->
+<script src="/private/right/javascript/user_right_app.js" type="text/javascript"></script>
+<script src="/private/right/javascript/user_right_map.js" type="text/javascript"></script>
+
+<script src="/private/member/javascript/member_app.js"    type="text/javascript"></script>
+{% endblock %}
+
+
+
+{% block script_init %} 
+<script>
+    jQuery(document).ready(function() {
+	App.init(); // initlayout and core plugins
+	//TableManaged.init();
+	//TableEditable.init();
+    });
+</script>
+{% endblock %}

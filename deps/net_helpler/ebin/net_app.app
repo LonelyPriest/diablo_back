@@ -1,0 +1,10 @@
+{application,net_helper,
+             [{description,"net helper"},
+              {id,"net_helper"},
+              {vsn,"1.0.0"},
+              {modules,[net_app,net_sup,net_client_sup,net_connection_sup,
+                        net_receiver,net_working,supervisor_new,tcp_acceptor,
+                        tcp_acceptor_sup,tcp_listener,tcp_listener_sup]},
+              {registered,[net_sup,net_client_sup]},
+              {applications,[kernel,stdlib]},
+              {mod,{net_app,[]}}]}.

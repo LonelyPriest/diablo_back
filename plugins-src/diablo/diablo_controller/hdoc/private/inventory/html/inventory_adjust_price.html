@@ -1,0 +1,222 @@
+<div class="row">
+  <div class="col-xs-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+	<i class="glyphicon glyphicon-align-justify"></i>
+	<a href="javascript:;">库存</a>
+	<i class="icon-angle-right"></i>
+      </li>
+      <li>
+	<a href="javascript:;">调价</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END row-->
+
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>库存调价</div>
+	<div class="tools">
+	  <a class="reload" href="#" x-ng-click="refresh()"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="row">
+	    <div class="col-md-4 col-ms-4 col-xs-4">
+	      <div class="input-group">
+		<span class="input-group-btn">
+		  <button type="button" class="btn">
+		    <i class="glyphicon glyphicon-hand-right fg-red"></i>
+		    <strong>请选择</strong>
+		  </button>
+		</span>
+		<select class="form-control"
+			x-ng-options="item as item.chinese for item in menu_items"
+			x-ng-model="filter.item"
+			x-ng-init="filter.item=menu_items[0]"></select>
+	      </div>
+	    </div>
+	    
+	    <div class="col-md-2 col-ms-2 col-xs-2">
+	      <select class="form-control"
+		      x-ng-options="operator for operator in ['&#8316;']"
+		      x-ng-model="filter.operator" x-ng-init="filter.operator='&#8316'">
+	      </select>
+	    </div>
+	    
+	    <div class="col-md-6 col-ms-6 col-xs-6">
+	      <span x-ng-switch on="filter.item.name">
+		<span x-ng-switch-when="by_number">
+		  <input type="text" class="form-control" placeholder="请输入款号"
+			 x-ng-model="filter.value"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_select($item, $model, $label)"
+	  		 typeahead="n for n in
+				    prompt.style_number|filter:$viewValue|limitTo:8"></input>
+		</span>
+		<span x-ng-switch-when="by_shop">
+		  <input type="text" class="form-control" placeholder="请输入店铺"
+			 x-ng-model="filter.value"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_select($item, $model, $label)"
+	  		 typeahead="s as s.name for s in
+				    prompt.shop|filter:$viewValue|limitTo:8"></input>
+		</span>
+		<span x-ng-switch-when="by_brand">
+		  <input type="text" class="form-control" placeholder="请输入品牌"
+			 x-ng-model="filter.value"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_select($item, $model, $label)"
+	  		 typeahead="b as b.name for b in
+				    prompt.brand|filter:$viewValue|limitTo:8"></input>
+		</span>		  
+		<span x-ng-switch-when="by_supplier">
+		  <input type="text" class="form-control" placeholder="请输入供应商"
+			 x-ng-model="filter.value"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_select($item, $model, $label)"
+	  		 typeahead="s as s.name for s in
+				    prompt.supplier|filter:$viewValue|limitTo:8"></input>
+		</span>
+	      </span>				
+	    </div>
+	  </div> <!--END row-->
+	  
+	  <div class="row">
+	    <div class="col-md-6 col-ms-6 col-xs-6">
+	      <div class="input-group">
+		<span class="input-group-btn">
+		  <button type="button" class="btn">
+		    <i class="glyphicon glyphicon-sort fg-red"></i>
+		    <strong>调整后价格</strong>
+		  </button>
+		</span>
+		<input class="form-control" type="text"
+		       x-ng-model="adjust.price"></input>
+		<span class="input-group-btn">
+		  <button type="button" class="btn btn-success"
+			  x-ng-disabled="!adjust.price || invalidInventoy"
+			  x-ng-click="adjust_price()">
+		    <i class="glyphicon glyphicon-ok"></i></button>
+		</span>
+	      </div>
+	    </div>
+	    
+	    <div class="col-md-6 col-ms-6 col-xs-6">
+	      <div class="input-group">
+		<span class="input-group-btn">
+		  <button type="button" class="btn">
+		    <i class="glyphicon glyphicon-sort fg-red"></i>
+		    <strong>调整后折扣</strong>
+		  </button>
+		</span>
+		<input class="form-control" type="text"
+		       x-ng-model="adjust.discount"></input>
+		<span class="input-group-btn">
+		  <button type="button" class="btn btn-success"
+			  x-ng-disabled="!adjust.discount || invalidInventoy"
+			  x-ng-click="adjust_price()">
+		    <i class="glyphicon glyphicon-ok"></i></button>
+		</span>
+	      </div>
+	    </div>
+	  </div> <!--END row-->
+	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <!-- <div class="panel panel-default"> -->
+	  <!--BEGIN inventory table-->
+	  <div class="table-responsive">
+	    <!-- <table ng-table="inventoryTable" -->
+	    <!-- 	   class="table table-bordered table-striped -->
+	    <!-- 		  table-hover table-condensed table-advanced"> -->
+	    <table class="table table-bordered table-striped
+			  table-hover table-condensed table-advanced">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>品名</th>
+	    	  <th class="warning">款号</th>
+		  <th>类别</th>
+		  <th class="info">颜色</th>
+		  <th>原价</th>
+		  <th>定价</th>
+	    	  <th>折扣</th>
+		  <th>年度</th>
+		  <th>季节</th>
+		  <th>性别</th>
+		  <th class="danger">尺码</th>
+		  <th>数量</th>		
+		  <th>店铺</th>
+		  <th>供应商</th>
+		</tr>
+	      </thead>
+	      
+	      <tbody>
+		<tr x-ng-repeat="inv in inventories">
+		  <td>{{inv.order_id}}</td>
+		  <td>{{inv.brand}}</td>
+		  <td>{{inv.style_number}}</td>
+		  <td>{{inv.type}}</td>
+		  <td>{{inv.color}}</td>
+		  <td>{{inv.org_price}}</td>
+		  <td>{{inv.plan_price}}</td>
+		  <td>{{inv.discount}}</td>
+		  <td>{{inv.year}}</td>
+		  <td>{{season[inv.season]}}</td>
+		  <td>{{sex[inv.sex]}}</td>
+		  <td>{{inv.size}}</td>
+		  <td>{{inv.amount}}</td>
+		  <td>{{inv.shop_name}}</td>
+		  <td>{{inv.supplier}}</td>
+		</tr>
+	      </tbody>
+
+	      <tfoot>
+	      	<tr>
+	      	  <td colspan=15>
+		    <!-- <ul class="pagination" x-ng-repeat="p in [5, 10, 25, 50]"> -->
+		    <!--   <li><a href="javascript:;" x-ng-click="change(p)">{{p}}</a></li> -->
+		    <!-- </ul> -->
+		    <!-- <diablo-itmes-perpage after-change="items_changed()"></diablo-itmes-perpage> -->
+	      	    <pagination class="pull-right" total-items="totalItems"
+		    		items-per-page="itemsPerpage"
+		    		boundary-links="true"
+		    		previous-text="&lsaquo;" next-text="&rsaquo;"
+		    		first-text="&laquo;" last-text="&raquo;"
+		    		x-ng-model="currentPage"
+		    		x-ng-change="page_changed(currentPage)">
+		    </pagination>
+	      	  </td>
+	      	</tr>
+	      </tfoot>
+	      
+	    </table> <!--END inventory table-->
+	  </div>
+
+	  <!-- </div> <\!--END panel-\-> -->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

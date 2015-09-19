@@ -1,0 +1,76 @@
+var wreportApp = angular.module(
+    "wreportApp", ['ngRoute', 'ngResource', 'diabloPattern',
+		   'diabloUtils', 'userApp', 'diabloFilterApp',
+		   'diabloNormalFilterApp', 'diabloAuthenApp',
+		   'ui.bootstrap', 'wgoodApp'])
+// .config(diablo_authen);
+    .config(function($httpProvider, authenProvider){
+	//  $httpProvider.responseInterceptors.push(authenProvider.interceptor);
+	$httpProvider.interceptors.push(authenProvider.interceptor);
+    });
+
+wreportApp.config(['$routeProvider', function($routeProvider){
+    var user = {"user": function(userService){
+    	return userService()}};
+
+    var retailer = {"filterRetailer": function(diabloFilter){
+	return diabloFilter.get_wretailer()}};
+    
+    var employee = {"filterEmployee": function(diabloNormalFilter){
+	return diabloNormalFilter.get_employee()}}; 
+    
+    $routeProvider.
+    	when('/wreport_daily', {
+    	    templateUrl: '/private/wreport/html/wreport_daily.html',
+            controller: 'wreportDailyCtrl',
+    	    resolve: angular.extend({}, employee, retailer, user)
+    	}).
+    // 	when('/shop/shop_new', {
+    // 	    templateUrl: '/private/shop/html/shop_new.html',
+    //         controller: 'newShopCtrl',
+    // 	    resolve: angular.extend({}, employee, user)
+    // 	}).
+    // 	when('/repo/repo_detail', {
+    // 	    templateUrl: '/private/shop/html/repo_detail.html',
+    //         controller: 'repoDetailCtrl'
+    // 	}).
+    // 	when('/repo/repo_new', {
+    // 	    templateUrl: '/private/shop/html/repo_new.html',
+    //         controller: 'repoNewCtrl'
+    // 	}).
+    	otherwise({
+	    templateUrl: '/private/wreport/html/wreport_daily.html',
+            controller: 'wreportDailyCtrl',
+    	    resolve: angular.extend({}, employee, retailer, user) 
+        })
+}]);
+
+wreportApp.service("wreportService", function($resource, dateFilter){
+    this.error = {};
+
+    var http = $resource("/wreport/:operation/:type",
+    			 {operation: '@operation', type: '@type'});
+
+    /*
+     * pagination
+     */
+    this.items_perpage = 5;
+    this.max_page_size = 5;
+    this.default_page = 1;
+    
+    this.daily_report = function(type, condition, currentPage){
+	return http.save({operation: "daily_wreport", type: type},
+			 {condition: condition,
+			  page:      currentPage,
+			  count:     this.items_perpage}).$promise;
+    };
+    
+});
+
+wreportApp.controller("wreportCtrl", function($scope){});
+
+wreportApp.controller("loginOutCtrl", function($scope, $resource){
+    $scope.home = function () {
+	diablo_login_out($resource)
+    };
+});

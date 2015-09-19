@@ -1,0 +1,192 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  移仓
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-12 col-md-12">
+	      <div class="input-group">
+	  	<div class="input-cont">
+	  	  <input type="text" class="form-control" placeholder="请输入款号"
+	  		 x-ng-model="filter.style_number"></input>
+	  	</div>
+	  	<span class="input-group-btn">
+	  	  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	  </div> <!--END form-group-->
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <!-- <div class="panel panel-default"> -->
+	  <!--BEGIN inventory table-->
+	  <div class="table-responsive">
+	    <table ng-table="inventoryTable"
+		   class="table table-bordered table-striped
+			  table-hover table-condensed table-advanced">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>品名</th>
+	    	  <th>款号</th>
+		  <th>类别</th>
+		  <th>颜色</th>
+		  <th>定价</th>
+	    	  <th>折扣</th>
+		  <th>年度</th>
+		  <th>季节</th>
+		  <th>性别</th>
+		  <th>尺码</th>
+		  <th>数量</th>		
+		  <th>所在店铺</th>
+		  <th>供应商</th>
+		  <th>目的店铺</th>
+		  <th>数量</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      
+	      <tbody>
+		<tr x-ng-repeat="inv in $data">
+		  <td data-title="'序号'" sortable="'id'">
+		    <span>{{inv.order_id}}</span>
+		  </td>
+
+		  <td data-title="'品名'">
+		    <span>{{inv.brand}}</span>
+		  </td>
+		  
+		  <td data-title="'款号'">
+		    <span>{{inv.style_number}}</span>
+		  </td>
+		  
+		  <td data-title="'类别'">
+		    <span>{{inv.type}}</span>
+		  </td>
+
+		  <td data-title="'颜色'">
+		    <span>{{inv.color}}</span>
+		  </td>
+		  
+		  <td data-title="'定价'">
+		    <span>{{inv.plan_price}}</span>
+		  </td>
+		  
+		  <td data-title="'折扣'">
+		    <span>{{inv.discount}}</span>
+		  </td>
+
+		  <td data-title="'年度'">
+		    <span>{{inv.year}}</span>
+		  </td>
+		  
+		  <td data-title="'季节'">
+		    <span>{{seasons[inv.season]}}</span>
+		  </td>
+
+		  <td data-title="'性别'">
+		    <span>{{sexs[inv.sex]}}</span>
+		  </td>
+		  
+		  <td data-title="'尺码'">
+		    <span>{{inv.size}}</span>
+		  </td>
+		  
+		  <td data-title="'数量'">
+		    <span>{{inv.amount}}</span>
+		  </td>
+
+		  <td data-title="'所在店铺'">
+		    <span>{{inv.shop_name}}</span>
+		  </td>
+		  
+		  <td data-title="'供应商'" ng-switch on="inv.supplier">
+		    <span ng-switch-when="null">暂无</span>
+		    <span ng-switch-default>{{inv.supplier}}</span>
+		  </td>		  
+
+		  <td data-title="'目的店铺'">
+		    <span ng-show="inv.move">{{inv.target.name}}</span>
+		    <form name="targetForm" ng-show="!inv.move">
+		      <div ng-class="{'has-error':
+				     targetForm.target.$invalid
+				     && !targetForm.target.$pristine}">
+			<select class="form-control input-small"
+				required
+				name="target"
+				x-ng-model="inv.target"
+				x-ng-options="t as t.name for t in valid_shops(inv)">
+			  <option value="">-- 请选择 --<option>
+			</select>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'数量'">
+		    <span ng-show="inv.move">{{inv.move_amount}}</span>
+		    <form name="amountForm" ng-show="!inv.move">
+		      <div ng-class="{'has-error':
+				     amountForm.amount.$invalid
+				     && !amountForm.amount.$pristine}">
+			<select class="form-control table-select"
+				required
+				name="amount"
+				x-ng-model="inv.move_amount"
+				x-ng-options="n for n in inv.range">
+			  <option value="">-- 请选择 --<option>
+			</select>
+		      </div>
+		    </form>		    
+		  </td>		  
+		  
+		  <td data-title="'操作'">
+		    <span ng-if="!inv.move">
+                      <a class="btn btn-xs bg-darkRed fg-white"
+			 x-ng-disabled="targetForm.$invalid
+					|| amountForm.$invalid
+					|| inv.move_amount===0"
+			 x-ng-click="inv.move=true">移仓
+			<i class="glyphicon glyphicon-share"></i></a>
+		    </span>
+		    <span ng-if="inv.move">
+		      <a class="btn btn-xs bg-emerald fg-white"
+			 x-ng-click="move_inventory(inv)">确认
+			<i class="glyphicon glyphicon-ok"></i></a>
+		      <a class="btn btn-xs bg-gray fg-white"
+			 x-ng-click="inv.move=false">取消
+			<i class="glyphicon glyphicon-remove"></i></a>
+		    </span>
+		  </td>
+		  
+		</tr>
+	      </tbody>
+	      
+	    </table> <!--END inventory table-->
+	  </div>
+
+	  <!-- </div> <\!--END panel-\-> -->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>

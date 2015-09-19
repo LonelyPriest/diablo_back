@@ -1,0 +1,298 @@
+#! /usr/bin/env escript
+
+%%! -sname knife_release
+
+-export([main/1, create_erl_bin/1, erl_bin_path/2]).
+%% only single parameter
+%% Options only for controller, proxy, agent
+main(Options)->
+    Subsystem = 
+	case Options of
+	    []     ->
+		usage(),
+		halt(1);
+	    [Arg]  ->
+		case lists:member(Arg, modules()) of
+		    true  -> list_to_atom(Arg);
+		    false ->
+			io:format("unkown option [~p]~n", [Arg]),
+			usage(),
+			halt(1)
+		end;
+	    _Args ->
+		io:format("only single prameter was allowed ~n"),
+		usage(),
+		halt(1)
+	end,
+    
+    %% usage(),
+    %% knife application path
+    EScriptPath =  filename:dirname(escript:script_name()),
+    KnifePath =  EScriptPath ++ "/../",
+
+    Knife = filelib:wildcard(KnifePath ++ "ebin"),    
+    Deps = filelib:wildcard(KnifePath ++ "deps/*/ebin"),
+
+    lists:foreach(
+     fun(Path) ->
+	     %% io:format("add deps path=~p~n", [Path]),
+	     true = code:add_pathz(Path)
+     end, Knife ++ Deps),
+
+    add_plugin(Subsystem, KnifePath ++ "plugins-src/"),
+
+    %% build .rel file
+    build_rel_file([sasl, kernel, mnesia, xmerl,
+		    gs, appmon, inets, os_mon, tv,
+		    debugger, runtime_tools, toolbar,
+		    observer]
+		   ++ [name2subsystem(Subsystem)], Subsystem),
+
+    StringSubSystem = atom_to_list(Subsystem),
+    %% build .script and .boot file
+    ok = systools:make_script(StringSubSystem, []),
+
+    %% build tar file
+    ok = systools:make_tar(StringSubSystem, [{erts, code:root_dir()}]),
+
+    case filelib:ensure_dir(StringSubSystem) of
+	ok ->
+	    os:cmd("rm -rf " ++ StringSubSystem),
+	    ok = file:make_dir(StringSubSystem);
+	{error, Error} ->
+	    io:format("Can not create directory ~p, reason:~p~n",
+		      [StringSubSystem, Error])
+    end,
+
+    ok = erl_tar:extract(StringSubSystem ++ ".tar.gz",
+			 [compressed, {cwd, StringSubSystem}]),
+
+    %% os:cmd("cp -r " ++ BinPath ++ " " ++ StringSubSystme ++ "/"),
+    %% create_erl_bin(StringSubSystem),
+    copy_otp(StringSubSystem),
+
+    lists:foreach(
+      fun(NoNeed) -> 
+	      os:cmd("rm -rf " ++ StringSubSystem ++ "/" ++ NoNeed)
+      end, ["releases", "erts-*"]),
+    file:delete(StringSubSystem ++ ".tar.gz"),
+
+    %% knife frame
+    create_knife_frame(StringSubSystem ++ "/knife"),
+    
+    %% plugins
+    create_plugins(StringSubSystem ++ "/knife/plugins/", Subsystem),
+    %% lib include otp lib, no need now
+    os:cmd("rm -rf " ++ StringSubSystem ++ "/lib"),
+
+    %% install script
+    os:cmd("cp install " ++ StringSubSystem ++ "/"),
+
+    %% extra files
+    add_extra_files(KnifePath, Subsystem),
+    
+    %% build tar
+    CurrTime = current_time(local),
+    erl_tar:create(StringSubSystem ++ "-" ++ CurrTime ++ ".tar.gz",
+		   [StringSubSystem], [compressed]),
+    
+    %% clean
+    clean(StringSubSystem),
+    ok.
+
+build_rel_file(Apps, Subsystem)->
+    ErtsInfo = {erts, erlang:system_info(version)},
+    ExtraApps = lists:usort(dependence(Apps, [])),
+    ExtraAppsInfo = [version(App) || App <- ExtraApps],
+
+    [{_, SubsystemVsn}] = [version(App)
+			 || App <- ExtraApps,
+			    App =:= name2subsystem(Subsystem)],
+    
+    RDesc = {release, {atom_to_list(Subsystem), SubsystemVsn},
+	     ErtsInfo,
+	     ExtraAppsInfo
+	    },
+
+    file:write_file(atom_to_list(Subsystem) ++ ".rel",
+    		    io_lib:format("~p.~n", [RDesc])),
+    ok.
+
+dependence([], Acc)->
+    Acc;
+dependence([App|RestApps], Acc) ->
+    case application:load(App) of
+	ok -> ok;
+	{error, {already_loaded, App}} -> ok ;
+	{error, Error} ->
+	    throw({failed_to_load_app, App, Error})
+    end,
+
+    {ok, Requires} = application:get_key(App, applications),
+    io:format("App ~p have requires ~p~n", [App, Requires]),
+
+    Solrs = Acc -- Requires,
+    dependence(RestApps, lists:umerge([App|Solrs], Requires)).
+
+
+version(App)->
+    application:load(App),
+    {ok, Vsn} = application:get_key(App, vsn),
+    {App, Vsn}.
+
+
+add_plugin(diablo_controller, PluginPath) ->
+    [Controller] = filelib:wildcard(PluginPath ++ "diablo/diablo_controller/ebin"),
+    true = code:add_pathz(Controller);
+add_plugin(diablo_proxy, PluginPath) ->
+    [Proxy] = filelib:wildcard(PluginPath ++ "diablo/diablo_proxy/ebin"),
+    true = code:add_pathz(Proxy);
+add_plugin(diablo_agent, PluginPath) ->
+    [Agent] = filelib:wildcard(PluginPath ++ "diablo/diablo_agent/ebin"),
+    true = code:add_pathz(Agent).
+
+modules() ->
+    ["diablo_controller", "diablo_proxy", "diablo_agent"].
+
+name2subsystem(diablo_controller) ->
+    diablo_controller;
+name2subsystem(diablo_proxy) ->
+    diablo_proxy;
+name2subsystem(diablo_agent) ->
+    diablo_agent.
+
+create_erl_bin(RootPath) ->
+    ErlPath = os:cmd("which erl"),
+    %%io:format("erl path=~p~n", [ErlPath]),
+    TokenPath = string:tokens(ErlPath, "/"),
+    %%io:format("tokenpath=~p~n", [TokenPath]),
+    Prefix = erl_bin_path(TokenPath, "/"),
+    %%io:format("Prefix=~p~n", [Prefix]),
+    [BinPath] = filelib:wildcard(Prefix ++ "/erlang/bin"),
+    %%io:format("BinPath=~p~n", [BinPath]),
+    os:cmd("cp -r " ++ BinPath ++ " " ++ RootPath ++ "/").
+
+erl_bin_path(["erlang"|_T], Acc) ->
+    Acc;
+erl_bin_path([H|T], Acc) ->
+    erl_bin_path(T, Acc ++ H ++ "/").
+
+copy_otp(Subsystem) ->
+    copy_otp(amd64, Subsystem),
+    copy_otp(i686, Subsystem),
+    copy_otp(i686_5x, Subsystem).
+
+copy_otp(amd64, Subsystem) ->
+    OtpVersion = "otp_bin_R16B03-1_centos-min.x86-64.tar.gz",
+    os:cmd("cp erlang/" ++ OtpVersion ++ " " ++ Subsystem ++ "/");
+    %% ok = erl_tar:extract(OtpVersion, [compressed, {cwd, Subsystem}]);
+copy_otp(i686, Subsystem) ->
+    OtpVersion = "otp_bin_R16B03-1_centos-min.i686.tar.gz",
+    os:cmd("cp erlang/" ++ OtpVersion ++ " " ++ Subsystem ++ "/");
+copy_otp(i686_5x, Subsystem) ->
+    OtpVersion = "otp_bin_R15B01_centos-min.i686.tar.gz",
+    os:cmd("cp erlang/" ++ OtpVersion ++ " " ++ Subsystem ++ "/").
+
+create_knife_frame(RootPath)->
+    os:cmd("mkdir -p " ++ RootPath),
+    lists:foreach(
+     fun(Dir) ->
+	     os:cmd("cp -r ../" ++ Dir ++ " " ++ RootPath ++ "/")
+     end, ["ebin", "deps", "include", "scripts"]),
+
+    DepsPath = RootPath ++ "/deps",
+    NoNeeds =
+	filelib:wildcard(DepsPath ++ "/*.ez")
+	++ filelib:wildcard(DepsPath ++ "/.*")
+	++ filelib:wildcard(DepsPath ++ "/*/.*")
+	++ filelib:wildcard(DepsPath ++ "/*/*/.*")
+	++ filelib:wildcard(DepsPath ++ "/*/src")
+	++ filelib:wildcard(DepsPath ++ "/*/test")
+	++ filelib:wildcard(DepsPath ++ "/*/examples")
+	++ filelib:wildcard(DepsPath ++ "/*/support")
+	++ filelib:wildcard(DepsPath ++ "/*/scripts")
+	++ filelib:wildcard(DepsPath ++ "/*/Makefile")
+	++ filelib:wildcard(DepsPath ++ "/*/deps.mk")
+	++ filelib:wildcard(DepsPath ++ "/*/generate_*"),
+
+    %% io:format("no needs ~p~n", [NoNeeds]),
+    lists:foreach(
+      fun(NoNeed) ->
+	      os:cmd("rm -rf " ++ NoNeed)
+      end, NoNeeds),
+
+    lists:foreach(
+     fun(Dir) ->
+	     os:cmd("mkdir -p " ++ RootPath ++ "/" ++ Dir)
+     end, ["log", "mnesia", "plugins"]),
+    
+    ok.
+
+create_plugins(PluginPath, Subsystem) ->
+    [Plugin] = 
+	filelib:wildcard(atom_to_list(Subsystem)
+			 ++ "/lib/"
+			 ++ atom_to_list(name2subsystem(Subsystem)) ++ "*/"),
+    io:format("cp -r ~p to ~p~n", [Plugin, PluginPath]),
+    os:cmd("cp -r " ++ Plugin ++ " " ++ PluginPath),
+    os:cmd("rm -rf " ++ Plugin),
+    ok.
+
+add_extra_files(KnifePath, diablo_controller)->
+    [Plugin] = 
+	filelib:wildcard("diablo_controller/knife/plugins/diablo_controller*/"),
+    
+    ExtraFiles = KnifePath ++ "plugins-src/diablo/diablo_controller/hdoc",
+    io:format("cp -r ~p to ~p~n", [ExtraFiles, Plugin]),
+    os:cmd("cp -r " ++ ExtraFiles ++ " " ++ Plugin),
+
+    ExtraPriv = KnifePath ++ "plugins-src/diablo/diablo_controller/priv",
+    os:cmd("cp -r " ++ ExtraPriv ++ " " ++ Plugin),
+
+    Assets = Plugin ++ "/hdoc/public/assets",
+    %% io:format("assets ~p~n", [Assets]),
+    NoNeeds =
+	%% image
+	filelib:wildcard(Plugin ++ "/hdoc/image/*")
+	++ filelib:wildcard(Assets ++ "/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/*/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/*/*/*/*/.*")
+	++ filelib:wildcard(Assets ++ "/*/*/*/*/*/*/*/*/.*"),
+
+    %% io:format("hdoc no needs ~p~n", [NoNeeds]),
+	
+    lists:foreach(
+      fun(NoNeed) ->
+	      os:cmd("rm -rf " ++ NoNeed)
+      end, NoNeeds).
+    
+clean(Subsystem) ->
+    lists:foreach(
+      fun(Dir) ->
+	      os:cmd("rm -rf " ++ Dir)
+     end, ["*.boot", "*.rel", "*.script", Subsystem]),
+    ok.
+
+current_time(local) ->
+    {{Year, Month, Day}, {Hour, Minute, Second}} =
+	calendar:now_to_local_time(erlang:now()),
+    lists:flatten(
+      io_lib:format("~4..0w-~2..0w-~2..0w_~2..0w-~2..0w-~2..0w",
+		    [Year, Month, Day, Hour, Minute, Second])).
+
+usage() ->
+    Script =  filename:basename(escript:script_name()),
+    Usage = Script ++ " [options]
+OPTIONS
+    diablo_controller
+        make a release controller module of knife
+    diablo_proxy
+        make a release proxy moudle of knife
+    diablo_agent
+        make a release agent module of knife \n" ,
+    
+    io:format("~s", [Usage]).

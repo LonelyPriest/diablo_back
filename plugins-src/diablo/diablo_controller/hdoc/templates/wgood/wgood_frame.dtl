@@ -1,0 +1,46 @@
+{% extends "../base_frame.dtl" %}
+
+{% block self_reference_css %}
+<link href="/public/assets/font-awesome/css/awesome-bootstrap-checkbox.css"
+      rel="stylesheet" type="text/css"/>
+<!-- <link href="/public/assets/bootstrap/plugins/fileinput/css/fileinput.css" -->
+<!--       rel="stylesheet" type="text/css"> -->
+{% endblock %}
+
+{% block self_reference_js %}
+<!-- pinyin--> 
+<script src="/public/assets/pinyin/pinyin.js"
+	type="text/javascript"></script>
+
+<!-- <script src="/private/utils/javascript/diablo_authen_app.js"  type="text/javascript"></script> -->
+<script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
+
+<!-- right app -->
+<script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script>
+<script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
+
+<!-- employ -->
+<!-- <script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script> -->
+<!-- purchaser-->
+<!-- <script src="/private/purchaser/js/purchaser_app.js"       type="text/javascript"></script> -->
+<!-- retailer -->
+<!-- <script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script>  -->
+<!-- self -->
+<script src="/private/wgood/js/wgood_app.js"       type="text/javascript"></script>
+<script src="/private/wgood/js/wgood_update.js"    type="text/javascript"></script>
+
+<script src="/private/wgood/js/wgood_size.js"      type="text/javascript"></script>
+<script src="/private/wgood/js/wgood_color.js"     type="text/javascript"></script> 
+
+
+{% endblock %}
+
+
+
+{% block script_init %} 
+<script>
+    jQuery(document).ready(function() {
+	App.init(); // initlayout and core plugins
+    });
+</script>
+{% endblock %}

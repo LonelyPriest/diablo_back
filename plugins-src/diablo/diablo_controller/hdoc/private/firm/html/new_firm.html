@@ -1,0 +1,138 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-sm-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">厂商</a>
+	<i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增厂商</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="firmNewForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">名称</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		<input type="text"
+		       class="form-control"
+		       name="name"
+		       required
+		       placeholder="请输入厂商名称"
+		       x-ng-model="firm.name"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="8"></input>
+		<span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="firmNewForm.name.$error.minlength
+			    || firmNewForm.name.$error.maxlength">
+		<span style="color:red">厂商名称太短，请输入2-8个字符</span>
+	      </div> 
+	    </div>
+
+	    <!--balance-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">欠款</label>
+	      <div class="col-sm-6 col-md-6">
+		<!-- <div class="input-group"> -->
+		<input class="form-control"
+		       type="number" step="0.01" 
+		       name="balance"
+		       placeholder="默认为0，支持两位小数"
+		       x-ng-model="firm.balance"
+		       x-ng-pattern="/^[+|\-]?\d+(.\d{1,2})?$/"></input>
+		<!-- <span class="input-group-addon bg-white fg-red">*</span> -->
+		<!-- </div> -->
+	      </div>
+	      <div ng-show="firmNewForm.balance.$invalid && !firmNewForm.balance.$pristine">
+		<span class="fg-red">请输入正确的数字，支持两位小数</span>
+	      </div> 
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group"
+		 ng-class="{'has-error': firmNewForm.mobile.$invalid
+			   && !firmNewForm.mobile.$pristine}">
+	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		<input type="tel"
+		       name="mobile"
+		       required
+		       ng-pattern="/^\d{3,4}\d{7,8}$/"
+		       placeholder="请输入电话或手机号码"
+		       class="form-control"
+		       x-ng-model="firm.mobile"></input>
+		<span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="firmNewForm.mobile.$invalid && !firmNewForm.mobile.$pristine">
+		<span style="color:red">请输入正确的电话或手机号码</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		<input type="text"
+		       class="form-control"
+		       name="address"
+		       required
+		       placeholder="请输入您的联系地址"
+		       x-ng-model="firm.address"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="20"></input>
+		<span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="firmNewForm.address.$error.minlength
+			    || firmNewForm.address.$error.maxlength">
+		<span style="color:red">名称太短，请输入2-20个字符</span>
+	      </div> 
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button class="btn btn-primary"
+			ng-disabled="firmNewForm.$invalid"
+			x-ng-click="new_firm()">确认</button>
+		<button class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->
+
+
+
+
+
+
+
+

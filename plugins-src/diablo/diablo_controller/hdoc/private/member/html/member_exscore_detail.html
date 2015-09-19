@@ -1,0 +1,119 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="fa fa-reorder"></i>
+	  兑换积分详情
+	</div>	
+	    
+	<div class="tools">
+	  <a class="reload" href="javascript:;" x-ng-click="reload()"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<div class="table-toolbar">
+	  <!-- <div class="btn-group">	   -->
+	  <!--   <button class="btn green"> -->
+	  <!--     <vm-add-button>新增会员</vm-add-button> -->
+	  <!--     <i class="fa fa-pencil"></i> -->
+	  <!--   </button> -->
+	  <!-- </div> -->
+	  <div class="row form-group">
+	    <div class="col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入手机号码"
+			 x-ng-model="filter.mobile"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入用户姓名"
+			 x-ng-model="filter.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>	    
+	  </div> <!--END form-group-->	  
+	</div> <!--END toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped table-hover
+			    table-condensed table-advanced"
+		     ng-table="accScoredetailTable">
+		<tbody>
+		  <tr ng-repeat="member in $data">
+		    <td data-title="'序号'"
+			sortable="'id'">
+		      <span>{{member.id}}</span>
+		    </td>
+		  
+		    <td data-title="'会员编号'">
+		      <span>{{member.number}}</span>
+		    </td>
+		  
+		    <td data-title="'姓名'">
+		      <span>{{member.name}}</span>
+		    </td>
+		  
+		    <td data-title="'性别'" ng-switch on={{member.sex}}>
+                      <span ng-switch-when=0>女</span>
+		      <span ng-switch-when=1>男</span>
+		    </td>
+
+		    <td data-title="'手机号码'">
+                      <span>{{member.mobile}}</span>
+		    </td>
+
+		    <td data-title="'兑换积分'">
+                      <span>{{member.consumed_score}}</span>
+		    </td>
+
+		    <td data-title="'兑换明细'">
+		      <span>{{member.gift}}</span>
+		    </td>
+		    
+		    <td data-title="'兑换日期'">
+                      <span>{{member.consumed_date}}</span>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+

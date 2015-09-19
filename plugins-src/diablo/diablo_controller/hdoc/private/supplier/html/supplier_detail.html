@@ -1,0 +1,216 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>
+	  供应商详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入供应商名称"
+			 x-ng-model="filter.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control"
+			 placeholder="请输入供应商手机或座机号码"
+			 x-ng-model="filter.mobile"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div> 
+	  </div> <!--END form-group-->	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table ng-table="supplierTable"
+		     class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<tbody>
+		  <tr ng-repeat="supplier in $data">
+		    <td data-title="'序号'" sortable="'id'">
+		      <span>{{supplier.id}}</span>
+		    </td>
+
+		    <td data-title="'名称'">
+		      <span>{{supplier.name}}</span>
+		    </td>
+		    
+		    <td data-title="'联系方式'">
+                      <span>{{supplier.mobile}}</span>
+		    </td>
+
+		    <td data-title="'联系地址'">
+                      <span>{{supplier.address}}</span>
+		    </td>
+
+		    <td data-title="'操作'">
+		      <a class="btn btn green btn-xs"
+			 ng-click="goto_page('#/supplier/supplier_new')">新增
+			<i class="glyphicon glyphicon-plus"></i></a>
+                      <a class="btn btn-primary btn-xs"
+			 data-dismiss="modal" data-toggle="modal"
+			 data-target="#supplierEditModal"
+			 x-ng-click="edit_supplier(supplier)">修改
+			<i class="glyphicon glyphicon-pencil"></i></a>
+                      <a href="" class="btn btn-danger btn-xs"
+			 data-dismiss="modal" data-toggle="modal"
+			 data-target="#supplierDeleteSubmit"
+			 x-ng-click="set_delete_supplier(supplier)">删除
+			<i class="glyphicon glyphicon-trash"></i></a>
+		    </td>
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<div id="supplierEditModal" class="modal fade" tabindex="-1"
+     data-backdrop="static" data-keyboard="false">
+  <!--BEGIN modal-dialog-->
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h4 class="modal-title">供应商编辑</h4>
+      </div>
+
+      <!--BEGIN modal body-->
+      <div class="modal-body">
+	<!--BEING form-->
+	<form class="form-horizontal" name="supplierEditForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    
+	    <div class="form-group">
+              <label class="col-md-2 control-label">名称</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+                       data-ng-model="supplier.name"></input>
+              </div>
+            </div>
+
+	    <div class="form-group">
+              <label class="col-md-2 control-label">地址</label>
+              <div class="col-md-4">
+		<input type="text" class="form-control" readonly="true"
+                       data-ng-model="supplier.address"></input>
+              </div>
+            </div>
+
+	    <!--mobile-->
+	    <div class="form-group"
+		 ng-class="{'has-error': supplierEditForm.mobile.$invalid && !supplierEditForm.mobile.$pristine}">
+	      <label class="col-md-2 control-label">手机号码</label>
+	      <div class="col-md-4">
+		<input type="text"
+		       name="mobile"
+		       required
+		       ng-pattern="/^0?(13[0-9]|15[0-35-9]|18[0236-9]|14[57])[0-9]{8}$/"
+		       placeholder="请输入手机号码"
+		       class="form-control"
+		       x-ng-model="supplier.mobile"></input>
+	      </div>
+	      <div>
+		<span style="color:red">*</span>
+	      </div>
+	      <div ng-show="supplierEditForm.mobile.$invalid && !supplierEditForm.mobile.$pristine">
+		<span style="color:red">请输入正确的手机号码</span>
+	      </div>
+	    </div>
+	  </div> <!--END form body-->
+	</form> <!--END form-->
+      </div> <!-- END modal body-->
+
+      <!--BEGIN modal-footer-->
+      <div class="modal-footer">
+	<div class="form-action fluid">
+	  <button type="button" class="btn blue"
+		  ng-disabled="supplierEditForm.$invalid"
+		  data-toggle="modal" data-target="#supplierEditResponse"
+		  x-ng-click="edit_supplier_request(supplier)">确认</button>
+	  <button type="button" class="btn default" data-dismiss="modal">取消</button>
+	</div>
+      </div>
+    </div> <!--END modal-footer-->
+    
+  </div><!--END modal-dialog-->
+</div>
+
+<response-notify-dialog
+   response-dialog-id="supplierEditResponse"
+   success-title="供应商信息修改成功"
+   error-title="供应商信息修改失败"
+   success-info={{response_success_info}}
+   error-info={{response_error_info}}
+   response="editSupplierResponse()"
+   after-close="afterEditResponse()">
+</response-notify-dialog>
+
+<subbmit-notify-dialog
+   dialog-id="supplierDeleteSubmit"
+   notify-title="删除供应商"
+   notify-body="确认要删除该供应商吗？"
+   target="#supplierDeleteResponse"
+   subbmit-callback="supplier_delete_submit()">
+</subbmit-notify-dialog>
+
+<response-notify-dialog
+   response-dialog-id="supplierDeleteResponse"
+   success-title="供应商删除成功"
+   error-title="供就商删除失败"
+   success-info={{response_success_delete_info}}
+   error-info={{response_error_delete_info}}
+   response="delete_response()"
+   after-close="after_delete_response()">
+</response-notify-dialog>
+
+
+
+
+
+
+
+
+
+

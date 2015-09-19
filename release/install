@@ -1,0 +1,95 @@
+#! /bin/bash
+
+echo "start to install ..."
+
+# [ ! -f forest*.tar.gz ] && \
+#     echo "forest tar package does not exist, please check..." && \
+#     exit 1
+
+# tar_package=$(ls forest*.tar.gz)
+
+# count=$(echo ${tar_package}| wc -l)
+
+# [ ${count} -ne 1 ] && \
+#     echo "there are more ${tar_package} was found, \
+# please delete the packages that are not need first" && \
+#     exit 1
+
+# echo "found package ${tar_package}, begin to install..."
+
+# tar -zxf ${tar_package}
+# [ $? -ne 0 ] && \
+#     echo "extract package ${tar_package} failed, make sure tar package is correct" && \
+#     exit 1
+
+## install otp runtime
+echo "install otp runtime"
+otp_package=
+version=$(getconf LONG_BIT)
+os_version=$(cat /etc/redhat-release | awk '{print $3}')
+if [ "x${version}" = "x64" ]; then
+    case ${os_version} in
+	5.*)
+	    otp_package="otp_bin_R15B01_centos-min.x86-64.tar.gz"
+	    ;;
+	6.*)
+	    otp_package="otp_bin_R16B03-1_centos-min.x86-64.tar.gz"
+	    ;;
+	*)
+	    echo "version ${os_versin} of centos does not support"
+	    exit 1
+	    ;;
+    esac
+elif  [ "x${version}" = "x32" ]; then
+    case ${os_version} in
+	5.*)
+	    otp_package="otp_bin_R15B01_centos-min.i686.tar.gz"
+	    ;;
+	6.*)
+	    otp_package="otp_bin_R16B03-1_centos-min.i686.tar.gz"
+	    ;;
+	*)
+	    echo "version ${os_versin} of centos does not support"
+	    exit 1
+	    ;;
+    esac
+else
+    echo "unkown otp runtime version ${version}"
+    exit 1
+fi
+
+[ ! -f ${otp_package} ] && echo "otp runtime ${otp_package} not found" && exit 1
+
+tar -zxf ${otp_package}
+[ $? -ne 0 ] && \
+    echo "extract package ${otp_package} failed" && exit 1
+
+current_dir=$(pwd)
+
+erl_bin=
+case ${os_version} in
+    5.*)
+	erl_bin=${current_dir}/erts-5.9.1/bin
+	;;
+    6.*)
+	erl_bin=${current_dir}/erts-5.10.4/bin
+	;;
+esac
+
+[ ! -e ${erl_bin} ] && echo "${erl_bin} is not exist, please check !!" && exit 1
+    
+
+sed s:%FINAL_ROOTDIR%:${current_dir}: ${erl_bin}/erl.src > ${erl_bin}/erl
+
+
+erl=${erl_bin}/erl
+knife_bin_dir=${current_dir}/knife/scripts
+sed s:%FINAL_ROOTDIR%:${erl}: ${knife_bin_dir}/knife-env.src > ${knife_bin_dir}/knife-env
+
+if [ $? -ne 0 ]; then
+    echo "install failed ..."
+    exit 1
+else
+    echo "congratulation, install sucessfully..."
+    exit 0
+fi

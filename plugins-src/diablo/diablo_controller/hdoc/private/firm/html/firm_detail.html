@@ -1,0 +1,265 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  厂商详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="new_firm()">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div>
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  
+	  <!--BEGIN form-group-->
+	  <div class="row form-group">
+
+	    <div class="col-xs-12 col-ms-12 col-md-12">
+	      <div class="input-group">
+		<span class="input-group-addon bg-green">
+		  <i class="glyphicon glyphicon-hand-right fg-white"></i>
+		</span>
+		<input
+		   class="form-control"
+		   placeholder="支持名称/手机/地址查询"
+		   typeahead-editable="false"
+		   typeahead-on-select="on_select_firm($item, $model, $label)"
+		   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:8"
+		   x-ng-model="filter.name"></input>
+	      </div>
+	    </div>
+	    
+	  </div> <!--END form-group-->	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>名称</th>
+		    <th class="danger">欠款</th>
+		    <th>联系方式</th>
+		    <th>联系地址</th>
+		    <th>日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="f in filter_firms">
+		    <td>{{f.order_id}}</td>
+		    <td>{{f.name}}</td>
+		    <td>{{f.balance}}</td>
+		    <td>{{f.mobile}}</td>
+		    <td>{{f.address}}</td>
+		    <td>{{f.entry_date}}</td>
+
+		    <td class="col-md-2">
+		      <!-- <a class="btn btn-success btn-xs" -->
+		      <!-- 	 x-ng-click="new_firm()">新增 -->
+		      <!-- 	<i class="glyphicon glyphicon-plus"></i></a> -->
+		      <button class="btn btn-primary btn-xs red-stripe"
+			      x-ng-click="trans_info(f)">对帐
+			<i class="glyphicon glyphicon-leaf"></i></button>
+		      
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_firm(f)">修改 
+			<i class="glyphicon glyphicon-pencil"></i></button>
+		      
+                      <button href="" class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_firm(f)">删除
+			<i class="glyphicon glyphicon-erase"></i></button>
+		    </td>
+		  </tr>
+
+		  <tr x-ng-if="total_items!==0" class="bg-white">
+		    <td colspan="2"></td>
+		    <td class="fg-red">{{total_balance}}</td> 
+		    <td colspan="4"></td>
+		  </tr>
+		  
+		</tbody>
+
+		<tfoot>
+		  <tr> 
+		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
+		      <span class="pagination">
+			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
+			  共 {{total_items}} 项</span>
+		      </span>
+		      <pagination
+			 class="pull-right"
+			 total-items="total_items"
+			 items-per-page="items_perpage"
+			 num-pages="num_pages"
+			 max-size="max_page_size"
+			 boundary-links="true"
+			 previous-text="&lsaquo;" next-text="&rsaquo;"
+			 first-text="&laquo;" last-text="&raquo;"
+			 x-ng-model="current_page"
+			 x-ng-change="page_changed(current_page)"></pagination>
+		    </td>
+		  </tr>
+		</tfoot>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type="text/ng-template" id="update-firm.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title"><span class="label label-sm label-primary">厂商编辑</span></h4>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" name="firmForm" novalidate> 
+      <div class="form-body">
+	    <!--Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">名称</label> 
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div ng-class="{'has-error':firmForm.name.$invalid
+				 && !firmForm.name.$pristine
+				 || !params.valid_firm(params.firm)}">
+		    <input type="text"
+			   class="form-control"
+			   name="name"
+			   required
+			   placeholder="请输入厂商名称"
+			   x-ng-model="params.firm.name"
+			   x-ng-minlength="2"
+			   x-ng-maxlength="8"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div>
+		<span ng-show="firmForm.name.$error.minlength
+			    || firmForm.name.$error.maxlength">
+		  <span class="fg-red">请输入2-8个字符</span>
+		</span>
+
+		<span ng-show="!params.valid_firm(params.firm)">
+		  <span class="fg-red">厂商已存在，请重新输入</span>
+		</span>
+	      </div>
+	      
+	    </div>
+
+	    <!--balance-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">欠款</label>
+	      <div class="col-sm-6 col-md-6">
+		<input type="text"
+		       class="form-control"
+		       name="balance"
+		       placeholder="默认为0，支持两位小数"
+		       x-ng-model="params.firm.balance"
+		       x-ng-pattern="/^[+|\-]?\d+(.\d{1,2})?$/"></input> 
+	      </div>
+	      <div ng-show="firmForm.balance.$invalid && !firmForm.balance.$pristine">
+		<span class="fg-red">请输入正确的数字，支持两位小数</span>
+	      </div> 
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group"
+		 ng-class="{'has-error': firmForm.mobile.$invalid
+			   && !firmForm.mobile.$pristine}">
+	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		<input type="text"
+		       name="mobile"
+		       required
+		       ng-pattern="/^\d{3,4}\d{7,8}$/"
+		       placeholder="请输入电话或手机号码"
+		       class="form-control"
+		       x-ng-model="params.firm.mobile"></input>
+		<span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="firmForm.mobile.$invalid && !firmForm.mobile.$pristine">
+		<span style="color:red">请输入正确的电话或手机号码</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		<input type="text"
+		       class="form-control"
+		       name="address"
+		       required
+		       placeholder="请输入您的联系地址"
+		       x-ng-model="params.firm.address"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="20"></input>
+		<span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="firmForm.address.$error.minlength
+			    || firmForm.address.$error.maxlength">
+		<span style="color:red">名称太短，请输入2-20个字符</span>
+	      </div> 
+	    </div>
+	    
+	  </div> 
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="firmForm.$invalid
+			   || !params.has_update(params.firm)
+			   || !params.valid_firm(params.firm)"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+</script>
+
+
+
+
+
+

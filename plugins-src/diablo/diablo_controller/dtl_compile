@@ -1,0 +1,36 @@
+#! /usr/bin/env escript
+
+%%! -sname diablo_dtl
+
+main(_) ->    
+    EScriptPath =  filename:dirname(escript:script_name()),
+
+    %% add deps path
+    KnifePath = EScriptPath ++ "/../../../",
+    Deps  = filelib:wildcard(KnifePath ++ "deps/*/ebin"),
+
+    lists:foreach(
+     fun(Path) ->
+	     true = code:add_pathz(Path)
+     end, Deps),
+
+    %% template dtl
+    TemplatesPath = EScriptPath ++ "/hdoc/templates/",
+    Templates =
+	filelib:wildcard(TemplatesPath ++ "*.dtl")
+	++ filelib:wildcard(TemplatesPath ++ "*/*.dtl"),
+
+    lists:foreach(
+      fun(Dtl) ->
+	      io:format("dtl ~p~n", [Dtl]),
+	      Module = filename:basename(Dtl, ".dtl"),
+	      erlydtl:compile_file(
+		Dtl,
+		list_to_atom(Module),
+		[{out_dir, "ebin"}, debug_info, verbose, report])
+      end, Templates),
+
+    ok.
+    
+
+    

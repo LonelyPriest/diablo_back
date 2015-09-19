@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  银行卡详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/bank/new_bank_card')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div> 
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <!-- <div class="row form-group"> -->
+
+	  <!--   <div class="col-sm-12 col-md-12"> -->
+	  <!--     <div class="input-group"> -->
+	  <!-- 	<div class="input-cont"> -->
+	  <!-- 	  <input type="text" class="form-control" placeholder="请输入店铺名称" -->
+	  <!-- 		 x-ng-model="filter.number"></input> -->
+	  <!-- 	  </div> -->
+	  <!-- 	<span class="input-group-btn"> -->
+	  <!-- 	  <button type="button" class="btn green"> -->
+	  <!-- 	    <i class="m-icon-swapright m-icon-white"></i> -->
+	  <!-- 	</span> -->
+	  <!--     </div> -->
+	  <!--   </div>  -->
+	    
+	  <!-- </div>  -->
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped table-hover
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>开户姓名</th>
+		    <th>开户行</th>
+		    <th>卡号</th>
+		    <th>备注</th>
+		    <th>日期</th>
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="c in cards">
+		    <td>{{c.order_id}}</td>
+		    <td>{{c.name}}</td> 
+		    <td>{{c.bank}}</td>
+		    <td>{{c.no}}</td>
+
+		    <td x-ng-switch on="c.remark">
+		      <span ng-switch-when="null">暂无</span>
+		      <span ng-switch-default>{{c.remark}}</span>
+		    </td> 
+		    
+		    <td>{{c.entry_date}}</td>
+
+		    <td class="col-md-2"> 
+                      <button class="btn btn-warning btn-xs red-stripe"
+			 x-ng-click="update_card(c)">修改
+			<i class="glyphicon glyphicon-pencil"></i></button>
+                      <button class="btn btn-danger btn-xs green-stripe"
+			 x-ng-click="delete_card(c)">删除
+			<i class="glyphicon glyphicon-trash"></i></button>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="edit-card.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">银行卡编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+  <div class="modal-body">
+    <form class="form-horizontal" name="cardForm" novalidate>
+      <div class="form-body">
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>卡号</span>
+	    <input type="text"
+		   class="form-control"
+		   name="no"
+		   required
+		   placeholder="请输入银行卡号"
+		   x-ng-model="params.card.no"
+		   x-ng-pattern="/^[0-9' ']+$/"
+		   x-ng-maxlength="23"></input> 
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="cardForm.no.$invalid && !cardForm.no.$pristine
+			|| cardFrom.no.$error.maxlength">
+	    <span style="color:red">请输入数字串或空格，最长23位</span>
+	  </div>
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>开户行</span>
+	    <input type="text"
+		   class="form-control"
+		   name="card"
+		   required
+		   placeholder="请输入开户行名称，如建设很行"
+		   x-ng-model="params.card.bank"
+		   x-ng-pattern="/^[\u4e00-\u9fa5]/"></input>
+	    
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="cardForm.card.$invalid && !cardForm.card.$pristine">
+	    <span class="fg-red">请输入中文字符串</span>
+	  </div> 
+	</div> 
+	
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-disabled="cardForm.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning"
+	    x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

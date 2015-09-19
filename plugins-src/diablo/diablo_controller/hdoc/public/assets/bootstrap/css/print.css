@@ -1,0 +1,19 @@
+@media print {
+    @page
+    {
+	size:auto;
+	margin: 0mm;
+    }
+
+    body
+    {
+	background-color:#FFFFFF;
+	margin: 0px;
+    }
+}
+
+.print-font {
+    font-size:8px;
+    font-family:"宋体"
+}
+

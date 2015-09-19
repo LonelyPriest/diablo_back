@@ -1,0 +1,224 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	  商家详情
+	</div>	
+
+	<div class="actions">
+	  <button type="button" class="btn btn-success red-stripe"
+		  x-ng-click="goto_page('#/merchant_new')">新增
+	    <i class="glyphicon glyphicon-plus"></i></button> 
+
+	  <button type="button" class="btn blue reload red-stripe"
+		  x-ng-click="refresh()">刷新
+	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	</div> 
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar"> 
+	  <div class="row form-group">
+	    
+	    <div class="col-sm-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入商家名称"
+			 x-ng-model="filter.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+
+	    <div class="col-sm-6 col-md-6">
+	      <div class="input-group">
+		<div class="input-cont">
+		  <input type="text" class="form-control" placeholder="请输入商家联系方式"
+			 x-ng-model="filter.name"></input>
+		</div>
+		<span class="input-group-btn">
+		  <button type="button" class="btn green">
+	  	    <i class="m-icon-swapright m-icon-white"></i>
+		</span>
+	      </div>
+	    </div>
+	    
+	  </div> <!--END form-group--> 
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered
+			    table-striped table-hover table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <td>序号</td>
+		    <td>名称</td>
+		    <td>类型</td>
+		    <td>经营人</td>
+		    <td>联系方式</td>
+		    <td>常驻地址</td>
+		    <td>注册日期</td>
+		    <td>操作</td>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="merchant in merchants">
+		    <td>{{merchant.order_id}} </td>
+		    <td>{{merchant.name}}</td>
+		    <td>{{merchant.type_name}}</td>
+		    <td>{{merchant.owner}}</td>
+		    <td>{{merchant.mobile}} </td> 
+		    <td>{{merchant.address}}</td> 
+		    <td>{{merchant.entry_date}}</td>
+
+		    <td class="col-md-2" data-title="'操作'"> 
+                      <a class="btn btn-primary btn-xs red-stripe" 
+			 x-ng-click="update_merchant(merchant)">修改
+			<i class="glyphicon glyphicon-pencil"></i></a>
+                      <a href="" class="btn btn-danger btn-xs green-stripe" 
+			 x-ng-click="delete_merchant(merchant)">删除
+			<i class="glyphicon glyphicon-erase"></i></a>
+		    </td>
+		    
+		  </tr>
+		</tbody>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="update-merchant.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">商家编辑</span>
+    </h4>
+  </div>
+
+  <!--BEGIN modal body-->
+
+  <div class="modal-body">
+    <!--BEING form-->
+    <form class="form-horizontal" name="form">
+      <!--BEGIN form body-->
+      <div class="form-body">
+	
+	<div class="form-group">
+          <label class="col-md-3 control-label">名称</label>
+          <div class="col-md-6">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.merchant.name"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">类型</label>
+          <div class="col-md-6">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.merchant.type_name"></input>
+          </div>
+        </div>
+
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">经营人</label>
+          <div class="col-md-6">
+	    <input type="text" class="form-control" readonly
+                   data-ng-model="params.merchant.owner"></input>
+          </div>
+        </div>
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">常驻地址</label>
+          <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group">
+	      <div ng-class="{'has-error':form.address.$invalid
+	 		     && !editForm.right.$pristine}">
+		<input type="text" readonly
+		       required
+		       class="form-control"
+		       name="address"
+                       x-ng-model="params.merchant.address"
+		       x-ng-minlength="2"
+		       x-ng-maxlength="20"></input>
+	      </div>
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div> 
+	  </div> 
+	  <div ng-show="form.address.$error.minlength
+		      || form.address.$error.maxlength">
+	  <span style="color:red">名称太短，请输入2-20个字符</span>
+	  </div> 
+	</div><!--END form group-->
+	
+
+	<div class="form-group">
+          <label class="col-md-3 control-label">联系方式</label>
+          <div class="col-sm-6 col-md-6"> 
+	    <div class="input-group">
+	      <div ng-class="{'has-error':form.mobile.$invalid
+	 		     && !form.mobile.$pristine}">
+		<input type="text"
+		       class="form-control"
+		       required
+		       name="mobile"
+                       x-ng-model="params.merchant.mobile"
+		       ng-pattern="/^0?(13[0-9]|15[0-35-9]|18[0236-9]|14[57])[0-9]{8}$/"></input>
+	      </div>
+	      <span class="input-group-addon bg-white fg-red">*</span>
+	    </div> 
+	  </div>
+	  <div ng-show="form.mobile.$error.minlength
+			|| form.mobile.$error.maxlength">
+	    <span style="color:red">名称太短，请输入2-20个字符</span>
+	  </div> 
+	</div> <!--END form group-->
+	
+      </div><!--END form body-->
+    </form><!--END form-->
+  </div>
+
+
+  <!--BEGIN modal-footer-->    
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="form.$invalid"
+	    x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+  
+  <!--END modal-footer-->
+</script> 
+
+
+
+
+
+
+
+
+

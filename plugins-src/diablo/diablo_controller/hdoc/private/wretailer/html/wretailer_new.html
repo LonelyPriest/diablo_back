@@ -1,0 +1,190 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-sm-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">零售商</a>
+        <i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">新增零售商</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="retailerNewForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">名称</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div x-ng-class="{'has-error': retailerNewForm.name.$invalid
+				   && !retailerNewForm.name.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="name"
+			   required
+			   placeholder="请输入零售商名称"
+			   x-ng-model="retailer.name"
+			   x-ng-pattern="pattern.name_address"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="retailerNewForm.name.$invalid
+			    && !retailerNewForm.name.$pristine">
+		<span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	      </div> 
+	    </div>
+
+	    <!-- <\!--discount-\-> -->
+	    <!-- <div class="form-group"> -->
+	    <!--   <label class="col-sm-3 col-md-3 control-label">拿货折扣</label> -->
+	    <!--   <div class="col-sm-4 col-md-4"> -->
+	    <!-- 	<input type="text" -->
+	    <!-- 	       class="form-control" -->
+	    <!-- 	       name="discount" -->
+	    <!-- 	       placeholder="整数，无折扣请输入100" -->
+	    <!-- 	       x-ng-pattern="/^\d{2,3}$/" -->
+	    <!-- 	       x-ng-model="retailer.discount" -->
+	    <!-- 	       x-ng-init="good.discount=100"></input>  -->
+	    <!--   </div> -->
+	    <!--   <div ng-show="retailerNewForm.discount.$invalid -->
+	    <!-- 		    && !retailerNewForm.discount.$pristine"> -->
+	    <!-- 	<span class="fg-red">两位整数，无折扣请输入100</span> -->
+	    <!--   </div>  -->
+	    <!-- </div>  -->
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">帐户欠款</label>
+	      <div class="col-sm-6 col-md-6">
+		<input class="form-control"
+		       type="number" step="0.01"
+		       name="balance"
+		       placeholder="默认为0，支持两位小数"
+		       x-ng-model="retailer.balance"
+		       x-ng-pattern="pattern.decimal_2"></input> 
+	      </div>
+	      <div ng-show="retailerNewForm.balance.$invalid
+			    && !retailerNewForm.balance.$pristine">
+		<span class="fg-red">请输入正确的数字，支持两位小数</span>
+	      </div> 
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
+	      <div class="col-sm-6 col-md-6"> 
+		<div class="input-group">
+		  <div x-ng-class="{'has-error': retailerNewForm.mobile.$invalid
+				   && !retailerNewForm.mobile.$pristine}">
+		    <input type="tel"
+			   name="mobile"
+			   required
+			   x-ng-pattern="pattern.tel_mobile"
+			   placeholder="请输入电话或手机号码"
+			   class="form-control"
+			   x-ng-model="retailer.mobile"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="retailerNewForm.mobile.$invalid
+			    && !retailerNewForm.mobile.$pristine">
+		<span class="fg-red">请输入正确的电话或手机号码</span>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div x-ng-class="{'has-error': retailerNewForm.address.$invalid
+				   && !retailerNewForm.address.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="address"
+			   required
+			   placeholder="请输入您的联系地址"
+			   x-ng-model="retailer.address"
+			   x-ng-pattern="pattern.name_address"></input>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div>
+	      </div>
+	      <div ng-show="retailerNewForm.address.$invalid
+			    && !retailerNewForm.address.$pristine">
+		<span class="fg-red">必需以中文开头，只允许字母，数字</span>
+	      </div> 
+	    </div> 
+
+	    <!--province-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">省（直辖市）</label>
+	      <div class="col-sm-6 col-md-6">
+		<div x-ng-class="{'has-error': retailerNewForm.province.$invalid
+				 && !retailerNewForm.province.$pristine}">
+		  <input type="text"
+			 class="form-control"
+			 name="province"
+			 placeholder="请选择省份或直辖市" 
+			 x-ng-model="retailer.province"
+			 typeahead-editable="false"
+			 typeahead="p as p.name for p in
+				    provinces|filter:$viewValue|limitTo:8"></input>
+		</div>
+	      </div>
+	      <div x-ng-show="retailerNewForm.province.$invalid
+			      && !retailerNewForm.province.$pristine">
+		<span class="fg-red">省或直辖市只能从列表选择</span>
+	      </div>
+	    </div> 
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">所在城市</label>
+	      <div class="col-sm-6 col-md-6">
+		<input type="text"
+		       class="form-control"
+		       name="city" 
+		       placeholder="请输入省所对应的城市（直辖市无需输入）"
+		       x-ng-model="retailer.city"
+		       typeahead="c as c.name for c in
+				  cities|filter:$viewValue|limitTo:8"></input>
+	      </div> 
+	      <div ng-show="!retailerNewForm.city.$pristine && !check_city(retailer.city)">
+		<span class="fg-red">请输入中文字符串</span>
+	      </div>
+	    </div>
+	    
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button class="btn btn-primary"
+			ng-disabled="retailerNewForm.$invalid"
+			x-ng-click="new_wretailer(retailer)">确认</button>
+		<button class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->

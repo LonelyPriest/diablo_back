@@ -1,0 +1,340 @@
+<div class="row">
+    <div class="portlet box purple">
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>
+	  新增库存
+	</div>	
+	
+	<!-- <div class="tools"> -->
+	<!--   <a class="reload" href="javascript:;"></a> -->
+	<!-- </div> -->
+	<div class="actions">
+	  <button class="btn btn-success btn-xs" x-ng-click="select_group()">
+	    <span>尺码组</span>
+	    <i class="glyphicon glyphicon-text-width"></i></button>
+	</div>
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN prompt-->
+	  <!-- <div class="alert alert-info" role="alert"> -->
+	  <!--   <p><span class="fg-red">颜色：</span> -->
+	  <!--     <span x-ng-repeat="color in prompt_colors"> -->
+	  <!-- 	<span>{{color.id}}</span> : <span class="fg-blue">{{color.name}}</span> -->
+	  <!--     </span> -->
+	  <!--   </p>	     -->
+	  <!-- </div> -->
+	  
+	  <!--BEGIN alert-->
+	  <!-- <div ng-show="show_error" class="alert alert-danger" role="alert"> -->
+	  <!--   <span>操作失败：{{response_error_info}}<span> -->
+	  <!-- </div> -->
+	  
+	  <!--BEGIN table-->
+	  <div class="table-responsive" style="overflow-x:auto">
+	    <table class="table table-bordered
+			  table-striped table-hover table-condensed">
+	      <thead>
+		<tr>
+	    	  <th>序号</th>
+		  <th>款号</th> 
+		  <th>品名</th>
+		  <th>类别</th>
+		  <th>颜色</th>
+		  <th>定价</th>
+	    	  <th>折扣</th>
+		  <th>性别</th>
+		  <th>季节</th> 
+		  <th>年度</th>
+		  <!-- <th>供应商</th> -->
+		  <!-- <th>尺码组</th> -->
+		  
+		  <!-- <th ng-repeat="g in inventory.group.sizes"> -->
+		  <!--   {{wrap_size_name(g)[0]}}<br>{{wrap_size_name(g)[1]}} -->
+		  <!-- </th> -->
+		  
+		  <th>数量</th>
+	    	  <th>操作</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr ng-repeat="inv in inventories">
+		  <td data-title="'序号'">
+		    <span>{{inv.order_id}}</span>
+		  </td>
+
+		  <td data-title="'款号'">
+		    <span ng-if="!inv.$new">{{inv.number}}</span>
+		    <form name="inv.form.number" ng-if="inv.$new">
+		      <div ng-class="{'has-error':
+				     inv.form.number.$invalid
+				     && !inv.form.number.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       x-ng-pattern="/^[A-Za-z0-9-]+$/"
+			       x-ng-model="inv.number"
+			       capitalize
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入款号，只能是字母或数字"
+			       typeahead="n for n in
+					  prompt_numbers|filter:$viewValue|limitTo:8"></input>
+		      </div>
+		    </form>
+		  </td>
+		  
+		  <td data-title="'品名'">
+		    <span ng-if="!inv.$new">{{inv.brand}}</span>
+		    <form name="inv.form.brand" ng-if="inv.$new">
+		      <div ng-class="{'has-error': inv.form.brand.$invalid
+				     && !inv.form.brand.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       x-ng-model="inv.brand"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入品名"
+			       typeahead="b.name for b in
+					  prompt_brands|filter:$viewValue|limitTo:8"></input>
+		      </div>
+		    </form>
+		  </td>
+		  
+		  <td data-title="'类别'">
+		    <span ng-if="!inv.$new">{{inv.inv_type}}</span>
+		    <form name="inv.form.type" ng-if="inv.$new"> 
+		      <div ng-class="{'has-error': inv.form.type.$invalid
+				     && !inv.form.type.$pristine}">
+			<input class="form-control" type="text"
+			       required
+			       x-ng-model="inv.inv_type"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入类别"
+			       typeahead="t.name for t in
+					  prompt_types|filter:$viewValue|limitTo:8"></input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'颜色'">
+		    <span ng-if="!inv.$new">{{inv.color}}</span>
+		    <form name="inv.form.color" ng-if="inv.$new">
+		      <div ng-class="{'has-error': inv.form.color.$invalid
+				     && !inv.form.color.$pristine}">
+			<input class="form-control input-small" type="text"
+			       required
+			       x-ng-model="inv.color"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入颜色"
+			       typeahead="c.name for c in
+					  prompt_colors|filter:$viewValue|limitTo:8"></input>
+		      </div>
+		    </form>
+		  </td>
+		  
+		  <td data-title="'定价'">
+		    <span ng-if="!inv.$new">{{inv.price}}</span>
+		    <form name="inv.form.price" ng-if="inv.$new">
+		      <div ng-class="{'has-error': inv.form.price.$invalid
+				     && !inv.form.price.$pristine}">
+			<input class="form-control input-small" type="text"
+			       required
+			       x-ng-pattern="/^\d+$/"
+			       x-ng-maxlength="6"
+			       x-ng-model="inv.price"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入６位以内的整数"></input>
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'折扣'">
+		    <span ng-if="!inv.$new">{{inv.discount}}</span>
+		    <form name="inv.form.discount" ng-if="inv.$new">
+		      <div ng-class="{'has-error':
+				     inv.form.discount.$invalid
+				     && !inv.form.discount.$pristine}">
+			<input class="form-control input-small" type="text"
+			       required
+			       x-ng-pattern="/^\d+$/"
+			       x-ng-maxlength="3"
+			       x-ng-minlength="2"
+			       x-ng-model="inv.discount"
+			       popover-placement="top"
+			       popover-trigger="focus"
+			       popover="请输入２位整数，无折扣请输入100">
+		      </div>
+		    </form>
+		  </td>
+
+		  <td data-title="'性别'">
+		    <span ng-if="!inv.$new">{{inv.sex.name}}</span>
+		    <div ng-if="inv.$new">
+		      <select class="form-control input-xsmall table-select"
+                              x-ng-model="inv.sex"
+                              x-ng-options="s as s.name for s in sexs"
+			      x-ng-init="inv.sex=sexs[0]">
+                      </select>
+		    </div>
+		  </td>
+
+
+		  <td data-title="'季节'">
+		    <span ng-if="!inv.$new">{{inv.season.name}}</span>
+		    <div ng-if="inv.$new">
+		      <select class="form-control input-xsmall table-select"
+                              x-ng-model="inv.season"
+                              x-ng-options="s as s.name for s in seasons"
+			      x-ng-init="inv.season=seasons[0]">
+                      </select>
+		    </div>
+		  </td>
+
+		  
+		  <td data-title="'年度'">
+		    <span ng-if="!inv.$new">{{inv.year}}</span>
+		    <form name="inv.form.year" ng-if="inv.$new">
+		      <div ng-class="{'has-error':
+		  		     inv.form.year.$invalid
+		  		     && !inv.form.year.$pristine}">
+		  	<input class="form-control input-xsmall" type="text"
+		  	       required
+		  	       x-ng-pattern="/^(\d{4})/"
+		  	       x-ng-maxlength="4"
+		  	       x-ng-model="inv.year"
+			       x-ng-init="inv.year=current_year()"
+		  	       popover-placement="top"
+		  	       popover-trigger="focus"
+		  	       popover="格式yyyy"></input>
+		      </div>
+		    </form>
+		  </td> 
+		  
+		  <!--amount-->
+		  <td data-title="'数量'">
+		    {{inv.total}}
+		  </td>
+
+		  <td data-title="'操作'">
+		    <span ng-if="inv.$new">
+		      <button class="btn btn-success btn-xs"
+			      ng-disabled="inv.form.brand.$invalid
+					   || inv.form.number.$invalid
+					   || inv.form.color.$invalid
+					   || inv.form.price.$invalid
+					   || inv.form.discount.$invalid"
+			      ng-click="new_inventory(inv)">新增
+			<i class="glyphicon glyphicon-plus"></i></button>
+		    </span>
+		    <span ng-if="inv.$editable">
+		      <button class="btn btn-info btn-xs"
+			      ng-click="inventory_detail(inv)">查看
+			<i class="glyphicon glyphicon-eye-open"></i></button>
+		    </span>
+		  </td>
+		</tr>		
+	      </tbody>
+	    </table> <!--END table-->
+	  </div> <!--END table-responsive-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->      
+    </div>
+</div>
+
+<script type="text/ng-template" id="select-size.html"> 
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr class="text-center" x-ng-repeat="g in params.groups">
+	    <td class="vert-align">
+	      <div class="checkbox checkbox-danger checkbox-circle">
+		<input id={{g.id}} type="checkbox" x-ng-model="g.select"></input>
+		<label for={{g.id}}>{{g.name}}</label>
+	      </div>
+	    </td>
+	    <td class="vert-align">{{g.si}}</td>
+	    <td class="vert-align">{{g.sii}}</td>
+	    <td class="vert-align">{{g.siii}}</td>
+	    <td class="vert-align">{{g.siv}}</td>
+	    <td class="vert-align">{{g.sv}}</td>
+	    <td class="vert-align">{{g.svi}}</td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>  
+</script>
+
+
+<script type="text/ng-template" id="inventory-new.html">
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table x-ng-repeat="t in params.groups"
+	 class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td x-ng-repeat="a in t.amount">{{a.size}}</td>
+	  </tr>
+	  <tr>
+	    <td>{{t.color}}</td>
+	    <td x-ng-repeat="a in t.amount">
+	      <input class="form-control" type="text"
+		     x-ng-model="a.count"></input>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">保存</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="inventory-detail.html">
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table x-ng-repeat="t in params.groups"
+	 class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td x-ng-repeat="a in t.amount">{{a.size}}</td>
+	  </tr>
+	  <tr>
+	    <td>{{t.color}}</td>
+	    <td x-ng-repeat="a in t.amount">{{a.count}}</td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">保存</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+
+

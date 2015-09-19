@@ -1,0 +1,248 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-th-list"></i>
+	  销售详情
+	</div>	
+	
+	<div class="tools">
+	  <a class="reload" href="javascript:;"></a>
+	</div>
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body util-btn-margin-bottom-5">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="row">
+
+	    <!-- BEGIN col-md-6 -->
+	    <div class="col-md-6">
+	      <query-pattern pattern="pattern" group-num="increment"
+			     add="add_filter()" del="del_filter()"></query-pattern>
+	      <query-group x-ng-repeat="n in filter_nums"
+			   filter="filters[n]" prompt="prompts" ok="do_search()">
+	      </query-group>
+	      
+	    </div> <!-- END col-md-6 -->
+
+	    <!-- BEGIN col-md-6 -->
+	    <div class="col-md-6">
+	      <!--BEGIN form-group-->
+	      <div class="row">
+		<div class="col-md-12">
+		  <div class="input-group">
+	    	    <span class="input-group-btn">
+		      <button type="button" class="btn">
+		      <i class="glyphicon glyphicon-user fg-red"></i>
+		      <strong>开始日期</strong></button>
+		    </span>
+		    <input type="text" class="form-control"
+			   placeholder="年/月/日"
+			   datepicker-popup="yyyy/MM/dd"
+			   is-open="isStartOpened"
+			   close-text="关闭"
+			   clear-text="清除"
+			   current-text="今天"
+			   show-weeks="false"
+	    		   x-ng-model="searchTime.startTime"></input>
+		    <span class="input-group-btn">
+		      <button type="button"
+			      class="btn btn-default"
+			      ng-click="isStartOpened=true;
+					isEndOpened=false;
+					open_calendar($event)">
+			<i class="glyphicon glyphicon-calendar"></i></button>
+		      <button type="button" class="btn btn-success"
+			      x-ng-disabled="!searchTime.startTime" ng-click="do_search()">
+			<i class="glyphicon glyphicon-ok"></i></button>
+		    </span>
+		  </div>
+		</div>
+
+		<div class="col-md-12">
+		  <div class="input-group">
+	    	    <span class="input-group-btn">
+		      <button type="button" class="btn">
+		      <i class="glyphicon glyphicon-user fg-red"></i>
+		      <strong>结束日期</strong></button>
+		    </span>
+		    <input type="text" class="form-control"
+			   placeholder="年/月/日"
+			   datepicker-popup="yyyy/MM/dd"
+			   is-open="isEndOpened"
+			   close-text="关闭"
+			   clear-text="清除"
+			   current-text="今天"
+			   show-weeks="false"
+	    		   x-ng-model="searchTime.endTime"></input>
+		    <span class="input-group-btn">
+		      <button type="button"
+			      class="btn btn-default"
+			      x-ng-click="isStartOpened=false;
+					  isEndOpened=true;
+					  open_calendar($event)">
+			<i class="glyphicon glyphicon-calendar"></i></button>
+		      <button type="button" class="btn btn-success"
+			      x-ng-disabled="!searchTime.endTime" x-ng-click="do_search()">
+			<i class="glyphicon glyphicon-ok"></i></button>
+		  </span>
+		  </div>
+		</div>
+		
+	      </div> <!-- END row form-group -->
+	    </div> <!-- END col-md-6 -->
+
+	  </div> <!--END row-->
+	  
+	</div> <!--END table-toolbar-->
+		  
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default">
+	    <!--EBGIN table responsive-->
+	    <div class="table-responsive">
+	      <!--BEGIN member table--> 
+	      <table class="table table-bordered table-striped
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th>流水号</th>
+		    <th>AD号</th>
+		    <th>品名</th>
+		    <th>款号</th>
+		    <th>类别</th>
+		    <th>颜色</th>
+		    <th>定价</th>
+		    <th>折扣</th>
+		    <th>年度</th>
+		    <th>季节</th>
+		    <th>性别</th>
+		    <th>尺码</th>
+		    <th>数量</th>
+		    <th>销售日期</th>
+		    <th>导购员</th>
+		    <th>供应商</th>
+		    <th>店铺</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="detail in inventories">
+		    <td data-title="'序号'"
+			sortable="'id'">
+		      <span>{{detail.order_id}}</span>
+		    </td>
+		    
+		    <td data-title="'流水号'"
+			sortable="'id'">
+		      <span>{{detail.running_no}}</span>
+		    </td>
+		    
+		    <td data-title="'AD号'">
+		      <span>{{detail.sn}}</span>
+		    </td>
+
+		    <td data-title="'品名'">
+		      <span>{{detail.brand}}</span>
+		    </td>
+
+		    <td data-title="'款号'">
+		      <span>{{detail.style_number}}</span>
+		    </td>
+
+		    <td data-title="'类别'">
+		      <span>{{detail.type}}</span>
+		    </td>
+
+		    <td data-title="'颜色'">
+		      <span>{{detail.color}}</span>
+		    </td>
+
+		    <td data-title="'定价'">
+		      <span>{{detail.plan_price}}</span>
+		    </td>
+
+		    <td data-title="'折扣'">
+		      <span>{{detail.discount}}</span>
+		    </td>
+
+		    <td data-title="'年度'">
+		      <span>{{detail.year}}</span>
+		    </td>
+
+		    <td data-title="'季节'">
+		      <span>{{season[detail.season]}}</span>
+		    </td>
+
+		    <td data-title="'性别'">
+		      <span>{{sex[detail.sex]}}</span>
+		    </td>
+
+		    <td data-title="'尺码'">
+		      <span>{{detail.size}}</span>
+		    </td>
+
+		    <td data-title="'数量'">
+		      <span>{{detail.amount}}</span>
+		    </td>
+
+		    <td data-title="'销售日期'">
+		      <span>{{detail.sale_date}}</span>
+		    </td>
+
+		    <td data-title="'导购员'">
+		      <span>{{detail.employe}}</span>
+		    </td>
+
+		    <td data-title="'供应商'" ng-switch on="detail.supplier">
+		      <span ng-switch-when="null">暂无</span>
+		      <span ng-switch-default>{{detail.supplier}}</span>
+		    </td>
+
+		    <td data-title="'店铺'">
+		      <span>{{detail.shop_name}}</span>
+		    </td>
+
+		  </tr>
+		</tbody>
+
+		<tfoot>
+	      	  <tr>
+	      	    <td colspan={{colspan}}>
+	      	      <pagination total-items="totalItems"
+				  items-per-page="itemsPerpage"
+				  boundary-links="true"
+				  previous-text="&lsaquo;" next-text="&rsaquo;"
+				  first-text="&laquo;" last-text="&raquo;"
+				  x-ng-model="currentPage"
+				  x-ng-change="page_changed()"></pagination>
+	      	    </td>
+	      	  </tr>
+		</tfoot>
+		
+	      </table> <!--END VM table-->
+	    </div> <!--END table responsive-->
+
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

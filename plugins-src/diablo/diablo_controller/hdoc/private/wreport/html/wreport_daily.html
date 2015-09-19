@@ -1,0 +1,203 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption"><i class="glyphicon glyphicon-map-marker"></i>
+	  <span>日报表</span>
+	</div> 
+	<div class="tools">
+	</div>
+      </div>
+
+      <div class="portlet-body">
+	<tabset>
+	  <tab heading="按店铺"
+	       select="do_search_by_shop(current_shop_page)">
+	    <div class="panel panel-default">
+	      <div class="table-responsive">
+		<table class="table table-bordered 
+			      table-striped table-hover table-condensed table-advanced">
+		  <thead>
+		    <tr>
+		      <th>序号</th>
+		      <th>店铺</th>
+		      <th>数量</th>
+		      <th class="success">销售额</th>
+		      <th class="danger">实收</th>
+		      <!-- <th>营业额</th> -->
+		      <!-- <th>净利润</th> -->
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr x-ng-repeat="r in shop_reports">
+		      <td>{{r.order_id}}</td>
+		      <td>{{r.shop.name}}</td>
+		      <td>{{r.t_amount}}</td>
+		      <td>{{r.t_spay}}</td>
+		      <td>{{r.t_hpay}}</td>
+		    </tr>
+		    <tr>
+		      <td colspan=2></td>
+		      <td>{{total_amounts}}</td>
+		      <td class="success">{{total_spay}}</td>
+		      <td class="danger">{{total_hpay}}</td>
+		    </tr>
+		  </tbody>
+		  <tfoot>
+		    <tr> 
+		      <td x-ng-show="total_items>items_perpage" colspan={{report_shop_colspan}}>
+			<span class="pagination">
+			  <span>显示第 {{current_shop_page}} / {{num_pages}} 项结果，
+			    共 {{total_items}} 项</span>
+			</span>
+			<pagination
+			   class="pull-right"
+			   total-items="total_items"
+			   items-per-page="items_perpage"
+			   num-pages="num_pages"
+			   max-size="max_page_size"
+			   boundary-links="true"
+			   previous-text="&lsaquo;" next-text="&rsaquo;"
+			   first-text="&laquo;" last-text="&raquo;"
+			   x-ng-model="current_shop_page"
+			   x-ng-change="do_search_by_shop(current_shop_page)">
+			</pagination>
+		      </td>
+		    </tr>
+		  </tfoot>
+		</table> <!--END table-->
+	      </div> <!--END table-responsive-->
+	    </div>
+	  </tab>
+
+	  <tab heading="按店员"
+	       select="do_search_by_employee(current_employee_page)">
+	    <div class="panel panel-default">
+	      <div class="table-responsive">
+		<table class="table table-bordered 
+			      table-striped table-hover table-condensed table-advanced">
+		  <thead>
+		    <tr>
+		      <th>序号</th>
+		      <th>店员</th>
+		      <th>数量</th>
+		      <th class="success">销售额</th>
+		      <th class="danger">实收</th> 
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr x-ng-repeat="e in employee_reports">
+		      <td>{{e.order_id}}</td>
+		      <td>{{e.employee.name}}</td>
+		      <td>{{e.t_amount}}</td>
+		      <td>{{e.t_spay}}</td>
+		      <td>{{e.t_hpay}}</td>
+		    </tr>
+		    <tr>
+		      <td colspan=2></td>
+		      <td>{{e_total_amounts}}</td>
+		      <td class="success">{{e_total_spay}}</td>
+		      <td class="danger">{{e_total_hpay}}</td>
+		    </tr>
+		  </tbody>
+		  <tfoot>
+		    <tr> 
+		      <td x-ng-show="e_total_items>items_perpage" colspan={{report_employee_colspan}}>
+			<span class="pagination">
+			  <span>显示第 {{current_employee_page}} / {{e_num_pages}} 项结果，
+			    共 {{e_total_items}} 项</span>
+			</span>
+			<pagination
+			   class="pull-right"
+			   total-items="e_total_items"
+			   items-per-page="items_perpage"
+			   num-pages="e_num_pages"
+			   max-size="max_page_size"
+			   boundary-links="true"
+			   previous-text="&lsaquo;" next-text="&rsaquo;"
+			   first-text="&laquo;" last-text="&raquo;"
+			   x-ng-model="current_employee_page"
+			   x-ng-change="do_search_by_employee(current_employee_page)">
+			</pagination>
+		      </td>
+		    </tr>
+		  </tfoot>
+		</table> <!--END table-->
+	      </div> <!--END table-responsive-->
+	    </div>
+	  </tab>
+
+	  <tab heading="按零售商"
+	       select="do_search_by_retailer(current_retailer_page)">
+	    <div class="panel panel-default">
+	      <div class="table-responsive">
+		<table class="table table-bordered 
+			      table-striped table-hover table-condensed table-advanced">
+		  <thead>
+		    <tr>
+		      <th>序号</th>
+		      <th>零售商</th>
+		      <th>数量</th>
+		      <th class="success">应付</th>
+		      <th class="danger">实付</th> 
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr x-ng-repeat="e in retailer_reports">
+		      <td>{{e.order_id}}</td>
+		      <td>{{e.retailer.name}}</td>
+		      <td>{{e.t_amount}}</td>
+		      <td>{{e.t_spay}}</td>
+		      <td>{{e.t_hpay}}</td>
+		    </tr>
+		    <tr>
+		      <td colspan=2></td>
+		      <td>{{r_total_amounts}}</td>
+		      <td class="success">{{r_total_spay}}</td>
+		      <td class="danger">{{r_total_hpay}}</td>
+		    </tr>
+		  </tbody>
+		  <tfoot>
+		    <tr> 
+		      <td x-ng-show="e_total_items>items_perpage" colspan={{report_retailer_colspan}}>
+			<span class="pagination">
+			  <span>显示第 {{current_retailer_page}} / {{e_num_pages}} 项结果，
+			    共 {{r_total_items}} 项</span>
+			</span>
+			<pagination
+			   class="pull-right"
+			   total-items="r_total_items"
+			   items-per-page="items_perpage"
+			   num-pages="r_num_pages"
+			   max-size="max_page_size"
+			   boundary-links="true"
+			   previous-text="&lsaquo;" next-text="&rsaquo;"
+			   first-text="&laquo;" last-text="&raquo;"
+			   x-ng-model="current_employee_page"
+			   x-ng-change="do_search_by_retailer(current_retailer_page)">
+			</pagination>
+		      </td>
+		    </tr>
+		  </tfoot>
+		</table> <!--END table-->
+	      </div> <!--END table-responsive-->
+	    </div>
+	  </tab>
+
+	  <tab heading="按厂商">
+	    <div class="panel panel-default">
+	    </div>
+	  </tab>
+	  
+	  <tab heading="按货号">
+	    <div class="panel panel-default">
+	    </div>
+	  </tab>
+	  
+	</tabset>
+      </div>
+      
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div> <!--END row-->
