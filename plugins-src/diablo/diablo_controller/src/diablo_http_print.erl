@@ -195,10 +195,10 @@ handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
 			  Content = Head ++ Body ++ Stastic ++ Foot,
 
 			  %% auto page
-			  DBody = ?f_print:pagination(auto, Height * 10, Content),
+			  %% DBody = ?f_print:pagination(auto, Height * 10, Content),
 			  
 			  %% no page
-			  %% DBody = ?f_print:pagination(just, Height * 10, Content),
+			  DBody = ?f_print:pagination(just, Height * 10, Content),
 
 			  %% page by height
 			  %% DBody = ?f_print:pagination(Height * 10, Content),

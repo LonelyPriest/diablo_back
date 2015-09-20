@@ -291,23 +291,23 @@ inventory(abstract, Merchant, Shop, [{S1, B1}|T] = _Conditions) ->
     
     "select a.style_number, a.brand_id, a.type_id, a.sex, a.season"
 	", a.total, a.s_group, a.free, a.org_price, a.tag_price, a.pkg_price"
-	", a.price3, a.price4, a.price5, a.discount, a.path"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.shop, a.merchant" 
 
 	", b.color as color_id, b.size, b.total as amount"
 	" from "
 	
 	"(select style_number, brand as brand_id, type as type_id, sex, season"
 	", amount as total, s_group, free, org_price, tag_price, pkg_price, price3"
-	", price4, price5, discount, path"
-	" from w_inventory where " ++ C 
+	", price4, price5, discount, path, shop, merchant"
+	" from w_inventory where (" ++ C  ++ ")"
 	++ " and shop=" ++ ?to_s(Shop)
 	++ " and merchant=" ++ ?to_s(Merchant)
 	++ " and deleted=" ++ ?to_s(?NO) ++ ") a"
 	
 	" left join w_inventory_amount b on"
 	" a.style_number=b.style_number and a.brand_id=b.brand"
-	" and b.shop=" ++ ?to_s(Shop)
-	++ " and b.merchant=" ++ ?to_s(Merchant);
+	" and a.shop=b.shop"
+	" and b.merchant";
     
     %% "select a.style_number, a.brand as brand_id"
     %% 	", a.color as color_id, a.size, a.total as amount"

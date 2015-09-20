@@ -221,6 +221,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    var sorts  = [];
 	    for(var i = 0; i < length; i++){
 		var inv  = in_sell(sell_detail, invs[i]);
+		
 		if(!in_sort(sorts, inv)) {
 		    var add = {$edit:true, $new:false, sizes:[], colors:[], amounts:[]};
 
