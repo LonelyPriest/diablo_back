@@ -129,9 +129,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	for (var i=0, l=sorts.length; i<l;i ++){
 	    if(tag.style_number === sorts[i].style_number
 	       && tag.brand_id  === sorts[i].brand.id){
-		// if (!in_array(sorts[i].sizes, tag.size)){
-		//     sorts[i].sizes.push(tag.size)
-		// }
+		
 		sorts[i].total += tag.amount;
 
 		if (angular.isDefined(tag.sell)){
