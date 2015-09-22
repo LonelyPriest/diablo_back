@@ -260,24 +260,6 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     /*
      * add
      */ 
-    $scope.valid_free_size_reject = function(inv){
-    	if (angular.isDefined(inv.amounts)
-    	    && angular.isDefined(inv.amounts[0].reject_count) 
-    	    && parseInt(inv.amounts[0].reject_count) > inv.total){
-    	    return false;
-    	}
-    	return true;
-    };
-    
-    var in_amount = function(amounts, inv){
-	for(var i=0, l=amounts.length; i<l; i++){
-	    if(amounts[i].cid === inv.color_id && amounts[i].size === inv.size){
-		amounts[i].count += parseInt(inv.amount);
-		return true;
-	    }
-	}
-	return false;
-    };
 
     var get_amount = function(cid, sname, amounts){
 	for (var i=0, l=amounts.length; i<l; i++){
@@ -287,6 +269,15 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	}
 	return undefined;
     }; 
+
+    $scope.valid_free_size_reject = function(inv){
+    	if (angular.isDefined(inv.amounts)
+    	    && angular.isDefined(inv.amounts[0].reject_count) 
+    	    && parseInt(inv.amounts[0].reject_count) > inv.total){
+    	    return false;
+    	}
+    	return true;
+    };
     
     var valid_all = function(amounts){
 	var unchanged = 0;
@@ -381,9 +372,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 			       valid:        valid_all};
 		
 		diabloUtilsService.edit_with_modal(
-		    "inventory-new.html",
-		    inv.sizes.length >= 6 ? "lg" : undefined,
-		    callback, $scope, payload); 
+		    "inventory-new.html", 'normal', callback, $scope, payload); 
 	    }
 	}) 
     };
@@ -470,87 +459,3 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
 });
-
-
-purchaserApp.controller("purchaserInventoryRejectDetailCtrl", function(
-    $scope, diabloPattern, diabloUtilsService, diabloFilter,
-    purchaserService, user, filterFirm, filterEmployee){
-    console.log(user); 
-
-    $scope.shops   = user.sortBadRepoes.concat(user.sortShops);
-    $scope.shopIds = user.shopIds.concat(user.badrepoIds);
-    
-    $scope.add = function(){
-	diablo_goto_page('#/record/inventory_new');
-    }
-
-    $scope.reject = function(){
-	diablo_goto_page('#/record/inventory_reject');
-    }
-
-    /*
-    ** filter
-    */ 
-    // initial
-    $scope.filters = [];
-
-    diabloFilter.reset_field();
-    diabloFilter.add_field("rsn", []);
-    diabloFilter.add_field("shop",     user.shops);
-    diabloFilter.add_field("firm",     filterFirm);
-    diabloFilter.add_field("employee", filterEmployee); 
-
-    $scope.filter = diabloFilter.get_filter();
-    $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time();
-
-    console.log($scope.filter);
-
-    /*
-     * pagination 
-     */
-    $scope.colspan = 15;
-    $scope.items_perpage = 10;
-    $scope.default_page = 1; 
-
-    $scope.do_search = function(page){
-	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if (angular.isUndefined(search.shop)
-		|| !search.shop || search.shop.length === 0){
-		search.shop = $scope.shopIds.length
-		    === 0 ? undefined : $scope.shopIds;
-	    } 
-	    purchaserService.filter_w_inventory_reject(
-		$scope.match, search, page, $scope.items_perpage).then(function(result){
-		    console.log(result);
-		    if (page === 1){
-			$scope.total_items = result.total
-		    }
-		    angular.forEach(result.data, function(d){
-			d.shop = diablo_get_object(d.shop_id, user.sortShops);
-			d.employee = diablo_get_object(d.employee_id, filterEmployee);
-			d.firm     = diablo_get_object(d.firm_id, filterFirm);
-		    })
-		    $scope.records = result.data; 
-		    diablo_order_page(page, $scope.items_perpage, $scope.records); 
-		}) 
-	})
-    }; 
-    
-    // default the first page
-    $scope.do_search($scope.default_page);
-
-    $scope.page_changed = function(){
-	// console.log($scope.current_page);
-	// console.log(page);
-	$scope.do_search($scope.current_page);
-    };
-
-
-    // details
-    $scope.rsn_detail = function(r){
-	console.log(r);
-	diablo_goto_page("#/record/inventory_rsn_detail/reject/" + r.rsn);
-    }
-});
-

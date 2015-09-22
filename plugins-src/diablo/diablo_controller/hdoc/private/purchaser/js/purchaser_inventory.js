@@ -1013,7 +1013,12 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     }
 
     $scope.update_detail = function(r){
-	diablo_goto_page('#/inventory_new_detail/update/' + r.rsn);
+	if (r.type === 0){
+	    diablo_goto_page('#/update_new_detail/' + r.rsn);
+	} else{
+	    diablo_goto_page('#/update_new_detail_reject/' + r.rsn);
+	}
+	
     }
 
     /*

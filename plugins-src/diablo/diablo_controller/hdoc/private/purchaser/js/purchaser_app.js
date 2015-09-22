@@ -45,46 +45,39 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
             controller: 'purchaserInventoryNewCtrl',
 	    resolve: angular.extend({}, user, firm, employee, color)
 	}).
-	// when('/record/inventory_new_detail', {
-	//     templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
-        //     controller: 'purchaserInventoryNewDetailCtrl',
-	//     resolve: angular.extend({}, user, firm, employee)
-	// }).
-	when('/inventory_new_detail', {
-	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
-            controller: 'purchaserInventoryNewDetailCtrl',
-	    resolve: angular.extend({}, user, firm, employee, base)
-	}).
-	when('/inventory_new_detail/update/:rsn?', {
+	when('/update_new_detail/:rsn?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail_update.html',
-            controller: 'purchaserInventoryNewDetailUpdateCtrl',
+            controller: 'purchaserInventoryNewUpdateCtrl',
 	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color)
-	}). 
-	when('/inventory_rsn_detail/:rsn?', {
-	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_rsn_detail.html',
-	    controller: 'purchaserInventoryNewRsnDetailCtrl',
-	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
-	}). 
+	}).
+	//
 	when('/inventory_reject', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_reject.html',
             controller: 'purchaserInventoryRejectCtrl',
 	    resolve: angular.extend({}, user, firm, employee, s_group, color)
+	}). 
+	when('/update_new_detail_reject/:rsn?', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_reject_update.html',
+            controller: 'purchaserInventoryRejectUpdateCtrl',
+	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color)
 	}).
-	// when('/record/inventory_reject_detail', {
-	//     templateUrl: '/private/purchaser/html/purchaser_inventory_reject_detail.html',
-        //     controller: 'purchaserInventoryRejectDetailCtrl',
-	//     resolve: angular.extend({}, user, firm, employee) 
-	// }).
-	// when('/record/inventory_rsn_detail/reject/:rsn?', {
-	//     templateUrl: '/private/purchaser/html/purchaser_inventory_reject_rsn_detail.html',
-	//     controller: 'purchaserInventoryRejectRsnDetailCtrl',
-	//     resolve: angular.extend({}, user, brand, firm, s_group)
-	// }). 
+	//
+	when('/inventory_rsn_detail/:rsn?', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_rsn_detail.html',
+	    controller: 'purchaserInventoryNewRsnDetailCtrl',
+	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
+	}).
+	when('/inventory_new_detail', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
+            controller: 'purchaserInventoryNewDetailCtrl',
+	    resolve: angular.extend({}, user, firm, employee, base)
+	}). 
 	when('/inventory_detail/:rsn?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_detail.html',
             controller: 'purchaserInventoryDetailCtrl' ,
 	    resolve: angular.extend({}, user, brand, firm, type, s_group, color, base)
-	}). 
+	}).
+	// 
 	when('/inventory/inventory_fix', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_fix.html',
             controller: 'purchaserInventoryFixCtrl' ,

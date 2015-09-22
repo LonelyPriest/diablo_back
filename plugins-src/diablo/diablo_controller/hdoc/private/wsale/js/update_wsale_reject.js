@@ -248,7 +248,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    if (item.style_number === $scope.inventories[i].style_number
 		&& item.brand_id  === $scope.inventories[i].brand_id){
-		diabloUtilsService.response_with_callback(
+		dialog.response_with_callback(
 		    false, "退货单编辑", "退货编辑失败：" + purchaserService.error[2099],
 		    $scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
 		return;
@@ -485,6 +485,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    old_retailer:   $scope.old_select.retailer.id, 
 	    old_balance:    $scope.old_select.surplus,
 	    old_should_pay: -$scope.old_select.should_pay,
+	    old_datetime:   $scope.old_select.datetime,
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
 	    total:         -seti($scope.select.total)
@@ -493,7 +494,13 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	console.log(added);
 	console.log(base);
 
-	console.log($scope.old_select);
+	// console.log($scope.old_select);
+	if ($scope.select.shop.id !== $scope.old_select.shop.id){
+	    dialog.response_with_callback(
+		false, "退货单编辑", "退货单编辑失败：", "暂不支持店铺修改！！",
+		undefined, function(){$scope.has_saved = false})
+	};
+	
 	var new_datetime = dateFilter($scope.select.datetime, "yyyy-MM-dd");
 	var old_datetime = dateFilter($scope.old_select.datetime, "yyyy-MM-dd");
 	if (added.length === 0

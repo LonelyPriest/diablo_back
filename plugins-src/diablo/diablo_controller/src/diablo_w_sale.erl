@@ -706,6 +706,12 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+sql(update_wsale, RSN, _Merchant, _Shop, DateTime, []) ->
+    ["update w_sale_detail set entry_date=\'" ++ ?to_s(DateTime) ++ "\'"
+     ++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'",
+     "update w_sale_detail_amount set entry_date=\'" ++ ?to_s(DateTime) ++ "\'"
+     ++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'"];
+    
 sql(update_wsale, RSN, Merchant, Shop, DateTime, Inventories) ->
     %% RSN      = ?v(<<"rsn">>, Props),
     %% Shop     = ?v(<<"shop">>, Props),
@@ -787,6 +793,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 		 "update w_sale_detail set total=total+" ++ ?to_s(Metric)
 		 ++ ",fdiscount=" ++ ?to_s(FDiscount)
 		 ++ ",fprice=" ++ ?to_s(FPrice)
+		 ++ ",entry_date=\'" ++ ?to_s(DateTime) ++ "\'"
 		 ++ " where rsn=\"" ++ ?to_s(RSN) ++ "\""
 		 ++ " and style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
 		 ++ " and brand=" ++ ?to_s(Brand)]

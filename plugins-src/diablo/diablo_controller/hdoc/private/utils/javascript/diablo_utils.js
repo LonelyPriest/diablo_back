@@ -222,7 +222,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
-	    backdrop: 'false',
+	    // backdrop: 'false',
+	    backdrop: 'static',
 	    // scope: scope,
 	    resolve:{
 		message: function(){
@@ -241,8 +242,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
-	    backdrop: 'false',
-	    // backdrop: 'static',
+	    // backdrop: 'false',
+	    backdrop: 'static',
 	    // scope: scope,
 	    resolve:{
 		message: function(){
@@ -262,7 +263,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
-	    backdrop: 'false',
+	    // backdrop: 'false',
+	    backdrop: 'static',
 	    scope: scope,
 	    resolve:{
 		message: function(){
@@ -282,8 +284,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: templateUrl,
 	    controller: 'diabloEditDialogCtrl',
-	    // backdrop: 'static',
-	    backdrop: 'false',
+	    // backdrop: 'false',
+	    backdrop: 'static', 
 	    size:  size,
 	    scope: scope,
 	    resolve:{

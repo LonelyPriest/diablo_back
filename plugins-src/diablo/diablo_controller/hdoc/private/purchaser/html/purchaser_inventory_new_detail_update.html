@@ -456,7 +456,7 @@
 	  <tr x-ng-repeat="c in params.colors">
 	    <td class="col-md-1" x-ng-switch on="c.cid">
 	      <span x-ng-switch-when="0">均色</span>
-	      <span x-ng-switch-default>{{c.name}}</span>
+	      <span x-ng-switch-default>{{c.cname}}</span>
 	    </td>
 	    <td x-ng-repeat="s in params.sizes">
 	      <form name="aform">
@@ -513,7 +513,7 @@
 	  <tr x-ng-repeat="c in params.colors">
 	    <td class="col-md-1" x-ng-switch on="c.cid">
 	      <span x-ng-switch-when="0">均色</span>
-	      <span x-ng-switch-default>{{c.name}}</span>
+	      <span x-ng-switch-default>{{c.cname}}</span>
 	    </td>
 	    <td x-ng-repeat="s in params.sizes">
 	      {{params.get_amount(c.cid, s, params.amount).count}} 

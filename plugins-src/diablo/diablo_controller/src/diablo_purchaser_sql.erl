@@ -245,6 +245,7 @@ good(used_detail, Merchant, StyleNumber, Brand) ->
 	
 	++ " and a.style_number=b.style_number"
 	++ " and a.brand=b.brand"
+	++ " and b.merchant=" ++ ?to_s(Merchant)
 	++ " and b.deleted=" ++ ?to_s(?NO)
 	++ " group by a.style_number, a.brand".
 
@@ -425,7 +426,8 @@ inventory(list, Merchant, Conditions) ->
 	" from ("
 	"select a.style_number, a.brand as brand_id"
 	", a.type as type_id, a.sex, a.season, a.amount as total"
-	", a.tag_price, a.pkg_price, a.price3, a.price4, a.price5, a.discount"
+	", a.tag_price, a.pkg_price, a.price3, a.price4, a.price5"
+	", a.discount, a.shop as shop_id"
 	" from w_inventory a"
 	" where " ++ ?sql_utils:condition(proplists_suffix, NewConditions)
 	++ "a.merchant=" ++ ?to_s(Merchant)
@@ -433,7 +435,8 @@ inventory(list, Merchant, Conditions) ->
 	++") a "
 
 	" left join w_inventory_amount b on"
-	" a.style_number=b.style_number and a.brand_id=b.brand";
+	" a.style_number=b.style_number and a.brand_id=b.brand"
+	" and a.shop_id=b.shop and b.merchant=" ++ ?to_s(Merchant);
 	%% " left join colors c on b.color=c.id";
     
     %% "select a.style_number, a.brand as brand_id"
@@ -452,34 +455,56 @@ inventory(list, Merchant, Conditions) ->
     %% 	++ "a.merchant=" ++ ?to_s(Merchant)
     %% 	++ ?sql_utils:fix_condition(time, time_with_prfix, StartTime, EndTime); 
 
-inventory(get_new_amount, _Merchant, Conditions) -> 
-    "select a.rsn, a.style_number, a.brand as brand_id"
-	", a.color as color_id, a.size, a.total as amount"
-	
-	", b.type as type_id, b.sex, b.season, b.amount as total"
-	", b.firm as firm_id, b.s_group, b.free, b.year"
-	", b.org_price, b.tag_price, b.pkg_price, b.price3, b.price4"
-	", b.price5, b.discount, b.path"
-	
-	", c.name as color"
-	
-	" from (" 
-	"select rsn, style_number, brand, color, size, total"
-	" from w_inventory_new_detail_amount"
-	" where " ++ ?utils:to_sqls(proplists, Conditions)
-	++ " and deleted=" ++ ?to_s(?NO) ++ ") a"
+inventory(get_new_amount, _Merchant, Conditions) ->
+    "select a.rsn, a.style_number, a.brand_id, a.type_id, a.sex"
+	", a.season, a.firm_id, a.s_group, a.free, a.year"
+	", a.org_price, a.tag_price, a.pkg_price, a.price3, a.price4"
+	", a.price5, a.discount, a.path"
 
-	++ " left join "
-	"(select style_number, brand, type, sex, season, amount"
-	", firm, s_group, free, year"
+	", b.color as color_id, b.size, b.total as amount"
+	" from "
+	
+	"(select rsn, style_number, brand as brand_id, type as type_id, sex"
+	", season, firm as firm_id, s_group, free, year"
 	", org_price, tag_price, pkg_price, price3, price4"
 	", price5, discount, path"
 	" from w_inventory_new_detail"
 	" where "++ ?utils:to_sqls(proplists, Conditions)
-	++ " and deleted=" ++ ?to_s(?NO) ++ ") b"
-	" on a.style_number=b.style_number and a.brand = b.brand"
+	++ " and deleted=" ++ ?to_s(?NO) ++ ") a"
 
-	" left join colors c on a.color=c.id";
+	" inner join w_inventory_new_detail_amount b on a.rsn=b.rsn"
+	" and a.style_number=b.style_number and a.brand_id=b.brand";
+
+    %% "select a.rsn, a.style_number, a.brand as brand_id"
+    %% 	", a.color as color_id, a.size, a.total as amount"
+	
+    %% 	", b.type as type_id, b.sex, b.season, b.amount as total"
+    %% 	", b.firm as firm_id, b.s_group, b.free, b.year"
+    %% 	", b.org_price, b.tag_price, b.pkg_price, b.price3, b.price4"
+    %% 	", b.price5, b.discount, b.path"
+	
+    %% 	", c.name as color"
+	
+    %% 	" from (" 
+    %% 	"select rsn, style_number, brand, color, size, total"
+    %% 	" from w_inventory_new_detail_amount"
+    %% 	" where " ++ ?utils:to_sqls(proplists, Conditions)
+    %% 	++ " and deleted=" ++ ?to_s(?NO) ++ ") a"
+
+    %% 	++ " left join "
+    %% 	"w_inventory_new_detail b"
+    %% 	" on a.rsn=b.rsn and a.style_number=b.style_number"
+    %% 	" and a.brand=b.brand"
+    %% 	%% "(select style_number, brand, type, sex, season, amount"
+	%% ", firm, s_group, free, year"
+	%% ", org_price, tag_price, pkg_price, price3, price4"
+	%% ", price5, discount, path"
+	%% " from w_inventory_new_detail"
+	%% " where "++ ?utils:to_sqls(proplists, Conditions)
+	%% ++ " and deleted=" ++ ?to_s(?NO) ++ ") b"
+	%% " on a.style_number=b.style_number and a.brand = b.brand"
+
+    %% " left join colors c on a.color=c.id";
 
 inventory(new_rsn_detail, _Merchant, Conditions) ->
     {_StartTime, _EndTime, NewConditions} =
