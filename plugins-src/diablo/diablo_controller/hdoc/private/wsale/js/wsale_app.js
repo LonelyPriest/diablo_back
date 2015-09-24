@@ -257,10 +257,12 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 wsaleApp.controller("wsaleNewCtrl", function(
     $scope, $q, dateFilter, localStorageService,
     diabloUtilsService, diabloPromise, diabloFilter, diabloNormalFilter,
-    wgoodService, purchaserService, wretailerService,
-    wsaleService, wsaleGoodService,
+    diabloPattern, wgoodService, purchaserService, 
+    wretailerService, wsaleService, wsaleGoodService,
     user, filterFirm, filterRetailer, filterEmployee,
     filterSizeGroup, filterBrand, filterType, filterColor, base){
+
+    $scope.pattern = {money: diabloPattern.decimal_2};
     
     // all right of user
     // console.log(user); 
@@ -1592,8 +1594,8 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
-    console.log($scope.filter);
-    console.log($scope.prompt);
+    // console.log($scope.filter);
+    // console.log($scope.prompt);
 
     var now = $.now();
     $scope.qtime_start = function(shopId){

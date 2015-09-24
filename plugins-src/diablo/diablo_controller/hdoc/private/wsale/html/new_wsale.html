@@ -137,7 +137,7 @@
 				 && !select.form.cashForm.$pristine}">
 	  	    <input class="form-control"
 			   type="number" step="0.01"
-			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
+			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.cash"
 			   placeholder="现金"
 			   popover-placement="top"
@@ -153,7 +153,7 @@
 				 && !select.form.cardForm.$pristine}">
 	  	    <input class="form-control"
 			   type="number" step="0.01"
-			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
+			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.card"
 			   placeholder="刷卡"
 			   popover-placement="top"
@@ -171,7 +171,7 @@
 	  	    <input class="form-control"
 			   type="number" step="0.01"
 			   placeholder="汇款"
-			   x-ng-pattern="/^\d+(.\d{1,2})?$/" 
+			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.wire"></input>
 		  </div> 
 		</form>
@@ -207,7 +207,7 @@
 				 && !select.form.vForm.$pristine}">
 	  	    <input class="form-control"
 			   type="number" step="0.01"
-			   x-ng-pattern="/^[+|\-]?\d+(.\d{1,2})?$/"
+			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.verificate"
 			   placeholder="核销"
 			   popover-placement="top"

@@ -210,8 +210,8 @@ shopApp.controller("shopDetailCtrl", function(
     $scope.goto_page   = diablo_goto_page;
 
     // console.log();
-    $scope.authen_list_repo = false;
-    if (rightAuthen.authen("list_repo", user.right, rightAuthen.shop_action())){
+    $scope.authen_list_repo = false; 
+    if (rightAuthen.authen("list_repo", user.right)){
 	$scope.authen_list_repo = true; 
     };
     

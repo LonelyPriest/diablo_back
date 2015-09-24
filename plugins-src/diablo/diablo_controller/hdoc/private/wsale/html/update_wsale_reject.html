@@ -44,7 +44,9 @@
 	      <div class="input-group">
 		<span class="input-group-addon">
 		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
-		<select class="form-control" type="text"
+		<select class="form-control"
+			type="text"
+			readonly
 	  		x-ng-model="select.shop"
 	  		x-ng-options="s as s.name for s in
 	  			  shops|filter:$viewValue|limitTo:8">

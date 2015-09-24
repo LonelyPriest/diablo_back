@@ -1,6 +1,7 @@
 var wgoodApp = angular.module(
     "wgoodApp", ['ngRoute', 'ngResource', 'diabloUtils', 'diabloFilterApp',
-		 'diabloPattern', 'diabloAuthenApp', 'ui.bootstrap', 'userApp'])
+		 'diabloNormalFilterApp', 'diabloPattern', 'diabloAuthenApp',
+		 'ui.bootstrap', 'userApp'])
 // .config(diablo_authen);
 .config(function($httpProvider, authenProvider){
 	$httpProvider.interceptors.push(authenProvider.interceptor); 
@@ -26,13 +27,16 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	return diabloFilter.get_color_type()}};
 
     var s_group = {"filterSizeGroup": function(diabloFilter){
-	return diabloFilter.get_size_group()}}; 
+	return diabloFilter.get_size_group()}};
+
+    var base = {"base": function(diabloNormalFilter){
+	return diabloNormalFilter.get_base_setting()}};
     
     $routeProvider.
 	when('/wgood_detail', {
 	    templateUrl: '/private/wgood/html/wgood_detail.html',
             controller: 'wgoodDetailCtrl',
-	    resolve: angular.extend({}, user, brand, firm, type, color) 
+	    resolve: angular.extend({}, user, brand, firm, type, color, base) 
 	}).
 	when('/wgood_update/:id?', {
 	    templateUrl: '/private/wgood/html/wgood_update.html',
@@ -57,7 +61,7 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	otherwise({
 	    templateUrl: '/private/wgood/html/wgood_detail.html',
             controller: 'wgoodDetailCtrl',
-	    resolve: angular.extend({}, user, brand, firm, type, color) 
+	    resolve: angular.extend({}, user, brand, firm, type, color, base) 
         })
 }]);
 
@@ -892,7 +896,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 wgoodApp.controller("wgoodDetailCtrl", function(
     $scope, $location, dateFilter, diabloUtilsService,
     diabloPagination, wgoodService, user, diabloFilter,
-    filterBrand, filterFirm, filterType, filterColor){
+    filterBrand, filterFirm, filterType, filterColor, base){
     // console.log(filterNumber);
     // console.log(firms);
     // console.log(filterBrand);
@@ -913,7 +917,14 @@ wgoodApp.controller("wgoodDetailCtrl", function(
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time();
+
+    var now = $.now();
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+    }();
+    
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
     
     // pagination
     $scope.colspan = 15;

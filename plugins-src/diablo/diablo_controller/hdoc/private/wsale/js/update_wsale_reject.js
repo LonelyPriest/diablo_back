@@ -523,7 +523,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	}).then(function(result){
 	    console.log(result);
 	    if (result.ecode == 0){
-		msg = "修入销售单成功！！单号：" + result.rsn; 
+		msg = "修改销售单成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "销售单编辑", msg, $scope,
 	    	    function(){

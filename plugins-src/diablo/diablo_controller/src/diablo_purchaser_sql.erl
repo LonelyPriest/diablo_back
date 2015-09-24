@@ -418,7 +418,8 @@ inventory(list, Merchant, Conditions) ->
 	?sql_utils:cut(fields_with_prifix, Conditions),
 
     "select a.style_number, a.brand_id, a.type_id, a.sex, a.season, a.total"
-	", a.tag_price, a.pkg_price, a.price3, a.price4, a.price5, a.discount"
+	", a.org_price, a.tag_price, a.pkg_price"
+	", a.price3, a.price4, a.price5, a.discount"
 
 	", b.color as color_id, b.size, b.total as amount"
 	%% ", c.name as color"
@@ -426,8 +427,8 @@ inventory(list, Merchant, Conditions) ->
 	" from ("
 	"select a.style_number, a.brand as brand_id"
 	", a.type as type_id, a.sex, a.season, a.amount as total"
-	", a.tag_price, a.pkg_price, a.price3, a.price4, a.price5"
-	", a.discount, a.shop as shop_id"
+	", a.org_price, a.tag_price, a.pkg_price, a.price3"
+	", a.price4, a.price5, a.discount, a.shop as shop_id"
 	" from w_inventory a"
 	" where " ++ ?sql_utils:condition(proplists_suffix, NewConditions)
 	++ "a.merchant=" ++ ?to_s(Merchant)
@@ -746,7 +747,13 @@ inventory_match(Merchant, StyleNumber, Shop, Firm) ->
 	%% ++ " left join brands b on a.brand=b.id" 
 	%% ++ " left join inv_types c on a.type=c.id".
 
-inventory(update, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
+inventory(update, RSN, _Merchant, _Shop, _Firm, Datetime, _Curtime, []) ->
+    ["update w_inventory_new set entry_date=\'" ++ ?to_s(Datetime) ++ "\'"
+     ++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'",
+     "update w_inventory_new_detail set entry_date=\'"
+     ++ ?to_s(Datetime) ++ "\' where rsn=\'" ++ ?to_s(RSN) ++ "\'"];
+
+inventory(update, RSN, Merchant, Shop, Firm, Datetime, Curtime, Inventories) ->
     
     lists:foldr(
       fun({struct, Inv}, Acc0)-> 
@@ -766,10 +773,10 @@ inventory(update, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
 		      amount_delete(RSN, Merchant, Shop, Inv, Amounts) ++ Acc0;
 		  <<"a">> ->
 		      amount_new(RSN, Merchant, Shop,
-				 Firm, Date, DateTime, Inv, Amounts)
+				 Firm, Datetime, Curtime, Inv, Amounts)
 			  ++ Acc0; 
 		  <<"u">> -> 
-		      amount_update(RSN, Merchant, Shop, Date, Inv) ++ Acc0
+		      amount_update(RSN, Merchant, Shop, Datetime, Inv) ++ Acc0
 	      end
       end, [], Inventories).
 

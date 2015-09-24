@@ -4,7 +4,7 @@
       
       <div class="portlet-title">
 	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
-	  入库编辑
+	  采购单编辑（入库）
 	</div>
 	<div class="actions">
 	  <button class="btn btn-success red-stripe"
@@ -41,7 +41,9 @@
 	      <div class="input-group">
 		<span class="input-group-addon">
 		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
-	  	<input class="form-control" type="text"
+	  	<input class="form-control"
+		       type="text"
+		       readonly
 	  	       x-ng-model="select.shop"
 	  	       placeholder="请选择店铺"
 	  	       typeahead-editable="false"

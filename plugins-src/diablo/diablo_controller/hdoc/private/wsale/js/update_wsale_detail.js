@@ -1,11 +1,12 @@
 wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope, $routeParams, $q, dateFilter, diabloUtilsService,
-    diabloPromise, diabloFilter,
+    diabloPromise, diabloFilter, diabloPattern,
     wgoodService, purchaserService, wretailerService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
     filterBrand, filterColor, filterType){
     console.log(user);
-    
+
+    $scope.pattern     = {money: diabloPattern.decimal_2};
     $scope.shops       = user.sortShops;
     $scope.retailers   = filterRetailer; 
     $scope.employees   = filterEmployee;

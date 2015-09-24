@@ -333,13 +333,6 @@ handle_call({update_good, Attrs}, _Form, State) ->
 			    ?sql_utils:execute(transaction, [Sql1, Sql2], GoodId)
 		    end,
 		{reply, Reply, State}; 
-		%% ?DEBUG("Sql1 ~p", [Sql1]),
-		%% case ?mysql:fetch(write, Sql1) of
-		%%     {error, Error} ->
-		%% 	{reply, {error, ?err(db_error, Error)}, State};
-		%%     {ok, _} -> 
-		%% 	{reply, {ok, StyleNumber}, State}
-		%% end;
 	    _Any -> 
 		{reply, {error, ?err(purchaser_good_exist, StyleNumber)}, State}
 	end
@@ -528,36 +521,43 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     
     RSN        = ?v(<<"rsn">>, Props),
     Shop       = ?v(<<"shop">>, Props),
+    Datetime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)), 
     Firm       = ?v(<<"firm">>, Props),
     Employee   = ?v(<<"employee">>, Props),
+
+    Balance    = ?v(<<"balance">>, Props), 
     Cash       = ?v(<<"cash">>, Props),
     Card       = ?v(<<"card">>, Props),
     Wire       = ?v(<<"wire">>, Props),
     VerifyPay  = ?v(<<"verificate">>, Props),
-    Comment    = ?v(<<"comment">>, Props),
-
-    OldBalance   = ?v(<<"old_balance">>, Props),
+    Comment    = ?v(<<"comment">>, Props), 
     ShouldPay    = ?v(<<"should_pay">>, Props),
-    OldShouldPay = ?v(<<"old_should_pay">>, Props),
-    HasPay       = ?v(<<"has_pay">>, Props),
-    OldHasPay    = ?v(<<"old_has_pay">>, Props),
+    HasPay       = ?v(<<"has_pay">>, Props, 0),
+    
 
-    %% Year       = ?utils:current_time(year),
-    %% Date       = ?v(<<"date">>, Props, ?utils:current_time(localdate)),
-    DateTime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)),
-    CurTime    = ?utils:current_time(localtime),
-    %% Datetime   = ?utils:current_time(localtime),
+    OldFirm      = ?v(<<"old_firm">>, Props),
+    OldBalance   = ?v(<<"old_balance">>, Props),
+    OldShouldPay = ?v(<<"old_should_pay">>, Props),
+    OldHasPay    = ?v(<<"old_has_pay">>, Props, 0),
+    OldDatatime  = ?v(<<"old_datetime">>, Props),
+
     Total      = ?v(<<"total">>, Props),
     
+    CurTime    = ?utils:current_time(localtime),
+    
     RealyShop = realy_shop(Merchant, Shop),
-    Sql1 = ?w_good_sql:inventory(
-	      update, RSN, Merchant, RealyShop, Firm,
-	      DateTime, CurTime, Inventories),
+    Sql1 = case Datetime =:= OldDatatime of
+	       true -> [];
+	       false ->
+		   ?w_good_sql:inventory(
+		      update, RSN, Merchant, RealyShop, Firm,
+		      Datetime, CurTime, Inventories)
+	   end,
 
     Updates =?utils:v(employ, string, Employee)
 	++ ?utils:v(firm, integer, Firm) 
 	++ ?utils:v(shop, integer, Shop)
-	++ ?utils:v(balance, float, OldBalance)
+    %% ++ ?utils:v(balance, float, OldBalance)
 	++ ?utils:v(should_pay, float, ShouldPay)
 	++ ?utils:v(has_pay, float, HasPay)
 	++ ?utils:v(cash, float, Cash)
@@ -566,24 +566,49 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 	++ ?utils:v(verificate, float, VerifyPay)
 	++ ?utils:v(total, integer, Total)
 	++ ?utils:v(comment, string, Comment)
-	++ ?utils:v(entry_date, string, DateTime),
+	++ case Datetime =:= OldDatatime of
+	       true -> [];
+	       false ->
+		   ?utils:v(entry_date, string, Datetime)
+	   end,
 
-    Sql2 = "update w_inventory_new set "
-	++ ?utils:to_sqls(proplists, comma, Updates)
-	++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
+    case Firm =:= OldFirm of
+	true ->
+	    Sql2 = "update w_inventory_new set "
+		++ ?utils:to_sqls(
+		      proplists, comma,
+		      ?utils:v(balance, float, OldBalance) ++ Updates)
+		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
 
-    case (ShouldPay - HasPay) - (OldShouldPay - OldHasPay) of
-	0 ->
-	    AllSql = Sql1 ++ [Sql2],
-	    Reply = ?sql_utils:execute(transaction, AllSql, RSN), 
-	    {reply, Reply, State};
-	Metric -> 
+	    case (ShouldPay - HasPay) - (OldShouldPay - OldHasPay) of
+		0 ->
+		    AllSql = Sql1 ++ [Sql2],
+		    Reply = ?sql_utils:execute(transaction, AllSql, RSN), 
+		    {reply, Reply, State};
+		Metric -> 
+		    AllSql = Sql1 ++ [Sql2] ++
+			["update suppliers set balance=balance+"
+			 ++ ?to_s(Metric) 
+			 ++ ", change_date=" ++ "\"" ++ CurTime ++ "\""
+			 " where id=" ++ ?to_s(Firm)
+			 ++ " and merchant=" ++ ?to_s(Merchant)],
+		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
+		    ?w_user_profile:update(firm, Merchant),
+		    {reply, Reply, State}
+	    end;
+	false ->
+	    Sql2 = "update w_inventory_new set "
+		++ ?utils:to_sqls(
+		      proplists, comma,
+		      ?utils:v(balance, float, Balance) ++ Updates),
 	    AllSql = Sql1 ++ [Sql2] ++
-		["update suppliers set balance=balance+"
-		 ++ ?to_s(Metric) 
-		 ++ ", change_date=" ++ "\"" ++ CurTime ++ "\""
-		 " where id=" ++ ?to_s(Firm)
-		 ++ " and merchant=" ++ ?to_s(Merchant)],
+		["update suppliers set balance=balance-"
+		 ++ ?to_s(OldShouldPay - OldHasPay)
+		 ++ " where id=" ++ ?to_s(OldFirm),
+		"update suppliers set balance=balance+"
+		 ++ ?to_s(ShouldPay - HasPay) 
+		 ++ " where id="++ ?to_s(Firm)],
+	    
 	    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 	    ?w_user_profile:update(firm, Merchant),
 	    {reply, Reply, State}

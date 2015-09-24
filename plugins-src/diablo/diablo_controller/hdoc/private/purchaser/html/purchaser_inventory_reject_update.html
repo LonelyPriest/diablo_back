@@ -4,11 +4,11 @@
       
       <div class="portlet-title">
 	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
-	  采购退货
+	  采购单编辑（退货）
 	</div>
 	<div class="actions">
 	  <button class="btn btn-success red-stripe"
-		  x-ng-disabled="!has_saved"
+		  x-ng-disabled="has_saved"
 		  x-ng-click="save_inventory()">保存
 	    <i class="glyphicon glyphicon-save"></i></button> 
 	</div>
@@ -147,7 +147,9 @@
 		  <div ng-class="{'has-error':select.form.extraForm.$invalid
 				 && !select.form.extraForm.$pristine}">
 	  	    <input class="form-control"
-			   type="number" step="0.01" 
+			   type="number"
+			   step="0.01"
+			   readonly
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
 	  		   x-ng-model="select.extra_pay"
 			   placeholder="关联费用" 

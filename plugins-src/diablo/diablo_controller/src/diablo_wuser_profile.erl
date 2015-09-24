@@ -694,7 +694,8 @@ handle_call({set_default, Merchant}, _From, State) ->
 	       {"dprice",          "0",  "0"},
 	       {"hand",            "0",  "0"},
 	       {"count",           "0",  "0"},
-	       {"calc",            "0",  "0"}
+	       {"calc",            "0",  "0"},
+	       {"comment",         "0",  "0"}
 	      ],
 
 
