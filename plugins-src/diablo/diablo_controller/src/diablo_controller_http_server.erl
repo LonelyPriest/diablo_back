@@ -62,47 +62,46 @@ valid_session(Req) ->
     end.	    
 
 dispatch(Req, DocRoot) ->
-    %% check session    
-    "/" ++ Path = Req:get(path),
+    %% check session
+    Path =
+	try
+	    "/" ++ PPath = Req:get(path),
+	    PPath
+	catch
+	    _:_ -> []
+	end,
+				  
+			      
+		     
     %% ?DEBUG("Req ~p", [Req]),
     %% ?DEBUG("Path = ~p", [Path]),
     try
-	case Req:get(method) of
-	    Method when Method =:= 'GET'; Method =:= 'HEAD' ->
-		case Path of
-		    [] -> root(Req);
-		    _ ->
-			case url_dispatch(Req, ?http_route:url_match(get)) of
-			    none ->
-				%% ?DEBUG("Path ~p", [Path]),
-				case filelib:is_file(
-				       filename:join([DocRoot, Path])) of
-				    true ->
-				       Req:serve_file(Path, DocRoot);
-				    false->
-					Req:not_found()
-				end;
-			    Response ->
-				Response
-			end
-		end;
-	    Method when Method =:= 'POST' ->
-		Payload = Req:recv_body(),
-		?DEBUG("post data ~ts", [Payload]),
-		case url_dispatch(Req, ?http_route:url_match(post, Payload)) of
-			    none ->
-				case filelib:is_file(
-				       filename:join([DocRoot, Path])) of
-				    true ->
-					Req:serve_file(Path, DocRoot);
-				    false->
-					Req:not_found()
-				end;
-			    Response ->
-				Response
-		end;
-	    Method when Method =:= 'DELETE' ->
-		case url_dispatch(Req, ?http_route:url_match(delete)) of
+	case Path of
+	    [] -> ok;
+	    _  ->
+		case Req:get(method) of
+		    Method when Method =:= 'GET'; Method =:= 'HEAD' ->
+			case Path of
+			    [] -> root(Req);
+			    _ ->
+				case url_dispatch(Req, ?http_route:url_match(get)) of
+				    none ->
+					%% ?DEBUG("Path ~p", [Path]),
+					case filelib:is_file(
+					       filename:join([DocRoot, Path])) of
+					    true ->
+						Req:serve_file(Path, DocRoot);
+					    false->
+						Req:not_found()
+					end;
+				    Response ->
+					Response
+				end
+			end;
+		    Method when Method =:= 'POST' ->
+			Payload = Req:recv_body(),
+			?DEBUG("post data ~ts", [Payload]),
+			case url_dispatch(Req, ?http_route:url_match(post, Payload)) of
 			    none ->
 				case filelib:is_file(
 				       filename:join([DocRoot, Path])) of
@@ -113,15 +112,29 @@ dispatch(Req, DocRoot) ->
 				end;
 			    Response ->
 				Response
-		end;
-	    Method when Method =:= 'OPTIONS' -> 
-		case filelib:is_file(
-		       filename:join([DocRoot, Path])) of
-		    true ->
-			Req:serve_file(Path, DocRoot);
-		    false->
-			Req:not_found()
-		end 
+			end;
+		    Method when Method =:= 'DELETE' ->
+			case url_dispatch(Req, ?http_route:url_match(delete)) of
+			    none ->
+				case filelib:is_file(
+				       filename:join([DocRoot, Path])) of
+				    true ->
+					Req:serve_file(Path, DocRoot);
+				    false->
+					Req:not_found()
+				end;
+			    Response ->
+				Response
+			end;
+		    Method when Method =:= 'OPTIONS' -> 
+			case filelib:is_file(
+			       filename:join([DocRoot, Path])) of
+			    true ->
+				Req:serve_file(Path, DocRoot);
+			    false->
+				Req:not_found()
+			end 
+		end
 	end
     catch 
         Type:What ->

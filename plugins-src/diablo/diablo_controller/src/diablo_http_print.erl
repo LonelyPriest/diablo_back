@@ -194,11 +194,17 @@ handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
 
 			  Content = Head ++ Body ++ Stastic ++ Foot,
 
-			  %% auto page
-			  %% DBody = ?f_print:pagination(auto, Height * 10, Content),
-			  
-			  %% no page
-			  DBody = ?f_print:pagination(just, Height * 10, Content),
+			  DBody = 
+			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1030"]) of
+				  true -> 
+				      %% no page
+				      ?DEBUG("no page with sn ~p", [SN]),
+				      ?f_print:pagination(just, Height * 10, Content);
+				  false ->
+				      %% auto page
+				      ?DEBUG("auto page with sn ~p", [SN]),
+				      ?f_print:pagination(auto, Height * 10, Content)
+			      end,
 
 			  %% page by height
 			  %% DBody = ?f_print:pagination(Height * 10, Content),
@@ -1035,7 +1041,7 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
 		  %% PL =  length(left_pading(Brand, Model)),
 		  NL  =  width(chinese, N) + 4,
 		  BL  =  width(chinese, B),
-		  NoL = width(chinese, No) + 2,
+		  NoL =  width(chinese, No) + 2,
 
 		  ?DEBUG("NL + BL + NoL ~p, L ~p", [NL + BL + NoL, L]),
 		  case NL + BL + NoL =< L of 
@@ -1080,8 +1086,13 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
 	     end, [], CT)
 	++ left_pading(Brand, Model)
 	++ pading(Column - 26)
-	++ "打印日期：" ++ ?utils:current_time(format_localtime)
-	++ br(Brand) ++ br(Brand) ++ br(Brand) ++ br(Brand) ++ br(Brand).
+	++ "打印日期：" ++ ?utils:current_time(format_localtime) 
+	%% ++ br(Brand)
+	%% ++ [27, 74, 144] ++ [27, 74, 144].
+	++ ?f_print:br(forward, Brand, Model).
+
+	
+
 
 row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
     [H|T] = FlatternAmounts,
@@ -1200,27 +1211,31 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 
     
     Head = ?f_print:decorate_data(head, ?to_a(Brand), ?to_a(Model), Height * 10), 
-    Tail = ?f_print:decorate_data(tail, ?to_a(Brand), ?to_a(Model)), 
+    Tail = ?f_print:decorate_data(tail, ?to_a(Brand), ?to_a(Model)),
+    Len  = erlang:length(Body),
     
     try 
 	%% query state 
 	{ok, SN} = get_printer_state(Path, SN, Key, CureentTimeTicks), 
 	
 	%% ok, print
-	GBKBodys = 
+	{GBKBodys, _} = 
 	    lists:foldr(
-	      fun(B, Acc) ->
+	      fun(B, {Acc, Lens}) ->
 		      Utf8Data = unicode:characters_to_list(?to_s(B), utf8),
 		      GBKData  = diablo_iconv:convert("utf-8", "gbk", Utf8Data),
-		      Base64 = 
-			  case IsPage of
-			      true ->
-			  	  base64:encode_to_string(Head ++ GBKData ++ Tail);
-			      false -> 
-				  base64:encode_to_string(GBKData)
-		      end,
-		      [Base64|Acc]
-	      end,  [], Body),
+		      Base64 =
+			  case Lens + 1 =:= Len of
+			      true -> 
+				  case IsPage of
+				      true ->
+					  base64:encode_to_string(Head ++ GBKData ++ Tail);
+				      false -> 
+					  base64:encode_to_string(GBKData)
+				  end
+			  end,
+		      {[Base64|Acc], Lens + 1}
+	      end,  {[], 0}, Body),
 
 	%% ?DEBUG("gbk body ~p", [GBKBodys]),
 	

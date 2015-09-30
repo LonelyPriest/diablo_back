@@ -3,7 +3,7 @@
 -include("../../../../include/knife.hrl").
 -include("diablo_controller.hrl").
 
--export([br/1, line/2, line/4, line/5, width/2, middle/3, line_space/1]).
+-export([br/1, br/3, line/2, line/4, line/5, width/2, middle/3, line_space/1]).
 -export([sort_amount/3, left_pading/2,
 	 pading/1, size_pading/3, clean_zero/1, f_round/1]).
 -export([pagination/2, pagination/3,
@@ -397,6 +397,15 @@ line_space('1/6') ->
     [27, 50];
 line_space(default) ->
     [27, 64].
+
+br(forward, <<"epson">>, <<"LQ55K">>) ->
+    br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
+br(forward, Brand, _Model) ->
+    br(Brand).
+
+    
 
 %% decorate_data(head, jolimark, 'LQ-200KIII', PaperHeight) ->
 %%     decorate_data(head, jolimark, none, PaperHeight);
