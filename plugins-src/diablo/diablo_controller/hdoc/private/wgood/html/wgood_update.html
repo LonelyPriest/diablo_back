@@ -338,9 +338,13 @@
 			 x-ng-model="good.color_desc">
 		  </input>
 		  <span class="input-group-btn">
-		    <button class="btn btn-primary" x-ng-click="select_color()">
+		    <button class="btn btn-primary"
+			    x-ng-disabled="good.free===0"
+			    x-ng-click="select_color()">
 		      <i class="glyphicon glyphicon-arrow-right"></i></button>
-		    <button class="btn btn-success" x-ng-click="new_color()">
+		    <button class="btn btn-success"
+			    x-ng-disabled="good.free===0"
+			    x-ng-click="new_color()">
 		      <i class="glyphicon glyphicon-plus"></i></button>
 		  </span>
 		</div>

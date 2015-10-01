@@ -42,7 +42,7 @@
 		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
 		<select class="form-control"
 			type="text"
-			readonly
+			disabled
 	  		x-ng-model="select.shop"
 	  		x-ng-options="s as s.name for s in
 	  			  shops|filter:$viewValue|limitTo:8">
@@ -182,7 +182,7 @@
 		    <!-- <th class="text-center">厂商</th> -->
 		    <th class="text-center">季节</th>
 		    <th class="text-center">进货价</th>
-		    <th class="text-center">数量</th> 
+		    <!-- <th class="text-center">库存</th>  -->
 		    <!-- <th class="text-center">吊牌价</th>  -->
 		    <!-- <th class="text-center">打包价</th> -->
 		    <!-- <th class="text-center">价3</th> -->
@@ -191,7 +191,7 @@
 		    <!-- <th class="text-center">折扣</th> -->
 		    <!-- <th class="text-center">店铺</th> -->
 		    <!-- <th class="text-center">数量</th> -->
-		    <!-- <th class="text-center">退货数量</th> -->
+		    <th class="text-center">数量</th>
 		    <th class="text-center">合计</th>
 		    <th class="text-center">操作</th>
 		  </tr>
@@ -222,16 +222,18 @@
 		    <td class="vert-align">{{inv.type.name}}</td>
 		    <td class="vert-align">{{sexs[inv.sex]}}</td>
 		    <td class="vert-align">{{seasons[inv.season]}}</td>
-		    <td class="col-md-1 vert-align">{{inv.org_price}}</td> 
+		    <td class="col-md-1 vert-align">{{inv.org_price}}</td>
+		    <!-- <td class="vert-align">{{inv.total}}</td>  -->
+
 		    
 		    <td class="col-md-1 vert-align">
 		      <div x-ng-if="!inv.$new && !inv.free_update">{{inv.reject}}</div> 
 		      <form name="inv.form.reject"
 			    ng-if="inv.$new && inv.free_color_size
 				   || !inv.$new && inv.free_update">
-			<div ng-class="{'has-error':inv.form.reject.$invalid
+			<div x-ng-class="{'has-error':inv.form.reject.$invalid
 				       && !inv.form.reject.$pristine
-				       || !valid_free_size_reject(inv)}"}>
+				       || !valid_free(inv)}"}>
 			  <input class="form-control"
 				 type="number" step="1" 
 				 required

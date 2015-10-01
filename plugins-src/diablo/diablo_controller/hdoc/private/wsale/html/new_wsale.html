@@ -474,15 +474,15 @@
 			
 			<td class="text-left vert-align">
 			  <span x-ng-if="inv.$new">
-			    <a class="btn btn-success btn-xs"
-			       x-ng-if="inv.free_color_size"
-			       x-ng-disabled="inv.form.good.$invalid
-					      || inv.form.sell.$invalid
-					      || inv.form.fprice.$invalid
-					      || inv.form.fdiscount.$invalid
-					      || has_saved"
-			       x-ng-click="add_free_inventory(inv)">保存
-			      <i class="glyphicon glyphicon-plus"></i></a>
+			    <!-- <a class="btn btn-success btn-xs" -->
+			    <!--    x-ng-if="inv.free_color_size" -->
+			    <!--    x-ng-disabled="inv.form.good.$invalid -->
+			    <!-- 		      || inv.form.sell.$invalid -->
+			    <!-- 		      || inv.form.fprice.$invalid -->
+			    <!-- 		      || inv.form.fdiscount.$invalid -->
+			    <!-- 		      || has_saved" -->
+			    <!--    x-ng-click="add_free_inventory(inv)">保存 -->
+			    <!--   <i class="glyphicon glyphicon-plus"></i></a> -->
 			    
 			    <a class="btn btn-success btn-xs"
 			       x-ng-if="!inv.free_color_size"
@@ -513,13 +513,13 @@
 			       x-ng-click="delete_inventory(inv)">删除
 			      <i class="glyphicon glyphicon-erase"></i></a>
 
-			    <a class="btn btn-success btn-xs"
-			       ng-if="inv.free_update"
-			       x-ng-disabled="inv.form.sell.$invalid
-					      || inv.form.fprice.$invalid
-					      || inv.form.fdiscount.$invalid"
-			       x-ng-click="save_free_update(inv)">保存
-			      <i class="glyphicon glyphicon-plus"></i></a>
+			    <!-- <a class="btn btn-success btn-xs" -->
+			    <!--    ng-if="inv.free_update" -->
+			    <!--    x-ng-disabled="inv.form.sell.$invalid -->
+			    <!-- 		      || inv.form.fprice.$invalid -->
+			    <!-- 		      || inv.form.fdiscount.$invalid" -->
+			    <!--    x-ng-click="save_free_update(inv)">保存 -->
+			    <!--   <i class="glyphicon glyphicon-plus"></i></a> -->
 			    
 			    <a class="btn btn-danger btn-xs"
 			       ng-if="inv.free_update"

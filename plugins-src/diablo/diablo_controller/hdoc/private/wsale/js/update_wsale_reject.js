@@ -448,17 +448,27 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 		amount         : function(){
 		    if (add.operation === 'd' || add.operation === "a"){
 			console.log(add.amounts);
-			return add.amounts.map(function(a){
-			    if (angular.isDefined(a.sell_count)
-				&& a.sell_count && parseInt(a.sell_count) !== 0){
-				return {cid:a.cid,
-					size:a.size,
-					sell_count: -parseInt(a.sell_count)};
-			    }
-			})
+			var filter =  add.amounts.filter(function(m){
+			    return angular.isDefined(m.sell_count)
+				&& !isNaN(parseInt(m.sell_count))
+				&& parseInt(m.sell_count) !== 0;
+			});
+			return filter.map(function(m){
+			    return {cid:m.cid,
+				    size:m.size,
+				    sell_count: -parseInt(m.sell_count)};
+			});
+			// return add.amounts.map(function(a){
+			//     if (angular.isDefined(a.sell_count)
+			// 	&& a.sell_count && parseInt(a.sell_count) !== 0){
+			// 	return {cid:a.cid,
+			// 		size:a.size,
+			// 		sell_count: -parseInt(a.sell_count)};
+			//     }
+			// })
 		    }}(),
 		
-		sell_total     : parseInt(add.sell),
+		sell_total     : -parseInt(add.sell),
 		fdiscount      : parseInt(add.fdiscount),
 		fprice         : parseFloat(add.fprice), 
 		
@@ -523,15 +533,15 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	}).then(function(result){
 	    console.log(result);
 	    if (result.ecode == 0){
-		msg = "修改销售单成功！！单号：" + result.rsn; 
+		msg = "修改退货单成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
-	    	    true, "销售单编辑", msg, $scope,
+	    	    true, "退货单编辑", msg, $scope,
 	    	    function(){
 			diablo_goto_page("#/wsale/new_wsale_detail");
 		    })
 	    } else{
 	    	diabloUtilsService.response_with_callback(
-	    	    false, "销售单编辑", "销售单编辑失败：" + wsaleService.error[result.ecode],
+	    	    false, "退货单编辑", "退货单编辑失败：" + wsaleService.error[result.ecode],
 		    $scope, function(){$scope.has_saved = false});
 	    }
 	}) 

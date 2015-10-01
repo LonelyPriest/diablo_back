@@ -195,14 +195,14 @@ handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
 			  Content = Head ++ Body ++ Stastic ++ Foot,
 
 			  DBody = 
-			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1030"]) of
+			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1037"]) of
 				  true -> 
 				      %% no page
-				      ?DEBUG("no page with sn ~p", [SN]),
+				      %% ?DEBUG("no page with sn ~p", [SN]),
 				      ?f_print:pagination(just, Height * 10, Content);
 				  false ->
 				      %% auto page
-				      ?DEBUG("auto page with sn ~p", [SN]),
+				      %% ?DEBUG("auto page with sn ~p", [SN]),
 				      ?f_print:pagination(auto, Height * 10, Content)
 			      end,
 
@@ -1232,7 +1232,9 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 					  base64:encode_to_string(Head ++ GBKData ++ Tail);
 				      false -> 
 					  base64:encode_to_string(GBKData)
-				  end
+				  end;
+			      false ->
+				  base64:encode_to_string(GBKData)
 			  end,
 		      {[Base64|Acc], Lens + 1}
 	      end,  {[], 0}, Body),
@@ -1274,13 +1276,19 @@ multi_send(SignHead, Path, Device, [H|T], _Result) ->
     		  [], "application/x-www-form-urlencoded", H}, [], []) of 
     	{ok, {{"HTTP/1.1", 200, "OK"}, _Head, Reply}} ->
     	    ?DEBUG("Reply ~ts", [Reply]),
-    	    {struct, Status} = mochijson2:decode(Reply), 
-    	    case ?v(<<"state">>, Status) of
-    		<<"ok">> ->
-    		    multi_send(SignHead, Path, Device, T, {});
-    		<<"100">> ->
-    		    Error = {error, ?err(print_content_error, Device)}, 
-    		    multi_send(SignHead, Path, Device, [], Error)
+	    case Reply of
+		"!device not found." ->
+		    Error = {error, ?err(printer_conn_not_found, Device)},
+		    multi_send(SignHead, Path, Device, [], Error);
+		_ ->
+		    {struct, Status} = mochijson2:decode(Reply), 
+		    case ?v(<<"state">>, Status) of
+			<<"ok">> ->
+			    multi_send(SignHead, Path, Device, T, {});
+			<<"100">> ->
+			    Error = {error, ?err(print_content_error, Device)}, 
+			    multi_send(SignHead, Path, Device, [], Error)
+		    end
     	    end;
     	{error, Reason} ->
     	    ?INFO("print http request failed: ~p", [Reason]),

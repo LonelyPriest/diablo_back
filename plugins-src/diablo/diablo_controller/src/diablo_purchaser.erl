@@ -546,13 +546,12 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     CurTime    = ?utils:current_time(localtime),
     
     RealyShop = realy_shop(Merchant, Shop),
-    Sql1 = case Datetime =:= OldDatatime of
-	       true -> [];
-	       false ->
-		   ?w_good_sql:inventory(
-		      update, RSN, Merchant, RealyShop, Firm,
-		      Datetime, CurTime, Inventories)
-	   end,
+    %% Sql1 = case Datetime =:= OldDatatime of
+    %% 	       true -> [];
+    %% 	       false ->
+    Sql1 = ?w_good_sql:inventory(update, RSN, Merchant, RealyShop, Firm,
+				 Datetime, CurTime, Inventories),
+    %% end,
 
     Updates =?utils:v(employ, string, Employee)
 	++ ?utils:v(firm, integer, Firm) 

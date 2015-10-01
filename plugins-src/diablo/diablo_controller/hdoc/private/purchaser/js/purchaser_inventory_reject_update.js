@@ -398,8 +398,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		operation      : add.operation,
 		amount         : function(){
 		    if (add.operation === 'd' || add.operation === "a"){
+			// console.log(add.amounts);
 			var filter =  add.amounts.filter(function(m){
-			  return angular.isDefined(m.reject)
+			    // console.log(m);
+			    return angular.isDefined(m.reject)
 				&& !isNaN(parseInt(m.reject))
 				&& parseInt(m.reject) !== 0;
 			});
@@ -497,12 +499,20 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     }; 
 
     $scope.valid_free = function(inv){
-    	if (angular.isDefined(inv.amounts)
-    	    && angular.isDefined(inv.amounts[0].reject) 
-    	    && parseInt(inv.amounts[0].reject) > inv.total){
-    	    return false;
-    	}
-    	return true;
+	var ret = false;
+	if (inv.free === 0){
+	     ret = true;
+	}
+	else {
+	    if (angular.isDefined(inv.amounts)
+    		&& angular.isDefined(inv.amounts[0].reject) 
+    		&& parseInt(inv.amounts[0].reject) > inv.total){
+    		ret =  false;
+    	    }
+	    ret =  true; 
+	}
+
+	return ret;
     };
     
     var valid_all = function(amounts){
@@ -624,6 +634,9 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    };
 
 	    if (inv.free === 0){
+		// console.log(inv);
+		// inv.total = inv.select_amounts[0].count;
+		inv.amounts = [{cid:0, size:'0', count:sort.total}];
 		inv.free_color_size = true;
 	    } else{
 		inv.free_color_size = false;
