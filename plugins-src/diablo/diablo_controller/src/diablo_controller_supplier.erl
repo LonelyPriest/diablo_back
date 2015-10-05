@@ -54,7 +54,7 @@ handle_call({w_new_supplier, Attrs}, _From, State)->
     Name     = ?v(<<"name">>, Attrs),
     %% Pinyin   = ?v(<<"pinyin">>, Attrs),
     Balance  = ?v(<<"balance">>, Attrs, 0),
-    Mobile   = ?v(<<"mobile">>, Attrs),
+    Mobile   = ?v(<<"mobile">>, Attrs, []),
     Address  = ?v(<<"address">>, Attrs),
     Merchant = ?v(<<"merchant">>, Attrs),
     
@@ -154,7 +154,8 @@ handle_call({w_list, Merchant}, _From, State) ->
     Sql = "select id, name, mobile, address, balance, entry_date from suppliers"
 	++ " where "
 	++ " merchant=" ++ ?to_s(Merchant)
-	++ " and deleted = " ++ ?to_s(?NO) ++ ";",
+	++ " and deleted = " ++ ?to_s(?NO)
+	++ " order by id",
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 

@@ -1,7 +1,8 @@
 wsaleApp.controller("wsaleRejectCtrl", function(
     $scope, $q, dateFilter, diabloUtilsService, diabloPromise,
-    diabloFilter, wgoodService, purchaserService, wsaleService,
-    user, filterRetailer, filterEmployee, filterSizeGroup, filterColor, base){
+    diabloFilter, diabloNormalFilter, wgoodService, purchaserService,
+    wsaleService, user, filterRetailer, filterEmployee, filterSizeGroup,
+    filterColor, base){
     // console.log(base);
     // console.log(user); 
     $scope.shops   = user.sortBadRepoes.concat(user.sortShops);
@@ -17,6 +18,18 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     $scope.immediately_print = function(shopId){
 	return diablo_base_setting("pim_print", shopId, base, parseInt, diablo_no); 
     };
+
+    $scope.q_typeahead = function(shopId){
+	// default prompt comes from backend
+	return diablo_base_setting("qtypeahead", shopId, base, parseInt, diablo_yes);
+    }();
+
+    var now = $.now();
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, function(v){return v},
+	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
+    }();
     
     $scope.select  = {
 	shop: $scope.shops[0],
@@ -79,8 +92,21 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
 
     $scope.today = function(){
-	return $.now();
-    }
+    	return now;
+    };
+
+    if ($scope.q_typeahead === diablo_no){
+	diabloNormalFilter.match_all_w_inventory(
+	    {shop:$scope.select.shop.id, start_time:$scope.qtime_start}
+	).$promise.then(function(invs){
+	    // console.log(invs);
+	    $scope.all_w_inventory = 
+		invs.map(function(inv){
+		    return angular.extend(
+			inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
+		})
+	});
+    };
 
     // $scope.get_repo = function(){
     // 	// console.log($scope.shops);
@@ -600,20 +626,39 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 
     $scope.save_free_update = function(inv){
 	inv.free_update = false;
-	// console.log(inv);
 	inv.amounts[0].reject_count = inv.reject;
 	$scope.re_calculate(); 
-    }
+    };
 
     $scope.cancel_free_update = function(inv){
 	inv.free_update = false;
 	inv.reject = inv.amounts[0].reject_count;
 	$scope.re_calculate(); 
-    }
+    };
 
     $scope.reset_inventory = function(inv){
 	$scope.inventories[0] = {$edit:false, $new:true};;
-    }
+    };
+
+    $scope.auto_save_free = function(inv){
+	if (angular.isUndefined(inv.reject)
+	    || !inv.reject
+	    || parseInt(inv.reject) === 0){
+	    return;
+	}
+	
+	if (inv.$new && inv.free_color_size){
+	    $scope.add_free_inventory(inv);
+	};
+
+	if (!inv.$new){
+	    if (inv.free_update){
+		$scope.save_free_update(inv)
+	    } else {
+		$scope.re_calculate(); 
+	    }
+	}
+    };
 }); 
 
 

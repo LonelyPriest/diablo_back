@@ -72,7 +72,8 @@
 		    <td>{{f.order_id}}</td>
 		    <td>{{f.name}}</td>
 		    <td>{{f.balance}}</td>
-		    <td>{{f.mobile}}</td>
+		    <td x-ng-if="!f.mobile">暂无</td>
+		    <td x-ng-if="f.mobile">{{f.mobile}}</td>
 		    <td>{{f.address}}</td>
 		    <td>{{f.entry_date}}</td>
 

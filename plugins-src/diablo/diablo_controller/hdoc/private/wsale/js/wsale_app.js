@@ -616,24 +616,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		 }
 	     }
 	    }); 
-    };
-
-    // $scope.get_repo = function(){
-    // 	// console.log($scope.shops);
-    // 	if ($scope.select.shop.repo !== -1){
-    // 	    return diablo_get_object($scope.select.shop.repo, $scope.repoes);
-    // 	} else{
-    // 	    return $scope.select.shop; 
-    // 	}
-    // }
-
+    }; 
     
     $scope.match_style_number = function(viewValue){
-	// console.log($scope.select.shop);
-	// if ($scope.select.shop.repo !== -1){
-	//     return diabloFilter.match_w_sale(
-	// 	viewValue, $scope.get_repo($scope.select.shop.repo).id);
-	// }
 	return diabloFilter.match_w_sale(viewValue, $scope.select.shop.id);
     } 
 

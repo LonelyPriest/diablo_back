@@ -216,10 +216,27 @@
 		  <tr class="text-center" ng-repeat="inv in inventories">
 		    
 		    <td>{{inv.order_id}}</td>
-		    <td class="col-md-2 text-left vert-align">
+		    <td x-ng-if="q_typeahead === 0" class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
-		      <form name="inv.form.good" ng-if="inv.$new">
-			<div ng-class="{'has-error':inv.form.good.$invalid
+		      <form name="inv.form.good" x-ng-if="inv.$new">
+			<div x-ng-class="{'has-error':inv.form.good.$invalid
+				       && !inv.form.good.$pristine}">
+			  <input class="form-control text-left" type="text"
+				 required
+				 x-ng-model="inv.style_number"
+				 placeholder="货号"
+				 typeahead-editable="false"
+				 typeahead-on-select="on_select_good($item, $model, $label)"
+				 typeahead="g as g.name for g in
+					    all_w_inventory|filter:{name:$viewValue}|limitTo:20"/>
+			</div>
+		      </form>
+		    </td>
+		    
+		    <td x-ng-if="q_typeahead === 1" class="col-md-2 text-left vert-align">
+		      <span x-ng-if="!inv.$new">{{inv.style_number}}</span>
+		      <form name="inv.form.good" x-ng-if="inv.$new">
+			<div x-ng-class="{'has-error':inv.form.good.$invalid
 				       && !inv.form.good.$pristine}">
 			  <input class="form-control text-left" type="text"
 				 required
@@ -237,6 +254,7 @@
 			</div>
 		      </form>
 		    </td>
+		    
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand}}</td>
 		    <td class="vert-align">{{inv.type}}</td>
@@ -302,6 +320,8 @@
 				   required
 				   x-ng-pattern="/^[1-9][0-9]*$/"
 				   x-ng-model="inv.reject"
+				   x-ng-model-options="{debounce: 1000}"
+				   x-ng-change="auto_save_free(inv)"
 				   popover-placement="top"
 				   popover-trigger="focus"
 				   popover="均色均码直接输入数量"></input>
@@ -317,13 +337,13 @@
 		    
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
-			   x-ng-if="inv.free_color_size"
-			   x-ng-disabled="inv.form.good.$invalid
-					  || inv.form.reject.$invalid
-					  || has_saved"
-			   x-ng-click="add_free_inventory(inv)">保存
-			  <i class="glyphicon glyphicon-plus"></i></a>
+			<!-- <a class="btn btn-success btn-xs" -->
+			<!--    x-ng-if="inv.free_color_size" -->
+			<!--    x-ng-disabled="inv.form.good.$invalid -->
+			<!-- 		  || inv.form.reject.$invalid -->
+			<!-- 		  || has_saved" -->
+			<!--    x-ng-click="add_free_inventory(inv)">保存 -->
+			<!--   <i class="glyphicon glyphicon-plus"></i></a> -->
 			
 			<a class="btn btn-success btn-xs"
 			   x-ng-if="!inv.free_color_size"

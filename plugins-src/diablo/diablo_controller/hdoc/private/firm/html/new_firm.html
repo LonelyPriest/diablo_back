@@ -71,16 +71,14 @@
 			   && !firmNewForm.mobile.$pristine}">
 	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
 	      <div class="col-sm-6 col-md-6">
-		<div class="input-group">
+		<!-- <div class="input-group"> -->
 		<input type="tel"
 		       name="mobile"
-		       required
 		       ng-pattern="/^\d{3,4}\d{7,8}$/"
-		       placeholder="请输入电话或手机号码"
+		       placeholder="请输入电话或手机号码，默认为空"
 		       class="form-control"
-		       x-ng-model="firm.mobile"></input>
-		<span class="input-group-addon bg-white fg-red">*</span>
-		</div>
+		       x-ng-model="firm.mobile"/>
+		<!-- </div> -->
 	      </div>
 	      <div ng-show="firmNewForm.mobile.$invalid && !firmNewForm.mobile.$pristine">
 		<span style="color:red">请输入正确的电话或手机号码</span>
@@ -95,7 +93,7 @@
 		       class="form-control"
 		       name="address"
 		       required
-		       placeholder="请输入您的联系地址"
+		       placeholder="请输入厂商联系地址"
 		       x-ng-model="firm.address"
 		       x-ng-minlength="2"
 		       x-ng-maxlength="20"></input>
