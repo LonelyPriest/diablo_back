@@ -141,9 +141,12 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
     ];
 
     this.extra_pay_types = [
-	{id:0, name: "代付运费"},
+	{id:0, name: "代付运费"}, 
 	{id:1, name: "样衣"},
 	{id:2, name: "少配饰"},
+	{id:3, name: "代付现金"},
+	{id:3, name: "初期欠款"}
+	
     ];
 
     this.export_type = {trans:0, trans_note:1};
@@ -1167,6 +1170,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     }
     
     $scope.re_calculate = function(){
+	// console.log("re_calculate");
 	$scope.select.total = 0;
 	$scope.select.should_pay = 0.00;
 	
@@ -1175,7 +1179,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	   && $scope.select.extra_pay){
 	    e_pay = parseFloat($scope.select.extra_pay);
 	}
-	
+
+	console.log($scope.inventories);
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.sell);
@@ -1481,9 +1486,12 @@ wsaleApp.controller("wsaleNewCtrl", function(
      */
     $scope.update_inventory = function(inv){
 	console.log(inv);
-	inv.$update = true; 
+	inv.$update = true;
+	// inv.$a_change = false;
 	if (inv.free_color_size){
 	    inv.free_update = true;
+	    inv.o_fdiscount = inv.fdiscount;
+	    inv.o_fprice    = inv.fprice;
 	    return;
 	}
 	
@@ -1526,17 +1534,21 @@ wsaleApp.controller("wsaleNewCtrl", function(
     };
 
     $scope.save_free_update = function(inv){
+	console.log("save_free_update", inv);
 	inv.free_update = false; 
 	inv.amounts[0].sell_count = inv.sell;
 	
 	// save
 	$scope.local_save();
-	$scope.re_calculate(); 
+	$scope.re_calculate();
     };
 
     $scope.cancel_free_update = function(inv){
+	// console.log(inv);
 	inv.free_update = false;
-	inv.sell = inv.amounts[0].sell_count;
+	inv.sell      = inv.amounts[0].sell_count;
+	inv.fdiscount = inv.o_fdiscount;
+	inv.fprice    = inv.o_fprice;
 	$scope.re_calculate(); 
     };
 
@@ -1555,8 +1567,12 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    $scope.add_free_inventory(inv);
 	};
 
-	if (!inv.$new && inv.free_update){
-	    $scope.save_free_update(inv)
+	if (!inv.$new){
+	    if (inv.free_update){
+		$scope.save_free_update(inv)
+	    } else {
+		$scope.re_calculate(); 
+	    }
 	}
     };
 });

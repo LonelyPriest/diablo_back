@@ -514,6 +514,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    verificate:     setv($scope.select.verificate),
 	    should_pay:     setv($scope.select.should_pay),
 	    has_pay:        setv($scope.select.has_pay),
+	    old_firm:       $scope.old_select.firm.id,
 	    old_balance:    setv($scope.old_select.surplus),
 	    old_should_pay: setv($scope.old_select.should_pay),
 	    old_has_pay:    setv($scope.old_select.has_pay)
@@ -640,12 +641,6 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 		diabloUtilsService.edit_with_modal(
 		    "inventory-new.html", undefined, callback, $scope, payload)
 	    } else{
-		// wgoodService.get_colors(inv.colors).then(function(colors){
-		//     console.log(colors); 
-		//     inv.colors = colors.map(function(c){
-		// 	return {cid:c.id, name:c.name}
-		//     });
-
 		inv.colors = inv.colors.map(function(cid){
 		    return diablo_find_color(parseInt(cid), filterColor); 
 		});

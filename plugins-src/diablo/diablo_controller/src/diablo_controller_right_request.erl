@@ -267,13 +267,13 @@ action(Session, Req, {"del_account"}, Payload) ->
 %% role
 %% =============================================================================
 action(Session, Req, {"new_role"}, Payload) ->
-    ?DEBUG("new_role with session ~p, payload ~p", [Session, Payload]),
+    ?DEBUG("new_role with session ~p~n, payload ~p", [Session, Payload]),
     Merchant  = ?session:get(merchant, Session),
     LoginId   = ?session:get(id, Session),
     LoginName = ?session:get(name, Session),
     LoginType = ?session:get(type, Session),
     RoleType  = ?value(<<"type">>, Payload),
-    
+      
     %% super can create merchant role, and merchant can create user role only
     Result =
 	case {?to_integer(LoginType), ?to_integer(RoleType)} of
@@ -289,7 +289,8 @@ action(Session, Req, {"new_role"}, Payload) ->
 	    {?MERCHANT, ?USER} ->
 		%% ?err(not_enought_right, LoginName);
 		case ?right:right(
-			new_user_role, [{<<"created_by">>, LoginId}|Payload]) of
+			new_user_role, [{<<"created_by">>, LoginId},
+					{<<"merchant">>, Merchant}|Payload]) of
 		    {ok, RoleName} ->
 			?succ(add_role,RoleName);
 		    {error, Error} ->

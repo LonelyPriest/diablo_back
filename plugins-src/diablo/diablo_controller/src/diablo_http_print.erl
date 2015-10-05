@@ -1529,7 +1529,9 @@ pay(veri, Veri) -> "核销：" ++ ?to_s(Veri).
 
 extra_pay_type(0) -> "运费代付";
 extra_pay_type(1) -> "样衣";
-extra_pay_type(2) -> "少配饰".
+extra_pay_type(2) -> "少配饰";
+extra_pay_type(3) -> "代付现金";
+extra_pay_type(4) -> "初期欠款".
 
 round(?YES, Money) ->
     ?to_s(f_round(Money));
