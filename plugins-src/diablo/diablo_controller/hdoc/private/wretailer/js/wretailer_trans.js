@@ -1,6 +1,6 @@
 wretailerApp.controller('wretailerTransCtrl', function(
     $scope, $routeParams, diabloFilter, wretailerService,
-    diabloUtilsService, filterRetailer, filterEmployee, user){
+    diabloUtilsService, filterRetailer, filterEmployee, user, base){
 
     // console.log(filterRetailer);
     // console.log($routeParams.retailer);
@@ -22,8 +22,21 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.hide_column = true;
     $scope.toggle_left = function(){
 	$scope.hide_column = !$scope.hide_column;
-    }
+    };
 
+    var now = $.now();
+
+    $scope.qtime_start = function(){
+	// -1 use the default setting
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+	return diablo_base_setting(
+	    "qtime_start", shop, base, diablo_set_date,
+	    diabloFilter.default_start_time(now));
+    }();
+    
     /* 
      * filter operation
      */ 
@@ -38,7 +51,8 @@ wretailerApp.controller('wretailerTransCtrl', function(
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time(); 
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+    // $scope.time   = diabloFilter.default_time(); 
 
 
     /*

@@ -128,12 +128,17 @@ function filterProvider(){
 	    match_wgood_with_firm: function(viewValue, firm){
 		return wgoodService.match_purchaser_good_with_firm(viewValue, firm)
 		    .then(function(goods){
-			console.log(goods); 
+			// console.log(goods); 
 			return goods.map(function(g){
 			    return angular.extend(
-				g, {name:g.style_number + "，" + g.brand + "，" + g.type})
+				g, {name:g.style_number + "，"
+				    + g.brand + "，" + g.type})
 			})
 		    })
+	    },
+
+	    match_all_w_good: function(start_time, firm){
+		return wgoodService.match_all_purchaser_good(start_time, firm);
 	    },
 
 	    match_w_query_inventory:function(viewValue, Shop){
@@ -157,6 +162,16 @@ function filterProvider(){
 				inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
 			})
 		    })
+	    },
+
+	    match_all_w_reject_inventory: function(start_time, shop, firm){
+	    	return resource.query_by_post(
+	    	    {operation:'match_all_reject_w_inventory'},
+	    	    {start_time: start_time,
+	    	     shop:shop,
+	    	     firm:firm,
+	    	     type:1}
+	    	).$promise;
 	    },
 	    
 	    match_w_inventory: function(viewValue, shop, firm){
@@ -296,7 +311,7 @@ function normalFilterProvider(){
 	return{
 	    match_all_w_inventory: function(condition){
 		return _invHttp.post_get({operation: 'match_all_w_inventory'}, condition)
-	    },
+	    }, 
 	    
 	    get_employee: function(){
 		// var http = $resource("/employ/:operation", {operation: '@operation'}); 
@@ -380,7 +395,7 @@ function shareFilterProvider(){
 	var _provinceHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _cityHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _baseHttp = $resource("/wbase/:operation", {operation: '@operation'});
-	var _goodHttp = $resource("/wgood/:operation/:id", {operation: '@operation', id: '@id'});
+	// var _goodHttp = $resource("/wgood/:operation/:id", {operation: '@operation', id: '@id'});
 	
 	return{
 	    get_right: function(){

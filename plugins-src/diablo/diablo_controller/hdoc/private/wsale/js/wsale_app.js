@@ -145,7 +145,7 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 	{id:1, name: "样衣"},
 	{id:2, name: "少配饰"},
 	{id:3, name: "代付现金"},
-	{id:3, name: "初期欠款"}
+	{id:4, name: "初期欠款"}
 	
     ];
 
@@ -316,7 +316,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	return diablo_base_setting(
 	    "qtime_start", shopId, base, function(v){return v},
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
-    }();
+    };
     // console.log($scope.qtime_start);
 
     // $scope.qtime_length = function(shopId){
@@ -496,7 +496,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
     if ($scope.q_typeahead === diablo_no){
 	diabloNormalFilter.match_all_w_inventory(
-	    {shop:$scope.select.shop.id, start_time:$scope.qtime_start}
+	    {shop:$scope.select.shop.id,
+	     start_time:$scope.qtime_start($scope.select.shop.id)}
 	).$promise.then(function(invs){
 	    // console.log(invs);
 	    $scope.all_w_inventory = 
@@ -1605,9 +1606,14 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     // console.log($scope.prompt);
 
     var now = $.now();
-    $scope.qtime_start = function(shopId){
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
 	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+	    "qtime_start", shop, base, diablo_set_date,
+	    diabloFilter.default_start_time(now));
     }();
     // console.log($scope.qtime_start);
     

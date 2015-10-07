@@ -1,7 +1,7 @@
 var firmApp = angular.module(
     'firmApp', ['ui.bootstrap', 'ngRoute', 'ngResource',
-		'diabloAuthenApp', 'diabloFilterApp', 'diabloPattern',
-		'diabloUtils', 'userApp', 'wgoodApp'])
+		'diabloAuthenApp', 'diabloFilterApp', 'diabloNormalFilterApp',
+		'diabloPattern', 'diabloUtils', 'userApp', 'wgoodApp'])
 // .config(diablo_authen);
 .config(function($httpProvider, authenProvider){
     // $httpProvider.responseInterceptors.push(authenProvider.interceptor);
@@ -26,6 +26,9 @@ firmApp.config(['$routeProvider', function($routeProvider){
 
     var employee = {"filterEmployee": function(diabloFilter){
 	return diabloFilter.get_employee()}};
+
+    var base = {"base": function(diabloNormalFilter){
+	return diabloNormalFilter.get_base_setting()}};
     
     $routeProvider.
 	when('/firm_detail/:page?', {
@@ -35,7 +38,7 @@ firmApp.config(['$routeProvider', function($routeProvider){
 	when('/firm_trans/:firm?/:ppage?/:cpage?', {
 	    templateUrl: '/private/firm/html/firm_trans.html',
 	    controller: 'firmTransCtrl',
-	    resolve: angular.extend({}, firm, employee, user)
+	    resolve: angular.extend({}, firm, employee, user, base)
 	}).
 	when('/firm_trans_rsn/:firm?/:rsn?/:ppage?/:p2page?', {
 	    templateUrl: '/private/firm/html/firm_trans_rsn_detail.html',

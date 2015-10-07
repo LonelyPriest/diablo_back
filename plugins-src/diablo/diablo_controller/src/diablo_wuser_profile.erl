@@ -148,7 +148,7 @@ init([]) ->
 
 
 handle_call({new_profile, Merchant}, _From, State) ->
-    ?DEBUG("=== new profile of merchant ~p, UserType, User ~p === ", [Merchant]),
+    ?DEBUG("new profile of merchant ~p", [Merchant]),
 
     try
 	{ok, MerchantInfo} = ?merchant:merchant(get, Merchant),

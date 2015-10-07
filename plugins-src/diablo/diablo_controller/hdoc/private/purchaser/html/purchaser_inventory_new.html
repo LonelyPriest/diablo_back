@@ -33,15 +33,20 @@
 	  <div class="row form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-knight fg-red"></i>厂商</span>
+		<!-- <span class="input-group-addon"> -->
+		<!--   <i class="glyphicon glyphicon-knight fg-red"></i>厂商</span> -->
 	  	<input class="form-control" type="text"
 	  	       x-ng-model="select.firm" 
 	  	       placeholder="请选择厂商"
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_firm()"
 	  	       typeahead="f as f.name for f in
-	  			  firms|filter:$viewValue|limitTo:8"></input> 
+	  			  firms|filter:$viewValue|limitTo:8"/>
+		<span class="input-group-btn">
+		  <button class="btn btn-warning red-stripe"
+			  x-ng-disabled="!select.firm"
+			  x-ng-click="select.firm=undefined"> 
+		    <i class="glyphicon glyphicon-pushpin"></i></button>
 	  	</span>
 	      </div>
 	    </div>
@@ -55,7 +60,7 @@
 	  	       placeholder="请选择店铺"
 	  	       typeahead-editable="false"
 	  	       typeahead="s as s.name for s in
-	  			  shops|filter:$viewValue|limitTo:8"></input> 
+	  			  shops|filter:$viewValue|limitTo:8"/>
 	      </div>
 	    </div>
 
@@ -287,7 +292,29 @@
 		  <!-- <tr class="text-center" ng-repeat="inv in inventories"> -->
 		  <tr class="text-center" ng-repeat="inv in current_inventories">  
 		    <td>{{inv.order_id}}</td>
-		    <td class="col-md-2 text-left vert-align">
+
+		    <td x-ng-if="q_prompt===0"
+			class="col-md-2 text-left vert-align">
+		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
+		      <form name="inv.form.good" ng-if="inv.$new">
+			<div ng-class="{'has-error':inv.form.good.$invalid
+				       && !inv.form.good.$pristine}">
+			<input class="form-control text-left" type="text"
+			       required
+			       x-ng-model="inv.style_number"
+			       placeholder="货号"
+			       typeahead-editable="false"
+			       typeahead-on-select="on_select_good($item, $model, $label)" 
+			       typeahead="g as g.name for g in all_w_goods |limitTo:15"></input>
+			  <span x-ng-show="loading">
+			    <i class="glyphicon glyphicon-refresh"></i>
+			  </span>
+			</div>
+		      </form>
+		    </td>
+		    
+		    <td x-ng-if="q_prompt===1"
+			class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" ng-if="inv.$new">
 			<div ng-class="{'has-error':inv.form.good.$invalid
@@ -301,7 +328,7 @@
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
 				 typeahead="g as g.name for g in
-					    match_prompt_good($viewValue)|limitTo:8"></input>
+					    match_prompt_good($viewValue)"></input>
 			  <span x-ng-show="loading">
 			    <i class="glyphicon glyphicon-refresh"></i>
 			  </span>

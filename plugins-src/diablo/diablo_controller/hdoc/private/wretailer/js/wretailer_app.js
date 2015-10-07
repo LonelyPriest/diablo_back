@@ -36,6 +36,9 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 
     var city = {"filterCity": function(diabloNormalFilter){
 	return diabloNormalFilter.get_city()}};
+
+    var base = {"base": function(diabloNormalFilter){
+	return diabloNormalFilter.get_base_setting()}};
     
     $routeProvider. 
 	when('/wretailer_new', {
@@ -51,12 +54,12 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 	when('/wretailer_trans/:retailer?/:ppage?/:cpage?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans.html',
 	    controller: 'wretailerTransCtrl',
-	    resolve: angular.extend({}, retailer, employee, user)
+	    resolve: angular.extend({}, retailer, employee, user, base)
 	}).
 	when('/wretailer_trans_rsn/:retailer?/:rsn?/:ppage?/:p2page?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans_rsn_detail.html',
 	    controller: 'wretailerTransRsnDetailCtrl',
-	    resolve: angular.extend({}, brand, firm, retailer, employee, s_group, type, user)
+	    resolve: angular.extend({}, brand, firm, retailer, employee, s_group, type, user, base)
 	}).
 	otherwise({
 	    templateUrl: '/private/wretailer/html/wretailer_detail.html',

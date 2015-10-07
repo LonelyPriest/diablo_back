@@ -127,7 +127,9 @@
 	      <div class="input-group">
 	    	<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-plane fg-red"></i>费用性质</span>
-		<select class="form-control" type="text"
+		<select class="form-control"
+			type="text"
+			disabled
 	  		x-ng-model="select.e_pay_type"
 	  		x-ng-options="ex as ex.name for ex in
 	  			      e_pay_types|filter:$viewValue|limitTo:8">

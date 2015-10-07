@@ -311,6 +311,7 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     filterEmployee, filterSizeGroup, filterColor, base){
     
     // var permitShops      = user.shopIds;
+    $scope.shopIds       = user.shopIds;
     $scope.goto_page     = diablo_goto_page; 
     
     // style_number
@@ -335,9 +336,13 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var now = $.now();
-    $scope.qtime_start = function(shopId){
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
 	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+	    "qtime_start", shop, base, diablo_set_date, diabloFilter.default_start_time(now));
     }();
     // console.log($scope.qtime_start);
     

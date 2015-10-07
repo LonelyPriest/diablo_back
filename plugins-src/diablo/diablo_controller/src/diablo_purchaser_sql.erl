@@ -273,7 +273,29 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	++ " and a.brand=b.id"
 	++ " and a.type=c.id" 
 	++ " and a.style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
-	++ " limit " ++ ?to_s(P).
+	++ " limit " ++ ?to_s(P);
+good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
+    "select a.id, a.style_number, a.brand as brand_id"
+	", a.type as type_id, a.firm as firm_id"
+	", a.sex, a.color, a.year, a.season, a.size, a.s_group, a.free"
+	", a.org_price, a.tag_price, a.pkg_price, a.price3, a.price4, a.price5"
+	", a.discount, a.path, a.alarm_day, a.entry_date"
+	
+	", b.name as brand"
+	", c.name as type"
+	
+	" from w_inventory_good a, brands b, inv_types c"
+	
+	" where a.merchant=" ++ ?to_s(Merchant)
+	++ case Firm of
+	       [] -> [];
+	       _ -> " and a.firm=" ++ ?to_s(Firm)
+	   end
+	++ " and a.entry_date>=\'" ++ ?to_s(StartTime) ++ "\'"
+	++ " and a.deleted=" ++ ?to_s(?NO)
+	++ " and a.brand=b.id"
+	++ " and a.type=c.id".
+
 
 inventory(abstract, Merchant, Shop, [{S1, B1}|T] = _Conditions) -> 
     %% C = lists:foldr(
@@ -742,10 +764,33 @@ inventory_match(Merchant, StyleNumber, Shop, Firm) ->
 	%% ++ " and deleted=" ++ ?to_s(?NO)
 	++ " order by a.id"
 	++ " limit " ++ ?to_s(P).
-	%% ++ ") a"
+
+inventory_match(all_reject, Merchant, Shop, Firm, StartTime) ->
+    "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
+	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
+	", a.org_price, a.tag_price, a.pkg_price"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day"
+
+	", b.name as brand" 
+	", c.name as type"
+	" from w_inventory a"
+
+	" left join brands b on a.brand=b.id" 
+	" left join inv_types c on a.type=c.id"
+
+    %% " (select id, style_number, brand, type, sex, season"
+    %% ", firm, s_group, free, org_price, tag_price, pkg_price"
+    %% ", price3, price4, price5, discount, path from w_inventory"
+	" where a.shop=" ++ ?to_s(Shop)
+	++ case Firm of
+	       [] -> [];
+	       Firm -> " and a.firm=" ++ ?to_s(Firm)
+	   end
+	++ " and a.merchant=" ++ ?to_s(Merchant)
+	++ " and entry_date>=\'" ++ ?to_s(StartTime) ++ "\'"
+    %% ++ " and deleted=" ++ ?to_s(?NO)
+	++ " order by a.id".
 	
-	%% ++ " left join brands b on a.brand=b.id" 
-	%% ++ " left join inv_types c on a.type=c.id".
 
 inventory(update, RSN, _Merchant, _Shop, _Firm, Datetime, _Curtime, []) ->
     ["update w_inventory_new set entry_date=\'" ++ ?to_s(Datetime) ++ "\'"

@@ -36,14 +36,32 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 
     var sell_type =  [{name:"销售开单", id:0, py:diablo_pinyin("销售开单")},
     		      {name:"销售退货", id:1, py:diablo_pinyin("销售退货")}];
+
+    var now = $.now();
+    
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+	return diablo_base_setting(
+	    "qtime_start", shop, base, diablo_set_date,
+	    diabloFilter.default_start_time(now));
+    }();
+
+    // $scope.q_typeahead = function(){
+    // 	// default prompt comes from backend
+    // 	return diablo_base_setting(
+    // 	    "qtypeahead", -1, base, parseInt, diablo_backend);
+    // }();
     
     // initial
     $scope.filters = [];
     diabloFilter.reset_field();
     
     diabloFilter.add_field("sell_type", sell_type);
-    diabloFilter.add_field("rsn", []);
-    diabloFilter.add_field("style_number", $scope.match_style_number);
+    diabloFilter.add_field("rsn", []); 
+    diabloFilter.add_field("style_number", $scope.match_style_number); 
     diabloFilter.add_field("brand",    filterBrand);
     diabloFilter.add_field("type",     filterType);
     diabloFilter.add_field("year",     diablo_full_year); 
@@ -55,11 +73,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
-    var now = $.now();
-    $scope.qtime_start = function(shopId){
-	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
-    }();
+    
     // console.log($scope.qtime_start); 
     $scope.time   = diabloFilter.default_time($scope.qtime_start);
     

@@ -102,18 +102,29 @@ purchaser_inventory(amount, Merchant, Shop, StyleNumber, Brand) ->
 match(style_number, Merchant, PromptNumber) ->
     gen_server:call(?SERVER, {match_style_number, Merchant, PromptNumber}).
 match(style_number_brand_firm, Merchant, PromptNumber, Firm) ->
-    gen_server:call(?SERVER, {match_style_number_brand_firm, Merchant, PromptNumber, Firm}).
+    gen_server:call(?SERVER, {match_style_number_brand_firm,
+			      Merchant, PromptNumber, Firm});
+match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
+    gen_server:call(?SERVER, {match_all_style_number_brand_firm,
+			      Merchant, StartTime, Firm}).
+
 
 %% match inventory 
 match(inventory, all_inventory, Merchant, Shop, Conditions) ->
     gen_server:call(?SERVER, {match_all_inventory, Merchant, Shop, Conditions});
 
 match(inventory, QType, Merchant, StyleNumber, Shop) ->
-    gen_server:call(?SERVER, {match_inventory, QType, Merchant, StyleNumber, Shop}).
+    gen_server:call(
+      ?SERVER, {match_inventory, QType, Merchant, StyleNumber, Shop}).
 
 match(inventory, QType, Merchant, StyleNumber, Shop, Firm) ->
-    gen_server:call(?SERVER, {match_inventory, QType, Merchant, StyleNumber, Shop, Firm}). 
+    gen_server:call(
+      ?SERVER, {match_inventory, QType, Merchant, StyleNumber, Shop, Firm});
 
+match(all_reject_inventory, QType, Merchant, Shop, Firm, StartTime) ->
+    gen_server:call(
+      ?SERVER, {match_all_reject_inventory,
+		QType, Merchant, Shop, Firm, StartTime}).
 
 %% =============================================================================
 %% filter with pagination
@@ -390,10 +401,21 @@ handle_call({match_style_number, Merchant, PromptNumber}, _Form, State) ->
     Reply =  ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
-handle_call({match_style_number_brand_firm, Merchant, PromptNumber, Firm}, _Form, State) ->
-    ?DEBUG("match_style_number_brand with merchant ~p, promptNumber ~p, firm ~p",
-	   [Merchant, PromptNumber, Firm]),
-    Sql = ?w_good_sql:good_match(style_number_brand_firm, Merchant, PromptNumber, Firm),
+handle_call({match_style_number_brand_firm, Merchant, PromptNumber, Firm},
+	    _Form, State) ->
+    ?DEBUG("match_style_number_brand with merchant ~p, promptNumber ~p"
+	   ",firm ~p", [Merchant, PromptNumber, Firm]),
+    Sql = ?w_good_sql:good_match(
+	     style_number_brand_firm, Merchant, PromptNumber, Firm),
+    Reply =  ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+
+handle_call({match_all_style_number_brand_firm, Merchant, StartTime, Firm},
+	    _Form, State) ->
+    ?DEBUG("match_all_style_number_brand with merchant ~p, start time ~p"
+	   ",firm ~p", [Merchant, StartTime, Firm]),
+    Sql = ?w_good_sql:good_match(
+	     all_style_number_brand_firm, Merchant, StartTime, Firm),
     Reply =  ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
@@ -410,9 +432,10 @@ handle_call({match_inventory, QType, Merchant, StyleNumber, Shop}, _Form, State)
     Reply =  ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
-handle_call({match_inventory, QType, Merchant, StyleNumber, Shop, Firm}, _Form, State) ->
-    ?DEBUG("match_inventory with qtype ~p, merchant ~p, styleNumber ~p, shop ~p, firm ~p",
-	   [QType, Merchant, StyleNumber, Shop, Firm]),
+handle_call({match_inventory,
+	     QType, Merchant, StyleNumber, Shop, Firm}, _Form, State) ->
+    ?DEBUG("match_inventory with qtype ~p, merchant ~p, styleNumber ~p"
+	   ",shop ~p, firm ~p", [QType, Merchant, StyleNumber, Shop, Firm]),
     RealyShop = case QType of
 		    1 -> realy_shop(true, Merchant, Shop);
 		    _ -> realy_shop(Merchant, Shop)
@@ -421,6 +444,20 @@ handle_call({match_inventory, QType, Merchant, StyleNumber, Shop, Firm}, _Form, 
     Sql = ?w_good_sql:inventory_match(Merchant, StyleNumber, RealyShop, Firm),
     Reply =  ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
+
+handle_call({match_all_reject_inventory,
+	     QType, Merchant, Shop, Firm, StartTime}, _Form, State) ->
+    ?DEBUG("match_all_reject_inventory with qtype ~p, merchant ~p"
+	   ", shop ~p, firm ~p, StartTime ~p",
+	   [QType, Merchant, Shop, Firm, StartTime]),
+    RealyShop = case QType of
+		    1 -> realy_shop(true, Merchant, Shop);
+		    _ -> realy_shop(Merchant, Shop)
+		end,
+    Sql = ?w_good_sql:inventory_match(
+	     all_reject, Merchant, RealyShop, Firm, StartTime),
+    Reply =  ?sql_utils:execute(read, Sql),
+    {reply, Reply, State}; 
 
 handle_call({match_all_inventory, Merchant, Shop, Conditions}, _From, State) ->
     ?DEBUG("match_all_inventory  with merchant ~p, shop ~p, conditions ~p",
@@ -518,7 +555,8 @@ handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
 handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     ?DEBUG("update_inventory: merchant ~p~n, inventories ~p, props ~p",
 	   [Merchant, Inventories, Props]), 
-    
+
+    Id         = ?v(<<"id">>, Props),
     RSN        = ?v(<<"rsn">>, Props),
     Shop       = ?v(<<"shop">>, Props),
     Datetime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)), 
@@ -530,9 +568,10 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     Card       = ?v(<<"card">>, Props),
     Wire       = ?v(<<"wire">>, Props),
     VerifyPay  = ?v(<<"verificate">>, Props),
-    Comment    = ?v(<<"comment">>, Props), 
-    ShouldPay    = ?v(<<"should_pay">>, Props),
-    HasPay       = ?v(<<"has_pay">>, Props, 0),
+    EPay       = ?v(<<"e_pay">>, Props, 0),
+    Comment    = ?v(<<"comment">>, Props, []), 
+    ShouldPay  = ?v(<<"should_pay">>, Props),
+    HasPay     = ?v(<<"has_pay">>, Props, 0),
     
 
     OldFirm      = ?v(<<"old_firm">>, Props),
@@ -590,23 +629,68 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 			 ++ ?to_s(Metric) 
 			 ++ ", change_date=" ++ "\"" ++ CurTime ++ "\""
 			 " where id=" ++ ?to_s(Firm)
-			 ++ " and merchant=" ++ ?to_s(Merchant)],
+			 ++ " and merchant=" ++ ?to_s(Merchant),
+			 
+			"update w_inventory_new set balance=balance+"
+			 ++ ?to_s(Metric)
+			 ++ " where shop=" ++ ?to_s(Shop)
+			 ++ " and merchant=" ++ ?to_s(Merchant)
+			 ++ " and id>" ++ ?to_s(Id)],
+		    
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 		    ?w_user_profile:update(firm, Merchant),
 		    {reply, Reply, State}
 	    end;
 	false ->
+	    Sql0 = "select id, rsn, firm, shop, merchant, balance"
+		", should_pay, has_pay, e_pay"
+		" from w_inventory_new"
+		" where shop=" ++ ?to_s(Shop)
+		++ " and merchant=" ++ ?to_s(Merchant)
+		++ " and firm=" ++ ?to_s(Firm)
+		++ " and id<" ++ ?to_s(Id)
+		++ " order by id desc limit 1",
+
+	    NewBalance = 
+		case ?sql_utils:execute(s_read, Sql0) of
+		    []      -> Balance;
+		    {ok, R} ->
+			?v(<<"balance">>, R)
+			    + ?v(<<"should_pay">>, R)
+			    + ?v(<<"e_pay">>, R)
+			    - ?v(<<"has_pay">>, R)
+		end,
+	    
+	    
 	    Sql2 = "update w_inventory_new set "
 		++ ?utils:to_sqls(
 		      proplists, comma,
-		      ?utils:v(balance, float, Balance) ++ Updates),
+		      ?utils:v(balance, float, NewBalance) ++ Updates)
+		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
+	    
 	    AllSql = Sql1 ++ [Sql2] ++
 		["update suppliers set balance=balance-"
-		 ++ ?to_s(OldShouldPay - OldHasPay)
+		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
 		 ++ " where id=" ++ ?to_s(OldFirm),
-		"update suppliers set balance=balance+"
-		 ++ ?to_s(ShouldPay - HasPay) 
-		 ++ " where id="++ ?to_s(Firm)],
+		 
+		 "update suppliers set balance=balance+"
+		 ++ ?to_s(ShouldPay + EPay - HasPay) 
+		 ++ " where id="++ ?to_s(Firm),
+
+		 "update w_inventory_new set balance=balance-"
+		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
+		 ++ " where shop=" ++ ?to_s(Shop)
+		 ++ " and merchant=" ++ ?to_s(Merchant)
+		 ++ " and firm=" ++ ?to_s(OldFirm)
+		 ++ " and id>" ++ ?to_s(Id),
+	    
+		 "update w_inventory_new set balance=balance+"
+		 ++ ?to_s(ShouldPay + EPay - HasPay) 
+		 ++ " where shop=" ++ ?to_s(Shop)
+		 ++ " and merchant=" ++ ?to_s(Merchant)
+		 ++ " and firm=" ++ ?to_s(Firm)
+		 ++ " and id>" ++ ?to_s(Id)
+		],
 	    
 	    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 	    ?w_user_profile:update(firm, Merchant),

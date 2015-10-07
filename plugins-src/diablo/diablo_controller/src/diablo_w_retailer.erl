@@ -190,7 +190,8 @@ handle_call({list_retailer, Merchant}, _From, State) ->
 	", address, balance, merchant, entry_date"
 	" from w_retailer"
 	" where merchant=" ++ ?to_s(Merchant)
-	++ " and deleted=" ++ ?to_s(?NO) ++ ";",
+	++ " and deleted=" ++ ?to_s(?NO)
+	++ " order by id desc",
 
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};

@@ -97,7 +97,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 
     if ($scope.q_typeahead === diablo_no){
 	diabloNormalFilter.match_all_w_inventory(
-	    {shop:$scope.select.shop.id, start_time:$scope.qtime_start}
+	    {shop:$scope.select.shop.id,
+	     start_time:$scope.qtime_start($scope.select.shop.id)}
 	).$promise.then(function(invs){
 	    // console.log(invs);
 	    $scope.all_w_inventory = 

@@ -86,19 +86,18 @@
 	    <div class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
 	      <div class="col-sm-6 col-md-6"> 
-		<div class="input-group">
-		  <div x-ng-class="{'has-error': retailerNewForm.mobile.$invalid
-				   && !retailerNewForm.mobile.$pristine}">
-		    <input type="tel"
-			   name="mobile"
-			   required
-			   x-ng-pattern="pattern.tel_mobile"
-			   placeholder="请输入电话或手机号码"
-			   class="form-control"
-			   x-ng-model="retailer.mobile"></input>
-		  </div>
-		  <span class="input-group-addon bg-white fg-red">*</span>
+		<!-- <div class="input-group"> -->
+		<div x-ng-class="{'has-error': retailerNewForm.mobile.$invalid
+				 && !retailerNewForm.mobile.$pristine}">
+		  <input type="tel"
+			 name="mobile"
+			 x-ng-pattern="pattern.tel_mobile"
+			 placeholder="请输入电话或手机号码"
+			 class="form-control"
+			 x-ng-model="retailer.mobile"/>
 		</div>
+		  <!-- <span class="input-group-addon bg-white fg-red">*</span> -->
+		<!-- </div> -->
 	      </div>
 	      <div ng-show="retailerNewForm.mobile.$invalid
 			    && !retailerNewForm.mobile.$pristine">
@@ -118,7 +117,7 @@
 			   required
 			   placeholder="请输入您的联系地址"
 			   x-ng-model="retailer.address"
-			   x-ng-pattern="pattern.name_address"></input>
+			   x-ng-pattern="pattern.name_address"/>
 		  </div>
 		  <span class="input-group-addon bg-white fg-red">*</span> 
 		</div>

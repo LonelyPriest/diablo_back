@@ -127,6 +127,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	var invs = result[1].data;
 
 	$scope.old_select.rsn        = rsn;
+	$scope.old_select.rsn_id     = base.id;
 	$scope.old_select.firm       = $scope.get_object(base.firm_id,   $scope.firms);
 	$scope.old_select.datetime   = diablo_set_datetime(base.entry_date); 
 	
@@ -142,7 +143,8 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	$scope.old_select.verificate = base.verificate;
 	$scope.old_select.should_pay = base.should_pay;
 	$scope.old_select.has_pay    = base.has_pay;
-	$scope.old_select.rsn        = base.rsn;
+	$scope.old_select.e_pay      = base.e_pay;
+	// $scope.old_select.rsn        = base.rsn;
 
 	$scope.select = angular.extend($scope.select, $scope.old_select);
 
@@ -494,12 +496,13 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 		&& $scope.select.firm.id === $scope.old_select.firm.id
 		&& new_datetime === old_datetime)){
 	    diabloUtilsService.response(
-	    	false, "入库单编辑", "入库单编辑失败：" + purchaserService.error[2094]);
+	    	false, "采购单编辑", "采购单编辑失败：" + purchaserService.error[2094]);
 	    return;
 	}
 
 	var base = {
-	    rsn :           $scope.select.rsn,
+	    id:             $scope.select.rsn_id,
+	    rsn:            $scope.select.rsn,
 	    firm:           $scope.select.firm.id,
 	    shop:           $scope.select.shop.id,
 	    datetime:       dateFilter($scope.select.datetime, "yyyy-MM-dd HH:mm:ss"),
@@ -512,6 +515,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    card:           setv($scope.select.card),
 	    wire:           setv($scope.select.wire),
 	    verificate:     setv($scope.select.verificate),
+	    e_pay:          setv($scope.select.e_pay),
 	    should_pay:     setv($scope.select.should_pay),
 	    has_pay:        setv($scope.select.has_pay),
 	    old_firm:       $scope.old_select.firm.id,
@@ -529,13 +533,13 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    console.log(state);
 	    if (state.ecode == 0){
 		diabloUtilsService.response_with_callback(
-		    true, "入库单修改", "入库单修改成功！！单号：" + state.rsn,
+		    true, "采购单修改", "采购单修改成功！！单号：" + state.rsn,
 		    $scope, function(){diablo_goto_page("#/inventory_new_detail")})
 	    	return;
 	    } else{
 	    	diabloUtilsService.response_with_callback(
-	    	    false, "入库单修改",
-	    	    "入库单修改失败：" + purchaserService.error[state.ecode],
+	    	    false, "采购单修改",
+	    	    "采购单修改失败：" + purchaserService.error[state.ecode],
 		    $scope, function(){$scope.has_saved = false});
 	    }
 	})

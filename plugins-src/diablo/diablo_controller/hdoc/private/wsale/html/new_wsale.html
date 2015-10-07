@@ -1115,7 +1115,7 @@
 	<!--Name-->
 	<div class="form-group">
 	  <label class="col-sm-3 col-md-3 control-label">名称</label>
-	  <div class="col-sm-5 col-md-5">
+	  <div class="col-sm-6 col-md-6">
 	    <div class="input-group">
 	      <input type="text"
 		     class="form-control"
@@ -1140,17 +1140,16 @@
 	     ng-class="{'has-error': retailerNewForm.mobile.$invalid
 		       && !retailerNewForm.mobile.$pristine}">
 	  <label class="col-sm-3 col-md-3 control-label">联系方式</label>
-	  <div class="col-sm-5 col-md-5">
-	    <div class="input-group">
+	  <div class="col-sm-6 col-md-6">
+	    <!-- <div class="input-group"> -->
 	      <input type="text"
 		     name="mobile"
-		     required
 		     ng-pattern="/^\d{3,4}\d{7,8}$/"
-		     placeholder="请输入电话或手机号码"
+		     placeholder="请输入电话或手机号码，默认为空"
 		     class="form-control"
 		     x-ng-model="params.retailer.mobile"></input>
-	      <span class="input-group-addon bg-white fg-red">*</span> 
-	    </div>
+	      <!-- <span class="input-group-addon bg-white fg-red">*</span>  -->
+	    <!-- </div> -->
 	  </div>
 	  <div ng-show="retailerNewForm.mobile.$invalid
 			&& !retailerNewForm.mobile.$pristine">
@@ -1160,13 +1159,13 @@
 
 	<div class="form-group">
 	  <label class="col-sm-3 col-md-3 control-label">联系地址</label>
-	  <div class="col-sm-5 col-md-5">
+	  <div class="col-sm-6 col-md-6">
 	    <div class="input-group">
 	      <input type="text"
 		     class="form-control"
 		     name="params.address"
 		     required
-		     placeholder="请输入您的联系地址"
+		     placeholder="请输入零售商联系地址"
 		     x-ng-model="params.retailer.address"
 		     x-ng-minlength="2"
 		     x-ng-maxlength="20"></input>
@@ -1279,16 +1278,15 @@
 		       && !firmForm.mobile.$pristine}">
 	  <label class="col-sm-3 col-md-3 control-label">联系方式</label>
 	  <div class="col-sm-6 col-md-6">
-	    <div class="input-group">
-	      <input type="text"
-		     name="mobile"
-		     required
-		     ng-pattern="/^\d{3,4}\d{7,8}$/"
-		     placeholder="请输入电话或手机号码"
-		     class="form-control"
-		     x-ng-model="params.firm.mobile"></input>
-	      <span class="input-group-addon bg-white fg-red">*</span>
-	    </div>
+	    <!-- <div class="input-group"> -->
+	    <input type="text"
+		   name="mobile"
+		   ng-pattern="/^\d{3,4}\d{7,8}$/"
+		   placeholder="请输入电话或手机号码，默认为空"
+		   class="form-control"
+		   x-ng-model="params.firm.mobile"></input>
+	      <!-- <span class="input-group-addon bg-white fg-red">*</span> -->
+	      <!-- </div> -->
 	  </div>
 	  <div ng-show="firmForm.mobile.$invalid && !firmForm.mobile.$pristine">
 	    <span style="color:red">请输入正确的电话或手机号码</span>

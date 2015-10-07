@@ -1,7 +1,7 @@
 purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope, $q, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
-    user, filterFirm, filterEmployee, filterSizeGroup, filterColor){
+    user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
     console.log(user);
 
     // $scope.shops     = user.sortShops;
@@ -15,6 +15,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.firms           = filterFirm;
     $scope.employees       = filterEmployee;
     $scope.extra_pay_types = purchaserService.extra_pay_types;
+
+    var now = $.now();
 
     // init
     $scope.has_saved       = false; 
@@ -35,7 +37,11 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	console.log($scope.select.firm);
 	$scope.select.surplus = parseFloat($scope.select.firm.balance);
 	$scope.re_calculate();
-    }
+
+	if ($scope.q_prompt === diablo_frontend){
+	    $scope.get_all_prompt_inventory();
+	}
+    };
 
     $scope.refresh = function(){
 	$scope.inventories = [];
@@ -68,7 +74,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	}
 
 	$scope.select.left_balance =
-	    $scope.f_add($scope.select.surplus, $scope.f_sub($scope.select.should_pay, e_pay));
+	    $scope.f_add($scope.select.surplus,
+			 $scope.f_sub($scope.select.should_pay, e_pay));
 	    // $scope.select.surplus + $scope.select.should_pay;
     };
 
@@ -101,7 +108,45 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     };
 
     $scope.today = function(){
-	return $.now();
+	return now;
+    };
+
+
+    $scope.q_typeahead = function(shopId){
+	console.log(shopId);
+	// default prompt comes from backend
+	return diablo_base_setting(
+	    "qtypeahead", shopId, base, parseInt, diablo_backend);
+    };
+
+    $scope.q_prompt = $scope.q_typeahead($scope.select.shop.id);
+    
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, function(v){return v},
+	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
+    }; 
+
+    $scope.get_all_prompt_inventory = function(){
+	diabloFilter.match_all_w_reject_inventory(
+	    $scope.qtime_start($scope.select.shop.id),
+	    $scope.select.shop.id,
+	    $scope.select.firm.id
+	).then(function(invs){
+	    // console.log(invs);
+	    $scope.all_prompt_inventory = invs.map(function(inv){
+		return angular.extend(
+		    inv, {name:inv.style_number +
+			  "，" + inv.brand + "，" + inv.type})
+	    });
+
+	    console.log($scope.all_prompt_inventory);
+	});
+    };
+    
+    if ($scope.q_prompt === diablo_frontend){
+	// console.log($scope.select);
+	$scope.get_all_prompt_inventory()
     };
 
     $scope.match_prompt_inventory = function(viewValue){

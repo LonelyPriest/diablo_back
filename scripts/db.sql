@@ -338,7 +338,8 @@ create table w_retailer
     entry_date      DATE, -- last changed
     deleted         INTEGER default 0, -- 0: no;  1: yes
 
-    unique  key  index_nm (name, merchant), 
+    unique  key  index_nm (name, merchant),
+    key          merchant (merchant),
     primary key     (id)
 ) default charset=utf8;
 

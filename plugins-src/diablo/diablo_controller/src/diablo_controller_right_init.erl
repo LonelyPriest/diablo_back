@@ -754,7 +754,8 @@ pass_action(wholesaler) ->
      <<"get_w_good">>,
      <<"get_used_w_good">>,
      <<"filter_w_good">>,
-     <<"match_w_good">>, 
+     <<"match_w_good">>,
+     <<"match_all_w_good">>,
      <<"match_w_good_style_number">>,
 
      %% inventnory
@@ -762,6 +763,7 @@ pass_action(wholesaler) ->
      <<"filter_w_inventory_group">>, 
      <<"match_w_inventory">>,
      <<"match_all_w_inventory">>,
+     <<"match_all_reject_w_inventory">>,
 
      %% inventory new
      <<"get_w_inventory_new">>,

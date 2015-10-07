@@ -234,6 +234,12 @@ wgoodApp.service("wgoodService", function($resource, $http, dateFilter){
 	    {prompt_value: viewValue, firm: firm}).$promise;
     };
 
+    this.match_all_purchaser_good = function(start_time, firm){
+	return http.query_by_post(
+	    {operation: "match_all_w_good"},
+	    {start_time: start_time, firm: firm}).$promise;
+    };
+
     this.add_purchaser_good = function(good, image){
 	return http.save({operation: "new_w_good"}, {good:good, image:image}).$promise;
     };
@@ -256,7 +262,7 @@ wgoodApp.service("wgoodService", function($resource, $http, dateFilter){
 	    {operation:"new_firm"},
 	    {name:    firm.name,
 	     balance: angular.isDefined(balance) ? parseInt(balance) : 0,
-	     mobile:  firm.mobile,
+	     mobile:  angular.isDefined(firm.mobile) && firm.mobile ? firm.mobile:undefined,
 	     address: firm.address}).$promise
     }; 
 });

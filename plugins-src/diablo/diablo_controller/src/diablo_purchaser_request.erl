@@ -292,12 +292,27 @@ action(Session, Req, {"w_inventory_fix_rsn_detail"}, Payload) ->
 %% match
 %% =============================================================================
 action(Session, Req, {"match_all_w_inventory"}, Payload) ->
-    ?DEBUG("all_w_style_number with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("match_all_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     Shop     = ?v(<<"shop">>, Payload),
     NewPayload = proplists:delete(<<"shop">>, Payload),
     batch_responed(
       fun() -> ?w_inventory:match(inventory, all_inventory, Merchant, Shop, NewPayload) end, Req);
+
+action(Session, Req, {"match_all_reject_w_inventory"}, Payload) ->
+    ?DEBUG("match_all_reject_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
+    Merchant   = ?session:get(merchant, Session),
+    Shop       = ?v(<<"shop">>, Payload),
+    Firm       = ?v(<<"firm">>, Payload, []),
+    QType      = ?v(<<"type">>, Payload, 0),
+    StartTime  = ?v(<<"start_time">>, Payload),
+
+    batch_responed(
+      fun() -> ?w_inventory:match(
+		  all_reject_inventory, QType, Merchant, Shop, Firm, StartTime) end, Req);
+
 
 action(Session, Req, {"match_w_inventory"}, Payload) ->
     ?DEBUG("match_w_inventory with session ~p~npayload ~p", [Session, Payload]),

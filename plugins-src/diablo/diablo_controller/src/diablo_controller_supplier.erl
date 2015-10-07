@@ -155,7 +155,7 @@ handle_call({w_list, Merchant}, _From, State) ->
 	++ " where "
 	++ " merchant=" ++ ?to_s(Merchant)
 	++ " and deleted = " ++ ?to_s(?NO)
-	++ " order by id",
+	++ " order by id desc",
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
@@ -247,11 +247,11 @@ fields() ->
     "name, mobile, address, merchant".
     
 
-sql_fun_reply(SqlFun, SuccReply) ->
-    case SqlFun() of
-	{error, Error} ->
-	    ?DEBUG("failed to sql fun ~p, error: ~p", [SqlFun, Error]),
-	    {error, ?err(db_error, Error)};
-	{ok, _} -> 
-	    {ok, SuccReply}
-    end.
+%% sql_fun_reply(SqlFun, SuccReply) ->
+%%     case SqlFun() of
+%% 	{error, Error} ->
+%% 	    ?DEBUG("failed to sql fun ~p, error: ~p", [SqlFun, Error]),
+%% 	    {error, ?err(db_error, Error)};
+%% 	{ok, _} -> 
+%% 	    {ok, SuccReply}
+%%     end.

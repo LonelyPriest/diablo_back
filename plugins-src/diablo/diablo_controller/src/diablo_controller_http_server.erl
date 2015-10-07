@@ -123,7 +123,7 @@ dispatch(Req, DocRoot) ->
 		    Response ->
 			Response
 		end;
-	    Method when Method =:= 'OPTIONS' -> 
+	    Method when Method =:= 'OPTIONS'; Method =:= 'TRACE' -> 
 		case filelib:is_file(
 		       filename:join([DocRoot, Path])) of
 		    true ->

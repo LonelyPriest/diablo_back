@@ -3,6 +3,8 @@ var diablo_delay = 1000; //ms
 
 var diablo_yes = 1;
 var diablo_no = 0;
+var diablo_frontend = 0;
+var diablo_backend = 1;
 var diablo_badrepo = 1;
 
 function diablo_range(n){

@@ -1,7 +1,8 @@
 purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope, dateFilter, diabloPattern, diabloUtilsService,
-    diabloFilter, wgoodService, purchaserService, localStorageService,
-    user, filterFirm, filterEmployee, filterColor){
+    diabloFilter, wgoodService, purchaserService,
+    localStorageService, user, filterFirm,
+    filterEmployee, filterColor, base){
     // console.log(user); 
     // $scope.shops = user.sortAvailabeShops;
     $scope.shops = user.sortShops;
@@ -15,11 +16,14 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope.float_sub       = diablo_float_sub;
     $scope.extra_pay_types = purchaserService.extra_pay_types; 
     $scope.disable_refresh = true;
+
+    $scope.q_prompt        = diablo_backend;
     
     $scope.right_update_orgprice = function(){
 	$scope.modify_orgprice = true;
-    }(); 
-    
+    }();
+
+    var now = $.now(); 
     // $scope.refresh_firm = function(){
     // 	// $scope.firms = [];
     // 	wgoodService.list_purchaser_firm().then(function(firms){
@@ -35,15 +39,26 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     // 	    }
     // 	});
     // };
-    
+
+    $scope.q_typeahead = function(shopId){
+	console.log(shopId);
+	// default prompt comes from backend
+	return diablo_base_setting(
+	    "qtypeahead", shopId, base, parseInt, diablo_backend);
+    };
 
     $scope.change_firm = function(){
-	// console.log($scope.select.firm);
+	console.log($scope.select.firm);
 	$scope.select.surplus = parseFloat($scope.select.firm.balance);
 	$scope.left_balance  = $scope.select.surplus;
 	
 	$scope.local_save();
 	$scope.re_calculate();
+
+	if ($scope.q_prompt === diablo_frontend){
+	    $scope.get_all_w_good();
+	}
+	
 	// $scope.refresh();
     };
 
@@ -84,7 +99,8 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     
     // init
     $scope.inventories = [];
-    $scope.inventories.push({$edit:false, $new:true}); 
+    $scope.inventories.push({$edit:false, $new:true});
+    
     $scope.select = {
 	shop: angular.isDefined($scope.shops) && $scope.shops.length !== 0 ? $scope.shops[0]:undefined,
 	total: 0,
@@ -157,7 +173,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     };
 
     $scope.today = function(){
-	return $.now();
+	return now;
     };
 
     /*
@@ -180,7 +196,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 
     $scope.local_save = function(){
 	var key = current_key();
-	var now = $.now();
+	// var now = $.now();
 	localStorageService.set(
 	    key,
 	    {t:now, v:$scope.inventories.filter(function(inv){
@@ -284,7 +300,35 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    return;
 	}
 	return diabloFilter.match_wgood_with_firm(viewValue, $scope.select.firm.id); 
-    }; 
+    };
+
+    $scope.q_prompt = $scope.q_typeahead($scope.select.shop.id);
+
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, function(v){return v},
+	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
+    };
+
+    $scope.get_all_w_good = function(){
+	diabloFilter.match_all_w_good(
+	    $scope.qtime_start($scope.select.shop.id), $scope.select.firm.id
+	).then(function(goods){
+	    // console.log(invs);
+	    $scope.all_w_goods =  goods.map(function(g){
+		return angular.extend(
+		    g, {name:g.style_number + "，"
+			+ g.brand + "，" + g.type})
+	    });
+
+	    console.log($scope.all_w_goods);
+	});
+    };
+    
+    if ($scope.q_prompt === diablo_frontend){
+	// console.log($scope.select);
+	$scope.get_all_w_good();
+    };
     
     $scope.on_select_good = function(item, model, label){
 	console.log(item);
@@ -787,6 +831,8 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	$scope.hide_column = !$scope.hide_column;
     }
 
+    var now = $.now();
+
     $scope.match_style_number = function(viewValue){
 	return diabloFilter.match_w_inventory(viewValue, $scope.shopIds);
 	// return diabloFilter.match_w_inventory(viewValue, user.availableShopIds)
@@ -811,10 +857,13 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
-    var now = $.now();
-    $scope.qtime_start = function(shopId){
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
 	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+	    "qtime_start", shop, base, diablo_set_date, diabloFilter.default_start_time(now));
     }();
     // console.log($scope.qtime_start);
     
@@ -994,6 +1043,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.f_add = diablo_float_add;
     $scope.f_sub = diablo_float_sub;
 
+    var now    = $.now();
     var dialog = diabloUtilsService;
 
     $scope.add = function(){
@@ -1091,8 +1141,6 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.prompt = diabloFilter.get_prompt();
 
     // console.log($scope.prompt);
-
-    var now = $.now();
     $scope.qtime_start = function(shopId){
 	return diablo_base_setting(
 	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));

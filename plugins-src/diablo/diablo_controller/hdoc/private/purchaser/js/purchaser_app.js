@@ -43,7 +43,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	when('/inventory_new', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new.html',
             controller: 'purchaserInventoryNewCtrl',
-	    resolve: angular.extend({}, user, firm, employee, color)
+	    resolve: angular.extend({}, user, firm, employee, color, base)
 	}).
 	when('/update_new_detail/:rsn?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail_update.html',
@@ -54,7 +54,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	when('/inventory_reject', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_reject.html',
             controller: 'purchaserInventoryRejectCtrl',
-	    resolve: angular.extend({}, user, firm, employee, s_group, color)
+	    resolve: angular.extend({}, user, firm, employee, s_group, color, base)
 	}). 
 	when('/update_new_detail_reject/:rsn?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_reject_update.html',

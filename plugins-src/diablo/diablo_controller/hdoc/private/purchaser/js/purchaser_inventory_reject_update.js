@@ -102,9 +102,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	var invs = result[1].data; 
 	
 	$scope.old_select.rsn        = rsn;
+	$scope.old_select.rsn_id     = base.id;
 	$scope.old_select.firm       = $scope.get_object(base.firm_id,   $scope.firms); 
 	$scope.old_select.datetime   = diablo_set_datetime(base.entry_date);
-
+	
 	console.log($scope.e_pay_types);
 	if (base.e_pay_type === -1){
 	    $scope.old_select.e_pay_type = $scope.e_pay_types[0];
@@ -441,6 +442,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	}
 
 	var base = {
+	    id:             $scope.select.rsn_id,
 	    rsn :           $scope.select.rsn,
 	    firm:           $scope.select.firm.id,
 	    shop:           $scope.select.shop.id,
@@ -452,6 +454,11 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    
 	    balance:        parseFloat($scope.select.surplus), 
 	    should_pay:     -setv($scope.select.should_pay),
+	    e_pay:         function(){
+		var e = setv($scope.select.e_pay);
+		return angular.isUndefined(e) ? undefined : -e;
+	    },
+	    
 	    // has_pay:        setv($scope.select.has_pay),
 
 
