@@ -29,7 +29,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	return diablo_base_setting(
 	    "qtime_start", shopId, base, function(v){return v},
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
-    }();
+    };
     
     $scope.select  = {
 	shop: $scope.shops[0],

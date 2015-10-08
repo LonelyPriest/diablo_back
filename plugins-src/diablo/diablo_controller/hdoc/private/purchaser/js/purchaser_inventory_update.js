@@ -266,7 +266,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    if (item.style_number === $scope.inventories[i].style_number
 		&& item.brand_id  === $scope.inventories[i].brand.id){
 		diabloUtilsService.response_with_callback(
-		    false, "修改库存", "修改库存失败：" + purchaserService.error[2099],
+		    false, "采购单修改", "采购单修改失败：" + purchaserService.error[2099],
 		    $scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
 		return;
 	    }
@@ -443,7 +443,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    || angular.isUndefined($scope.select.employee)
 	    || diablo_is_empty($scope.select.employee)){
 	    diabloUtilsService.response(
-		false, "库存编辑", "库存编辑失败：" + purchaserService.error[2096]);
+		false, "采购单修改", "采购单修改失败：" + purchaserService.error[2096]);
 	    return;
 	};
 

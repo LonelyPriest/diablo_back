@@ -180,8 +180,10 @@
 	      <div class="input-group">
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-plane fg-red"></i>总数</span>
-	  	<input class="form-control" type="text" readonly
-	  	       x-ng-model="select.total"></input>
+	  	<!-- <input class="form-control" type="text" readonly -->
+	  	<!--        x-ng-model="select.total"/ > -->
+		<input class="form-control" type="text" readonly
+	  	       x-ng-model="select.abs_total"/ >
 	      </div>
 	    </div>
 	    
@@ -480,6 +482,13 @@
 			  <i class="glyphicon glyphicon-erase"></i></a> 
 		      </span> 
 		    </td>
+		  </tr>
+
+		  <tr class="text-center">
+		    <td colspan=8></td>
+		    <td class="vert-align">{{select.abs_total}}</td>
+		    <td class="vert-align">{{select.should_pay}}</td>
+		    <td></td>
 		  </tr>
 		</tbody> 
 	      </table> <!--END supplier table-->

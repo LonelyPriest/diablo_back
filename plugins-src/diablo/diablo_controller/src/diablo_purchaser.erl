@@ -556,10 +556,12 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     ?DEBUG("update_inventory: merchant ~p~n, inventories ~p, props ~p",
 	   [Merchant, Inventories, Props]), 
 
+    CurTime    = ?utils:current_time(localtime),
+    
     Id         = ?v(<<"id">>, Props),
     RSN        = ?v(<<"rsn">>, Props),
     Shop       = ?v(<<"shop">>, Props),
-    Datetime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)), 
+    Datetime   = ?v(<<"datetime">>, Props, CurTime), 
     Firm       = ?v(<<"firm">>, Props),
     Employee   = ?v(<<"employee">>, Props),
 
@@ -582,7 +584,7 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 
     Total      = ?v(<<"total">>, Props),
     
-    CurTime    = ?utils:current_time(localtime),
+    %% CurTime    = ?utils:current_time(localtime),
     
     RealyShop = realy_shop(Merchant, Shop),
     %% Sql1 = case Datetime =:= OldDatatime of
@@ -666,7 +668,8 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 		++ ?utils:to_sqls(
 		      proplists, comma,
 		      ?utils:v(balance, float, NewBalance) ++ Updates)
-		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
+		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'"
+		++ " and id=" ++ ?to_s(Id),
 	    
 	    AllSql = Sql1 ++ [Sql2] ++
 		["update suppliers set balance=balance-"

@@ -75,12 +75,15 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     }; 
 
     $scope.re_calculate = function(){
+	// console.log("re_calculate");
 	$scope.select.total = 0;
+	$scope.select.abs_total = 0;
 	$scope.select.should_pay = 0.00;
 
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.sell);
+	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
 	    $scope.select.should_pay
 		+= one.fprice * one.sell * one.fdiscount / 100;
 	}
@@ -182,13 +185,16 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    var invs        = result.inv;
 	    var sell_detail = result.detail; 
 
-	    var date = base.entry_date.substr(0,10).split("-")
-	    var time = base.entry_date.substr(11, 8).split(":");
+	    // var date = base.entry_date.substr(0,10).split("-")
+	    // var time = base.entry_date.substr(11, 8).split(":");
 	    // console.log(datetime);
-	    $scope.old_select.rsn        = base.rsn; 
-	    $scope.old_select.datetime   = new Date(
-		date[0], date[1]-1, date[2], time[0], time[1], time[2]);
-	    $scope.old_select.retailer   = $scope.get_object(base.retailer_id, $scope.retailers);
+	    $scope.old_select.rsn      = base.rsn;
+	    $scope.old_select.rsn_id   = base.id;
+	    $scope.old_select.datetime = diablo_set_datetime(base.entry_date);
+	    // $scope.old_select.datetime   = new Date(
+	    // 	date[0], date[1]-1, date[2], time[0], time[1], time[2]);
+	    $scope.old_select.retailer = $scope.get_object(
+		base.retailer_id, $scope.retailers);
 
 	    if (base.e_pay_type === -1){
 		$scope.old_select.e_pay_type = $scope.e_pay_types[0];
@@ -214,6 +220,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.old_select.has_pay    = base.has_pay;
 
 	    $scope.select = angular.extend($scope.select, $scope.old_select);
+	    $scope.select.abs_total = 0;
 	    // console.log($scope.select);
 
 	    var length = invs.length;
@@ -283,6 +290,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    
 	    $scope.inventories.unshift({$edit:false, $new:true});
 
+	    $scope.re_calculate();
+
 	    $scope.total_items = $scope.inventories.length; 
 	    $scope.current_page_index = $scope.get_page($scope.default_page);
 
@@ -341,7 +350,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    if (item.style_number === $scope.inventories[i].style_number
 		&& item.brand_id  === $scope.inventories[i].brand.id){
 		diabloUtilsService.response_with_callback(
-		    false, "销售单编辑", "开单失败：" + wsaleService.error[2191],
+		    false, "销售单编辑", "销售单编辑失败：" + wsaleService.error[2191],
 		$scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
 		return;
 	    }
@@ -520,7 +529,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    || angular.isUndefined($scope.select.employee)
 	    || diablo_is_empty($scope.select.employee)){
 	    diabloUtilsService.response(
-		false, "销售开单", "开单失败：" + wsaleService.error[2192]);
+		false, "销售单编辑", "销售单编辑失败：" + wsaleService.error[2192]);
 	    return;
 	}; 
 
@@ -572,7 +581,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	var sets = diablo_set_string;
 	
 	var base = {
-	    rsn :          $scope.select.rsn,
+	    id:            $scope.select.rsn_id,
+	    rsn:           $scope.select.rsn,
 	    retailer:      $scope.select.retailer.id,
 	    shop:          $scope.select.shop.id,
 	    datetime:      dateFilter($scope.select.datetime, "yyyy-MM-dd HH:mm:ss"),
@@ -583,6 +593,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    card:           setv($scope.select.card),
 	    wire:           setv($scope.select.wire),
 	    verificate:     setv($scope.select.verificate),
+	    e_pay:          setv($scope.select.e_pay),
 	    should_pay:     setv($scope.select.should_pay),
 	    has_pay:        setv($scope.select.has_pay),
 	    comment:        sets($scope.select.comment),
@@ -632,7 +643,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	}).then(function(result){
 	    console.log(result);
 	    if (result.ecode == 0){
-		msg = "修入销售单成功！！单号：" + result.rsn; 
+		msg = "销售单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "销售单编辑", msg, $scope,
 	    	    function(){
@@ -652,6 +663,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
     // watch balance
     var reset_payment = function(newValue){
+	console.log("reset_payment newValue ", newValue);
 	$scope.select.has_pay = 0.00;
 	if(angular.isDefined($scope.select.cash) && $scope.select.cash){
 	    $scope.select.has_pay

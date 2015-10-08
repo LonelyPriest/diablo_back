@@ -115,8 +115,9 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    var sell_detail = result.detail; 
 
 	    // console.log(datetime);
-	    $scope.old_select.rsn        = base.rsn; 
-	    $scope.old_select.datetime   = diablo_set_datetime(base.entry_date)
+	    $scope.old_select.rsn        = base.rsn;
+	    $scope.old_select.rsn_id     = base.id;
+	    $scope.old_select.datetime   = diablo_set_datetime(base.entry_date);
 	    $scope.old_select.retailer   = $scope.get_object(base.retailer_id, $scope.retailers);
 
 	    console.log($scope.e_pay_types);
@@ -137,7 +138,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    $scope.old_select.comment      = base.comment;
 	    $scope.old_select.total        = Math.abs(base.total);
 	    $scope.old_select.should_pay   = Math.abs(base.should_pay);
-	    $scope.old_select.left_balance = base.balance + base.should_pay;
+	    $scope.old_select.left_balance = $scope.f_add(base.balance, base.should_pay);
 	    $scope.select = angular.extend($scope.select, $scope.old_select);
 	    // console.log($scope.select);
 
@@ -481,6 +482,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	var sets  = diablo_set_string; 
 
 	var base = {
+	    id:            $scope.select.rsn_id,
 	    rsn :          $scope.select.rsn,
 	    retailer:      $scope.select.retailer.id,
 	    shop:          $scope.select.shop.id,
@@ -489,13 +491,18 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    balance:       parseFloat($scope.select.surplus),
 	    
 	    should_pay:     -setv($scope.select.should_pay),
+	    
+	    e_pay:         function(){
+		var e = setv($scope.select.e_pay);
+		return angular.isUndefined(e) ? undefined : -e;
+	    },
 	    comment:        sets($scope.select.comment),
 
 	    old_shop:       $scope.old_select.shop.id,
 	    old_retailer:   $scope.old_select.retailer.id, 
 	    old_balance:    $scope.old_select.surplus,
 	    old_should_pay: -$scope.old_select.should_pay,
-	    old_datetime:   $scope.old_select.datetime,
+	    old_datetime:   dateFilter($scope.old_select.datetime, "yyyy-MM-dd HH:mm:ss"),
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
 	    total:         -seti($scope.select.total)
@@ -533,7 +540,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	}).then(function(result){
 	    console.log(result);
 	    if (result.ecode == 0){
-		msg = "修改退货单成功！！单号：" + result.rsn; 
+		msg = "退货单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "退货单编辑", msg, $scope,
 	    	    function(){

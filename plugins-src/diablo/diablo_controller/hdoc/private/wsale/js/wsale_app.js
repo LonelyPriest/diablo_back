@@ -344,6 +344,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	extra_pay: undefined,
 	
 	total: 0,
+	abs_total: 0,
 	has_pay: 0.00,
 	should_pay: 0.00,
 	extra_pay_type: $scope.extra_pay_types[0],
@@ -447,7 +448,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.select.has_pay    = 0.00;
 	$scope.select.should_pay = 0.00;
 
-	$scope.select.total   = 0;
+	$scope.select.total     = 0;
+	$scope.select.abs_total = 0;
 	$scope.select.comment = undefined;
 	$scope.select.left_balance = $scope.select.surplus;
 
@@ -1158,6 +1160,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.re_calculate = function(){
 	// console.log("re_calculate");
 	$scope.select.total = 0;
+	$scope.select.abs_total = 0;
 	$scope.select.should_pay = 0.00;
 	
 	var e_pay = 0.00;
@@ -1170,6 +1173,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.sell);
+	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
 
 	    var f1 = $scope.float_mul(one.fprice, one.fdiscount * 0.01);
 	    var f2 = $scope.float_mul(f1, one.sell);

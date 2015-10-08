@@ -194,7 +194,7 @@
 	    	<span class="input-group-addon">
 	    	  <i class="glyphicon glyphicon-map-marker fg-red"></i>总数</span>
 	    	<input class="form-control" type="text" readonly
-	    	       x-ng-model="select.total"></input>
+	    	       x-ng-model="select.abs_total"></input>
 	      </div>
 	    </div>
 	    
@@ -532,10 +532,10 @@
 		      </tr>
 
 		      <tr x-ng-if="inventories.length>1" class="text-center">
-			<td colspan="8"></td>
-			<td class="vert-align fg-red">{{select.total}}</td>
-			<td class="vert-align fg-red">{{select.should_pay}}</td>
-			<td colspan="1"></td>
+			<td colspan=8></td>
+			<td class="vert-align">{{select.abs_total}}</td>
+			<td class="vert-align">{{select.should_pay}}</td>
+			<td colspan=2></td>
 		      </tr>
 		      
 		    </tbody> 

@@ -375,7 +375,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    || angular.isUndefined($scope.select.employee)
 	    || diablo_is_empty($scope.select.employee)){
 	    diabloUtilsService.response_with_callback(
-		false, "采购退货", "采购退货编辑失败："
+		false, "采购退货编辑", "采购退货编辑失败："
 		    + purchaserService.error[2096], undefined, function(){
 			$scope.has_saved = false; 
 		    });
@@ -436,7 +436,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		&& $scope.select.firm.id === $scope.old_select.firm.id
 		&& new_datetime === old_datetime)){
 	    dialog.response_with_callback(
-	    	false, "退货单编辑", "退货单编辑失败：" + purchaserService.error[2094],
+	    	false, "采购退货编辑", "采购退货编辑失败：" + purchaserService.error[2094],
 	    $scope, function(){$scope.has_saved = false});
 	    return;
 	}
@@ -480,7 +480,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    console.log(state);
 	    if (state.ecode == 0){
 		dialog.response_with_callback(
-		    true, "退货单修改", "退货单修改成功！！单号：" + state.rsn,
+		    true, "采购退货编辑", "采购退货编辑成功！！单号：" + state.rsn,
 		    $scope, function(){diablo_goto_page("#/inventory_new_detail")})
 	    	return;
 	    } else{

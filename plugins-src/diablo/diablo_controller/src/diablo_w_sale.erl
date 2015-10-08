@@ -199,10 +199,13 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     ?DEBUG("update_sale with merchant ~p~n~p, props ~p",
 	   [Merchant, Inventories, Props]),
 
+    CurTime    = ?utils:current_time(localtime),
+    
+    RSNId      = ?v(<<"id">>, Props),
     RSN        = ?v(<<"rsn">>, Props),
     Retailer   = ?v(<<"retailer">>, Props),
     Shop       = ?v(<<"shop">>, Props), 
-    DateTime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)),
+    DateTime   = ?v(<<"datetime">>, Props, CurTime),
     Employee   = ?v(<<"employee">>, Props),
 
     Balance    = ?v(<<"balance">>, Props), 
@@ -210,6 +213,8 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     Card       = ?v(<<"card">>, Props),
     Wire       = ?v(<<"wire">>, Props),
     VerifyPay  = ?v(<<"verificate">>, Props),
+    EPay       = ?v(<<"e_pay">>, Props, 0),
+    
     Comment    = ?v(<<"comment">>, Props),
     ShouldPay  = ?v(<<"should_pay">>, Props, 0),
     HasPay     = ?v(<<"has_pay">>, Props, 0),
@@ -223,8 +228,6 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 
     RealyShop    = realy_shop(Merchant, Shop), 
     Sql1 = sql(update_wsale, RSN, Merchant, RealyShop, DateTime, Inventories), 
-
-
     Updates = ?utils:v(employ, string, Employee)
 	++ ?utils:v(retailer, integer, Retailer) 
 	++ ?utils:v(shop, integer, Shop)
@@ -242,39 +245,85 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     case Retailer =:= OldRetailer of
 	true ->
 	    Sql2 = "update w_sale set "
-		++ ?utils:to_sqls(proplists, comma,
-				  ?utils:v(balance, float, OldBalance) ++ Updates)
+		++ ?utils:to_sqls(
+		      proplists, comma,
+		      ?utils:v(balance, float, OldBalance) ++ Updates)
 		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
+	    
 	    case  (ShouldPay - HasPay) - (OldShouldPay - OldHasPay) of
 		0 ->
 		    AllSql = Sql1 ++ [Sql2],
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 		    {reply, Reply, State};
 		Metric ->
+		    ?DEBUG("Metric ~p", [Metric]),
 		    AllSql = Sql1 ++ [Sql2] ++
 			["update w_retailer set balance=balance+"
 			 ++ ?to_s(Metric) 
-			 %% ++ ", change_date=" ++ "\"" ++ ?to_s(DateTime) ++ "\""
+			 ++ ", change_date=" ++ "\"" ++ ?to_s(CurTime) ++ "\""
 			 ++ " where id=" ++ ?to_s(Retailer)
-			 ++ " and merchant=" ++ ?to_s(Merchant)],
+			 ++ " and merchant=" ++ ?to_s(Merchant),
+
+			 "update w_sale set balance=balance+" ++ ?to_s(Metric)
+			 ++ " where shop=" ++ ?to_s(Shop)
+			 ++ " and merchant=" ++ ?to_s(Merchant)
+			 ++ " and id>" ++ ?to_s(RSNId)],
+		    
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 		    ?w_user_profile:update(retailer, Merchant),
 		    {reply, Reply, State}
 	    end;
 	false ->
+	    Sql0 = "select id, rsn, retailer, shop, merchant, balance"
+		", should_pay, has_pay, e_pay"
+		" from w_sale"
+		" where shop=" ++ ?to_s(Shop)
+		++ " and merchant=" ++ ?to_s(Merchant)
+		++ " and retailer=" ++ ?to_s(Retailer)
+		++ " and id<" ++ ?to_s(RSNId)
+		++ " order by id desc limit 1",
+
+	    NewBalance = 
+		case ?sql_utils:execute(s_read, Sql0) of
+		    []      -> Balance;
+		    {ok, R} ->
+			?v(<<"balance">>, R)
+			    + ?v(<<"should_pay">>, R)
+			    + ?v(<<"e_pay">>, R)
+			    - ?v(<<"has_pay">>, R)
+		end,
+	    
 	    Sql2 = 
 		"update w_sale set "
 		++ ?utils:to_sqls(
 		      proplists, comma,
-		      ?utils:v(balance, float, Balance) ++ Updates) 
-		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
+		      ?utils:v(balance, float, NewBalance) ++ Updates) 
+		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'"
+		++ " and id=" ++ ?to_s(RSNId),
 	    
 	    AllSql = Sql1 ++ [Sql2] ++ 
 		["update w_retailer set balance=balance-"
-		 ++ ?to_s(OldShouldPay - OldHasPay) ++ " where id=" ++ ?to_s(OldRetailer),
+		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
+		 ++ " where id=" ++ ?to_s(OldRetailer),
 		 
-		 "update w_retailer set balance=balance+" ++ ?to_s(ShouldPay - HasPay)
-		 ++ " where id=" ++ ?to_s(Retailer)],
+		 "update w_retailer set balance=balance+"
+		 ++ ?to_s(ShouldPay + EPay - HasPay)
+		 ++ " where id=" ++ ?to_s(Retailer),
+
+		 "update w_sale set balance=balance-"
+		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
+		 ++ " where shop=" ++ ?to_s(Shop)
+		 ++ " and merchant=" ++ ?to_s(Merchant)
+		 ++ " and retailer=" ++ ?to_s(OldRetailer)
+		 ++ " and id>" ++ ?to_s(RSNId),
+
+		 "update w_sale set balance=balance+"
+		 ++ ?to_s(ShouldPay + EPay - HasPay) 
+		 ++ " where shop=" ++ ?to_s(Shop)
+		 ++ " and merchant=" ++ ?to_s(Merchant)
+		 ++ " and retailer=" ++ ?to_s(Retailer)
+		 ++ " and id>" ++ ?to_s(RSNId) 
+		],
 
 	    Reply = ?sql_utils:execute(transaction, AllSql, RSN),
 	    ?w_user_profile:update(retailer, Merchant),
