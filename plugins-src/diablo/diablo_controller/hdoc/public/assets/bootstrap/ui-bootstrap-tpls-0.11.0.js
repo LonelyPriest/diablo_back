@@ -2176,14 +2176,15 @@ angular.module('ui.bootstrap.pagination', [])
   };
 
   this.render = function() {
-    $scope.page = parseInt(ngModelCtrl.$viewValue, 10) || 1;
+      console.log(parseInt(ngModelCtrl.$viewValue, 10));
+      $scope.page = parseInt(ngModelCtrl.$viewValue, 10) || 1;
   };
 
   $scope.selectPage = function(page) {
-    if ( $scope.page !== page && page > 0 && page <= $scope.totalPages) {
-      ngModelCtrl.$setViewValue(page);
-      ngModelCtrl.$render();
-    }
+      if ( $scope.page !== page && page > 0 && page <= $scope.totalPages) {
+	  ngModelCtrl.$setViewValue(page);
+	  ngModelCtrl.$render();
+      }
   };
 
   $scope.getText = function( key ) {
@@ -2203,6 +2204,7 @@ angular.module('ui.bootstrap.pagination', [])
   $scope.$watch('totalPages', function(value) {
     setNumPages($scope.$parent, value); // Readonly variable
 
+      console.log($scope.page, value);
     if ( $scope.page > value ) {
       $scope.selectPage(value);
     } else {

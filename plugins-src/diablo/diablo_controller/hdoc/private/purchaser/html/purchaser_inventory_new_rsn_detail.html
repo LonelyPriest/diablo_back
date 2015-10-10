@@ -10,7 +10,7 @@
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
 	    <button type="button" class="btn red green-stripe"
-		    x-ng-click="goto_page('#/inventory_new_detail')">返回
+		    x-ng-click="go_back()">返回
 	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 
 	    <button type="button" class="btn blue purple-stripe"
@@ -124,7 +124,7 @@
 		  	<span>显示第 {{current_page}} / {{num_pages}} 项结果，
 		  	  共 {{total_items}} 项</span>
 		      </span>
-		      <pagination class="pull-right"
+		      <pagination class="pagination-lg pull-right"
 		  		  total-items="total_items"
 		  		  items-per-page="items_perpage"
 		  		  num-pages="num_pages"
@@ -133,7 +133,6 @@
 		  		  previous-text="&lsaquo;" next-text="&rsaquo;"
 		  		  first-text="&laquo;" last-text="&raquo;"
 		  		  x-ng-model="current_page"
-		  		  x-ng-init="current_page=default_page"
 		  		  x-ng-change="page_changed()"></pagination>
 		    </td>
 		  </tr>

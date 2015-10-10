@@ -304,23 +304,34 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
 
 
 purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
-    $scope, $routeParams, $location,
-    diabloUtilsService, diabloFilter,
-    wgoodService, purchaserService,
+    $scope, $routeParams, $location, diabloUtilsService, diabloFilter,
+    wgoodService, purchaserService, localStorageService,
     user, filterBrand, filterFirm, filterType,
     filterEmployee, filterSizeGroup, filterColor, base){
     
     // var permitShops      = user.shopIds;
-    $scope.shopIds       = user.shopIds;
-    $scope.goto_page     = diablo_goto_page; 
+    $scope.shopIds   = user.shopIds;
+    $scope.goto_page = diablo_goto_page;
+
+    var dialog       = diabloUtilsService;
+    var use_storage  = $routeParams.rsn ? false : true;
     
     // style_number
     $scope.match_style_number = function(viewValue){
 	return diabloFilter.match_w_inventory(viewValue, user.shopIds)
-    }; 
+    };
+
+    $scope.go_back = function(){
+	var ppage = diablo_set_integer($routeParams.ppage);
+	if(angular.isDefined(ppage)){
+	    $scope.goto_page("#/inventory_new_detail/" + ppage.toString()) 
+	} else{
+	    $scope.goto_page("#/inventory_new_detail") 
+	}
+    };
     
     // initial
-    $scope.filters = [];
+    // $scope.filters = [];
     
     diabloFilter.reset_field();
     diabloFilter.add_field("rsn", []);
@@ -335,22 +346,31 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
-    var now = $.now();
-    $scope.qtime_start = function(){
-	var shop = -1
-	if ($scope.shopIds.length === 1){
-	    shop = $scope.shopIds[0];
-	};
-	return diablo_base_setting(
-	    "qtime_start", shop, base, diablo_set_date, diabloFilter.default_start_time(now));
-    }();
-    // console.log($scope.qtime_start);
-    
-    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
-    //$scope.time   = diabloFilter.default_time();
-
     // console.log($scope.filter);
-    console.log($scope.prompt);
+    // console.log($scope.prompt); 
+
+    var now = $.now(); 
+    var storage = localStorageService.get(diablo_key_invnetory_trans_detail);
+    console.log(storage);
+    
+    if (use_storage && angular.isDefined(storage) && storage !== null){
+    	$scope.filters = storage.filter;
+    	$scope.time    = storage.time;
+    } else{
+	$scope.filters = [];
+	
+	$scope.qtime_start = function(){
+	    var shop = -1
+	    if ($scope.shopIds.length === 1){
+		shop = $scope.shopIds[0];
+	    };
+	    return diablo_base_setting(
+		"qtime_start", shop, base, diablo_set_date,
+		diabloFilter.default_start_time(now));
+	}(); 
+	$scope.time = diabloFilter.default_time($scope.qtime_start);
+	// console.log($scope.time);
+    }; 
     
     /*
      * pagination 
@@ -358,8 +378,10 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     $scope.colspan = 17;
     $scope.items_perpage = 10;
     $scope.max_page_size = 10;
+    
     // default the first page
     $scope.default_page = 1;
+    $scope.current_page = $scope.default_page;
 
     var add_search_condition = function(search){
 	if (angular.isUndefined(search.shop)
@@ -376,6 +398,13 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     }
 
     $scope.do_search = function(page){
+	// save condition of query
+	if (use_storage){
+	    localStorageService.set(
+		diablo_key_invnetory_trans_detail,
+		{filter:$scope.filters, time:$scope.time, page:page, t:now});
+	};
+	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    add_search_condition(search);
 

@@ -1,13 +1,35 @@
 var firmApp = angular.module(
     'firmApp', ['ui.bootstrap', 'ngRoute', 'ngResource',
-		'diabloAuthenApp', 'diabloFilterApp', 'diabloNormalFilterApp',
+		'LocalStorageModule', 'diabloAuthenApp',
+		'diabloFilterApp', 'diabloNormalFilterApp',
 		'diabloPattern', 'diabloUtils', 'userApp', 'wgoodApp'])
-// .config(diablo_authen);
-.config(function($httpProvider, authenProvider){
-    // $httpProvider.responseInterceptors.push(authenProvider.interceptor);
-    $httpProvider.interceptors.push(authenProvider.interceptor); 
-});
-
+    .config(function(localStorageServiceProvider){
+	localStorageServiceProvider
+	    .setPrefix('firmApp')
+	    .setStorageType('localStorage')
+	    .setNotify(true, true)
+    })
+    .run(['$route', '$rootScope', '$location',
+	  function ($route, $rootScope, $location) {
+	      var original = $location.path;
+	      $location.path = function (path, reload) {
+		  if (reload === false) {
+		      var lastRoute = $route.current;
+		      var un = $rootScope.$on(
+			  '$locationChangeSuccess',
+			  function () {
+			      $route.current = lastRoute;
+			      un();
+			  });
+		  }
+		  return original.apply($location, [path]);
+	      };
+	  }])
+    .config(function($httpProvider, authenProvider){
+	// $httpProvider.responseInterceptors.push(authenProvider.interceptor);
+	$httpProvider.interceptors.push(authenProvider.interceptor); 
+    });
+    
 firmApp.config(['$routeProvider', function($routeProvider){
     var user = {"user": function(userService){
     	return userService()}};
@@ -31,16 +53,16 @@ firmApp.config(['$routeProvider', function($routeProvider){
 	return diabloNormalFilter.get_base_setting()}};
     
     $routeProvider.
-	when('/firm_detail/:page?', {
+	when('/firm_detail', {
 	    templateUrl: '/private/firm/html/firm_detail.html',
             controller: 'firmDetailCtrl'
 	}).
-	when('/firm_trans/:firm?/:ppage?/:cpage?', {
+	when('/firm_trans/:firm?/:page?', {
 	    templateUrl: '/private/firm/html/firm_trans.html',
 	    controller: 'firmTransCtrl',
 	    resolve: angular.extend({}, firm, employee, user, base)
 	}).
-	when('/firm_trans_rsn/:firm?/:rsn?/:ppage?/:p2page?', {
+	when('/firm_trans_rsn/:firm?/:rsn?/:ppage?', {
 	    templateUrl: '/private/firm/html/firm_trans_rsn_detail.html',
 	    controller: 'firmTransRsnDetailCtrl',
 	    resolve: angular.extend({}, brand, firm, employee, s_group, type, user)
@@ -158,22 +180,64 @@ firmApp.controller("firmNewCtrl", function(
 
 firmApp.controller("firmDetailCtrl", function(
     $scope, $location, $routeParams, firmService, diabloUtilsService,
-    diabloPagination){
+    diabloPagination, localStorageService){
 
     var f_add = diablo_float_add;
+    var now   = $.now();
+
+    $scope.save_to_local = function(search, t_firm){
+	var s = localStorageService.get(diablo_key_firm);
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_firm, {
+		    search:angular.isDefined(search) ? search:s.search,
+		    t_firm:angular.isDefined(t_firm) ? t_firm:s.t_firm,
+		    page:$scope.current_page,
+		    t:now}
+	    )
+	}
+    };
+
+    $scope.reset_local_storage = function(){
+	var s = localStorageService.get(diablo_key_firm);
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_firm, {
+		    search:undefined,
+		    t_firm:undefined,
+		    page:$scope.current_page,
+		    t:now}
+	    ) 
+	};
+    };
+    
     
     /*
      * pagination
      */
-    $scope.colspan = 7;
+    $scope.colspan       = 7;
     $scope.max_page_size = 10;
     $scope.items_perpage = 10;
-    $scope.default_page = 1;
-    $scope.current_page = $scope.default_page;
+    $scope.default_page  = 1;
 
-    $scope.page_changed = function(page){
+    var storage = localStorageService.get(diablo_key_firm);
+    console.log(storage);
+    if (angular.isDefined(storage) && storage !== null){
+	$scope.current_page = storage.page;
+	$scope.search       = storage.search;
+	$scope.total_items  = storage.t_firm;
+    } else {
+	$scope.current_page = $scope.default_page;
+	$scope.search       = undefined;
+	$scope.total_items  = undefined;
+    }
+
+    $scope.page_changed = function(){
 	// console.log(page);
-	$scope.filter_firms = diabloPagination.get_page(page);
+	// $scope.current_page = page;
+	console.log($scope.current_page);
+	$scope.save_to_local();
+	$scope.filter_firms = diabloPagination.get_page($scope.current_page);
     }
     
     $scope.do_search = function(search){
@@ -187,6 +251,9 @@ firmApp.controller("firmDetailCtrl", function(
 
     $scope.on_select_firm = function(item, model, label){
 	console.log(model);
+
+	$scope.save_to_local(model.name); 
+	
 	var filters = $scope.do_search(model.name);
 	diablo_order(filters);
 	console.log(filters);
@@ -200,6 +267,8 @@ firmApp.controller("firmDetailCtrl", function(
 	diabloPagination.set_data(filters);
 	$scope.total_items  = diabloPagination.get_length();
 	$scope.filter_firms = diabloPagination.get_page($scope.default_page);
+	// save
+	$scope.save_to_local(undefined, $scope.total_items);
     }
     
     var in_prompt = function(p, prompts){
@@ -210,9 +279,18 @@ firmApp.controller("firmDetailCtrl", function(
 	}
 
 	return false;
-    }
-    
+    };
+
     $scope.refresh = function(){
+	$scope.reset_local_storage();
+	$scope.do_refresh($scope.default_page, undefined);
+    };
+    
+    $scope.do_refresh = function(page, search){
+	console.log(page); 
+	$scope.current_page = page;
+	$scope.search       = search;
+	
 	firmService.list_firm().then(function(data){
 	    console.log(data);
 	    $scope.firms = angular.copy(data);
@@ -222,14 +300,23 @@ firmApp.controller("firmDetailCtrl", function(
 	    	    angular.isDefined(f.entry_date) ? f.entry_date.slice(0,10) : undefined;
 		$scope.total_balance = f_add($scope.total_balance, f.balance);
 	    })
-	    
-	    
-	    diablo_order($scope.firms);
 
-	    diabloPagination.set_data($scope.firms);
+	    var filters;
+	    if (angular.isDefined(search)){
+		filters = $scope.do_search(search);
+	    } else {
+		filters = $scope.firms;
+	    }
+	    
+	    diablo_order(filters);
+
+	    // pagination
+	    diabloPagination.set_data(filters);
 	    diabloPagination.set_items_perpage($scope.items_perpage);
-	    $scope.total_items = diabloPagination.get_length();
+	    $scope.total_items  = diabloPagination.get_length();
 	    $scope.filter_firms = diabloPagination.get_page($scope.current_page);
+	    // save
+	    $scope.save_to_local($scope.search, $scope.total_items);
 	    
 	    $scope.prompts = [];
 	    for(var i=0, l=$scope.firms.length; i<l; i++){
@@ -244,20 +331,13 @@ firmApp.controller("firmDetailCtrl", function(
 		if (!in_prompt(f.mobile, $scope.prompts)){
 		    $scope.prompts.push({name: f.mobile, py:diablo_pinyin(f.mobile)}); 
 		} 
-	    }
+	    } 
 
-	    if (angular.isDefined($routeParams.page)){
-		var page = parseInt($routeParams.page);
-		if (page != $scope.current_page){
-		    $scope.current_page = page;
-		    $scope.page_changed($scope.current_page); 
-		}
-	    }
-	    
+	    // console.log($scope.current_page);
 	});
     }
 
-    $scope.refresh();
+    $scope.do_refresh($scope.current_page, $scope.search);
     
 
     $scope.new_firm = function(){
@@ -266,11 +346,9 @@ firmApp.controller("firmDetailCtrl", function(
 
     $scope.trans_info = function(f){
 	console.log(f);
-	// console.log(r.id); 
-	diablo_goto_page("#/firm_trans/"
-			 + f.id.toString()
-			 + "/" + $scope.current_page.toString())
-    }
+	$scope.save_to_local(); 
+	diablo_goto_page("#/firm_trans/" + f.id.toString());
+    };
 
     var dialog = diabloUtilsService; 
     $scope.update_firm = function(old_firm){
@@ -364,8 +442,8 @@ firmApp.controller("firmDetailCtrl", function(
     }
 });
 
-firmApp.controller("firmCtrl", function($scope){
-    
+firmApp.controller("firmCtrl", function($scope, localStorageService){
+    diablo_remove_local_storage(localStorageService)
 });
 
 firmApp.controller("loginOutCtrl", function($scope, $resource){

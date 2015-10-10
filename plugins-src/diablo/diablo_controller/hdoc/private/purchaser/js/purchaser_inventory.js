@@ -812,10 +812,11 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     $scope, $routeParams, $q, dateFilter, diabloPattern, diabloFilter,
     diabloUtilsService, diabloPromise, purchaserService, wgoodService,
-    user, filterBrand, filterFirm, filterType, filterSizeGroup, filterColor, base){
+    localStorageService, user, filterBrand, filterFirm, filterType,
+    filterSizeGroup, filterColor, base){
 
-    $scope.shops = user.sortShops.concat(user.sortBadRepoes);
-    $scope.shopIds = user.shopIds.concat(user.badrepoIds);
+    $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
+    $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     
     $scope.sexs      = diablo_sex;
     $scope.seasons   = diablo_season;
@@ -830,8 +831,6 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     $scope.toggle_left = function(){
 	$scope.hide_column = !$scope.hide_column;
     }
-
-    var now = $.now();
 
     $scope.match_style_number = function(viewValue){
 	return diabloFilter.match_w_inventory(viewValue, $scope.shopIds);
@@ -852,22 +851,44 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     diabloFilter.add_field("year", diablo_full_year);
     diabloFilter.add_field("shop", $scope.shops);
     diabloFilter.add_field("firm", filterFirm);
-    
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
-    $scope.qtime_start = function(){
-	var shop = -1
-	if ($scope.shopIds.length === 1){
-	    shop = $scope.shopIds[0];
-	};
-	return diablo_base_setting(
-	    "qtime_start", shop, base, diablo_set_date, diabloFilter.default_start_time(now));
-    }();
+    var now = $.now();
+    var storage = localStorageService.get(diablo_key_inventory_detail);
+    
+    if (angular.isDefined(storage) && storage !== null){
+    	$scope.filters = storage.filter;
+    	$scope.time    = storage.time;
+    } else{
+	$scope.filters = [];
+	
+	$scope.qtime_start = function(){
+	    var shop = -1
+	    if ($scope.shopIds.length === 1){
+		shop = $scope.shopIds[0];
+	    };
+	    return diablo_base_setting(
+		"qtime_start", shop, base, diablo_set_date,
+		diabloFilter.default_start_time(now));
+	}();
+	$scope.time   = diabloFilter.default_time($scope.qtime_start);
+	// console.log($scope.time);
+    };
+
+    // $scope.qtime_start = function(){
+    // 	var shop = -1
+    // 	if ($scope.shopIds.length === 1){
+    // 	    shop = $scope.shopIds[0];
+    // 	};
+    // 	return diablo_base_setting(
+    // 	    "qtime_start", shop, base, diablo_set_date,
+    // 	    diabloFilter.default_start_time(now));
+    // }();
     // console.log($scope.qtime_start);
     
-    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+    // $scope.time   = diabloFilter.default_time($scope.qtime_start); 
     // $scope.time   = diabloFilter.default_time(); 
 
     /*
@@ -879,6 +900,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     
     // default the first page
     $scope.default_page = 1;
+    $scope.current_page = $scope.default_page;
     
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);
@@ -889,8 +911,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	return alarm ? "danger" : "";
     }
     
-    var now = diablo_now_date(); 
-
+    
     // filter
     var add_search_condition = function(search){
 	if (angular.isUndefined(search.shop)
@@ -900,8 +921,16 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 		=== 0 ? undefined : $scope.shopIds; ;
 	};
     };
+
+    var now_date = diablo_now_date();
     
     $scope.do_search = function(page){
+	$scope.current_page = page;
+
+	localStorageService.set(
+	    diablo_key_inventory_detail,
+	    {filter:$scope.filters, time:$scope.time, page:page, t:now});
+	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    add_search_condition(search);
 	    
@@ -913,8 +942,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 			$scope.total_amount = result.t_amount;
 		    }
 		    angular.forEach(result.data, function(d){
-			var last = diablo_set_date(d.last_sell);
-			if (now.getTime() - last.getTime()
+			if (now_date.getTime() - diablo_set_date(d.last_sell)
 			    > diablo_day_millisecond * d.alarm_day){
 			    d.isAlarm = true;
 			} else{
@@ -934,7 +962,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	});
     };
     
-    $scope.do_search($scope.default_page);
+    $scope.do_search($scope.current_page);
         
     /*
      * detail
@@ -1031,8 +1059,9 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
 
 purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
-    $scope, dateFilter, diabloPattern, diabloUtilsService,
-    diabloFilter, purchaserService, user, filterFirm, filterEmployee, base){
+    $scope, $routeParams, $location, dateFilter, diabloPattern,
+    diabloUtilsService, localStorageService, diabloFilter, purchaserService,
+    user, filterFirm, filterEmployee, base){
     // console.log(user);
     // console.log(filterFirm);
     // console.log(filterEmployee);
@@ -1058,8 +1087,21 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	diablo_goto_page('#/inventory_detail');
     }
 
-    $scope.new_detail = function(r){
-	diablo_goto_page('#/inventory_rsn_detail/' + r.rsn);
+    $scope.trans_detail = function(r){
+	localStorageService.set(
+	    "inventory-trans-stastic",
+	    {total_items:      $scope.total_items,
+	     total_amounts:    $scope.total_amounts,
+	     total_spay:       $scope.total_spay,
+	     total_hpay:       $scope.total_hpay,
+	     total_cash:       $scope.total_cash,
+	     total_card:       $scope.total_card,
+	     total_wire:       $scope.total_wire,
+	     total_verificate: $scope.total_verificate,
+	     t:                now});
+	
+	diablo_goto_page('#/inventory_rsn_detail/'
+			 + r.rsn + "/" + $scope.current_page.toString());
     }
 
     $scope.update_detail = function(r){
@@ -1114,23 +1156,18 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	    callback, undefined, $scope);
     };
 
-
-    
-    // $scope.shops = user.sortAvailabeShops;
-    // $scope.shops = user.sortShops;
-    var purchaser_type = purchaserService.purchaser_type;
     
     /*
     * filter
     */
-    // initial
-    $scope.filters = []; 
-    diabloFilter.reset_field();
 
     var has_pay =  [{name:">0", id:0, py:diablo_pinyin("大于0")},
     		    {name:"=0", id:1, py:diablo_pinyin("等于0")}];
     
-    diabloFilter.add_field("purchaser_type", purchaser_type);
+    // initial
+    // $scope.filters = []; 
+    diabloFilter.reset_field(); 
+    diabloFilter.add_field("purchaser_type", purchaserService.purchaser_type);
     diabloFilter.add_field("rsn", []);
     diabloFilter.add_field("shop",     $scope.shops);
     diabloFilter.add_field("firm",     filterFirm);
@@ -1140,14 +1177,35 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
 
+    var storage = localStorageService.get(diablo_key_invnetory_trans);
+
+    if (angular.isDefined(storage) && storage !== null){
+    	$scope.filters = storage.filter;
+    	$scope.time    = storage.time;
+    } else{
+	$scope.filters = [];
+	
+	$scope.qtime_start = function(){
+	    var shop = -1
+	    if ($scope.shopIds.length === 1){
+		shop = $scope.shopIds[0];
+	    };
+	    return diablo_base_setting(
+		"qtime_start", shop, base, diablo_set_date,
+		diabloFilter.default_start_time(now));
+	}();
+	$scope.time   = diabloFilter.default_time($scope.qtime_start);
+	// console.log($scope.time);
+    };
+
     // console.log($scope.prompt);
-    $scope.qtime_start = function(shopId){
-	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
-    }();
+    // $scope.qtime_start = function(shopId){
+    // 	return diablo_base_setting(
+    // 	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+    // }();
     // console.log($scope.qtime_start);
     
-    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+    // $scope.time   = diabloFilter.default_time($scope.qtime_start); 
     //$scope.time   = diabloFilter.default_time();
     
     /*
@@ -1158,6 +1216,14 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.max_page_size = 10;
     $scope.default_page = 1;
 
+    var back_page = diablo_set_integer($routeParams.page);
+    // console.log(back_page);
+    if (angular.isDefined(back_page)){
+	$scope.current_page = back_page;
+    } else{
+	$scope.current_page = $scope.default_page; 
+    };
+    
     var add_search_condition = function(search){
 	if (angular.isUndefined(search.shop)
 	    || !search.shop || search.shop.length === 0){
@@ -1168,14 +1234,39 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     };
     
     $scope.do_search = function(page){
-	console.log(page);
+	// console.log(page);
+	$scope.current_page = page;
+
+	localStorageService.set(
+	    diablo_key_invnetory_trans,
+	    {filter:$scope.filters, time:$scope.time, page:page, t:now});
+
+	if (angular.isDefined(back_page)){
+	    var stastic = localStorageService.get("inventory-trans-stastic");
+	    console.log(stastic);
+	    $scope.total_items      = stastic.total_items;
+	    $scope.total_amounts    = stastic.total_amounts;
+	    $scope.total_spay       = stastic.total_spay;
+	    $scope.total_hpay       = stastic.total_hpay;
+	    $scope.total_cash       = stastic.total_cash;
+	    $scope.total_card       = stastic.total_card;
+	    $scope.total_wire       = stastic.total_wire;
+	    $scope.total_verificate = stastic.total_verificate;
+
+	    // recover
+	    $location.path("/inventory_new_detail", false);
+	    $routeParams.page = undefined;
+	    back_page = undefined;
+	    localStorageService.remove("inventory-trans-stastic");
+	}
+	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    add_search_condition(search);
 	    
 	    purchaserService.filter_w_inventory_new(
 		$scope.match, search, page, $scope.items_perpage).then(function(result){
 		    console.log(result);
-		    if (page === 1){
+		    if (page === 1 && angular.isUndefined(back_page)){
 			$scope.total_items      = result.total
 			$scope.total_amounts    = result.t_amount;
 			$scope.total_spay       = result.t_spay;
@@ -1185,6 +1276,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 			$scope.total_wire       = result.t_wire;
 			$scope.total_verificate = result.t_verificate;
 		    }
+		    
 		    angular.forEach(result.data, function(d){
 			d.firm = diablo_get_object(d.firm_id, filterFirm);
 			d.shop = diablo_get_object(d.shop_id, $scope.shops);
@@ -1196,11 +1288,10 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	})
     };
 			
-    // default the first page
-    $scope.do_search($scope.default_page);
+    $scope.do_search($scope.current_page);
 
     $scope.page_changed = function(){
-	console.log($scope.current_page);
+	// console.log($scope.current_page);
 	$scope.do_search($scope.current_page);
     };
 

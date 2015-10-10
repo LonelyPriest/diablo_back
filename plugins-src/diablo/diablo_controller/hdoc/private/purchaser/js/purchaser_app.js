@@ -1,7 +1,8 @@
 var purchaserApp = angular.module(
-    'purchaserApp', ['ui.bootstrap', 'ngRoute', 'ngResource',
-		     'LocalStorageModule', 'diabloPattern', 'diabloNormalFilterApp',
-		     'diabloUtils', 'userApp', 'employApp', 'wgoodApp'])
+    'purchaserApp',
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'LocalStorageModule',
+     'diabloPattern', 'diabloNormalFilterApp', 'diabloUtils',
+     'userApp', 'employApp', 'wgoodApp'])
     .config(function(localStorageServiceProvider){
 	localStorageServiceProvider
 	    .setPrefix('purchaserApp')
@@ -12,7 +13,23 @@ var purchaserApp = angular.module(
     .config(function($httpProvider, authenProvider){
 	// $httpProvider.responseInterceptors.push(authenProvider.interceptor);
 	$httpProvider.interceptors.push(authenProvider.interceptor); 
-    });
+    })
+    .run(['$route', '$rootScope', '$location',
+	  function ($route, $rootScope, $location) {
+	      var original = $location.path;
+	      $location.path = function (path, reload) {
+		  if (reload === false) {
+		      var lastRoute = $route.current;
+		      var un = $rootScope.$on(
+			  '$locationChangeSuccess',
+			  function () {
+			      $route.current = lastRoute;
+			      un();
+			  });
+		  }
+		  return original.apply($location, [path]);
+	      };
+	  }]);
 
 purchaserApp.config(['$routeProvider', function($routeProvider){
     var user = {"user": function(userService){
@@ -62,12 +79,12 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color)
 	}).
 	//
-	when('/inventory_rsn_detail/:rsn?', {
+	when('/inventory_rsn_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_rsn_detail.html',
 	    controller: 'purchaserInventoryNewRsnDetailCtrl',
 	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
 	}).
-	when('/inventory_new_detail', {
+	when('/inventory_new_detail/:page?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
             controller: 'purchaserInventoryNewDetailCtrl',
 	    resolve: angular.extend({}, user, firm, employee, base)

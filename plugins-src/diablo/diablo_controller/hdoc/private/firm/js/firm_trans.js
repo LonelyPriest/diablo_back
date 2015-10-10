@@ -1,23 +1,64 @@
 firmApp.controller('firmTransCtrl', function(
-    $scope, $routeParams, diabloFilter, firmService,
-    diabloUtilsService, filterFirm, filterEmployee, user, base){
+    $scope, $routeParams, $location, localStorageService,
+    diabloFilter, firmService, diabloUtilsService,
+    filterFirm, filterEmployee, user, base){
 
-    console.log(filterFirm);
-    // console.log($routeParams.retailer);
+    // console.log(filterFirm);
+    // console.log($routeParams);
     var firm_id = parseInt($routeParams.firm);
     $scope.firm = diablo_get_object(firm_id, filterFirm);
-    console.log($scope.firm);
-
-    $scope.shops   = user.sortBadRepoes.concat(user.sortShops);
-    $scope.shopIds = user.shopIds.concat(user.badrepoIds);
+    // console.log($scope.firm); 
+    $scope.shops        = user.sortBadRepoes.concat(user.sortShops);
+    $scope.shopIds      = user.shopIds.concat(user.badrepoIds); 
+    $scope.goto_page    = diablo_goto_page; 
+    $scope.f_add        = diablo_float_add;
+    $scope.f_sub        = diablo_float_sub;
+    $scope.default_page = 1;
     
-    $scope.goto_page = diablo_goto_page;
-    $scope.f_add = diablo_float_add;
-    $scope.f_sub = diablo_float_sub;
+    var now             = $.now(); 
 
-    $scope.back = function(){
-	$scope.goto_page("#/firm_detail/" + $routeParams.ppage.toString())
-    }
+    $scope.go_back = function(){$scope.goto_page("#/firm_detail")}; 
+
+    /*
+     * local sate
+     */ 
+    $scope.save_to_local = function(filter, time){
+	var s = localStorageService.get(diablo_key_firm_trans);
+	
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_firm_trans, {
+		    filter:angular.isDefined(filter) ? filter:s.filter,
+		    time:angular.isDefined(time) ? time:s.time,
+		    // stastic:angular.isDefined(stastic) ? stastic:s.stastic,
+		    page:$scope.current_page,
+		    t:now}
+	    )
+	} else {
+	    localStorageService.set(
+		diablo_key_firm_trans, {
+		    filter:   filter,
+		    time:     time,
+		    // stastic:  stastic,
+		    page:     $scope.current_page,
+		    t:        now})
+	}
+    };
+
+    // $scope.reset_local_storage = function(){
+    // 	var s = localStorageService.get(diablo_key_firm_trans);
+	
+    // 	if (angular.isDefined(s) && s !== null){
+    // 	    localStorageService.set(
+    // 		diablo_key_firm_trans, {
+    // 		    filter:s.filter,
+    // 		    f_time:s.f_time,
+    // 		    stastic:undefined,
+    // 		    page:$scope.current_page,
+    // 		    t:now}
+    // 	    )
+    // 	}
+    // };
 
 
     /*
@@ -27,20 +68,7 @@ firmApp.controller('firmTransCtrl', function(
     $scope.toggle_left = function(){
 	$scope.hide_column = !$scope.hide_column;
     }
-
-    var now = $.now();
-
-    $scope.qtime_start = function(){
-	// -1 use the default setting
-	var shop = -1
-	if ($scope.shopIds.length === 1){
-	    shop = $scope.shopIds[0];
-	};
-	return diablo_base_setting(
-	    "qtime_start", shop, base, diablo_set_date,
-	    diabloFilter.default_start_time(now));
-    }();
-
+    
     /* 
      * filter operation
      */ 
@@ -55,7 +83,29 @@ firmApp.controller('firmTransCtrl', function(
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+
+    var storage = localStorageService.get(diablo_key_firm_trans);
+    console.log(storage);
+    if (angular.isDefined(storage) && storage !== null){
+	$scope.filters      = storage.filter;
+	$scope.time         = storage.time; 
+    } else {
+	$scope.filters = [];
+	$scope.qtime_start = function(){
+	    // -1 use the default setting
+	    var shop = -1
+	    if ($scope.shopIds.length === 1){
+		shop = $scope.shopIds[0];
+	    };
+	    return diablo_base_setting(
+		"qtime_start", shop, base, diablo_set_date,
+		diabloFilter.default_start_time(now));
+	}();
+	
+	$scope.time         = diabloFilter.default_time($scope.qtime_start);
+	// $scope.stastic      = undefined;
+	// $scope.current_page = $scope.default_page;
+    }
     // $scope.time   = diabloFilter.default_time(); 
 
 
@@ -65,10 +115,44 @@ firmApp.controller('firmTransCtrl', function(
     $scope.colspan = 18;
     $scope.items_perpage = 10;
     $scope.max_page_size = 10;
-    $scope.default_page = 1;
+    
+    var back_page = diablo_set_integer($routeParams.page);
+    if (angular.isDefined(back_page)){
+	$scope.current_page = back_page;
+    } else{
+	$scope.current_page = $scope.default_page; 
+    };
+    
+    $scope.refresh = function(){
+	$scope.do_search($scope.default_page);
+    };
 
     $scope.do_search = function(page){
 	console.log(page);
+	$scope.current_page = page;
+	
+	// save
+	$scope.save_to_local($scope.filters, $scope.time);
+
+	if (angular.isDefined(back_page)){
+	    var stastic = localStorageService.get("firm-trans-stastic");
+	    console.log(stastic);
+	    $scope.total_items      = stastic.total_items
+	    $scope.total_amounts    = stastic.total_amounts;
+	    $scope.total_spay       = stastic.total_spay;
+	    $scope.total_hpay       = stastic.total_hpay;
+	    $scope.total_cash       = stastic.total_cash;
+	    $scope.total_card       = stastic.total_card;
+	    $scope.total_wire       = stastic.total_wire;
+	    $scope.total_verificate = stastic.total_verificate;
+
+	    // recover
+	    $location.path("/firm_trans/" + firm_id.toString(), false);
+	    $routeParams.page = undefined;
+	    back_page = undefined;
+	    localStorageService.remove("firm-trans-stastic");
+	};
+	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    if (angular.isUndefined(search.shop)
 		|| !search.shop || search.shop.length === 0){
@@ -81,7 +165,7 @@ firmApp.controller('firmTransCtrl', function(
 	    firmService.filter_w_inventory_new(
 		$scope.match, search, page, $scope.items_perpage).then(function(result){
 		    console.log(result);
-		    if (page === 1){
+		    if (page === 1 && angular.isUndefined(back_page)){
 			$scope.total_items      = result.total
 			$scope.total_amounts    = result.t_amount;
 			$scope.total_spay       = result.t_spay;
@@ -89,7 +173,7 @@ firmApp.controller('firmTransCtrl', function(
 			$scope.total_cash       = result.t_cash;
 			$scope.total_card       = result.t_card;
 			$scope.total_wire       = result.t_wire;
-			$scope.total_verificate = result.t_verificate;
+			$scope.total_verificate = result.t_verificate; 
 		    }
 		    angular.forEach(result.data, function(d){
 			d.firm = diablo_get_object(d.firm_id, filterFirm);
@@ -97,8 +181,8 @@ firmApp.controller('firmTransCtrl', function(
 			d.employee = diablo_get_object(d.employee_id, filterEmployee);
 		    });
 		    $scope.records = result.data;
-		    diablo_order_page(page, $scope.items_perpage, $scope.records);
-		}) 
+		    diablo_order_page(page, $scope.items_perpage, $scope.records); 
+		})
 	})
     }; 
     
@@ -107,14 +191,25 @@ firmApp.controller('firmTransCtrl', function(
     }
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    $scope.do_search($scope.current_page);
 
     $scope.trans_rsn_detail = function(r){
-    	console.log(r);
-    	// $location.url("#/wsale_detail/" + r.rsn);
+    	console.log(r); 
+	// save stastic
+	localStorageService.set(
+	  "firm-trans-stastic"  ,
+	    	{total_items       :$scope.total_items,
+	    	 total_amounts     :$scope.total_amounts,
+	    	 total_spay        :$scope.total_spay,
+	    	 total_hpay        :$scope.total_hpay,
+	    	 total_cash        :$scope.total_cash,
+	    	 total_card        :$scope.total_card,
+	    	 total_wire        :$scope.total_wire,
+	    	 total_verificate  :$scope.total_verificate,
+		 t:                 now});
+	
     	diablo_goto_page("#/firm_trans_rsn/" + firm_id.toString()
 			 + "/" + r.rsn
-			 + "/" + $routeParams.ppage
 			 + "/" + $scope.current_page.toString());
     };
 
@@ -166,12 +261,11 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
     $scope.goto_page = diablo_goto_page;
 
     // console.log($routeParams);
-    $scope.back = function(){
+    $scope.go_back = function(){
 	console.log($routeParams);
-	$scope.goto_page("#/firm_trans/" + $routeParams.firm
-			 + "/" + $routeParams.ppage.toString()
-			 + "/" + $routeParams.p2page.toString());
-    }
+	$scope.goto_page("#/firm_trans/" + firm_id.toString()
+			 + "/" + $routeParams.ppage.toString());
+    };
 
     // initial
     $scope.filters = [];

@@ -1,6 +1,6 @@
 <div class="row">
   <div x-ng-repeat="f in filters">
-    <div class="col-md-6 col-sm-12">
+    <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="input-group">
 	<div class="input-group-btn">
 	  <button type="button" class="btn">
@@ -11,7 +11,7 @@
 		x-ng-change="change_field(f)"
 		x-ng-model="f.field">
 	</select>
-
+	
 	<div class="input-group-btn">
 	  <button type="button" class="btn">
 	    <i class="glyphicon glyphicon-chevron-right fg-red"></i></button>

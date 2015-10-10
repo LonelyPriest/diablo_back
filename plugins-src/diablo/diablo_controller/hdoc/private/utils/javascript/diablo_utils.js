@@ -138,7 +138,20 @@ diabloUtils.directive('queryPattern', function () {
 		ngModel.$setViewValue(newValue);
 	    });
 
-	    scope.increment = 0;
+	    // console.log(scope.filters);
+
+	    // scope.increment = 0;
+	    scope.increment = scope.filters.length;
+	    angular.forEach(scope.filters, function(f){
+	    	angular.forEach(f.fields, function(e){
+	    	    if (e.name === f.field.name){
+	    		f.field = e;
+	    	    }
+	    	})
+	    });
+
+	    console.log(scope.filters);
+	    
 	    // add a filter
 	    scope.add_filter = function(){
 		// console.log("add_filter...");

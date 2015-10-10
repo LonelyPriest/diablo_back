@@ -7,6 +7,24 @@ var diablo_frontend = 0;
 var diablo_backend = 1;
 var diablo_badrepo = 1;
 
+/*
+ * storage key
+ */
+
+// wsale
+var diablo_key_wsale_trans            = "q-wsale-trans";
+var diablo_key_wsale_trans_detail     = "q-wsale-trans-detail";
+
+// inventory
+var diablo_key_inventory_detail       = "q-inventory-detail"
+var diablo_key_invnetory_trans        = "q-inventory-trans";
+var diablo_key_invnetory_trans_detail = "q-inventory-trans-detail";
+
+// firm
+var diablo_key_firm                   = "q-firm-detail";
+var diablo_key_firm_trans             = "q-firm-trans";
+var diablo_key_firm_trans_detail      = "q-firm-trans-detail";
+
 function diablo_range(n){
     if (n < 0) return;
     return n ? diablo_range(n - 1).concat(n):[];
@@ -109,6 +127,7 @@ var diablo_get_object = function(objectId, objects){
 
 var diablo_remove_local_storage = function(l){
     var keys = l.keys();
+    console.log(keys);
     var now = $.now();
     angular.forEach(keys, function(k){
 	if (now > l.get(k).t + diablo_day_millisecond){
@@ -334,7 +353,8 @@ var diablo_now_date = function(){
 var diablo_set_date = function(date){
     // console.log(date);
     var a = date.split("-");
-    return new Date(parseInt(a[0]), parseInt(a[1]) - 1, parseInt(a[2]));
+    return new Date(parseInt(a[0]), parseInt(a[1]) - 1, parseInt(a[2]))
+	.getTime();
 };
 
 var diablo_set_datetime = function(datetime){
@@ -511,4 +531,6 @@ var diablo_in_colors = function(color, colors){
     }
 
     return false;
-}
+};
+
+
