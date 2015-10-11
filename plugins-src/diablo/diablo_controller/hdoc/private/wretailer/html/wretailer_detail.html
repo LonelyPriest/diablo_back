@@ -13,7 +13,7 @@
 	    <i class="glyphicon glyphicon-plus"></i></button> 
 
 	  <button type="button" class="btn blue reload red-stripe"
-		  x-ng-click="do_refresh()">刷新
+		  x-ng-click="refresh()">刷新
 	    <i class="glyphicon glyphicon-refresh"></i></button> 
 	</div>
 	
@@ -40,7 +40,7 @@
 		   typeahead-editable="false"
 		   typeahead-on-select="on_select_retailer($item, $model, $label)"
 		   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20"
-		   x-ng-model="filter.name"></input>
+		   x-ng-model="search"></input>
 	      </div>
 	    </div>
 
@@ -130,7 +130,7 @@
 			  共 {{total_items}} 项</span>
 		      </span>
 		      <pagination
-			 class="pull-right"
+			 class="pagination-lg pull-right"
 			 total-items="total_items"
 			 items-per-page="items_perpage"
 			 num-pages="num_pages"
@@ -139,7 +139,7 @@
 			 previous-text="&lsaquo;" next-text="&rsaquo;"
 			 first-text="&laquo;" last-text="&raquo;"
 			 x-ng-model="current_page"
-			 x-ng-change="page_changed(current_page)"></pagination>
+			 x-ng-change="page_changed()"></pagination>
 		    </td>
 		  </tr>
 		</tfoot>

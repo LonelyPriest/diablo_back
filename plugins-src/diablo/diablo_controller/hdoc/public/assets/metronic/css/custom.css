@@ -95,3 +95,13 @@ ul.page-sidebar-menu > li.active > a {
     border-top-color: transparent !important;
     color: #ffffff;
 }
+
+.update-content {
+  /*background-color:#fff; */
+    width: 360px;
+    margin: 0 auto; 
+    margin-bottom: 0px;
+  /*padding: 30px;*/
+  /*padding-top: 20px;*/
+  /*padding-bottom: 15px;*/
+}

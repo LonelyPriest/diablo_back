@@ -1,13 +1,34 @@
 var wretailerApp = angular.module(
     'wretailerApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource', 'wgoodApp',
-     'diabloAuthenApp', 'diabloFilterApp', 'diabloNormalFilterApp',
-     'diabloPattern', 'diabloUtils', 'userApp'])
-// .config(diablo_authen);
-.config(function($httpProvider, authenProvider){
-    // $httpProvider.responseInterceptors.push(authenProvider.interceptor);
-    $httpProvider.interceptors.push(authenProvider.interceptor); 
-});
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'LocalStorageModule',
+     'wgoodApp', 'diabloAuthenApp', 'diabloFilterApp',
+     'diabloNormalFilterApp', 'diabloPattern', 'diabloUtils', 'userApp'])
+    .config(function(localStorageServiceProvider){
+	localStorageServiceProvider
+	    .setPrefix('wretailerApp')
+	    .setStorageType('localStorage')
+	    .setNotify(true, true)
+    })
+    .run(['$route', '$rootScope', '$location',
+	  function ($route, $rootScope, $location) {
+	      var original = $location.path;
+	      $location.path = function (path, reload) {
+		  if (reload === false) {
+		      var lastRoute = $route.current;
+		      var un = $rootScope.$on(
+			  '$locationChangeSuccess',
+			  function () {
+			      $route.current = lastRoute;
+			      un();
+			  });
+		  }
+		  return original.apply($location, [path]);
+	      };
+	  }])
+    .config(function($httpProvider, authenProvider){
+	// $httpProvider.responseInterceptors.push(authenProvider.interceptor);
+	$httpProvider.interceptors.push(authenProvider.interceptor); 
+    });
 
 wretailerApp.config(['$routeProvider', function($routeProvider){
     var user = {"user": function(userService){
@@ -46,17 +67,17 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 	    controller: 'wretailerNewCtrl',
 	    resolve: angular.extend({}, province, city, user) 
 	}).
-	when('/wretailer_detail/:page?', {
+	when('/wretailer_detail', {
 	    templateUrl: '/private/wretailer/html/wretailer_detail.html',
 	    controller: 'wretailerDetailCtrl',
 	    resolve: angular.extend({}, province, city, user)
 	}).
-	when('/wretailer_trans/:retailer?/:ppage?/:cpage?', {
+	when('/wretailer_trans/:retailer?/:page?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans.html',
 	    controller: 'wretailerTransCtrl',
 	    resolve: angular.extend({}, retailer, employee, user, base)
 	}).
-	when('/wretailer_trans_rsn/:retailer?/:rsn?/:ppage?/:p2page?', {
+	when('/wretailer_trans_rsn/:retailer?/:rsn?/:ppage?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans_rsn_detail.html',
 	    controller: 'wretailerTransRsnDetailCtrl',
 	    resolve: angular.extend({}, brand, firm, retailer, employee, s_group, type, user, base)
@@ -253,12 +274,47 @@ wretailerApp.controller("wretailerNewCtrl", function(
 
 wretailerApp.controller("wretailerDetailCtrl", function(
     $scope, $location, $routeParams, diabloPattern, diabloUtilsService,
-    diabloPagination, wretailerService, filterProvince, filterCity){
+    diabloPagination, localStorageService, wretailerService,
+    filterProvince, filterCity){
     $scope.provinces = angular.copy(filterProvince);
     $scope.cities    = angular.copy(filterCity);
     
     var dialog = diabloUtilsService;
     var f_add  = diablo_float_add;
+    var now    = $.now();
+
+    $scope.save_to_local = function(search, t_retailer){
+	var s = localStorageService.get(diablo_key_retailer);
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_retailer, {
+		    search:angular.isDefined(search) ? search:s.search,
+		    t_retailer:angular.isDefined(t_retailer) ? t_retailer:s.t_retailer,
+		    page:$scope.current_page,
+		    t:now}
+	    )
+	} else {
+	    localStorageService.set(
+		diablo_key_retailer, {
+		    search:     search,
+		    t_retailer: t_retailer,
+		    page:       $scope.current_page,
+		    t:          now})
+	}
+    };
+
+    $scope.reset_local_storage = function(){
+	var s = localStorageService.get(diablo_key_retailer);
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_retailer, {
+		    search:     undefined,
+		    t_retailer: undefined,
+		    page:       $scope.current_page,
+		    t:          now}
+	    ) 
+	};
+    };
 
     /*
      * pagination
@@ -267,11 +323,25 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     $scope.max_page_size = 10;
     $scope.items_perpage = 10;
     $scope.default_page = 1;
-    $scope.current_page = $scope.default_page;
 
-    $scope.page_changed = function(page){
+    var storage = localStorageService.get(diablo_key_retailer);
+    console.log(storage);
+    
+    if (angular.isDefined(storage) && storage !== null){
+	$scope.current_page = storage.page;
+	$scope.search       = storage.search;
+	$scope.total_items  = storage.t_retailer;
+    } else {
+	$scope.current_page = $scope.default_page;
+	$scope.search       = undefined;
+	$scope.total_items  = undefined;
+    }
+    
+    $scope.page_changed = function(){
 	// console.log(page);
-	$scope.filter_retailers = diabloPagination.get_page(page);
+	console.log($scope.current_page);
+	$scope.save_to_local();
+	$scope.filter_retailers = diabloPagination.get_page($scope.current_page);
     }
     
     $scope.do_search = function(search){
@@ -287,6 +357,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 
     $scope.on_select_retailer = function(item, model, label){
 	console.log(model);
+	
 	var filters = $scope.do_search(model.name);
 	diablo_order(filters);
 	console.log(filters);
@@ -300,6 +371,8 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	diabloPagination.set_data(filters);
 	$scope.total_items      = diabloPagination.get_length();
 	$scope.filter_retailers = diabloPagination.get_page($scope.default_page);
+	// save
+	$scope.save_to_local(model.name, $scope.total_items);
     }
 
     var in_prompt = function(p, prompts){
@@ -311,8 +384,17 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 
 	return false;
     }
-    
+
     $scope.refresh = function(){
+	$scope.reset_local_storage(); 
+	$scope.do_refresh($scope.default_page, undefined);
+    };
+    
+    $scope.do_refresh = function(page, search){
+	console.log(page);
+	$scope.current_page = page;
+	$scope.search       = search;
+	
 	wretailerService.list_retailer().then(function(data){
 	    // console.log(data);
 	    $scope.retailers = angular.copy(data);
@@ -325,12 +407,20 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    
 	    diablo_order($scope.retailers);
 
-	    diabloPagination.set_data($scope.retailers);
+	    var filters;
+	    if (angular.isDefined(search)){
+		filters = $scope.do_search(search);
+	    } else {
+		filters = $scope.retailers;
+	    }
+	    
+	    diabloPagination.set_data(filters);
 	    diabloPagination.set_items_perpage($scope.items_perpage);
 	    $scope.total_items      = diabloPagination.get_length();
 	    $scope.filter_retailers = diabloPagination.get_page($scope.current_page);
-	    // console.log($scope.filter_retailers);
-
+	    // save
+	    $scope.save_to_local($scope.search, $scope.total_items);
+	    
 	    $scope.prompts = [];
 	    for(var i=0, l=$scope.retailers.length; i<l; i++){
 		var r = $scope.retailers[i];
@@ -359,35 +449,23 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 		    } 
 		}
 	    }
-
-	    if (angular.isDefined($routeParams.page)){
-		var page = parseInt($routeParams.page);
-		if (page != $scope.current_page){
-		    $scope.current_page = page;
-		    $scope.page_changed($scope.current_page); 
-		}
-	    } 
 	})
     };
 
-    $scope.do_refresh = function(){
-	// console.log("do_refresh");
-	// $routeParams.page = $scope.default_page;
-	$location.path("/wretailer_detail");
-	$scope.current_page = $scope.default_page;
-	$scope.refresh($scope.default_page);
-    }
+    // $scope.do_refresh = function(){
+    // 	$location.path("/wretailer_detail");
+    // 	$scope.current_page = $scope.default_page;
+    // 	$scope.refresh($scope.default_page);
+    // } 
     
-    $scope.refresh();
+    $scope.do_refresh($scope.current_page, $scope.search);
 
     $scope.new_retailer = function(){
 	$location.path("/wretailer_new"); 
     };
 
     $scope.trans_info = function(r){
-	// console.log(r.id); 
-	diablo_goto_page("#/wretailer_trans/" +r.id.toString()
-			+ "/" + $scope.current_page.toString())
+	diablo_goto_page("#/wretailer_trans/" +r.id.toString());
     }
 
     var pattern = {name_address: diabloPattern.ch_name_address,
@@ -503,7 +581,9 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     }
 });
 
-wretailerApp.controller("wretailerCtrl", function(){});
+wretailerApp.controller("wretailerCtrl", function($scope, localStorageService){
+    diablo_remove_local_storage(localStorageService);
+});
 
 wretailerApp.controller("loginOutCtrl", function($scope, $resource){
     $scope.home = function () {

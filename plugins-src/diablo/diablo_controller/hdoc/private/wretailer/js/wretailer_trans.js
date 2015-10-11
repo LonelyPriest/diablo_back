@@ -1,49 +1,63 @@
 wretailerApp.controller('wretailerTransCtrl', function(
-    $scope, $routeParams, diabloFilter, wretailerService,
-    diabloUtilsService, filterRetailer, filterEmployee, user, base){
+    $scope, $routeParams, $location, diabloFilter, wretailerService,
+    localStorageService, diabloUtilsService,
+    filterRetailer, filterEmployee, user, base){
 
     // console.log(filterRetailer);
     // console.log($routeParams.retailer);
     var retailer_id = parseInt($routeParams.retailer);
     $scope.retailer = diablo_get_object(retailer_id, filterRetailer);
-    console.log($scope.retailer);
+    // console.log($scope.retailer);
 
     $scope.shops     = user.sortBadRepoes.concat(user.sortShops);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     $scope.goto_page = diablo_goto_page;
     $scope.float_add = diablo_float_add;
     $scope.float_sub = diablo_float_sub;
+    var now          = $.now();
 
-    $scope.back = function(){
-	$scope.goto_page("#/wretailer_detail/" + $routeParams.ppage.toString())
-    }
+    $scope.go_back = function(){$scope.goto_page("#/wretailer_detail")};
 
-    
+    /*
+     * local sate
+     */ 
+    $scope.save_to_local = function(filter, time){
+	var s = localStorageService.get(diablo_key_retailer_trans);
+	
+	if (angular.isDefined(s) && s !== null){
+	    localStorageService.set(
+		diablo_key_retailer_trans, {
+		    filter:angular.isDefined(filter) ? filter:s.filter,
+		    time:angular.isDefined(time) ? time:s.time,
+		    // stastic:angular.isDefined(stastic) ? stastic:s.stastic,
+		    page:$scope.current_page,
+		    t:now}
+	    )
+	} else {
+	    localStorageService.set(
+		diablo_key_retailer_trans, {
+		    filter:   filter,
+		    time:     time,
+		    // stastic:  stastic,
+		    page:     $scope.current_page,
+		    t:        now})
+	}
+    };
+
+    /*
+     * toggle column
+     */
     $scope.hide_column = true;
     $scope.toggle_left = function(){
 	$scope.hide_column = !$scope.hide_column;
-    };
-
-    var now = $.now();
-
-    $scope.qtime_start = function(){
-	// -1 use the default setting
-	var shop = -1
-	if ($scope.shopIds.length === 1){
-	    shop = $scope.shopIds[0];
-	};
-	return diablo_base_setting(
-	    "qtime_start", shop, base, diablo_set_date,
-	    diabloFilter.default_start_time(now));
-    }();
+    }; 
     
     /* 
      * filter operation
      */ 
     // initial
-    $scope.filters = [];
-    diabloFilter.reset_field();
-
+    // $scope.filters = [];
+    diabloFilter.reset_field(); 
     // diabloFilter.add_field("rsn", []);
     diabloFilter.add_field("shop",     $scope.shops);
     // diabloFilter.add_field("retailer", filterRetailer);
@@ -51,9 +65,26 @@ wretailerApp.controller('wretailerTransCtrl', function(
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time($scope.qtime_start);
-    // $scope.time   = diabloFilter.default_time(); 
 
+    var storage = localStorageService.get(diablo_key_retailer_trans);
+    console.log(storage);
+    if (angular.isDefined(storage) && storage !== null){
+	$scope.filters      = storage.filter;
+	$scope.time         = storage.time; 
+    } else {
+	$scope.filters = [];
+	$scope.qtime_start = function(){
+	    // -1 use the default setting
+	    var shop = -1
+	    if ($scope.shopIds.length === 1){
+		shop = $scope.shopIds[0];
+	    };
+	    return diablo_base_setting(
+		"qtime_start", shop, base, diablo_set_date,
+		diabloFilter.default_start_time(now));
+	}(); 
+	$scope.time         = diabloFilter.default_time($scope.qtime_start);
+    } 
 
     /*
      * pagination 
@@ -63,7 +94,42 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.max_page_size = 10;
     $scope.default_page = 1;
 
+    var back_page = diablo_set_integer($routeParams.page);
+    if (angular.isDefined(back_page)){
+	$scope.current_page = back_page;
+    } else{
+	$scope.current_page = $scope.default_page; 
+    };
+
+    $scope.refresh = function(){
+	$scope.do_search($scope.default_page);
+    };
+
     $scope.do_search = function(page){
+	console.log(page);
+	$scope.current_page = page;
+
+	// save
+	$scope.save_to_local($scope.filters, $scope.time);
+	// recover
+	if (angular.isDefined(back_page)){
+	    var stastic = localStorageService.get("retailer-trans-stastic");
+	    console.log(stastic);
+	    $scope.total_items      = stastic.total_items
+	    $scope.total_amounts    = stastic.total_amounts;
+	    $scope.total_spay       = stastic.total_spay;
+	    $scope.total_hpay       = stastic.total_hpay;
+	    $scope.total_cash       = stastic.total_cash;
+	    $scope.total_card       = stastic.total_card;
+	    $scope.total_wire       = stastic.total_wire;
+	    $scope.total_verificate = stastic.total_verificate;
+	    
+	    $location.path("/retailer_trans/" + retailer_id.toString(), false);
+	    $routeParams.page = undefined;
+	    back_page         = undefined;
+	    localStorageService.remove("retailer-trans-stastic");
+	};
+	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    if (angular.isUndefined(search.shop)
 		|| !search.shop || search.shop.length === 0){
@@ -76,7 +142,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		$scope.match, search, page, $scope.items_perpage
 	    ).then(function(result){
 		console.log(result);
-		if (page === 1){
+		if (page === 1 && angular.isUndefined(back_page)){
 		    $scope.total_items      = result.total;
 		    $scope.total_amounts    = result.t_amount;
 		    $scope.total_spay       = result.t_spay;
@@ -102,13 +168,25 @@ wretailerApp.controller('wretailerTransCtrl', function(
     }
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    $scope.do_search($scope.current_page);
 
     $scope.trans_rsn_detail = function(r){
     	console.log(r);
     	// $location.url("#/wsale_detail/" + r.rsn);
-    	diablo_goto_page("#/wretailer_trans_rsn/" + retailer_id + "/" + r.rsn
-			 + "/" + $routeParams.ppage
+	localStorageService.set(
+	    "retailer-trans-stastic"  ,
+	    {total_items       :$scope.total_items,
+	     total_amounts     :$scope.total_amounts,
+	     total_spay        :$scope.total_spay,
+	     total_hpay        :$scope.total_hpay,
+	     total_cash        :$scope.total_cash,
+	     total_card        :$scope.total_card,
+	     total_wire        :$scope.total_wire,
+	     total_verificate  :$scope.total_verificate,
+	     t:                 now});
+	
+    	diablo_goto_page("#/wretailer_trans_rsn/" + retailer_id.toString()
+			 + "/" + r.rsn
 			 + "/" + $scope.current_page.toString());
     };
 
@@ -160,11 +238,10 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
 
     $scope.goto_page = diablo_goto_page;
 
-    console.log($routeParams);
+    // console.log($routeParams);
     $scope.back = function(){
 	$scope.goto_page("#/wretailer_trans/" + $routeParams.retailer
-			 + "/" + $routeParams.ppage.toString()
-			 + "/" + $routeParams.p2page.toString());
+			 + "/" + $routeParams.ppage.toString());
     }
 
     // initial
@@ -201,7 +278,7 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
 	    	search.shop = user.shopIds; 
 	    };
 	    
-	    console.log(search);
+	    // console.log(search);
 
 	    wretailerService.filter_w_sale_rsn_group(
 		$scope.match, search, page, $scope.items_perpage

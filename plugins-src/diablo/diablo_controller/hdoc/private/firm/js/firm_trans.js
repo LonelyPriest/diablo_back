@@ -18,7 +18,7 @@ firmApp.controller('firmTransCtrl', function(
     var now             = $.now(); 
 
     $scope.go_back = function(){$scope.goto_page("#/firm_detail")}; 
-
+    
     /*
      * local sate
      */ 
@@ -43,23 +43,7 @@ firmApp.controller('firmTransCtrl', function(
 		    page:     $scope.current_page,
 		    t:        now})
 	}
-    };
-
-    // $scope.reset_local_storage = function(){
-    // 	var s = localStorageService.get(diablo_key_firm_trans);
-	
-    // 	if (angular.isDefined(s) && s !== null){
-    // 	    localStorageService.set(
-    // 		diablo_key_firm_trans, {
-    // 		    filter:s.filter,
-    // 		    f_time:s.f_time,
-    // 		    stastic:undefined,
-    // 		    page:$scope.current_page,
-    // 		    t:now}
-    // 	    )
-    // 	}
-    // };
-
+    }; 
 
     /*
      * hide column
@@ -73,7 +57,7 @@ firmApp.controller('firmTransCtrl', function(
      * filter operation
      */ 
     // initial
-    $scope.filters = [];
+    // $scope.filters = [];
     diabloFilter.reset_field();
 
     // diabloFilter.add_field("rsn", []);
@@ -102,13 +86,9 @@ firmApp.controller('firmTransCtrl', function(
 		diabloFilter.default_start_time(now));
 	}();
 	
-	$scope.time         = diabloFilter.default_time($scope.qtime_start);
-	// $scope.stastic      = undefined;
-	// $scope.current_page = $scope.default_page;
+	$scope.time         = diabloFilter.default_time($scope.qtime_start); 
     }
-    // $scope.time   = diabloFilter.default_time(); 
-
-
+    
     /*
      * pagination 
      */
@@ -163,7 +143,8 @@ firmApp.controller('firmTransCtrl', function(
 	    search.firm = firm_id;
 
 	    firmService.filter_w_inventory_new(
-		$scope.match, search, page, $scope.items_perpage).then(function(result){
+		$scope.match, search, page, $scope.items_perpage
+	    ).then(function(result){
 		    console.log(result);
 		    if (page === 1 && angular.isUndefined(back_page)){
 			$scope.total_items      = result.total

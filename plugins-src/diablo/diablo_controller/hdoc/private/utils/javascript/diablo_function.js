@@ -25,6 +25,11 @@ var diablo_key_firm                   = "q-firm-detail";
 var diablo_key_firm_trans             = "q-firm-trans";
 var diablo_key_firm_trans_detail      = "q-firm-trans-detail";
 
+// retailer
+var diablo_key_retailer               = "q-retailer-detail";
+var diablo_key_retailer_trans         = "q-retailer-trans";
+var diablo_key_retailer_trans_detail  = "q-retailer-trans-detail";
+
 function diablo_range(n){
     if (n < 0) return;
     return n ? diablo_range(n - 1).concat(n):[];

@@ -193,8 +193,11 @@ firmApp.controller("firmDetailCtrl", function(
 		    search:angular.isDefined(search) ? search:s.search,
 		    t_firm:angular.isDefined(t_firm) ? t_firm:s.t_firm,
 		    page:$scope.current_page,
-		    t:now}
-	    )
+		    t:now})
+	} else {
+	    localStorageService.set(
+		diablo_key_firm, {search:search, t_firm:t_firm,
+				  page:$scope.current_page, t:now})
 	}
     };
 
@@ -202,13 +205,9 @@ firmApp.controller("firmDetailCtrl", function(
 	var s = localStorageService.get(diablo_key_firm);
 	if (angular.isDefined(s) && s !== null){
 	    localStorageService.set(
-		diablo_key_firm, {
-		    search:undefined,
-		    t_firm:undefined,
-		    page:$scope.current_page,
-		    t:now}
-	    ) 
-	};
+		diablo_key_firm, {search:undefined, t_firm:undefined,
+				  page:$scope.current_page, t:now})
+	}
     };
     
     
@@ -250,9 +249,8 @@ firmApp.controller("firmDetailCtrl", function(
     };
 
     $scope.on_select_firm = function(item, model, label){
-	console.log(model);
-
-	$scope.save_to_local(model.name); 
+	console.log(model); 
+	// $scope.save_to_local(model.name); 
 	
 	var filters = $scope.do_search(model.name);
 	diablo_order(filters);
@@ -268,7 +266,7 @@ firmApp.controller("firmDetailCtrl", function(
 	$scope.total_items  = diabloPagination.get_length();
 	$scope.filter_firms = diabloPagination.get_page($scope.default_page);
 	// save
-	$scope.save_to_local(undefined, $scope.total_items);
+	$scope.save_to_local(model.name, $scope.total_items);
     }
     
     var in_prompt = function(p, prompts){

@@ -99,8 +99,6 @@ loginApp.controller("loginCtrl", function($scope, $location, $resource){
     }
 });
 
-	
-
 
     
 
