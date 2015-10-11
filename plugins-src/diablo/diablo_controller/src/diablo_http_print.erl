@@ -1268,7 +1268,7 @@ multi_send(_SignHead, _Path, Device, [], {}) ->
 multi_send(_SignHead, _Path, _Device, [], Error) ->
     Error;
 multi_send(SignHead, Path, Device, [H|T], _Result) ->
-    ?INFO("start to print ..."),
+    ?DEBUG("start to print ..."),
     %% multi_send(SignHead, Path, Device, T, {}).
     Sign = bin2hex(sha1, crypto:hash(sha, SignHead ++ H)),
     case httpc:request(

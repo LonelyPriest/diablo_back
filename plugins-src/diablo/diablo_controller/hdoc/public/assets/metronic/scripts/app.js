@@ -528,6 +528,15 @@ var App = function () {
             }, 1000);
         });
 
+	jQuery('body').on('click', '.portlet > .portlet-title > .actions > button.reload', function (e) {
+	    e.preventDefault();
+	    var el = jQuery(this).closest(".portlet").children(".portlet-body");
+            App.blockUI(el);
+            window.setTimeout(function () {
+                App.unblockUI(el);
+            }, 1000);
+        });
+
         jQuery('body').on('click', '.portlet > .portlet-title > .tools > .collapse, .portlet .portlet-title > .tools > .expand', function (e) {
             e.preventDefault();
             var el = jQuery(this).closest(".portlet").children(".portlet-body");

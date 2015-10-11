@@ -8,13 +8,15 @@
 	</div>	
 
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
-		  x-ng-click="new_retailer()">新增
-	    <i class="glyphicon glyphicon-plus"></i></button> 
+	  <div class="btn-group btn-group-solid">
+	    <a type="button" class="btn btn-success red-stripe"
+	       x-ng-click="new_retailer()">新增
+	      <i class="glyphicon glyphicon-plus"></i></a> 
 
-	  <button type="button" class="btn blue reload red-stripe"
-		  x-ng-click="refresh()">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	    <a type="button" class="btn blue reload purple-stripe"
+	       x-ng-click="refresh()">刷新
+	      <i class="glyphicon glyphicon-refresh"></i></a>
+	  </div>
 	</div>
 	
 	<!-- <div class="tools"> -->
@@ -83,7 +85,12 @@
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.name}}</td>
 		    <td>{{r.balance}}</td>
-		    <td>{{r.mobile}}</td>
+		    <td>
+		      <div x-ng-switch on="r.mobile">
+			<span x-ng-switch-when="">暂无</span>
+			<span x-ng-switch-default>{{r.mobile}}</span>
+		      </div>
+		    </td>
 		    <td>
 		      <div x-ng-switch on="r.pid">
 			<span x-ng-switch-when=-1>暂无</span>
