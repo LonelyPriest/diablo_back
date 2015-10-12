@@ -34,14 +34,14 @@
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_retailer()"
 	  	       typeahead="r as r.name for r in
-	  			  retailers|filter:$viewValue|limitTo:8"></input>
+	  			  retailers|filter:$viewValue|limitTo:8"/>
 	  	<!-- <span class="input-group-btn"> -->
 	  	<!--   <button class="btn btn-success" -->
 	  	<!-- 	  x-ng-click="add_retailer()"> -->
 		<!--     <i class="glyphicon glyphicon-plus"></i></button> -->
 	  	<!-- </span> -->
 		<span class="input-group-btn">
-		  <button class="btn btn-warning"
+		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.retailer"
 	  		  x-ng-click="select.retailer=undefined">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>

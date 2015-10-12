@@ -89,9 +89,9 @@ sidebar(Session) ->
 	case ?right_auth:authen(?new_w_firm, Session) of
 	    {ok, ?new_w_firm} ->
 		[{"new_firm", "新增厂商", "glyphicon glyphicon-plus"},
-		 {"firm_detail", "厂商详情", "glyphicon glyphicon-leaf"}];
+		 {"firm_detail", "厂商详情", "glyphicon glyphicon-book"}];
 	    _ ->
-		[{"firm_detail", "厂商详情", "glyphicon glyphicon-leaf"}]
+		[{"firm_detail", "厂商详情", "glyphicon glyphicon-book"}]
 	end,
 
     %% level_2_menu,

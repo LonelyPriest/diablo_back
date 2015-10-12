@@ -17,19 +17,29 @@ firmApp.controller('firmTransCtrl', function(
     
     var now             = $.now(); 
 
-    $scope.go_back = function(){$scope.goto_page("#/firm_detail")}; 
+    $scope.go_back = function(){
+	localStorageService.remove(diablo_key_firm_trans);
+	$scope.goto_page("#/firm_detail")
+    }; 
     
     /*
      * local sate
      */ 
     $scope.save_to_local = function(filter, time){
 	var s = localStorageService.get(diablo_key_firm_trans);
+
+	var format_time = undefined;
+	if (angular.isDefined(time)){
+	    format_time = {start_time:diablo_get_time(time.start_time),
+			   end_time:  diablo_get_time(time.end_time)}
+	};
 	
 	if (angular.isDefined(s) && s !== null){
 	    localStorageService.set(
 		diablo_key_firm_trans, {
 		    filter:angular.isDefined(filter) ? filter:s.filter,
-		    time:angular.isDefined(time) ? time:s.time,
+		    start_time:angular.isDefined(time)
+			? diablo_get_time(time) :s.time,
 		    // stastic:angular.isDefined(stastic) ? stastic:s.stastic,
 		    page:$scope.current_page,
 		    t:now}
@@ -38,7 +48,8 @@ firmApp.controller('firmTransCtrl', function(
 	    localStorageService.set(
 		diablo_key_firm_trans, {
 		    filter:   filter,
-		    time:     time,
+		    start_time: angular.isDefined(time)
+			? diablo_get_time(time) : undefined,
 		    // stastic:  stastic,
 		    page:     $scope.current_page,
 		    t:        now})
@@ -72,7 +83,7 @@ firmApp.controller('firmTransCtrl', function(
     console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
 	$scope.filters      = storage.filter;
-	$scope.time         = storage.time; 
+	$scope.qtime_start  = storage.start_time; 
     } else {
 	$scope.filters = [];
 	$scope.qtime_start = function(){
@@ -85,9 +96,10 @@ firmApp.controller('firmTransCtrl', function(
 		"qtime_start", shop, base, diablo_set_date,
 		diabloFilter.default_start_time(now));
 	}();
-	
-	$scope.time         = diabloFilter.default_time($scope.qtime_start); 
     }
+
+    $scope.time = diabloFilter.default_time($scope.qtime_start); 
+
     
     /*
      * pagination 
@@ -112,7 +124,7 @@ firmApp.controller('firmTransCtrl', function(
 	$scope.current_page = page;
 	
 	// save
-	$scope.save_to_local($scope.filters, $scope.time);
+	$scope.save_to_local($scope.filters, $scope.time.start_time);
 
 	if (angular.isDefined(back_page)){
 	    var stastic = localStorageService.get("firm-trans-stastic");
@@ -227,12 +239,16 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     wgoodService, firmService,
     filterBrand, filterFirm, filterEmployee, filterSizeGroup,
-    filterType, user){
+    filterType, user, base){
     // console.log($routeParams);
 
     // console.log(filterEmployee);
+    $scope.shopIds   = user.shopIds;
+    
     var firm_id = parseInt($routeParams.firm);
     $scope.firm = diablo_get_object(firm_id, filterFirm);
+
+    var now = $.now();
     
     // style_number
     $scope.match_style_number = function(viewValue){
@@ -244,6 +260,7 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
     // console.log($routeParams);
     $scope.go_back = function(){
 	console.log($routeParams);
+	
 	$scope.goto_page("#/firm_trans/" + firm_id.toString()
 			 + "/" + $routeParams.ppage.toString());
     };
@@ -260,7 +277,20 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
     
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time();
+
+    $scope.qtime_start = function(){
+	// -1 use the default setting
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+	return diablo_base_setting(
+	    "qtime_start", shop, base, diablo_set_date,
+	    diabloFilter.default_start_time(now));
+    }();
+    
+    $scope.time = diabloFilter.default_time($scope.qtime_start);
+    console.log($scope.time);
     
     /*
      * pagination 
@@ -276,9 +306,9 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 	    if (angular.isUndefined(search.shop)
 	    	|| !search.shop || search.shop.length === 0){
 	    	search.shop = user.shopIds.length
-		    === 0 ? undefined : user.shopIds;; 
+		    === 0 ? undefined : $scope.shopIds;; 
 	    };
-
+	    
 	    if (angular.isUndefined(search.rsn)){
 		search.rsn  =  $routeParams.rsn ? $routeParams.rsn : undefined; 
 	    }

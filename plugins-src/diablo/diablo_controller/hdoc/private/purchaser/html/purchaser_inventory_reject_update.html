@@ -7,10 +7,16 @@
 	  采购单编辑（退货）
 	</div>
 	<div class="actions">
-	  <button class="btn btn-success red-stripe"
-		  x-ng-disabled="has_saved"
-		  x-ng-click="save_inventory()">保存
-	    <i class="glyphicon glyphicon-save"></i></button> 
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	    
+	    <button class="btn btn-success purple-stripe"
+		    x-ng-disabled="has_saved"
+		    x-ng-click="save_inventory()">保存
+	      <i class="glyphicon glyphicon-save"></i></button> 
+	  </div>
 	</div>
 	<div class="tools">
 	</div>
@@ -24,7 +30,8 @@
 	  <div class="row form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon"> <i class="icon icon-rss fg-red"></i>厂商</span> 
+		<!-- <span class="input-group-addon"> -->
+		<!--   <i class="icon icon-rss fg-red"></i>厂商</span>  -->
 	  	<input class="form-control" type="text"
 	  	       x-ng-model="select.firm"
 	  	       placeholder="请选择厂商"
@@ -32,6 +39,13 @@
 		       typeahead-on-select="change_firm()"
 	  	       typeahead="f as f.name for f in
 	  			  firms|filter:$viewValue|limitTo:8"/>
+
+		<span class="input-group-btn">
+		  <button class="btn bg-lightGray fg-red"
+			  x-ng-disabled="!select.firm"
+			  x-ng-click="select.firm=undefined"> 
+		    <i class="glyphicon glyphicon-pushpin"></i></button>
+	  	</span>
 	  	
 	      </div>
 	    </div>

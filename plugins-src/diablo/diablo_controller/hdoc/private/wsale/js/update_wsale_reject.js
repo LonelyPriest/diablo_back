@@ -22,6 +22,8 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     $scope.f_mul           = diablo_float_mul;
     $scope.get_object      = diablo_get_object;
 
+    $scope.go_back = function(){diablo_goto_page("#/wsale/new_wsale_detail")};
+
     var dialog             = diabloUtilsService;
 
     
@@ -543,9 +545,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 		msg = "退货单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "退货单编辑", msg, $scope,
-	    	    function(){
-			diablo_goto_page("#/wsale/new_wsale_detail");
-		    })
+	    	    function(){$scope.go_back()})
 	    } else{
 	    	diabloUtilsService.response_with_callback(
 	    	    false, "退货单编辑", "退货单编辑失败：" + wsaleService.error[result.ecode],

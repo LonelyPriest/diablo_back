@@ -366,7 +366,15 @@ var diablo_set_datetime = function(datetime){
     var date = datetime.substr(0,10).split("-")
     var time = datetime.substr(11, 8).split(":");
     return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2]);
-}
+};
+
+var diablo_get_time = function(date){
+    if (typeof(date) === 'object'){
+	return date.getTime();
+    } else {
+	return date;
+    }
+};
 
 diablo_get_amount = function(cid, size, sorts){
     for(var i=0, l=sorts.length; i<l; i++){
@@ -537,5 +545,3 @@ var diablo_in_colors = function(color, colors){
 
     return false;
 };
-
-

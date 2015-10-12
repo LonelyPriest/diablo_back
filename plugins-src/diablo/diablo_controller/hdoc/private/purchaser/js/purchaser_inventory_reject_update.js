@@ -21,6 +21,8 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope.seasons         = diablo_season; 
     $scope.e_pay_types     = purchaserService.extra_pay_types;
 
+    $scope.go_back = function(){diablo_goto_page("#/inventory_new_detail")};
+
     var dialog = diabloUtilsService;
     var setv   = diablo_set_float;
 

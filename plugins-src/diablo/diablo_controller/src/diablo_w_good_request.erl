@@ -319,9 +319,9 @@ sidebar(Session) ->
 	case ?right_auth:authen(?new_w_good, Session) of
 	    {ok, ?new_w_good} ->
 		[{"wgood_new", "新增货品", "glyphicon glyphicon-plus"},
-		 {"wgood_detail", "货品详情", "glyphicon glyphicon-leaf"}];
+		 {"wgood_detail", "货品详情", "glyphicon glyphicon-book"}];
 	    _ ->
-		[{"wgood_detail", "货品详情", "glyphicon glyphicon-leaf"}]
+		[{"wgood_detail", "货品详情", "glyphicon glyphicon-book"}]
 	end, 
 
     L1 = ?menu:sidebar(level_1_menu, G1),

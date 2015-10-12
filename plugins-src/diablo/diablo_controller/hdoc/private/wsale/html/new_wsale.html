@@ -45,14 +45,14 @@
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_retailer()"
 	  	       typeahead="r as r.name for r in
-	  			  retailers|filter:$viewValue|limitTo:8"></input>
+	  			  retailers|filter:$viewValue|limitTo:8"/>
 	  	<span class="input-group-btn">
-	  	  <button class="btn btn-success"
+	  	  <button class="btn green"
 	  		  x-ng-click="add_retailer()">
 		    <i class="glyphicon glyphicon-plus"></i></button> 
 	  	</span>
 		<span class="input-group-btn">
-		  <button class="btn btn-warning"
+		  <button class="btn default fg-red red-stripe"
 			  x-ng-disabled="!select.retailer"
 	  		  x-ng-click="select.retailer=undefined">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>
@@ -120,7 +120,7 @@
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
 	    	<span class="input-group-addon">
-	    	  <i class="glyphicon glyphicon-comment fg-red"></i>备注</span>
+	    	  <i class="icon icon-comment fg-red"></i>备注</span>
 	    	<input class="form-control"
 		       type="text"
 		       placeholder="备注"

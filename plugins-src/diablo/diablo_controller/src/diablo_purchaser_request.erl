@@ -411,7 +411,7 @@ sidebar(Session) ->
 	    TransR = [{"inventory_new_detail", "采购记录", "glyphicon glyphicon-download"}],
 	    TransD = [{"inventory_rsn_detail", "采购明细", "glyphicon glyphicon-leaf"}],
 
-	    InvDetail = [{"inventory_detail", "库存详情", "glyphicon glyphicon-tasks"}],
+	    InvDetail = [{"inventory_detail", "库存详情", "glyphicon glyphicon-book"}],
 
 	    
 	    %% Record =

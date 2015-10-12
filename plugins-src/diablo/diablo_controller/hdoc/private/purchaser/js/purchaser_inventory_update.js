@@ -11,7 +11,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.employees   = filterEmployee;
     $scope.size_groups = filterSizeGroup;
     $scope.sexs        = diablo_sex;
-    $scope.seasons     = diablo_season;
+    $scope.seasons     = diablo_season; 
 
     $scope.has_saved   = false;
 
@@ -22,6 +22,8 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.float_add  = diablo_float_add;
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
+
+    $scope.go_back = function(){diablo_goto_page("#/inventory_new_detail")};
 
     // pagination
     $scope.colspan = 9;

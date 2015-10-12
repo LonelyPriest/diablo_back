@@ -28,6 +28,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
 
+    $scope.go_back = function(){diablo_goto_page("#/wsale/new_wsale_detail")};
+
     // pagination
     $scope.colspan = 9;
     $scope.items_perpage = 10;
@@ -651,7 +653,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 			// modify current balance of retailer
 			// $scope.select.retailer.balance = $scope.select.left_balance;
 			// $scope.select.surplus = $scope.select.retailer.balance;
-			diablo_goto_page("#/wsale/new_wsale_detail");
+			// diablo_goto_page("#/wsale/new_wsale_detail");
+			$scope.go_back();
 		    })
 	    } else{
 	    	diabloUtilsService.response_with_callback(

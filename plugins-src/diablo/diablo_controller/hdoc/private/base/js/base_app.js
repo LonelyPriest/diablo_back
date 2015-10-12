@@ -435,7 +435,7 @@ baseApp.controller("printFormatCtrl", function(
     $scope, dateFilter, baseService, diabloPattern, diabloUtilsService, wprintService, user){
     // shop and repo
     $scope.shops = [{id: -1, name:"== 请选择店铺或仓库，默认所有配置相同 =="}]
-	.concat(user.sortShops, user.sortRepoes);
+	.concat(user.sortShops, user.sortRepoes); 
 
     // var gen_format = function(shopId){
     // 	console.log($scope.shop_format($scope.shops[0]));
@@ -445,9 +445,10 @@ baseApp.controller("printFormatCtrl", function(
     // };
         
     // $scope.print_types = baseService.print_types;
-    
+
+    $scope.select       = {shop: $scope.shops[0]};
     $scope.print_fields = diablo_print_field;
-    $scope.actions = wprintService.print_actions;
+    $scope.actions      = wprintService.print_actions;
 
     var dialog = diabloUtilsService;
 
@@ -486,6 +487,7 @@ baseApp.controller("printFormatCtrl", function(
     };
     
     $scope.refresh = function(shop){
+	// console.log(shop);
 	wprintService.list_printer_format().then(function(data){
 	    console.log(data);
 	    // class by shop
@@ -501,13 +503,11 @@ baseApp.controller("printFormatCtrl", function(
 	    
 	    console.log($scope.pformats); 
 	    
-	    $scope.select = {shop:shop,
-			     pformat: $scope.shop_format(shop)}; 
-	    
+	    $scope.select = {shop:shop, pformat: $scope.shop_format(shop)}; 
 	})
     }; 
 
-    $scope.refresh($scope.shops[0]); 
+    $scope.refresh($scope.select.shop);
         
     $scope.update_printer_format = function(f){
 	console.log(f);

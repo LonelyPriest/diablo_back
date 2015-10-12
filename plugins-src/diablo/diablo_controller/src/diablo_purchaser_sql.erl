@@ -274,6 +274,7 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	++ " and a.type=c.id" 
 	++ " and a.style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " limit " ++ ?to_s(P);
+
 good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
     "select a.id, a.style_number, a.brand as brand_id"
 	", a.type as type_id, a.firm as firm_id"
@@ -720,7 +721,7 @@ inventory_match(all_inventory, Merchant, Shop, Conditions) ->
     "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
 	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
 	", a.org_price, a.tag_price, a.pkg_price"
-	", a.price3, a.price4, a.price5, a.discount, a.path"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day"
 
 	", b.name as brand" 
 	", c.name as type"

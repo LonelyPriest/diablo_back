@@ -393,17 +393,17 @@ sidebar(Session) ->
     Super = [
 	     {{"role_merchant", "商户角色", "glyphicon glyphicon-map-marker"},
 	      [{"role_new", "新增角色", "glyphicon glyphicon-plus"},
-	       {"role_detail", "角色详情", "glyphicon glyphicon-briefcase"}]},
+	       {"role_detail", "角色详情", "glyphicon glyphicon-book"}]},
 	     
 	     {{"account_merchant", "商户帐户", "glyphicon glyphicon-user"},
 	      [{"account_new", "新增帐户", "glyphicon glyphicon-plus"},
-	       {"account_detail", "帐户详情", "glyphicon glyphicon-briefcase"}]}
+	       {"account_detail", "帐户详情", "glyphicon glyphicon-book"}]}
 	    ],
 
     Role1 = 
 	case ?right_auth:authen(?list_role, Session) of
 	    {ok, ?list_role} ->
-		[{"role_detail", "角色详情", "glyphicon glyphicon-briefcase"}];
+		[{"role_detail", "角色详情", "glyphicon glyphicon-book"}];
 	    _ ->
 		[]
 	end,
@@ -419,7 +419,7 @@ sidebar(Session) ->
     Account1 =
 	case ?right_auth:authen(?list_account, Session) of
 	    {ok, ?list_account} ->
-		[{"account_detail", "帐户详情", "glyphicon glyphicon-briefcase"}];
+		[{"account_detail", "帐户详情", "glyphicon glyphicon-book"}];
 	    _ ->
 		[]
 	end,

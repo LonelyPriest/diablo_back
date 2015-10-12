@@ -1623,10 +1623,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     var now = $.now();
 
     var storage = localStorageService.get(diablo_key_wsale_trans);
-    // console.log(old_q);
+    console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
-    	$scope.filters = storage.filter;
-    	$scope.time    = storage.time;
+    	$scope.filters        = storage.filter;
+    	$scope.qtime_start    = storage.start_time;
     } else{
 	$scope.filters = [];
 	
@@ -1639,9 +1639,11 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		"qtime_start", shop, base, diablo_set_date,
 		diabloFilter.default_start_time(now));
 	}();
-	$scope.time   = diabloFilter.default_time($scope.qtime_start);
-	// console.log($scope.time);
     };
+
+    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+
+    // console.log($scope.time);
 
     /*
      * pagination 
@@ -1668,10 +1670,16 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	console.log(page);
 
 	$scope.current_page = page;
-	// save condition of query
+	
+	// save condition of query 
 	localStorageService.set(
 	    diablo_key_wsale_trans,
-	    {filter:$scope.filters, time:$scope.time, page:page, t:now});
+	    {filter:$scope.filters,
+	     start_time: diablo_get_time($scope.time.start_time),
+	     page:page, t:now});
+	
+
+	// console.log($scope.time); 
 
 	if (angular.isDefined(back_page)){
 	    var stastic = localStorageService.get("wsale-trans-stastic");
@@ -1696,7 +1704,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	    if (angular.isUndefined(search.shop)
 		|| !search.shop || search.shop.length === 0){
 		search.shop = $scope.shopIds.length === 0 ? undefined : $scope.shopIds; 
-	    } 
+	    }
 	    
 	    wsaleService.filter_w_sale_new(
 		$scope.match, search, page, $scope.items_perpage

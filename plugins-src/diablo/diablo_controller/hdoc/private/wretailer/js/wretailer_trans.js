@@ -16,20 +16,23 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.float_sub = diablo_float_sub;
     var now          = $.now();
 
-    $scope.go_back = function(){$scope.goto_page("#/wretailer_detail")};
+    $scope.go_back = function(){
+	localStorageService.remove(diablo_key_retailer_trans);
+	$scope.goto_page("#/wretailer_detail")
+    };
 
     /*
      * local sate
      */ 
     $scope.save_to_local = function(filter, time){
 	var s = localStorageService.get(diablo_key_retailer_trans);
-	
+
 	if (angular.isDefined(s) && s !== null){
 	    localStorageService.set(
 		diablo_key_retailer_trans, {
 		    filter:angular.isDefined(filter) ? filter:s.filter,
-		    time:angular.isDefined(time) ? time:s.time,
-		    // stastic:angular.isDefined(stastic) ? stastic:s.stastic,
+		    start_time:angular.isDefined(time)
+			? diablo_get_time(time) :s.time, 
 		    page:$scope.current_page,
 		    t:now}
 	    )
@@ -37,8 +40,8 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	    localStorageService.set(
 		diablo_key_retailer_trans, {
 		    filter:   filter,
-		    time:     time,
-		    // stastic:  stastic,
+		    start_time: angular.isDefined(time)
+			? diablo_get_time(time) : undefined,
 		    page:     $scope.current_page,
 		    t:        now})
 	}
@@ -70,7 +73,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
     console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
 	$scope.filters      = storage.filter;
-	$scope.time         = storage.time; 
+	$scope.qtime_start  = storage.start_time; 
     } else {
 	$scope.filters = [];
 	$scope.qtime_start = function(){
@@ -83,8 +86,9 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		"qtime_start", shop, base, diablo_set_date,
 		diabloFilter.default_start_time(now));
 	}(); 
-	$scope.time         = diabloFilter.default_time($scope.qtime_start);
-    } 
+    }
+
+    $scope.time         = diabloFilter.default_time($scope.qtime_start); 
 
     /*
      * pagination 
@@ -110,7 +114,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	$scope.current_page = page;
 
 	// save
-	$scope.save_to_local($scope.filters, $scope.time);
+	$scope.save_to_local($scope.filters, $scope.time.start_time);
 	// recover
 	if (angular.isDefined(back_page)){
 	    var stastic = localStorageService.get("retailer-trans-stastic");
@@ -223,13 +227,16 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     wgoodService, wretailerService,
     filterBrand, filterFirm, filterRetailer, filterEmployee, filterSizeGroup,
-    filterType, user){
+    filterType, user, base){
     // console.log($routeParams);
 
     // console.log(filterEmployee);
     var retailer_id = parseInt($routeParams.retailer);
     $scope.retailer = diablo_get_object(retailer_id, filterRetailer);
     $scope.flot_mul = diablo_float_mul;
+
+    $scope.shopIds   = user.shopIds; 
+    var now          = $.now();
 
     // style_number
     $scope.match_style_number = function(viewValue){
@@ -257,7 +264,18 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
     
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time();
+
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+	return diablo_base_setting(
+	    "qtime_start", shop, base, diablo_set_date,
+	    diabloFilter.default_start_time(now));
+    }();
+
+    $scope.time = diabloFilter.default_time($scope.qtime_start);
     
     /*
      * pagination 

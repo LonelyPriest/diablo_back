@@ -7,8 +7,12 @@
 	  <span>交易单编辑（销售）</span>
 	</div>
 	<div class="actions">
-	  <div class="btn-group"> 
-	    <button class="btn btn-success red-stripe"
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	    
+	    <button class="btn btn-success purple-stripe"
 		    x-ng-disabled="disable_save()"
 		    x-ng-click="save_wsale()">保存
 	      <i class="glyphicon glyphicon-save"></i></button> 
@@ -32,14 +36,15 @@
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_retailer()"
 	  	       typeahead="r as r.name for r in
-	  			  retailers|filter:$viewValue|limitTo:8"></input>
-	  	<span class="input-group-btn">
-	  	  <button class="btn btn-success"
-	  		  x-ng-click="add_retailer()">
-		    <i class="glyphicon glyphicon-plus"></i></button> 
-	  	</span>
+	  			  retailers|filter:$viewValue|limitTo:8"/>
+	  	<!-- <span class="input-group-btn"> -->
+	  	<!--   <button class="btn btn-success" -->
+	  	<!-- 	  x-ng-click="add_retailer()"> -->
+		<!--     <i class="glyphicon glyphicon-plus"></i></button>  -->
+	  	<!-- </span> -->
+		
 		<span class="input-group-btn">
-		  <button class="btn btn-warning"
+		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.retailer"
 	  		  x-ng-click="select.retailer=undefined">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>

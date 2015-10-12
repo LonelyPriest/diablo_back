@@ -168,8 +168,8 @@ sidebar(Session) ->
 	     {{"printer", "打印机", "glyphicon glyphicon-print"}, Print},
 	     {{"setting", "基本设置", "glyphicon glyphicon-cog"},
 	      [{"print_option", "系统设置", "glyphicon glyphicon-wrench"},
-	       {"print_format", "打印格式", "glyphicon glyphicon-text-width"},
-	       {"print_task", "打印任务",  "glyphicon glyphicon-tasks"}
+	       {"print_format", "打印格式", "glyphicon glyphicon-text-width"}
+	       %% {"print_task", "打印任务",  "glyphicon glyphicon-tasks"}
 	       %% {"table_detail", "表单", "glyphicon glyphicon-list-alt"}
 	      ]
 	     }],

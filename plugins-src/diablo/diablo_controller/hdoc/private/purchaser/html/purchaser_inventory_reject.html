@@ -28,7 +28,7 @@
 	  <div class="row form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon"> <i class="icon icon-rss fg-red"></i>厂商</span> 
+		<!-- <span class="input-group-addon"> <i class="icon icon-rss fg-red"></i>厂商</span>  -->
 	  	<input class="form-control" type="text"
 	  	       x-ng-model="select.firm"
 	  	       placeholder="请选择厂商"
@@ -36,6 +36,12 @@
 		       typeahead-on-select="change_firm()"
 	  	       typeahead="f as f.name for f in
 	  			  firms|filter:$viewValue|limitTo:8"/>
+		<span class="input-group-btn">
+		  <button class="btn bg-lightGray fg-red"
+			  x-ng-disabled="!select.firm"
+			  x-ng-click="select.firm=undefined"> 
+		    <i class="glyphicon glyphicon-pushpin"></i></button>
+	  	</span>
 	  	
 	      </div>
 	    </div>

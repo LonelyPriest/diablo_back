@@ -24,20 +24,7 @@ wreportApp.config(['$routeProvider', function($routeProvider){
     	    templateUrl: '/private/wreport/html/wreport_daily.html',
             controller: 'wreportDailyCtrl',
     	    resolve: angular.extend({}, employee, retailer, user)
-    	}).
-    // 	when('/shop/shop_new', {
-    // 	    templateUrl: '/private/shop/html/shop_new.html',
-    //         controller: 'newShopCtrl',
-    // 	    resolve: angular.extend({}, employee, user)
-    // 	}).
-    // 	when('/repo/repo_detail', {
-    // 	    templateUrl: '/private/shop/html/repo_detail.html',
-    //         controller: 'repoDetailCtrl'
-    // 	}).
-    // 	when('/repo/repo_new', {
-    // 	    templateUrl: '/private/shop/html/repo_new.html',
-    //         controller: 'repoNewCtrl'
-    // 	}).
+    	}). 
     	otherwise({
 	    templateUrl: '/private/wreport/html/wreport_daily.html',
             controller: 'wreportDailyCtrl',

@@ -7,10 +7,15 @@
 	  <span>交易单编辑（退货）</span>
 	</div>
 	<div class="actions">
-	  <button class="btn btn-success red-stripe"
-		  x-ng-disabled="disable_save()"
-		  x-ng-click="save_inventory()">保存
-	    <i class="glyphicon glyphicon-save"></i></button> 
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	    <button class="btn btn-success purple-stripe"
+		    x-ng-disabled="disable_save()"
+		    x-ng-click="save_inventory()">保存
+	      <i class="glyphicon glyphicon-save"></i></button>
+	  </div>
 	</div>
 	<div class="tools">
 	</div>
@@ -30,9 +35,9 @@
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_retailer()"
 	  	       typeahead="r as r.name for r in
-	  			  retailers|filter:$viewValue|limitTo:8"></input> 
+	  			  retailers|filter:$viewValue|limitTo:8"/>
 		<span class="input-group-btn">
-		  <button class="btn btn-warning"
+		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.retailer"
 	  		  x-ng-click="select.retailer=undefined">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>

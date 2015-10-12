@@ -121,35 +121,35 @@ sidebar(Session) ->
 		   [{?new_shop,
 		     {"shop_new", "新增店铺", "glyphicon glyphicon-plus"}},
 		    {?list_shop,
-		     {"shop_detail", "店铺详情", "glyphicon glyphicon-leaf"}}
+		     {"shop_detail", "店铺详情", "glyphicon glyphicon-book"}}
 		   ]),
 
     RepoAuthen = AuthenFun(
 		   [{?new_repo,
 		     {"repo_new", "新增仓库", "glyphicon glyphicon-plus"}},
 		    {?list_repo,
-		     {"repo_detail", "仓库详情", "glyphicon glyphicon-leaf"}}
+		     {"repo_detail", "仓库详情", "glyphicon glyphicon-book"}}
 		   ]),
 
     BadRepoAuthen = AuthenFun(
 		   [{?new_badrepo,
 		     {"badrepo_new", "新增次品仓", "glyphicon glyphicon-plus"}},
 		    {?list_badrepo,
-		     {"badrepo_detail", "次品仓详情", "glyphicon glyphicon-leaf"}}
+		     {"badrepo_detail", "次品仓详情", "glyphicon glyphicon-book"}}
 		   ]), 
 
     SidebarShop = 
 	case ShopAuthen of
 	    []   -> [];
 	    Shop ->
-		[{{"shop", "店铺", "glyphicon glyphicon-shopping-cart"}, Shop}] 
+		[{{"shop", "店铺", "icon icon-truck"}, Shop}] 
 	end,
 
     SidebarRepo = 
 	case RepoAuthen of
 	    []   -> [];
 	    Repo ->
-		[{{"repo", "仓库", "glyphicon glyphicon-map-marker"}, Repo}]
+		[{{"repo", "仓库", "icon icon-twitter"}, Repo}]
 		%% ?menu:sidebar(level_1_menu, Sidebar)
 		%% ?menu:sidebar(
 		%%    level_2_menu,

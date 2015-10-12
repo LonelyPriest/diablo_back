@@ -857,10 +857,11 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     var now = $.now();
     var storage = localStorageService.get(diablo_key_inventory_detail);
+    console.log(storage);
     
     if (angular.isDefined(storage) && storage !== null){
-    	$scope.filters = storage.filter;
-    	$scope.time    = storage.time;
+    	$scope.filters       = storage.filter;
+    	$scope.qtime_start   = storage.start_time;
     } else{
 	$scope.filters = [];
 	
@@ -873,9 +874,10 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 		"qtime_start", shop, base, diablo_set_date,
 		diabloFilter.default_start_time(now));
 	}();
-	$scope.time   = diabloFilter.default_time($scope.qtime_start);
-	// console.log($scope.time);
     };
+
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+    // console.log($scope.time); 
 
     // $scope.qtime_start = function(){
     // 	var shop = -1
@@ -929,7 +931,9 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
 	localStorageService.set(
 	    diablo_key_inventory_detail,
-	    {filter:$scope.filters, time:$scope.time, page:page, t:now});
+	    {filter:$scope.filters,
+	     start_time:diablo_get_time($scope.time.start_time),
+	     page:page, t:now});
 	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    add_search_condition(search);
@@ -1178,10 +1182,11 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var storage = localStorageService.get(diablo_key_invnetory_trans);
+    console.log(storage);
 
     if (angular.isDefined(storage) && storage !== null){
-    	$scope.filters = storage.filter;
-    	$scope.time    = storage.time;
+    	$scope.filters     = storage.filter;
+    	$scope.qtime_start = storage.start_time;
     } else{
 	$scope.filters = [];
 	
@@ -1194,9 +1199,10 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 		"qtime_start", shop, base, diablo_set_date,
 		diabloFilter.default_start_time(now));
 	}();
-	$scope.time   = diabloFilter.default_time($scope.qtime_start);
-	// console.log($scope.time);
     };
+    
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+    // console.log($scope.time); 
 
     // console.log($scope.prompt);
     // $scope.qtime_start = function(shopId){
@@ -1235,11 +1241,13 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     
     $scope.do_search = function(page){
 	// console.log(page);
-	$scope.current_page = page;
-
+	$scope.current_page = page; 
+	
 	localStorageService.set(
 	    diablo_key_invnetory_trans,
-	    {filter:$scope.filters, time:$scope.time, page:page, t:now});
+	    {filter:$scope.filters,
+	     start_time:diablo_get_time($scope.time.start_time),
+	     page:page, t:now});
 
 	if (angular.isDefined(back_page)){
 	    var stastic = localStorageService.get("inventory-trans-stastic");

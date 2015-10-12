@@ -8,21 +8,23 @@
 	</div>	
 
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
-		  x-ng-click="goto_page('#/inventory/inventory_fix_detail')">盘点详情
-	    <i class="glyphicon glyphicon-plus"></i></button>
-	  
-	  <!-- <button type="button" class="btn btn-danger green-stripe" -->
-	  <!-- 	  x-ng-click="goto_page('#/wsale/reject_wsale')">退货单 -->
-	  <!--   <i class="glyphicon glyphicon-plus"></i></button> -->
-	  
-	  <!-- <button type="button" class="btn btn-warning" -->
-	  <!-- 	  x-ng-click="goto_page('#/wsale/new_wsale_detail')">开单详情 -->
-	  <!--   <i class="glyphicon glyphicon-leaf"></i></button> -->
-	  
-	  <button type="button" class="btn blue red-stripe reload"
-		  x-ng-click="do_search(default_page)">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn btn-success red-stripe"
+		    x-ng-click="goto_page('#/inventory/inventory_fix_detail')">盘点详情
+	      <i class="glyphicon glyphicon-plus"></i></button>
+	    
+	    <!-- <button type="button" class="btn btn-danger green-stripe" -->
+	    <!-- 	  x-ng-click="goto_page('#/wsale/reject_wsale')">退货单 -->
+	    <!--   <i class="glyphicon glyphicon-plus"></i></button> -->
+	    
+	    <!-- <button type="button" class="btn btn-warning" -->
+	    <!-- 	  x-ng-click="goto_page('#/wsale/new_wsale_detail')">开单详情 -->
+	    <!--   <i class="glyphicon glyphicon-leaf"></i></button> -->
+	    
+	    <button type="button" class="btn blue purple-stripe reload"
+		    x-ng-click="do_search(default_page)">刷新
+	      <i class="icon icon-spinner fg-white"></i></button> 
+	  </div>
 	</div>
 	
       </div>

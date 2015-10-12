@@ -15,13 +15,18 @@ sale(new_by_shop, Merchant, Conditions) ->
     {StartTime, EndTime, NewConditions} = 
 	?sql_utils:cut(fields_no_prifix, Conditions), 
     "select shop as shop_id"
-	", SUM(total) as t_amount"
-	", SUM(should_pay) as t_spay"
-	", SUM(has_pay) as t_hpay"
+	", sum(total) as t_amount"
+	", sum(should_pay) as t_spay"
+	", sum(has_pay) as t_hpay"
+	", sum(has_pay) as t_hpay"
+	", sum(cash) as t_cash"
+	", sum(card) as t_card"
+	", sum(wire) as t_wire"
+	", sum(verificate) as t_verificate"
 	" from w_sale"
 	++ " where " ++ ?utils:to_sqls(proplists, NewConditions)
 	++ " and merchant=" ++ ?to_s(Merchant)
-	++ ?sql_utils:condition(time_no_prfix, StartTime, EndTime)
+	++ " and " ++ ?sql_utils:condition(time_no_prfix, StartTime, EndTime)
 	++ " and deleted=" ++ ?to_s(?NO)
 	++ " group by shop";
 

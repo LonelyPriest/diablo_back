@@ -23,8 +23,12 @@
 		      <th>序号</th>
 		      <th>店铺</th>
 		      <th>数量</th>
-		      <th class="success">销售额</th>
-		      <th class="danger">实收</th>
+		      <th class="success">应收</th>
+		      <th class="danger">实收</th> 
+		      <th>现金</th>
+		      <th>刷卡</th>
+		      <th>汇款</th>
+		      <th>核销</th>
 		      <!-- <th>营业额</th> -->
 		      <!-- <th>净利润</th> -->
 		    </tr>
@@ -36,12 +40,20 @@
 		      <td>{{r.t_amount}}</td>
 		      <td>{{r.t_spay}}</td>
 		      <td>{{r.t_hpay}}</td>
+		      <td>{{r.t_cash}}</td>
+		      <td>{{r.t_card}}</td>
+		      <td>{{r.t_wire}}</td>
+		      <td>{{r.t_verificate}}</td>
 		    </tr>
 		    <tr>
 		      <td colspan=2></td>
 		      <td>{{total_amounts}}</td>
-		      <td class="success">{{total_spay}}</td>
-		      <td class="danger">{{total_hpay}}</td>
+		      <td>{{total_spay}}</td>
+		      <td>{{total_hpay}}</td>
+		      <td>{{total_cash}}</td>
+		      <td>{{total_card}}</td>
+		      <td>{{total_wire}}</td>
+		      <td>{{total_verificate}}</td>
 		    </tr>
 		  </tbody>
 		  <tfoot>

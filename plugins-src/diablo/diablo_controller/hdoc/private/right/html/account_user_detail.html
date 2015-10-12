@@ -8,13 +8,15 @@
 	</div>
 	
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
-		  ng-click="goto_page('#/account_user/account_new')">新增
-	    <i class="glyphicon glyphicon-plus"></i></button> 
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn btn-success red-stripe"
+		    ng-click="goto_page('#/account_user/account_new')">新增
+	      <i class="glyphicon glyphicon-plus"></i></button> 
 
-	  <button type="button" class="btn blue reload red-stripe"
-		  x-ng-click="refresh()">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	    <button type="button" class="btn blue reload red-stripe"
+		    x-ng-click="refresh()">刷新
+	      <i class="icon icon-spinner fg-white"></i></button>
+	  </div>
 	</div>
 	
 	
@@ -25,16 +27,16 @@
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
-	  <div class="input-group">
-	    <div class="input-cont">
-	      <input type="text" class="form-control" placeholder="请输入帐户名称"
-		     x-ng-model="filter.name"></input>
-	    </div>
-	    <span class="input-group-btn">
-	      <button type="button" class="btn green">
-	  	<i class="m-icon-swapright m-icon-white"></i>
-	    </span>
-	  </div>  
+	  <!-- <div class="input-group"> -->
+	  <!--   <div class="input-cont"> -->
+	  <!--     <input type="text" class="form-control" placeholder="请输入帐户名称" -->
+	  <!-- 	     x-ng-model="filter.name"></input> -->
+	  <!--   </div> -->
+	  <!--   <span class="input-group-btn"> -->
+	  <!--     <button type="button" class="btn green"> -->
+	  <!-- 	<i class="m-icon-swapright m-icon-white"></i> -->
+	  <!--   </span> -->
+	  <!-- </div>   -->
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 

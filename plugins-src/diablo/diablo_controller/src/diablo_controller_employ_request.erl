@@ -75,7 +75,7 @@ sidebar(Session) ->
     S1 = 
 	case ?right_auth:authen(?list_employe, Session) of
 	    {ok, ?list_employe} ->
-		[{"employ_detail", "员工详情", "glyphicon glyphicon-leaf"}];
+		[{"employ_detail", "员工详情", "glyphicon glyphicon-book"}];
 	    _ ->
 		[]
 	end,

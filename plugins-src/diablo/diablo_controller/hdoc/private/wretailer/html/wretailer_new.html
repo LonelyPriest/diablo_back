@@ -161,8 +161,8 @@
 		       typeahead="c as c.name for c in
 				  cities|filter:$viewValue|limitTo:8"></input>
 	      </div> 
-	      <div ng-show="!retailerNewForm.city.$pristine && !check_city(retailer.city)">
-		<span class="fg-red">请输入中文字符串</span>
+	      <div ng-show="!retailerNewForm.city.$pristine && !check_city(retailer.city, retailer.province)">
+		<span class="fg-red">请输入中文字符串，所在省（直辖市）必须输入</span>
 	      </div>
 	    </div>
 	    
@@ -174,7 +174,8 @@
 	    <div class="col-md-offset-3 col-md-6">
 	      <span class="pull-right">
 		<button class="btn btn-primary"
-			ng-disabled="retailerNewForm.$invalid"
+			ng-disabled="retailerNewForm.$invalid
+				     || !check_city(retailer.city, retailer.province)"
 			x-ng-click="new_wretailer(retailer)">确认</button>
 		<button class="btn btn-warning"
 			x-ng-click="cancel()">取消</button>

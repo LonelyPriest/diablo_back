@@ -541,7 +541,7 @@ sidebar(Session) ->
 	    %%  }],
 
 	    SaleR =
-		[{"new_wsale_detail", "交易记录", "glyphicon glyphicon-tasks"}],
+		[{"new_wsale_detail", "交易记录", "glyphicon glyphicon-download"}],
 	    
 	    SaleD =
 		[{"wsale_rsn_detail", "交易明细", "glyphicon glyphicon-leaf"}],

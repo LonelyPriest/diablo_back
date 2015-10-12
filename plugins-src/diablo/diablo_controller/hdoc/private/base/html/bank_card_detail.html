@@ -9,13 +9,15 @@
 	</div>	
 
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
-		  x-ng-click="goto_page('#/bank/new_bank_card')">新增
-	    <i class="glyphicon glyphicon-plus"></i></button> 
+	  <div class="btn-group btn-group-solid"> 
+	    <button type="button" class="btn btn-success red-stripe"
+		    x-ng-click="goto_page('#/bank/new_bank_card')">新增
+	      <i class="glyphicon glyphicon-plus"></i></button> 
 
-	  <button type="button" class="btn blue reload red-stripe"
-		  x-ng-click="refresh()">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	    <button type="button" class="btn blue reload red-stripe"
+		    x-ng-click="refresh()">刷新
+	      <i class="icon icon-spinner fg-white"></i></button>
+	  </div>
 	</div> 
       </div>
 

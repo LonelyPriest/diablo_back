@@ -237,15 +237,29 @@ wretailerApp.controller("wretailerNewCtrl", function(
 		      decimal_2:    diabloPattern.decimal_2,
 		      city:         diabloPattern.chinese};
 
-    $scope.check_city = function(city){
+    // $scope.use_province = false;
+
+    $scope.check_city = function(city, province){
 	if (city){
 	    var name = typeof(city) === 'object' ? city.name : city;
+	    if (!province){
+		// $scope.use_province = true;
+		return false;
+	    }
 	    return $scope.pattern.city.test(name);
 	} else {
 	    return true;
 	}
 	
     }
+
+    // $scope.$watch(retailer.city, function(newValue, oldValue){
+    // 	if (newValue === undefined) return;
+
+    // 	if (newValue && !retailer.province){
+	    
+    // 	}
+    // });
     
     $scope.new_wretailer = function(retailer){
 	console.log(retailer); 

@@ -1,5 +1,15 @@
 var version_update = function(){
     var updates = [
+	{date:"2015-10-13",
+	 content: [
+	     "修改退货到次品仓，有时退货失败的问题",
+	     "修改从次品仓退货到厂商，明细无法显示的问题",
+	     "新增零售商时，增加条件约束，所在城市输入时，所在省（直辖市）必须输入",
+	     "优化部分查询条件智能展示",
+	     "优化部分图标，统一显示"
+	 ]
+	},
+	
 	{date: "2015-10-12",
 	 content: [
 	     "修改用户2小时内无操作时，系统自动清理该用户，以增加系统安全性",
@@ -22,7 +32,7 @@ var version_update = function(){
 		 + "<h4 class='text-center' style='margin-top:40px'><span class='fg-red'><strong>"
 		    + "<u>" + updates[i].date + "日更新</u>"
 		    + "</strong></span></h4>"
-		    + "<h5 class='text-center'><span class='fg-red'>注：首次登录时，请务必清除浏览器缓存后再登陆！！</span></h5>"
+		    + "<h5 class='text-center'><span class='fg-red'>注：设备首次登录时，请务必清除浏览器缓存后再登陆！！</span></h5>"
 		    + "<ol style='padding:0;color:orange'>"
 
 		var c = ""

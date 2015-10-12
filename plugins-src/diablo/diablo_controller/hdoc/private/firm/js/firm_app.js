@@ -65,7 +65,7 @@ firmApp.config(['$routeProvider', function($routeProvider){
 	when('/firm_trans_rsn/:firm?/:rsn?/:ppage?', {
 	    templateUrl: '/private/firm/html/firm_trans_rsn_detail.html',
 	    controller: 'firmTransRsnDetailCtrl',
-	    resolve: angular.extend({}, brand, firm, employee, s_group, type, user)
+	    resolve: angular.extend({}, brand, firm, employee, s_group, type, user, base)
 	}). 
 	when('/new_firm', {
 	    templateUrl: '/private/firm/html/new_firm.html',

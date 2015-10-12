@@ -8,20 +8,20 @@
 	</div>
 	
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
-	  	  x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
-	    <i class="glyphicon glyphicon-plus"></i></button>
-	  
-	  <button type="button" class="btn btn-warning red-stripe"
-	  	  x-ng-click="goto_page('#/inventory/inventory_rsn_detail/fix')">盘点明细
-	    <i class="glyphicon glyphicon-leaf"></i></button>
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn btn-success red-stripe"
+	  	    x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
+	      <i class="glyphicon glyphicon-plus"></i></button>
+	    
+	    <button type="button" class="btn btn-warning purple-stripe"
+	  	    x-ng-click="goto_page('#/inventory/inventory_rsn_detail/fix')">盘点明细
+	      <i class="glyphicon glyphicon-leaf"></i></button>
 
-	  <button type="button" class="btn blue reload red-stripe"
-		  x-ng-click="do_search(default_page)">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button>
-	  
-	</div>
-	
+	    <button type="button" class="btn blue reload purple-stripe"
+		    x-ng-click="do_search(default_page)">刷新
+	      <i class="icon icon-spinner fg-white"></i></button>
+	  </div> 
+	</div> 
       </div>
 
       <!--BEGIN table container-->
