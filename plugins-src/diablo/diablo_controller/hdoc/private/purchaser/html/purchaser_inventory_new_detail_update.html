@@ -252,7 +252,7 @@
 		</thead>
 		<tbody>
 		  <!-- <tr class="text-center" ng-repeat="inv in inventories"> -->
-		  <tr class="text-center" ng-repeat="inv in get_inventory(current_page_index)">  
+		  <tr class="text-center" ng-repeat="inv in get_inventory(current_page_index)">
 		    <td>{{inv.order_id}}</td>
 		    <td class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>

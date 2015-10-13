@@ -2,8 +2,9 @@ var version_update = function(){
     var updates = [
 	{date:"2015-10-13",
 	 content: [
-	     "修改退货到次品仓，有时退货失败的问题",
-	     "修改从次品仓退货到厂商，明细无法显示的问题",
+	     "解决修改销售记录时，修改零售商有时无法成功的问题",
+	     "解决退货到次品仓，有时退货失败的问题",
+	     "解决从次品仓退货到厂商，明细无法显示的问题",
 	     "新增零售商时，增加条件约束，所在城市输入时，所在省（直辖市）必须输入",
 	     "优化部分查询条件智能展示",
 	     "优化部分图标，统一显示"
@@ -29,10 +30,10 @@ var version_update = function(){
 
 	    for (var i=0, l=updates.length; i<l; i++){
 		var s =  "<div class='update-content'><div class='text-left'>"
-		 + "<h4 class='text-center' style='margin-top:40px'><span class='fg-red'><strong>"
+		 + "<h4 class='text-center' style='margin-top:20px'><span class='fg-red'><strong>"
 		    + "<u>" + updates[i].date + "日更新</u>"
 		    + "</strong></span></h4>"
-		    + "<h5 class='text-center'><span class='fg-red'>注：设备首次登录时，请务必清除浏览器缓存后再登陆！！</span></h5>"
+		    + "<h5 class='text-center'><span class='fg-red'>注：首次登录时，请务必清除浏览器缓存后再登陆！！</span></h5>"
 		    + "<ol style='padding:0;color:orange'>"
 
 		var c = ""
@@ -45,10 +46,11 @@ var version_update = function(){
 		content += s + c + e;
 	    }
 
-	    $('body').append(content).append("<div class='copyright'><span> 2015-2025 &copy;&nbsp钱掌柜&nbsp&nbsp&nbsp&nbsp</span>"
-					     + "<span><i class='glyphicon glyphicon-star'></i>"
-					     + "QQ群：261033201"
-					     + "</span></div>");
+	    $('body').append(content);
+		// .append("<div class='copyright'><span> 2015-2025 &copy;&nbsp钱掌柜&nbsp&nbsp&nbsp&nbsp</span>"
+		// 			     + "<span><i class='glyphicon glyphicon-star'></i>"
+		// 			     + "QQ群：261033201"
+		// 			     + "</span></div>");
 	}
     } 
 }();

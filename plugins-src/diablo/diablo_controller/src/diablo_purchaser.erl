@@ -655,8 +655,8 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 
 	    NewBalance = 
 		case ?sql_utils:execute(s_read, Sql0) of
-		    []      -> Balance;
-		    {ok, R} ->
+		    {ok, []}  -> Balance;
+		    {ok, R}   ->
 			?v(<<"balance">>, R)
 			    + ?v(<<"should_pay">>, R)
 			    + ?v(<<"e_pay">>, R)

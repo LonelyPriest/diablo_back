@@ -73,7 +73,7 @@ wsaleApp.config(['$routeProvider', function($routeProvider){
 	    controller: 'wsaleNewDetailCtrl',
 	    resolve: angular.extend({}, user, retailer, employee, base) 
 	}).
-	when('/update_wsale_detail/:rsn?', {
+	when('/update_wsale_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/wsale/html/update_wsale_detail.html',
 	    controller: 'wsaleUpdateDetailCtrl',
 	    resolve: angular.extend({}, user, retailer, employee, s_group, brand, color, type)
@@ -89,7 +89,7 @@ wsaleApp.config(['$routeProvider', function($routeProvider){
 	    controller: 'wsaleRejectCtrl',
 	    resolve: angular.extend({}, user, retailer, employee, s_group, color, base) 
 	}).
-	when('/update_wsale_reject/:rsn?', {
+	when('/update_wsale_reject/:rsn?/:ppage?', {
 	    templateUrl: '/private/wsale/html/update_wsale_reject.html',
 	    controller: 'wsaleUpdateRejectCtrl',
 	    resolve: angular.extend({}, user, retailer, employee, s_group, brand, color, type, base)
@@ -270,7 +270,7 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 });
 
 wsaleApp.controller("wsaleNewCtrl", function(
-    $scope, $q, dateFilter, localStorageService,
+    $scope, $q, $timeout, dateFilter, localStorageService,
     diabloUtilsService, diabloPromise, diabloFilter, diabloNormalFilter,
     diabloPattern, wgoodService, purchaserService, 
     wretailerService, wsaleService, wsaleGoodService,
@@ -1555,27 +1555,41 @@ wsaleApp.controller("wsaleNewCtrl", function(
     };
 
     $scope.reset_inventory = function(inv){
+	inv.$reset = true;
 	$scope.inventories[0] = {$edit:false, $new:true};;
     };
 
+    var timeout_auto_save = undefined;
     $scope.auto_save_free = function(inv){
+	
 	if (angular.isUndefined(inv.sell)
 	    || !inv.sell
 	    || parseInt(inv.sell) === 0){
 	    return;
 	}
-	
-	if (inv.$new && inv.free_color_size){
-	    $scope.add_free_inventory(inv);
-	};
 
-	if (!inv.$new){
-	    if (inv.free_update){
-		$scope.save_free_update(inv)
-	    } else {
-		$scope.re_calculate(); 
-	    }
+	if (inv.form.sell && inv.form.sell.$invalid
+	    || inv.form.fdiscount && inv.form.fdiscount.$invalid
+	    || inv.form.fprice && inv.form.fprice.$invalid){
+	    return;
 	}
+
+	$timeout.cancel(timeout_auto_save);
+	timeout_auto_save = $timeout(function(){
+	    if (!inv.$reset){
+		if (inv.$new && inv.free_color_size){
+		    $scope.add_free_inventory(inv);
+		};
+
+		if (!inv.$new){
+		    if (inv.free_update){
+			$scope.save_free_update(inv)
+		    } else {
+			$scope.re_calculate(); 
+		    }
+		}
+	    } 
+	}, 1000); 
     };
 });
 
@@ -1655,6 +1669,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     // console.log($routeParams);
     $scope.default_page = 1;
 
+    console.log($routeParams);
     var back_page = diablo_set_integer($routeParams.page);
     // console.log(back_page);
     
@@ -1742,11 +1757,8 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     };
 
     $scope.do_search($scope.current_page);
-    
-    $scope.rsn_detail = function(r){
-	// console.log(r);
-	// console.log($scope.current_page);
-	// save stastic
+
+    $scope.save_stastic = function(){
 	localStorageService.set(
 	    "wsale-trans-stastic",
 	    {total_items:      $scope.total_items,
@@ -1758,7 +1770,12 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	     total_wire:       $scope.total_wire,
 	     total_verificate: $scope.total_verificate,
 	     t:                now});
-	
+    };
+    
+    $scope.rsn_detail = function(r){
+	// console.log(r);
+	// console.log($scope.current_page);
+	$scope.save_stastic();	
 	diablo_goto_page(
 	    "#/wsale_rsn_detail/"
 		+ r.rsn + "/" + $scope.current_page.toString()); 
@@ -1799,10 +1816,15 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     };
 
     $scope.update_detail = function(r){
+	$scope.save_stastic();
 	if (r.type === 0){
-	    diablo_goto_page('#/update_wsale_detail/' + r.rsn); 
+	    diablo_goto_page(
+		'#/update_wsale_detail/'
+		    + r.rsn + "/" + $scope.current_page.toString()); 
 	} else {
-	    diablo_goto_page('#/update_wsale_reject/' + r.rsn); 
+	    diablo_goto_page(
+		'#/update_wsale_reject/'
+		    + r.rsn + "/" + $scope.current_page.toString()); 
 	}
     };
 

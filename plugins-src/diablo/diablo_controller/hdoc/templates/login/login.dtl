@@ -50,6 +50,13 @@
     <div class="logo">
       <img src="/private/img/login.png" alt=""/>
     </div>     <!-- END LOGO -->
+
+    <div class="copyright">
+      <span> 2015-2025 &copy;&nbsp钱掌柜&nbsp&nbsp&nbsp&nbsp</span>
+      <span><i class="glyphicon glyphicon-star"></i>
+	QQ群：261033201
+      </span>
+    </div>
     
     <!-- BEGIN content-->
     <div class="content" x-ng-controller="loginCtrl">

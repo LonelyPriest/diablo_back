@@ -7,6 +7,10 @@ angular.module("diabloPattern", []).service("diabloPattern", [function(){
 
     // only number
     this.number = /^[0-9]*$/;
+    
+    this.positive_num = /^[1-9][0-9]*$/;
+    
+    this.positive_decimal_2 = /^\d+(.\d{1,2})?$/;
 
     this.decimal_2 = /^[+|\-]?\d+(.\d{1,2})?$/;
 

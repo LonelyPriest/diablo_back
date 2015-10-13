@@ -462,7 +462,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 
 	$timeout.cancel(timeout_sytle_number);
 	timeout_sytle_number = $timeout(function(){
-	    console.log(newValue, oldValue);
+	    // console.log(newValue, oldValue);
 	    check_same_good(newValue, $scope.good.brand);
 	}, diablo_delay)
     });

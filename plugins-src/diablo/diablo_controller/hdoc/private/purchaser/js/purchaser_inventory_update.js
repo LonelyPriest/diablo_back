@@ -23,7 +23,9 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
 
-    $scope.go_back = function(){diablo_goto_page("#/inventory_new_detail")};
+    $scope.go_back = function(){
+	diablo_goto_page("#/inventory_new_detail/" + $routeParams.ppage);
+    };
 
     // pagination
     $scope.colspan = 9;
@@ -746,5 +748,12 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	// }; 
     }
 
+    $scope.reset_inventory = function(inv){
+	// inv.$reset = true; 
+	// console.log($scope.inventories);
+	$scope.inventories[0] = {$edit:false, $new:true};
+	// $scope.current_inventories = $scope.get_page($scope.current_page); 
+	// $scope.current_page_index = $scope.get_page($scope.current_page);
+    } 
     
 });

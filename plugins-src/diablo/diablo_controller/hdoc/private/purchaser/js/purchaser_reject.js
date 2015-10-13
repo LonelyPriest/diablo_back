@@ -1,5 +1,5 @@
 purchaserApp.controller("purchaserInventoryRejectCtrl", function(
-    $scope, $q, dateFilter, diabloPattern, diabloUtilsService,
+    $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
     console.log(user);
@@ -38,6 +38,13 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	$scope.select.surplus = parseFloat($scope.select.firm.balance);
 	$scope.re_calculate();
 
+	if ($scope.q_prompt === diablo_frontend){
+	    $scope.get_all_prompt_inventory();
+	}
+    };
+
+    $scope.change_shop = function(){
+	console.log($scope.select.shop);
 	if ($scope.q_prompt === diablo_frontend){
 	    $scope.get_all_prompt_inventory();
 	}
@@ -501,6 +508,39 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     }
 
     $scope.reset_inventory = function(inv){
+	inv.$reset = true; 
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
+
+    var timeout_auto_save = undefined;
+    $scope.auto_save_free = function(inv){
+	
+	if (angular.isUndefined(inv.amounts[0].reject_count)
+	    || !inv.amounts[0].reject_count
+	    || parseInt(inv.amounts[0].reject_count) === 0){
+	    return;
+	}
+
+	if (inv.form.amount && inv.form.reject.$invalid){
+	    return;
+	}
+
+	$timeout.cancel(timeout_auto_save);
+	timeout_auto_save = $timeout(function(){
+	    if (!inv.$reset){
+		if (inv.$new && inv.free_color_size){
+		    $scope.add_free_inventory(inv);
+		};
+
+		if (!inv.$new){
+		    if (inv.free_update){
+			$scope.save_free_update(inv)
+		    } else {
+			$scope.re_calculate(); 
+		    }
+		}
+	    } 
+	}, 1000); 
+    };
+    
 });

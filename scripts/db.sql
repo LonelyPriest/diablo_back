@@ -43,6 +43,7 @@ create table employees
     address         VARCHAR(64),
     merchant        INTEGER, -- which merchant belong to
     deleted         INTEGER default 0, -- 0: no;  1: yes
+    unique  key  index_mn (merchant, name),
     primary key     (id)
 ) default charset=utf8;
 
@@ -137,7 +138,7 @@ create table brands(
     merchant         INTEGER default -1,  -- brand belong to
     deleted          INTEGER default 0, -- 0: no;  1: yes
     
-    unique  key  index_nm (name, merchant), 
+    unique  key  index_nm (name, supplier, merchant), 
     primary key      (id)
 )default charset=utf8;
 
@@ -376,7 +377,7 @@ create table w_inventory_good
     deleted          INTEGER default 0, -- 0: no;  1: yes
 
     UNIQUE key       index_sbsm (style_number, brand, merchant),
-    key              index_sbm (style_number, brand, firm, merchant),
+    key              index_sbm  (style_number, brand, firm, merchant),
     key              merchant (merchant),
     
     primary key      (id)
@@ -440,8 +441,8 @@ create table w_inventory_amount(
     total          INTEGER default 0,
     entry_date     DATETIME,
     deleted        INTEGER default 0, -- 0: no;  1: yes
-    UNIQUE key       index_sbsm (style_number, brand, color, size, shop, merchant),
-    key            index_sbsm     (style_number, brand, shop, merchant),
+    UNIQUE key     index_sbss (style_number, brand, color, size, shop, merchant),
+    key            index_sbsm (style_number, brand, shop, merchant),
     primary key    (id)
 )default charset=utf8;
 
@@ -629,9 +630,9 @@ create table w_sale(
     check_date     DATETIME default null, -- date of last change
     entry_date     DATETIME,
     deleted        INTEGER default 0, -- 0: no;  1: yes
-    key rsn        (rsn),
-    key index_smer (shop, merchant, employ, retailer) 
-    primary key    (id),
+    unique  key rsn (rsn),
+    key index_smer  (shop, merchant, employ, retailer),
+    primary key     (id),
     
 )default charset=utf8;
 
@@ -684,6 +685,7 @@ create table w_sale_detail(
     deleted        INTEGER default 0, -- 0: no;  1: yes
 
     unique  key  index_rsb (rsn, style_number, brand),
+    key          index_sb  (style_number, brand),
     primary key    (id)
 )default charset=utf8;
 

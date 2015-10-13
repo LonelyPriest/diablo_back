@@ -285,8 +285,8 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 
 	    NewBalance = 
 		case ?sql_utils:execute(s_read, Sql0) of
-		    []      -> Balance;
-		    {ok, R} ->
+		    {ok, []} -> Balance;
+		    {ok, R}  ->
 			?v(<<"balance">>, R)
 			    + ?v(<<"should_pay">>, R)
 			    + ?v(<<"e_pay">>, R)
@@ -378,24 +378,35 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
     ?DEBUG("last_sale with merchant ~p, condtions ~p", [Merchant, Conditions]),
     Retailer = ?v(<<"retailer">>, Conditions),
     Shop     = ?v(<<"shop">>, Conditions),
-    C1 = [{<<"shop">>, Shop}, {<<"retailer">>, Retailer}], 
+    C1 = [{<<"a.shop">>, Shop},
+	  {<<"a.merchant">>, Merchant},
+	  {<<"a.retailer">>, Retailer},
+	  {<<"a.type">>, 0}],
+    
     C2 = proplists:delete(<<"retailer">>,
 			  proplists:delete(<<"shop">>, Conditions)),
-    CorrectC2 = ?utils:correct_condition(<<"a.">>, C2),
-    
-    
-    Sql = "select a.id, a.rsn, a.style_number, a.sell_style"
-	", a.fdiscount, a.fprice"
-	" from w_sale_detail a"
-	" inner join "
-	  "(select rsn from w_sale where " ++ ?utils:to_sqls(proplists, C1)
-	++ ") b on a.rsn=b.rsn"
-	%% " where a.rsn in"
-	%% "(select rsn from w_sale where "
-	%% ++ ?utils:to_sqls(proplists, C1) ++ ")"
-	%% ++ ?sql_utils:condition(proplists, C2)
-	++ " where " ++ ?utils:to_sqls(proplists, CorrectC2)
+    CorrectC2 = ?utils:correct_condition(<<"b.">>, C2),
+
+    Sql = 
+	"select a.rsn, b.id, b.rsn, b.style_number, b.sell_style"
+	", b.fdiscount, b.fprice"
+	" from w_sale a, w_sale_detail b"
+	" where a.rsn=b.rsn" ++ ?sql_utils:condition(proplists, C1)
+	++ " and " ++ ?utils:to_sqls(proplists, CorrectC2)
 	++ " order by id desc limit 1",
+    
+    %% Sql = "select a.id, a.rsn, a.style_number, a.sell_style"
+    %% 	", a.fdiscount, a.fprice"
+    %% 	" from w_sale_detail a"
+    %% 	" inner join "
+    %% 	  "(select rsn from w_sale where " ++ ?utils:to_sqls(proplists, C1)
+    %% 	++ ") b on a.rsn=b.rsn",
+    %% 	%% " where a.rsn in"
+    %% 	%% "(select rsn from w_sale where "
+    %% 	%% ++ ?utils:to_sqls(proplists, C1) ++ ")"
+    %% 	%% ++ ?sql_utils:condition(proplists, C2)
+    %% 	++ " where " ++ ?utils:to_sqls(proplists, CorrectC2)
+    %% 	++ " order by id desc limit 1",
     Reply = ?sql_utils:execute(s_read, Sql),
     {reply, Reply, State};
 

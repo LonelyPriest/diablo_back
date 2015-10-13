@@ -28,7 +28,9 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
 
-    $scope.go_back = function(){diablo_goto_page("#/wsale/new_wsale_detail")};
+    $scope.go_back = function(){
+	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
+    };
 
     // pagination
     $scope.colspan = 9;

@@ -52,6 +52,7 @@
 		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
 		<select class="form-control" type="text"
 	  		x-ng-model="select.shop"
+			x-ng-change="change_shop()"
 	  		x-ng-options="s as s.name for s in
 	  			  shops|filter:$viewValue|limitTo:8">
 		</select> 
@@ -186,10 +187,10 @@
 		    <th class="text-center">货号</th>
 		    <th class="text-center">品名</th>
 		    <th class="text-center">类别</th>
-		    <th class="text-center">性别</th>
+		    <!-- <th class="text-center">性别</th> -->
 		    <!-- <th class="text-center">厂商</th> -->
 		    <th class="text-center">季节</th>
-		    <th class="text-center">数量</th>
+		    <th class="text-center">库存</th>
 		    <th class="text-center">进货价</th>
 		    <!-- <th class="text-center">吊牌价</th>  -->
 		    <!-- <th class="text-center">打包价</th> -->
@@ -246,7 +247,7 @@
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand}}</td>
 		    <td class="vert-align">{{inv.type}}</td>
-		    <td class="vert-align">{{sexs[inv.sex]}}</td>
+		    <!-- <td class="vert-align">{{sexs[inv.sex]}}</td> -->
 		    <!-- <td>{{inv.firm}}</td> -->
 		    <td class="vert-align">{{seasons[inv.season]}}</td>
 		    <td class="vert-align">{{inv.total}}</td>
@@ -280,6 +281,7 @@
 				 required
 				 x-ng-pattern="/^[1-9][0-9]*$/"
 				 x-ng-model="inv.amounts[0].reject_count"
+				 x-ng-change="auto_save_free(inv)"
 				 placeholder="数量"
 				 popover-placement="top"
 				 popover-trigger="focus"
@@ -295,50 +297,50 @@
 		    
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
-			   x-ng-if="inv.free_color_size"
-			   x-ng-disabled="inv.form.good.$invalid
-					  || inv.form.reject.$invalid
-					  || !valid_free_size_reject(inv)"
-			   x-ng-click="add_free_inventory(inv)">保存
-			  <i class="glyphicon glyphicon-plus"></i></a>
+			<!-- <a class="btn btn-success btn-xs" -->
+			<!--    x-ng-if="inv.free_color_size" -->
+			<!--    x-ng-disabled="inv.form.good.$invalid -->
+			<!-- 		  || inv.form.reject.$invalid -->
+			<!-- 		  || !valid_free_size_reject(inv)" -->
+			<!--    x-ng-click="add_free_inventory(inv)">保存 -->
+			<!--   <i class="glyphicon glyphicon-plus"></i></a> -->
 			
-			<a class="btn btn-success btn-xs"
+			<a class="btn btn-success"
 			   x-ng-if="!inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid"
 			   x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-warning btn-xs"
+			<a class="btn btn-warning"
 			   x-ng-disabled="!inv.style_number"
 			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a>
 		      </div>
 
 		      <div ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn btn-primary"
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
 			
-			<a class="btn yellow btn-xs"
+			<a class="btn yellow"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn btn-danger"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
-			   ng-if="inv.free_update"
-			   x-ng-disabled=" inv.form.amount.$invalid"
+			<a class="btn btn-success"
+			   x-ng-if="inv.free_update"
+			   x-ng-disabled=" inv.form.reject.$invalid"
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn btn-danger"
 			   ng-if="inv.free_update"
 			   x-ng-disabled=" inv.form.amount.$invalid"
 			   x-ng-click="inv.free_update=false">取消

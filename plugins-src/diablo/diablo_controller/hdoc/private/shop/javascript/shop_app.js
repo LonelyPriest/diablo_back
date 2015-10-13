@@ -149,9 +149,11 @@ shopApp.controller("newShopCtrl", function(
 
     // repo
     $scope.authen_list_repo = false;
-    if (rightAuthen.authen("list_repo", user.right, rightAuthen.shop_action())){
+    if (rightAuthen.authen(rightAuthen.shop_action()["list_repo"], user.right)){
 	$scope.authen_list_repo = true; 
     };
+
+    console.log($scope.authen_list_repo);
     
 
     $scope.repertories = [];

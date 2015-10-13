@@ -1,5 +1,5 @@
 purchaserApp.controller("purchaserInventoryNewCtrl", function(
-    $scope, dateFilter, diabloPattern, diabloUtilsService,
+    $scope, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, wgoodService, purchaserService,
     localStorageService, user, filterFirm,
     filterEmployee, filterColor, base){
@@ -331,7 +331,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     };
     
     $scope.on_select_good = function(item, model, label){
-	console.log(item);
+	console.log(item); 
 
 	// has been added
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
@@ -803,10 +803,43 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     }
 
     $scope.reset_inventory = function(inv){
-	console.log($scope.inventories);
+	inv.$reset = true; 
+	// console.log($scope.inventories);
 	$scope.inventories[0] = {$edit:false, $new:true};
 	$scope.current_inventories = $scope.get_page($scope.current_page);
     }
+
+    var timeout_auto_save = undefined;
+    $scope.auto_save_free = function(inv){
+	// console.log(inv);
+	if (angular.isUndefined(inv.amount[0].count)
+	    || !inv.amount[0].count
+	    || parseInt(inv.amount[0].count) === 0){
+	    return;
+	}
+
+	if (inv.form.amount && inv.form.amount.$invalid
+	    || inv.form.orgprice && inv.form.orgprice.$invalid){
+	    return;
+	}
+
+	$timeout.cancel(timeout_auto_save);
+	timeout_auto_save = $timeout(function(){
+	    if (!inv.$reset){
+		if (inv.$new && inv.free_color_size){
+		    $scope.add_inventory(inv);
+		};
+
+		if (!inv.$new){
+		    if (inv.update_directory){
+			$scope.save_update(inv)
+		    } else {
+			$scope.re_calculate(); 
+		    }
+		}
+	    } 
+	}, 1000); 
+    };
 });
 
 purchaserApp.controller("purchaserInventoryDetailCtrl", function(
@@ -1091,7 +1124,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	diablo_goto_page('#/inventory_detail');
     }
 
-    $scope.trans_detail = function(r){
+    $scope.save_stastic = function(){
 	localStorageService.set(
 	    "inventory-trans-stastic",
 	    {total_items:      $scope.total_items,
@@ -1103,19 +1136,26 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	     total_wire:       $scope.total_wire,
 	     total_verificate: $scope.total_verificate,
 	     t:                now});
-	
+    };
+
+    $scope.trans_detail = function(r){
+	$scope.save_stastic();
 	diablo_goto_page('#/inventory_rsn_detail/'
 			 + r.rsn + "/" + $scope.current_page.toString());
-    }
+    };
 
     $scope.update_detail = function(r){
+	$scope.save_stastic(); 
 	if (r.type === 0){
-	    diablo_goto_page('#/update_new_detail/' + r.rsn);
+	    diablo_goto_page(
+		'#/update_new_detail/'
+		    + r.rsn + "/" + $scope.current_page.toString());
 	} else{
-	    diablo_goto_page('#/update_new_detail_reject/' + r.rsn);
-	}
-	
-    }
+	    diablo_goto_page(
+		'#/update_new_detail_reject/'
+		    + r.rsn + "/" + $scope.current_page.toString());
+	} 
+    };
 
     /*
      * hide column

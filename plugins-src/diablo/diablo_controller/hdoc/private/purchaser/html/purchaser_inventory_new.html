@@ -345,8 +345,7 @@
 		    <td class="vert-align">{{seasons[inv.season]}}</td>
 		    
 		    <td class="col-md-1 vert-align">
-		      <span x-ng-if="!inv.$new
-				     && !inv.update_directory">
+		      <span x-ng-if="!inv.$new && !inv.update_directory">
 			{{inv.org_price}}</span>
 		      <form name="inv.form.orgprice"
 			    x-ng-if="inv.$new && inv.free_color_size && modify_orgprice 
@@ -380,13 +379,13 @@
 		    <!-- </td> -->
 		    
 		    <td class="col-md-1 vert-align">
-		      <div ng-if="!inv.$new
-				  && !inv.update_directory">
-			{{inv.total}}</div> 
+		      <span x-ng-if="!inv.$new && !inv.update_directory">
+			{{inv.total}}
+		      </span> 
 		      <form name="inv.form.amount"
-			    ng-if="inv.$new
-				   && inv.free_color_size
-				   || inv.update_directory">
+			    x-ng-if="inv.$new
+				     && inv.free_color_size
+				     || inv.update_directory">
 			<div ng-class="{'has-error':inv.form.amount.$invalid
 				       && !inv.form.amount.$pristine}">
 			  <input class="form-control"
@@ -395,6 +394,7 @@
 				 required
 				 x-ng-pattern="/^[1-9][0-9]*$/"
 				 x-ng-model="inv.amount[0].count"
+				 x-ng-change="auto_save_free(inv)"
 				 popover-placement="top"
 				 popover-trigger="focus"
 				 popover="均色均码直接输入数量"></input>
@@ -402,20 +402,22 @@
 		      </form>
 		    </td>
 
-		    <td>
+		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
-		      <span x-ng-if="!inv.$new">{{inv.total * inv.org_price}}</span>
+		      <span x-ng-if="!inv.$new">
+			{{inv.total * inv.org_price}}
+		      </span>
 		    </td>
 		    
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
-				x-ng-if="inv.free_color_size"
-				x-ng-disabled="inv.form.good.$invalid
-					       || inv.form.amount.$invalid"
-				x-ng-click="add_inventory(inv)">保存
-			  <i class="glyphicon glyphicon-plus"></i></a> 
-			<a class="btn btn-success btn-xs"
+			<!-- <a class="btn btn-success btn-xs" -->
+			<!-- 	x-ng-if="inv.free_color_size" -->
+			<!-- 	x-ng-disabled="inv.form.good.$invalid -->
+			<!-- 		       || inv.form.amount.$invalid" -->
+			<!-- 	x-ng-click="add_inventory(inv)">保存 -->
+			<!--   <i class="glyphicon glyphicon-plus"></i></a>  -->
+			<a class="btn btn-success"
 				x-ng-if="!inv.free_color_size"
 				x-ng-disabled="inv.form.good.$invalid
 					       || inv.free_color_size
@@ -423,33 +425,33 @@
 					       || has_saved"
 				x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a> 
-			<a class="btn btn-warning btn-xs"
+			<a class="btn btn-warning"
 			   x-ng-disabled="!inv.style_number"
 			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a> 
 		      </div>
 
 		      <div ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn btn-primary"
 			   x-ng-if="!inv.update_directory"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
-			<a class="btn yellow btn-xs"
+			<a class="btn yellow"
 			   x-ng-if="!inv.update_directory"
 			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
-			<a class="btn btn-danger btn-xs"
+			<a class="btn btn-danger"
 			   x-ng-if="!inv.update_directory"
 			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
+			<a class="btn btn-success"
 			   x-ng-if="inv.update_directory"
 			   x-ng-disabled="inv.form.amount.$invalid"
 			   x-ng-click="save_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
-			<a class="btn btn-danger btn-xs"
+			<a class="btn btn-danger"
 			   ng-if="inv.update_directory"
 			   x-ng-disabled="inv.form.amount.$invalid"
 			   x-ng-click="inv.update_directory=false;
