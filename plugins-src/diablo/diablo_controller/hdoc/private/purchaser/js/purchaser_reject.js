@@ -5,16 +5,17 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     console.log(user);
 
     // $scope.shops     = user.sortShops;
-    $scope.shops           = user.sortBadRepoes.concat(user.sortShops);
+    $scope.shops             = user.sortBadRepoes.concat(user.sortShops);
     // $scope.shops     = user.sortAvailabeShops;
-    $scope.f_add           = diablo_float_add;
-    $scope.f_sub           = diablo_float_sub;
+    $scope.f_add             = diablo_float_add;
+    $scope.f_sub             = diablo_float_sub;
     
-    $scope.sexs            = diablo_sex;
-    $scope.seasons         = diablo_season;
-    $scope.firms           = filterFirm;
-    $scope.employees       = filterEmployee;
-    $scope.extra_pay_types = purchaserService.extra_pay_types;
+    $scope.sexs              = diablo_sex;
+    $scope.seasons           = diablo_season;
+    $scope.firms             = filterFirm;
+    $scope.employees         = filterEmployee;
+    $scope.extra_pay_types   = purchaserService.extra_pay_types;
+    $scope.timeout_auto_save = undefined;
 
     var now = $.now();
 
@@ -502,15 +503,24 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     };
 
     $scope.save_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save); 
 	inv.free_update = false;
-	inv.reject = inv.amounts[0].reject_count;
+	inv.reject      = inv.amounts[0].reject_count;
 	$scope.re_calculate(); 
     }
 
+    $scope.cancel_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
+	inv.free_update = false;
+	inv.amounts[0].reject_count = inv.reject;
+    } 
+    
     $scope.reset_inventory = function(inv){
-	inv.$reset = true; 
+	// inv.$reset = true;
+	$timeout.cancel($scope.timeout_auto_save);
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
+
 
     var timeout_auto_save = undefined;
     $scope.auto_save_free = function(inv){
@@ -519,27 +529,17 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	    || !inv.amounts[0].reject_count
 	    || parseInt(inv.amounts[0].reject_count) === 0){
 	    return;
-	}
+	} 
 
-	if (inv.form.amount && inv.form.reject.$invalid){
-	    return;
-	}
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    };
 
-	$timeout.cancel(timeout_auto_save);
-	timeout_auto_save = $timeout(function(){
-	    if (!inv.$reset){
-		if (inv.$new && inv.free_color_size){
-		    $scope.add_free_inventory(inv);
-		};
-
-		if (!inv.$new){
-		    if (inv.free_update){
-			$scope.save_free_update(inv)
-		    } else {
-			$scope.re_calculate(); 
-		    }
-		}
-	    } 
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv);
+	    }
 	}, 1000); 
     };
     

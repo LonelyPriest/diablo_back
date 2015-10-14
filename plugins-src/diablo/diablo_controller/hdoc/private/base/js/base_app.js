@@ -160,7 +160,7 @@ baseApp.controller("bankCardNewCtrl", function($scope, baseService, diabloUtilsS
 	    if (state.ecode == 0){
 		diabloUtilsService.response_with_callback(
 		    true, "新增银行卡", "恭喜您，银行卡 " + $scope.card.no + " 成功创建！！",
-		    $scope, function(){location.href = "#/bank/bank_card_detail"});		    
+		    $scope, function(){diablo_goto_page("#/bank/bank_card_detail")});
 	    } else{
 		diabloUtilsService.response(
 		    false, "新增银行卡", "新增银行卡失败：" + baseService.error[state.ecode]); 
@@ -172,6 +172,10 @@ baseApp.controller("bankCardNewCtrl", function($scope, baseService, diabloUtilsS
 	baseService.list_card().then(function(cards){
 	    console.log(cards);
 	})
+    }
+
+    $scope.cancel_new_card = function(){
+	diablo_goto_page("#/bank/bank_card_detail");
     }
 });
 
@@ -252,9 +256,25 @@ baseApp.controller("printOptionCtrl", function(
     $scope.print_formats = baseService.print_formats;
     $scope.yes_no        = baseService.yes_no;
     $scope.time_length   = baseService.time_length;
-    $scope.prompt_types  = baseService.prompt_types;
-
+    $scope.prompt_types  = baseService.prompt_types; 
     console.log($scope.print_formats);
+
+    $scope.show_switch = function(name){
+	if (name === 'pum'
+	    || name === 'qtime_start'
+	    || name === 'qtime_length'
+	    || name === 'phone1'
+	    || name === 'phone2'
+	    || name === 'comment1'
+	    || name === 'comment2'
+	    || name === 'comment3'
+	   ){
+	    return false;
+	}
+
+	return true;
+    };
+    
     // console.log($scope.print_types);
 
     var dialog = diabloUtilsService;
@@ -390,10 +410,13 @@ baseApp.controller("printOptionCtrl", function(
 	    angular.extend(s, {prompt_types: $scope.prompt_types}); 
 	};
 	if (s.ename === 'ptable'
-	   || s.ename === 'pretailer'
-	   || s.ename === 'pround'
-	   || s.ename === 'ptrace_price'
-	   || s.ename === 'pim_print'){
+	    || s.ename === 'pretailer'
+	    || s.ename === 'pround'
+	    || s.ename === 'ptrace_price'
+	    || s.ename === 'pim_print'
+	    || s.ename === 'reject_negative'
+	    || s.ename === 'check_sale'
+	    || s.ename === 'show_discount'){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};
 	if (s.ename === 'qtime_length'){

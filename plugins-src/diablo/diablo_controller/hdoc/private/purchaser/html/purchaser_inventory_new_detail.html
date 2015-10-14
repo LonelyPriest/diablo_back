@@ -73,23 +73,30 @@
 		  <tr>
 		    <th>序号</th>
 		    <th>单号</th>
-		    <th class="danger">厂商</th>
-		    <th>店铺</th>
-		    <th>入单员</th>
+		    <th class="danger">
+		      <span x-ng-click="toggle_base()">
+			<span x-ng-if="!hidden.base">
+			  <i class="glyphicon glyphicon-backward fg-red"></i>厂商</span>
+			<span x-ng-if="hidden.base">
+			  厂商<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		      </span>
+		    </th>
+		    <th x-ng-if="!hidden.base">店铺</th>
+		    <th x-ng-if="!hidden.base">入单员</th>
 		    <th>采购</th>
 		    <th class="danger">数量</th>
 		    
-		    <th x-ng-if="!hide_column">现金</th>
-		    <th x-ng-if="!hide_column">刷卡</th>
-		    <th x-ng-if="!hide_column">汇款</th>
-		    <th x-ng-if="!hide_column" class="warning">核销</th>
-		    <th x-ng-if="!hide_column" class="danger">费用</th>
+		    <th x-ng-if="!hidden.balance">现金</th>
+		    <th x-ng-if="!hidden.balance">刷卡</th>
+		    <th x-ng-if="!hidden.balance">汇款</th>
+		    <th x-ng-if="!hidden.balance" class="warning">核销</th>
+		    <th x-ng-if="!hidden.balance" class="danger">费用</th>
 
 		    <th class="info">
-		      <span x-ng-click="toggle_left()">
-			<span x-ng-if="!hide_column">
+		      <span x-ng-click="toggle_balance()">
+			<span x-ng-if="!hidden.balance">
 			  <i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
-			<span x-ng-if="hide_column">
+			<span x-ng-if="hidden.balance">
 			  帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		      </span>
 		    </th>
@@ -108,8 +115,8 @@
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.rsn}}</td>
 		    <td>{{r.firm.name}}</td>
-		    <td>{{r.shop.name}}</td>
-		    <td>{{r.employee.name}}</td>
+		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
+		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
 		    <td x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>入库</span>
 		      <span class="bg-red" x-ng-switch-when=1>退货</span>
@@ -117,11 +124,11 @@
 		    
 		    <td>{{r.total}}</td>
 		    
-		    <td x-ng-if="!hide_column">{{r.cash}}</td>
-		    <td x-ng-if="!hide_column">{{r.card}}</td>
-		    <td x-ng-if="!hide_column">{{r.wire}}</td>
-		    <td x-ng-if="!hide_column">{{r.verificate}}</td>
-		    <td x-ng-if="!hide_column">
+		    <td x-ng-if="!hidden.balance">{{r.cash}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.card}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.wire}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.verificate}}</td>
+		    <td x-ng-if="!hidden.balance">
 		      <span x-ng-if="r.e_pay!==0" class="bg-blue">{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
@@ -150,16 +157,16 @@
 		    </td>
 		    <td>{{r.entry_date}}</td>
 		    <td> 
-                      <button class="btn btn-primary btn-xs red-stripe"
+                      <button class="btn diablo-button btn-primary"
 			      x-ng-click="trans_detail(r)">明细
 			<i class="glyphicon glyphicon-leaf"></i></button>
 		      
-		      <button class="btn yellow btn-xs red-stripe"
+		      <button class="btn diablo-button yellow"
 		      	      x-ng-disabled="r.state===1"
 		      	      x-ng-click="update_detail(r)">修改
-		      	<i class="glyphicon glyphicon-pencil"></i></button>
+		      	<i class="glyphicon glyphicon-edit"></i></button>
 		      
-		      <button class="btn red btn-xs green-stripe"
+		      <button class="btn diablo-button red"
 			      x-ng-disabled="r.state===1"
 		      	      x-ng-click="check_detail(r)">审核
 		      	<i class="glyphicon glyphicon-check"></i></button>
@@ -174,12 +181,13 @@
 
 		  <!--Total info-->
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td colspan="6"></td>
+		    <td x-ng-if="hidden.base" colspan="4"></td>
+		    <td x-ng-if="!hidden.base" colspan="6"></td>
 		    <td class="danger">{{total_amounts}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_cash}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_card}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_wire}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_verificate}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_cash}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_card}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_wire}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_verificate}}</td>
 		    <td colspan="1"></td> 
 		    <td class="danger">{{total_spay}}</td>
 		    <td class="info">{{total_hpay}}</td>

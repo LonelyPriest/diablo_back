@@ -203,7 +203,8 @@
 		    <!-- <th class="text-center">厂商</th> -->
 		    <th class="text-center">季节</th>
 		    <!-- <th class="text-center">单价类型</th> -->
-		    <th class="text-center">折扣</th> 
+		    <th x-ng-if="setting.show_discount"
+			class="text-center">折扣</th> 
 		    <th class="text-center">单价</th>
 		    <!-- <th class="text-center">成交价</th> -->
 		    <!-- <th class="text-center">库存</th> -->
@@ -216,7 +217,7 @@
 		  <tr class="text-center" ng-repeat="inv in inventories">
 		    
 		    <td>{{inv.order_id}}</td>
-		    <td x-ng-if="q_typeahead === 0" class="col-md-2 text-left vert-align">
+		    <td x-ng-if="!setting.q_backend" class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" x-ng-if="inv.$new">
 			<div x-ng-class="{'has-error':inv.form.good.$invalid
@@ -233,7 +234,7 @@
 		      </form>
 		    </td>
 		    
-		    <td x-ng-if="q_typeahead === 1" class="col-md-2 text-left vert-align">
+		    <td x-ng-if="setting.q_backend" class="col-md-2 text-left vert-align">
 		      <span x-ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" x-ng-if="inv.$new">
 			<div x-ng-class="{'has-error':inv.form.good.$invalid
@@ -283,7 +284,7 @@
 		    <!--   {{inv[inv.sell_style.f]}} -->
 		    <!-- </td> -->
 
-		    <td class="col-md-1 vert-align">
+		    <td x-ng-if="setting.show_discount" class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fdiscount}}</div> 
 			  <form name="inv.form.fdiscount"
 				ng-if="inv.$new && inv.free_color_size
@@ -361,36 +362,36 @@
 			<!--    x-ng-click="add_free_inventory(inv)">保存 -->
 			<!--   <i class="glyphicon glyphicon-plus"></i></a> -->
 			
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="!inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid"
 			   x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-warning btn-xs"
+			<a class="btn diablo-input-button btn-warning"
 			   x-ng-disabled="!inv.style_number"
 			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a>
 		      </div>
 
 		      <div ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn diablo-input-button btn-primary"
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
 			
-			<a class="btn yellow btn-xs"
+			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   ng-if="inv.free_update"
 			   x-ng-disabled="inv.form.reject.$invalid
 					  || inv.form.fdiscount.$invalid
@@ -398,7 +399,7 @@
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   ng-if="inv.free_update"
 			   x-ng-disabled=" inv.form.reject.$invalid"
 			   x-ng-click="cancel_free_update(inv)">取消
@@ -410,7 +411,8 @@
 		  <!--stastic-->
 		  <tr x-ng-if="select.total && select.total !== 0"
 		      class="bg-white">
-		    <td colspan="8"></td>
+		    <td x-ng-if="setting.show_discount" colspan="8"></td>
+		    <td x-ng-if="!setting.show_discount" colspan="7"></td>
 		    <td class="danger text-center">{{select.should_pay}}</td>
 		    <td></td>
 		  </tr>

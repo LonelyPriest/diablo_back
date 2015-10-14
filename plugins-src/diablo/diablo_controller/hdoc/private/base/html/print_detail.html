@@ -101,6 +101,19 @@
 			{{prompt_types[s.value].cname}}
 		      </span>
 
+		      <span ng-switch-when="show_discount">
+			<!-- <input type="checkbox" diablo-switch /> -->
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		      <span ng-switch-when="reject_negative">
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		      <span ng-switch-when="check_sale">
+			{{yes_no[s.value].cname}}
+		      </span>
+
 		      <!--default--> 
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
@@ -111,11 +124,14 @@
 		    </td> 
 		    
 		    <td>{{s.entry_date}}</td>
-
+		    
+		    <!-- <td x-ng-if="show_switch(s.ename)" class="col-md-2"> -->
+		    <!--   <input type="checkbox" x-ng-model="s.value" diablo-switch /> -->
+		    <!-- </td> -->
 		    <td class="col-md-2"> 
-                      <button class="btn btn-warning btn-xs red-stripe"
+                      <button class="btn diablo-button btn-warning"
 			 x-ng-click="update_setting(s)">修改
-			<i class="glyphicon glyphicon-pencil"></i></button> 
+			<i class="glyphicon glyphicon-edit"></i></button> 
 		    </td>
 		    
 		  </tr>
@@ -317,6 +333,31 @@
 		      x-ng-model="params.setting.value"
 		      x-ng-options="q as q.cname for q in params.setting.prompt_types"
 		      x-ng-init="params.setting.value=params.setting.prompt_types[params.setting.value]">
+	      </select>
+
+
+	      <select x-ng-switch-when="show_discount"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="s as s.cname for s in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="check_sale"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="c as c.cname for c in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="reject_negative"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="r as r.cname for r in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
 	      </select>
 	      
 

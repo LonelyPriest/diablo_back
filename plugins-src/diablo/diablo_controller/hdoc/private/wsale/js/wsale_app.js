@@ -76,7 +76,7 @@ wsaleApp.config(['$routeProvider', function($routeProvider){
 	when('/update_wsale_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/wsale/html/update_wsale_detail.html',
 	    controller: 'wsaleUpdateDetailCtrl',
-	    resolve: angular.extend({}, user, retailer, employee, s_group, brand, color, type)
+	    resolve: angular.extend({}, user, retailer, employee, s_group, brand, color, type, base)
 	}). 
 	when('/wsale_rsn_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/wsale/html/wsale_rsn_detail.html',
@@ -277,8 +277,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
     user, filterFirm, filterRetailer, filterEmployee,
     filterSizeGroup, filterBrand, filterType, filterColor, base){
 
-    $scope.pattern = {money: diabloPattern.decimal_2};
-    
+    $scope.pattern           = {money: diabloPattern.decimal_2};
+    $scope.timeout_auto_save = undefined;
+
+    $scope.setting = {q_backend:true, show_discount:true};
+
     // all right of user
     // console.log(user); 
     // console.log(base); 
@@ -294,43 +297,30 @@ wsaleApp.controller("wsaleNewCtrl", function(
     wsaleGoodService.set_type(angular.copy(filterType));
     wsaleGoodService.set_size_group(angular.copy(filterSizeGroup));
     wsaleGoodService.set_firm(angular.copy(filterFirm));
-    
-    // $scope.repoes  = user.sortRepoes;
-    $scope.shops = user.sortShops; 
-    $scope.find_shop = function(shopId){
-	for(var i=0, l=$scope.shops.length; i<l; i++)
-	    if(shopId === $scope.shops[i].id){
-		return $scope.shops[i];
-	    }
-    }
 
-    $scope.change_shop = function(){
-	$scope.local_save();
-	wsaleGoodService.set_shop($scope.select.shop.id);
-    }
-
+    // base setting
     $scope.trace_price = function(shopId){
-	return diablo_base_setting("ptrace_price", shopId, base, parseInt, diablo_no); 
+	return diablo_base_setting(
+	    "ptrace_price", shopId, base, parseInt, diablo_no); 
     }
 
     $scope.immediately_print = function(shopId){
-	return diablo_base_setting("pim_print", shopId, base, parseInt, diablo_no); 
-    };
-
-    $scope.q_typeahead = function(shopId){
-	// default prompt comes from backend
-	return diablo_base_setting("qtypeahead", shopId, base, parseInt, diablo_yes);
-    }();
-    // console.log($scope.q_typeahead);
-
-    var now = $.now();
-    $scope.qtime_start = function(shopId){
 	return diablo_base_setting(
-	    "qtime_start", shopId, base, function(v){return v},
-	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
+	    "pim_print", shopId, base, parseInt, diablo_no); 
     };
-    // console.log($scope.qtime_start);
 
+    $scope.q_typeahead = function(){
+	// default prompt comes from backend
+	return diablo_base_setting(
+	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+    // console.log($scope.q_typeahead); 
+
+    $scope.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+    
     // $scope.qtime_length = function(shopId){
     // 	return diablo_base_setting("qtime_length", shopId, base, diablo_yes);
     // }();
@@ -361,7 +351,10 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	should_pay: 0.00,
 	extra_pay_type: $scope.extra_pay_types[0],
 	// extra_pay: 0.00
-    };
+    }; 
+
+    // console.log($scope.select);
+    
     
 
     // $scope.format_v = function(v){
@@ -370,25 +363,57 @@ wsaleApp.controller("wsaleNewCtrl", function(
     // 	} else{
     // 	    return parseFloat(v)
     // 	}
-    // } 
+    // }
+
+    // shops
+    $scope.shops = user.sortShops;
+    if ($scope.shops.length !== 0){
+	$scope.select.shop = $scope.shops[0]; 
+	$scope.select.trace_price = $scope.trace_price($scope.select.shop.id);
+	wsaleGoodService.set_shop($scope.select.shop.id);
+    }
     
+    $scope.find_shop = function(shopId){
+	for(var i=0, l=$scope.shops.length; i<l; i++)
+	    if(shopId === $scope.shops[i].id){
+		return $scope.shops[i];
+	    }
+    }
+
+    $scope.change_shop = function(){
+	$scope.local_save();
+	wsaleGoodService.set_shop($scope.select.shop.id);
+    } 
+
+    // employees
+    $scope.employees = filterEmployee;
+    if ($scope.employees.length !== 0){
+	$scope.select.employee = $scope.employees[0];
+    }
+    
+    $scope.find_employee = function(number){
+	for(var i=0, l=$scope.employees.length; i<l; i++)
+	    if(number === $scope.employees[i].id){
+		return $scope.employees[i];
+	    }
+    };
+
     // retailer;
-    $scope.retailers = filterRetailer; 
+    $scope.retailers = filterRetailer;
+    if ($scope.retailers.length !== 0){
+	$scope.select.retailer = $scope.retailers[0];
+	var balance = $scope.select.retailer.balance;
+	$scope.select.surplus = angular.isDefined(balance)
+	    && !isNaN(balance) && balance ? parseFloat($scope.select.retailer.balance) : 0;
+	$scope.select.left_balance = $scope.select.surplus;
+    };
+    
     $scope.find_retailer = function(retailerId){
 	for(var i=0, l=$scope.retailers.length; i<l; i++)
 	    if($scope.retailers[i].id === retailerId){
 		return $scope.retailers[i];
 	    }
     }
-
-    // employees
-    $scope.employees = filterEmployee; 
-    $scope.find_employee = function(number){
-	for(var i=0, l=$scope.employees.length; i<l; i++)
-	    if(number === $scope.employees[i].id){
-		return $scope.employees[i];
-	    }
-    }; 
 
     $scope.change_retailer = function(){
 	var balance = $scope.select.retailer.balance;
@@ -439,7 +464,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	diabloUtilsService.edit_with_modal(
 	    "new-retailer.html", undefined, callback, $scope, {retailer: {}});
     };
-
+    
     $scope.refresh = function(){
 	$scope.inventories = [];
 	$scope.inventories.push({$edit:false, $new:true});
@@ -469,46 +494,20 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.has_saved = false;
 
 	// $scope.get_retailer(); 
+    }; 
+
+    var now = $.now();
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, function(v){return v},
+	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
     };
-    
-    // init
-    // $scope.refresh();
-    $scope.inventories = [];
-    $scope.inventories.push({$edit:false, $new:true});
+    // console.log($scope.qtime_start);
 
+    $scope.setting.show_discount = $scope.show_discount();
 
-    if ($scope.shops.length !== 0){
-	$scope.select.shop = $scope.shops[0]; 
-	$scope.select.trace_price = $scope.trace_price($scope.select.shop.id);
-	wsaleGoodService.set_shop($scope.select.shop.id);
-    }
-
-    // console.log($scope.select);
-    
-    if ($scope.retailers.length !== 0){
-	$scope.select.retailer = $scope.retailers[0];
-	var balance = $scope.select.retailer.balance;
-	$scope.select.surplus = angular.isDefined(balance)
-	    && !isNaN(balance) && balance ? parseFloat($scope.select.retailer.balance) : 0;
-	$scope.select.left_balance = $scope.select.surplus;
-    };
-
-    if ($scope.employees.length !== 0){
-	$scope.select.employee = $scope.employees[0];
-    }
-    
-    // calender
-    $scope.open_calendar = function(event){
-	event.preventDefault();
-	event.stopPropagation();
-	$scope.isOpened = true;
-    };
-
-    $scope.today = function(){
-	return $.now();
-    }
-
-    if ($scope.q_typeahead === diablo_no){
+    $scope.setting.q_backend = $scope.q_typeahead($scope.select.shop.id);
+    if (!$scope.setting.q_backend){
 	diabloNormalFilter.match_all_w_inventory(
 	    {shop:$scope.select.shop.id,
 	     start_time:$scope.qtime_start($scope.select.shop.id)}
@@ -521,7 +520,25 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		})
 	});
     };
-	
+
+    console.log($scope.setting);
+    
+    // init
+    // $scope.refresh();
+    $scope.inventories = [];
+    $scope.inventories.push({$edit:false, $new:true});
+
+    
+    // calender
+    $scope.open_calendar = function(event){
+	event.preventDefault();
+	event.stopPropagation();
+	$scope.isOpened = true;
+    };
+
+    $scope.today = function(){
+	return $.now();
+    }
 
     // local save
     /*
@@ -1536,7 +1553,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
     };
 
     $scope.save_free_update = function(inv){
-	console.log("save_free_update", inv);
+	// console.log("save_free_update", inv);
+	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false; 
 	inv.amounts[0].sell_count = inv.sell;
 	
@@ -1547,6 +1565,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
     $scope.cancel_free_update = function(inv){
 	// console.log(inv);
+	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
 	inv.sell      = inv.amounts[0].sell_count;
 	inv.fdiscount = inv.o_fdiscount;
@@ -1555,40 +1574,27 @@ wsaleApp.controller("wsaleNewCtrl", function(
     };
 
     $scope.reset_inventory = function(inv){
-	inv.$reset = true;
+	$timeout.cancel($scope.timeout_auto_save);
 	$scope.inventories[0] = {$edit:false, $new:true};;
     };
 
-    var timeout_auto_save = undefined;
     $scope.auto_save_free = function(inv){
-	
 	if (angular.isUndefined(inv.sell)
 	    || !inv.sell
 	    || parseInt(inv.sell) === 0){
 	    return;
-	}
+	} 
 
-	if (inv.form.sell && inv.form.sell.$invalid
-	    || inv.form.fdiscount && inv.form.fdiscount.$invalid
-	    || inv.form.fprice && inv.form.fprice.$invalid){
-	    return;
-	}
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    // console.log(inv); 
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    }; 
 
-	$timeout.cancel(timeout_auto_save);
-	timeout_auto_save = $timeout(function(){
-	    if (!inv.$reset){
-		if (inv.$new && inv.free_color_size){
-		    $scope.add_free_inventory(inv);
-		};
-
-		if (!inv.$new){
-		    if (inv.free_update){
-			$scope.save_free_update(inv)
-		    } else {
-			$scope.re_calculate(); 
-		    }
-		}
-	    } 
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
 	}, 1000); 
     };
 });
@@ -1606,12 +1612,21 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.float_sub = diablo_float_sub;
     
     $scope.disable_print = false;
-    $scope.show_column   = false;
+
+    $scope.show = {base:false, balance:false};
     
-    $scope.toggle_left = function(){
+    // $scope.show_column   = false;
+    
+    $scope.toggle_balance = function(){
 	// console.log("toggle left");
-	$scope.show_column = !$scope.show_column;
+	$scope.show.balance = !$scope.show.balance;
     };
+
+    $scope.toggle_base = function(){
+	$scope.show.base = !$scope.show.base;
+    };
+
+    
 
     /* 
      * filter operation

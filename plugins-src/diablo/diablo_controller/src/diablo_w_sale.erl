@@ -156,7 +156,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		++ ?to_s(Shop) ++ ","
 		++ ?to_s(Merchant) ++ ","
 		++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		       true -> ?to_s(Balance) ++ ",";
+		       true  -> ?to_s(Balance) ++ ",";
 		       false -> ?to_s(CurrentBalance) ++ ","
 		   end
 		++ ?to_s(ShouldPay) ++ ","
@@ -267,6 +267,7 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 			 "update w_sale set balance=balance+" ++ ?to_s(Metric)
 			 ++ " where shop=" ++ ?to_s(Shop)
 			 ++ " and merchant=" ++ ?to_s(Merchant)
+			 ++ " and retailer=" ++ ?to_s(Retailer)
 			 ++ " and id>" ++ ?to_s(RSNId)],
 		    
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),

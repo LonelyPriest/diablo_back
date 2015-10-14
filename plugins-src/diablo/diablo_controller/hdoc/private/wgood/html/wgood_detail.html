@@ -73,10 +73,17 @@
 		    <th>年度</th>
 		    <th x-ng-if="show_orgprice">进货价</th>
 		    <th>吊牌价</th>
-		    <th>批发价</th>
-		    <th>价3</th>
-		    <th>价4</th>
-		    <th>价5</th>
+		    <th>
+		      <span x-ng-click="toggle_price()">
+			<span x-ng-if="!hidden.p3_5">
+			  <i class="glyphicon glyphicon-backward fg-red"></i>批发价</span>
+			<span x-ng-if="hidden.p3_5">
+			  批发价<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		      </span>
+		    </th>
+		    <th x-ng-if="!hidden.p3_5">价3</th>
+		    <th x-ng-if="!hidden.p3_5">价4</th>
+		    <th x-ng-if="!hidden.p3_5">价5</th>
 		    <th>折扣</th>
 		    <th>上架日期</th>
 		    <!-- <th>缩略图</th> -->
@@ -96,9 +103,9 @@
 		    <td x-ng-if="show_orgprice">{{g.org_price}}</td>
 		    <td>{{g.tag_price}}</td>
 		    <td>{{g.pkg_price}}</td>
-		    <td>{{g.price3}}</td>
-		    <td>{{g.price4}}</td>
-		    <td>{{g.price5}}</td>
+		    <td x-ng-if="!hidden.p3_5">{{g.price3}}</td>
+		    <td x-ng-if="!hidden.p3_5">{{g.price4}}</td>
+		    <td x-ng-if="!hidden.p3_5">{{g.price5}}</td>
 		    <td>{{g.discount}}</td> 
 		    <td>{{g.entry_date}}</td>
 		    <!-- <td> -->
@@ -107,7 +114,7 @@
 		    <!--   	<i class="glyphicon glyphicon-picture"></i></button> -->
 		    <!-- </td> -->
 		    <td data-title="'操作'"> 
-		      <button class="btn btn-primary btn-xs red-stripe"
+		      <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="g.free===0 && !g.path"
 			      x-ng-click="lookup_detail(g)">详情
 			<i class="glyphicon glyphicon-leaf"></i></button>
@@ -116,13 +123,13 @@
 		      <!-- 	      x-ng-click="image(g)">样图 -->
 		      <!-- 	<i class="glyphicon glyphicon-picture"></i></button> -->
 		      
-		      <button class="btn btn-warning btn-xs red-stripe"
+		      <button class="btn diablo-button btn-warning"
 			      x-ng-click="update_good(g)">修改
 			<i class="glyphicon glyphicon-edit"></i></button> 
 
-		      <button class="btn btn-danger btn-xs green-stripe"
+		      <button class="btn diablo-button btn-danger"
 			      x-ng-click="delete_good(g)">删除
-			<i class="glyphicon glyphicon-trash"></i></button>
+			<i class="glyphicon glyphicon-erase"></i></button>
 		      
 		    </td>
 		  </tr>

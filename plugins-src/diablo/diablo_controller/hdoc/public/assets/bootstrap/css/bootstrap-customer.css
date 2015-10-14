@@ -68,3 +68,12 @@ input[type="number"] {
   display: flex;
   align-items: center;
 }
+
+.diablo-button {
+    padding:0px 4px 0px 4px !important;
+}
+
+
+.diablo-input-button {
+    padding:5px 4px 5px 4px !important;
+}

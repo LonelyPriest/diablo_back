@@ -20,14 +20,18 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     $scope.f_add           = diablo_float_add;
     $scope.f_sub           = diablo_float_sub;
     $scope.f_mul           = diablo_float_mul;
-    $scope.get_object      = diablo_get_object;
+    $scope.get_object      = diablo_get_object; 
+    $scope.setting         = {q_backend:true, show_discount:true};
+    var dialog             = diabloUtilsService;
 
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
     };
 
-    var dialog             = diabloUtilsService;
-
+    $scope.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
     
     $scope.old_select  = {};    
     $scope.select      = {}; 
@@ -144,7 +148,9 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    $scope.old_select.should_pay   = Math.abs(base.should_pay);
 	    $scope.old_select.left_balance = $scope.f_add(base.balance, base.should_pay);
 	    $scope.select = angular.extend($scope.select, $scope.old_select);
-	    // console.log($scope.select);
+	    // console.log($scope.select); 
+	    $scope.setting.show_discount   = $scope.show_discount();
+	    console.log($scope.setting);
 
 	    var length = invs.length;
 	    var sorts  = [];

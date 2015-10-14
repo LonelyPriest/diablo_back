@@ -8,14 +8,15 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope.shops = user.sortShops;
     // console.log($scope.shops);
     
-    $scope.firms           = filterFirm;
-    $scope.employees       = filterEmployee; 
-    $scope.sexs            = diablo_sex;
-    $scope.seasons         = diablo_season;
-    $scope.float_add       = diablo_float_add;
-    $scope.float_sub       = diablo_float_sub;
-    $scope.extra_pay_types = purchaserService.extra_pay_types; 
-    $scope.disable_refresh = true;
+    $scope.firms             = filterFirm;
+    $scope.employees         = filterEmployee; 
+    $scope.sexs              = diablo_sex;
+    $scope.seasons           = diablo_season;
+    $scope.float_add         = diablo_float_add;
+    $scope.float_sub         = diablo_float_sub;
+    $scope.extra_pay_types   = purchaserService.extra_pay_types; 
+    $scope.disable_refresh   = true;
+    $scope.timeout_auto_save = undefined;
 
     $scope.q_prompt        = diablo_backend;
     
@@ -757,7 +758,9 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
      * update inventory
      */
     $scope.update_inventory = function(inv){
-	inv.$update = true; 
+	inv.$update = true;
+	inv.o_org_price = inv.org_price;
+	
 	if (inv.free_color_size){
 	    inv.update_directory = true;
 	    return; 
@@ -789,55 +792,52 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    "inventory-new.html", modal_size, callback, $scope, payload)
     };
 
-    $scope.save_update = function(inv){
-	inv.$update = false;
-	inv.update_directory = false;
-	
-	if (inv.free_color_size){
-	    inv.total = inv.amount[0].count;
-	}
+    $scope.save_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
+	inv.$update          = false;
+	inv.update_directory = false; 
+	inv.total            = inv.amount[0].count;
 	
 	$scope.local_save();
 	$scope.re_calculate()
 
-    }
+    };
+
+    $scope.cancel_free_update = function(inv){
+	console.log(inv);
+	$timeout.cancel($scope.timeout_auto_save);
+	inv.update_directory = false;
+	inv.$update          = false;
+	inv.org_price        = inv.o_org_price;
+	inv.amount[0].count  = inv.total; 
+	// $scope.re_calculate(); 
+    };
 
     $scope.reset_inventory = function(inv){
-	inv.$reset = true; 
+	// inv.$reset = true; 
 	// console.log($scope.inventories);
+	$timeout.cancel($scope.timeout_auto_save);
 	$scope.inventories[0] = {$edit:false, $new:true};
 	$scope.current_inventories = $scope.get_page($scope.current_page);
     }
 
-    var timeout_auto_save = undefined;
     $scope.auto_save_free = function(inv){
 	// console.log(inv);
 	if (angular.isUndefined(inv.amount[0].count)
 	    || !inv.amount[0].count
 	    || parseInt(inv.amount[0].count) === 0){
 	    return;
-	}
+	} 
 
-	if (inv.form.amount && inv.form.amount.$invalid
-	    || inv.form.orgprice && inv.form.orgprice.$invalid){
-	    return;
-	}
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_inventory(inv);
+	    }
 
-	$timeout.cancel(timeout_auto_save);
-	timeout_auto_save = $timeout(function(){
-	    if (!inv.$reset){
-		if (inv.$new && inv.free_color_size){
-		    $scope.add_inventory(inv);
-		};
-
-		if (!inv.$new){
-		    if (inv.update_directory){
-			$scope.save_update(inv)
-		    } else {
-			$scope.re_calculate(); 
-		    }
-		}
-	    } 
+	    if (!inv.$new && inv.update_directory){
+		$scope.save_update(inv) 
+	    }
 	}, 1000); 
     };
 });
@@ -1109,6 +1109,14 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.f_add = diablo_float_add;
     $scope.f_sub = diablo_float_sub;
 
+    $scope.hidden = {base:true, balance:true};
+    $scope.toggle_base = function(){
+	$scope.hidden.base = !$scope.hidden.base;
+    };
+    $scope.toggle_balance = function(){
+	$scope.hidden.balance = !$scope.hidden.balance;
+    };
+
     var now    = $.now();
     var dialog = diabloUtilsService;
 
@@ -1156,16 +1164,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 		    + r.rsn + "/" + $scope.current_page.toString());
 	} 
     };
-
-    /*
-     * hide column
-     */
-    $scope.hide_column = true;
-
-    $scope.toggle_left = function(){
-	$scope.hide_column = !$scope.hide_column;
-    }
-
+    
     $scope.check_detail = function(r){
 	console.log(r);
 	var callback = function(){

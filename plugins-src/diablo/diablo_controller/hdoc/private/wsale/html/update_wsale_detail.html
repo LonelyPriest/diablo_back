@@ -296,7 +296,8 @@
 		    <th class="text-center">单价</th>
 		    <!-- <th class="text-center">折扣</th> -->
 		    <th class="text-center">成交价</th>
-		    <th class="text-center">成交折扣</th>
+		    <th x-ng-if="setting.show_discount"
+			class="text-center">折扣</th>
 		    <th class="text-center">数量</th>
 		    <th class="text-center">合计</th>
 		    <th class="text-center">操作</th>
@@ -327,6 +328,7 @@
 			</div>
 		      </form>
 		    </td>
+		    
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand.name}}</td>
 		    <td class="vert-align">{{inv.total}}</td>
@@ -340,18 +342,22 @@
 		    <!-- <td class="vert-align">{{inv.last_discount}}</td>  -->
 
 		    <!-- price style-->
+		    <!-- <td class="vert-align"> -->
+		    <!--   <div ng-if="!inv.$new && !inv.free_update">{{inv.sell_style.name}}</div>  -->
+		    <!--   <div x-ng-if="inv.$new && inv.free_color_size && inv.sell_style -->
+		    <!-- 		    || !inv.$new && inv.free_update"> -->
+		    <!-- 	<select class="form-control table-select" -->
+		    <!-- 		x-ng-model="inv.sell_style" -->
+		    <!-- 		x-ng-change="inv.fprice=inv[inv.sell_style.f]" -->
+		    <!-- 		x-ng-options="s as s.name for s -->
+		    <!-- 			      in sell_styles|filter:$viewValue|limitTo:8"> -->
+		    <!-- 	  <\!-- <option value="">{{inv.sell_style.name}}<option> -\->  -->
+		    <!-- 	</select> -->
+		    <!--   </div> -->
+		    <!-- </td> -->
+
 		    <td class="vert-align">
-		      <div ng-if="!inv.$new && !inv.free_update">{{inv.sell_style.name}}</div> 
-		      <div x-ng-if="inv.$new && inv.free_color_size && inv.sell_style
-				    || !inv.$new && inv.free_update">
-			<select class="form-control table-select"
-				x-ng-model="inv.sell_style"
-				x-ng-change="inv.fprice=inv[inv.sell_style.f]"
-				x-ng-options="s as s.name for s
-					      in sell_styles|filter:$viewValue|limitTo:8">
-			  <!-- <option value="">{{inv.sell_style.name}}<option> --> 
-			</select>
-		      </div>
+		      <div>{{inv.sell_style.name}}</div> 
 		    </td>
 
 		    <td class="col-md-1 vert-align">
@@ -383,7 +389,8 @@
 		    </td>
 
 
-		    <td class="col-md-1 vert-align">
+		    <td x-ng-if="setting.show_discount"
+			class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fdiscount}}</div> 
 		      <form name="inv.form.fdiscount"
 			    ng-if="inv.$new && inv.free_color_size
@@ -433,7 +440,7 @@
 		    
 		    <td class="text-left vert-align">
 		      <span x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid
 					  || inv.form.sell.$invalid
@@ -443,36 +450,36 @@
 			   x-ng-click="add_free_inventory(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="!inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid"
 			   x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-warning btn-xs"
+			<a class="btn diablo-input-button btn-warning"
 			   x-ng-disabled="!inv.style_number"
 			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a>
 		      </span>
 
 		      <span ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn diablo-input-button btn-primary"
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
 			
-			<a class="btn yellow btn-xs"
+			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   ng-if="inv.free_update"
 			   x-ng-disabled="inv.form.sell.$invalid
 					  || inv.form.fprice.$invalid
@@ -480,7 +487,7 @@
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   ng-if="inv.free_update"
 			   x-ng-disabled=" inv.form.sell.$invalid"
 			   x-ng-click="cancel_free_update(inv)">取消
@@ -490,7 +497,8 @@
 		  </tr>
 
 		  <tr class="text-center">
-		    <td colspan=8></td>
+		    <td x-ng-if="setting.show_discount" colspan=8></td>
+		    <td x-ng-if="!setting.show_discount" colspan=7></td>
 		    <td class="vert-align">{{select.abs_total}}</td>
 		    <td class="vert-align">{{select.should_pay}}</td>
 		    <td></td>

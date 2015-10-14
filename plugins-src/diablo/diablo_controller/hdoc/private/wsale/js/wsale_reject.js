@@ -12,7 +12,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     $scope.f_add   = diablo_float_add;
     $scope.f_sub   = diablo_float_sub;
     $scope.f_mul   = diablo_float_mul;
-    $scope.extra_pay_types = wsaleService.extra_pay_types;
+    $scope.extra_pay_types   = wsaleService.extra_pay_types;
+    $scope.timeout_auto_save = undefined;
+    $scope.setting = {q_backend:true, show_discount:true};
 
     $scope.pattern = {reject:diabloPattern.positive_num,
 		      price:diabloPattern.positive_decimal_2};
@@ -23,10 +25,16 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	return diablo_base_setting("pim_print", shopId, base, parseInt, diablo_no); 
     };
 
-    $scope.q_typeahead = function(shopId){
+    $scope.q_typeahead = function(){
 	// default prompt comes from backend
-	return diablo_base_setting("qtypeahead", shopId, base, parseInt, diablo_yes);
-    }();
+	return diablo_base_setting(
+	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+
+    $scope.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
 
     var now = $.now();
     $scope.qtime_start = function(shopId){
@@ -99,7 +107,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     	return now;
     };
 
-    if ($scope.q_typeahead === diablo_no){
+    $scope.setting.show_discount = $scope.show_discount();
+    $scope.setting.q_backend = $scope.q_typeahead();
+    if (!$scope.setting.q_backend){
 	diabloNormalFilter.match_all_w_inventory(
 	    {shop:$scope.select.shop.id,
 	     start_time:$scope.qtime_start($scope.select.shop.id)}
@@ -633,12 +643,14 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
 
     $scope.save_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
 	inv.amounts[0].reject_count = inv.reject;
 	$scope.re_calculate(); 
     };
 
     $scope.cancel_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
 	inv.reject = inv.amounts[0].reject_count;
 	inv.fdiscount = inv.o_fdiscount;
@@ -647,39 +659,26 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
 
     $scope.reset_inventory = function(inv){
-	inv.$reset = true;
+	$timeout.cancel($scope.timeout_auto_save);
 	$scope.inventories[0] = {$edit:false, $new:true};;
     };
 
-    var timeout_auto_save = undefined; 
     $scope.auto_save_free = function(inv){
 	if (angular.isUndefined(inv.reject)
 	    || !inv.reject
 	    || parseInt(inv.reject) === 0){
 	    return;
-	}
-
-	if (inv.form.reject && inv.form.reject.$invalid
-	    || inv.form.fdiscount && inv.form.fdiscount.$invalid
-	    || inv.form.fprice && inv.form.fprice.$invalid){
-	    return;
-	}
-
-	$timeout.cancel(timeout_auto_save);
-	timeout_auto_save = $timeout(function(){
-	    if (!inv.$reset){
-		if (inv.$new && inv.free_color_size){
-		    $scope.add_free_inventory(inv);
-		}
-
-		if (!inv.$new){
-		    if (inv.free_update){
-			$scope.save_free_update(inv)
-		    } else {
-			$scope.re_calculate(); 
-		    }
-		}
-	    } 
+	} 
+	
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    }
+		
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
 	}, 1000); 
     };
 }); 

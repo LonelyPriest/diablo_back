@@ -41,7 +41,7 @@
 	  			  firms|filter:$viewValue|limitTo:8"/>
 		
 		<span class="input-group-btn">
-		  <button class="btn bg-lightGray fg-red"
+		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.firm"
 			  x-ng-click="select.firm=undefined"> 
 		    <i class="glyphicon glyphicon-pushpin"></i></button>
@@ -340,20 +340,20 @@
 		      </form>
 		    </td>
 
-		    <td>
+		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
 		      <span x-ng-if="!inv.$new">{{inv.total * inv.org_price}}</span>
 		    </td>
 		    
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 				x-ng-if="inv.free_color_size"
 				x-ng-disabled="inv.form.good.$invalid
 					       || inv.form.amount.$invalid"
 				x-ng-click="add_inventory(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a> 
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 				x-ng-if="!inv.free_color_size"
 				x-ng-disabled="inv.form.good.$invalid
 					       || inv.free_color_size
@@ -361,33 +361,33 @@
 					       || has_saved"
 				x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a> 
-			<a class="btn btn-warning btn-xs"
+			<a class="btn diablo-input-button btn-warning"
 				x-ng-disabled="!inv.style_number"
 				x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a> 
 		      </div>
 
 		      <div ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn diablo-input-button btn-primary"
 				x-ng-if="!inv.update_directory"
 				x-ng-disabled="inv.free_color_size"
 				x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
-			<a class="btn yellow btn-xs"
+			<a class="btn diablo-input-button yellow"
 				x-ng-if="!inv.update_directory"
 				x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 				x-ng-if="!inv.update_directory"
 				x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 				x-ng-if="inv.update_directory"
 				x-ng-disabled="inv.form.amount.$invalid"
 				x-ng-click="save_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 				ng-if="inv.update_directory"
 				x-ng-disabled="inv.form.amount.$invalid"
 				x-ng-click="inv.update_directory=false;

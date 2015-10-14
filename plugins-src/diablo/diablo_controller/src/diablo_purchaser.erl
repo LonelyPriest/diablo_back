@@ -637,6 +637,7 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 			 ++ ?to_s(Metric)
 			 ++ " where shop=" ++ ?to_s(Shop)
 			 ++ " and merchant=" ++ ?to_s(Merchant)
+			 ++ " and firm=" ++ ?to_s(Firm)
 			 ++ " and id>" ++ ?to_s(Id)],
 		    
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN),

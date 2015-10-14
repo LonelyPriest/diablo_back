@@ -908,7 +908,15 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     // console.log(filterBrand);
     // console.log(filterType);
 
-    $scope.show_orgprice = rightAuthen.show_orgprice(user.type);
+    // $scope.show_orgprice = rightAuthen.show_orgprice(user.type);
+    $scope.hidden = {
+	org_price:rightAuthen.show_orgprice(user.type),
+	p3_5:true
+    };
+
+    $scope.toggle_price = function(){
+	$scope.hidden.p3_5 = !$scope.hidden.p3_5;
+    };
     
     /*
      * filter

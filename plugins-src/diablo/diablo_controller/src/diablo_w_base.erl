@@ -232,7 +232,8 @@ handle_call({add_shop_setting, Merchant, Shop}, _From, State) ->
 	      {"qtime_length",    "查询跨度",     "30",  "0"},
 	      {"qtypeahead",      "提示方式",     "1",   "0"}, %% 0: front; 1:backend
 	      {"reject_negative", "零库存退货",   "0",   "0"},
-	      {"check_sale",      "检测库存销售", "1",  "0"}
+	      {"check_sale",      "检测库存销售", "1",   "0"},
+	      {"show_discount",   "开单显示折扣", "1",  "0"}
 	     ],
 
     Sql0 = lists:foldr(

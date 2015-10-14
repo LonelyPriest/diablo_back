@@ -457,94 +457,32 @@ diabloUtils.directive('diabloItmesPerpage', function(diabloPagination) {
 });
 
 
-diabloUtils.directive('xlsfileUpload', function () {
+diabloUtils.directive('diabloSwitch', function(){
     return {
 	restrict: 'AE',
-	template: '<span class="btn btn-success fileinput-button">'
-	    + '<span>{{name}}</span><i class="glyphicon glyphicon-import"></i>'
-	    +'<input id="xlf" type="file"></input>'
-	    +'</span>',
-	// template: '<input id="xlf" type="file"></input>',
-	replace: true,
-	transclude: true,
-	scope: {
-	    name: '@'
-	},
+	require: '?ngModel', 
 	
-	link: function(scope, element, attrs){
-    	    var XW = {
-    		/* worker message */
-    		msg: 'xls',
-    		/* worker scripts */
-    		// rABS:   '/public/assets/js-xls/xlsworker2.js',
-    		// norABS: '/public/assets/js-xls/xlsworker1.js',
-    		noxfer: '/public/assets/js-xls/xlsworker.js'
-    	    };
-	    
-    	    function xw(data, cb) {
-    		xw_noxfer(data, cb);
-    	    };
+	link: function(scope, element, attrs, ngModel){
+	    element.bootstrapSwitch();
 
-    	    function fixdata(data) {
-    		var o = "", l = 0, w = 10240;
-    		for(; l<data.byteLength/w; ++l){
-    		    o+=String.fromCharCode.apply(null,new Uint8Array(data.slice(l*w,l*w+w)));
-    		}
-		
-    		o+=String.fromCharCode.apply(null, new Uint8Array(data.slice(l*w)));
-    		return o;
-    	    };
+	    element.on('switchChange.bootstrapSwitch', function(event, state) {
+                if (ngModel) {
+		    console.log(scope.$parent);
+                    scope.$apply(function() {
+			// var newValue = state === true ? 1:0;
+                        ngModel.$setViewValue(state);
+                    });
+                }
+            });
 
-    	    function process_wb(wb) {
-    		XLS.SSF.load_table(wb.SSF);
-    		var output = to_json(wb);
-    		// var output = JSON.stringify(to_json(wb), 2, 2);
-    		console.log(output);
-    		//console.log("output", new Date());
-    	    };
-
-    	    function to_json(workbook) {
-    		var result = {};
-    		workbook.SheetNames.forEach(function(sheetName) {
-    		    var roa = XLS.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
-    		    if(roa.length > 0){
-    			result[sheetName] = roa;
-    		    }
-    		});
-    		return result;
-    	    };
-
-    	    function xw_noxfer(data, cb) {
-    		var worker = new Worker(XW.noxfer);
-    		worker.onmessage = function(e) {
-    		    switch(e.data.t) {
-    		    case 'ready': break;
-    		    case 'e': console.error(e.data.d); break;
-    		    case XW.msg: cb(JSON.parse(e.data.d)); break;
-    		    }
-    		};
-    		var arr = btoa(fixdata(data));
-    		worker.postMessage({d:arr, b:false});
-    	    }
-
-	        	    
-    	    var handleFile = function(e){
-    		console.log(e);
-    		var file = e.target.files[0];
-    		var reader = new FileReader();
-    		reader.onload = function(e){
-    		    // console.log(e);
-    		    var data = e.target.result;;
-    		    // console.log(data);
-    		    xw(data, process_wb);
-    		}
-    		reader.readAsArrayBuffer(file);
-    	    };
-
-	    var xlf = document.getElementById('xlf');
-    	    if(xlf.addEventListener){
-		xlf.addEventListener('change', handleFile, false);
-	    }
+	     scope.$watch(attrs.ngModel, function(newValue, oldValue) {
+		 console.log(newValue, oldValue);
+                 if (newValue) {
+                     element.bootstrapSwitch('state', true, true);
+                 } else {
+                     element.bootstrapSwitch('state', false, true);
+                 }
+             });
 	}
     }
 });

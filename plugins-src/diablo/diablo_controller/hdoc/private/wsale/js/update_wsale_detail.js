@@ -3,7 +3,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     diabloPromise, diabloFilter, diabloPattern,
     wgoodService, purchaserService, wretailerService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
-    filterBrand, filterColor, filterType){
+    filterBrand, filterColor, filterType, base){
     console.log(user);
 
     $scope.pattern     = {money: diabloPattern.decimal_2};
@@ -17,6 +17,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.seasons     = diablo_season;
     $scope.sell_styles = diablo_sell_style;
     $scope.e_pay_types = wsaleService.extra_pay_types;
+    $scope.setting     = {q_backend:true, show_discount:true};
 
     // $scope.old_base    = {};
     $scope.old_select  = {};
@@ -27,6 +28,11 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.float_add  = diablo_float_add;
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
+
+    $scope.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
 
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
@@ -225,6 +231,10 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
 	    $scope.select = angular.extend($scope.select, $scope.old_select);
 	    $scope.select.abs_total = 0;
+	    
+	    $scope.setting.show_discount = $scope.show_discount();
+	    // console.log($scope.setting);
+
 	    // console.log($scope.select);
 
 	    var length = invs.length;
@@ -668,7 +678,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
     // watch balance
     var reset_payment = function(newValue){
-	console.log("reset_payment newValue ", newValue);
+	// console.log("reset_payment newValue ", newValue);
 	$scope.select.has_pay = 0.00;
 	if(angular.isDefined($scope.select.cash) && $scope.select.cash){
 	    $scope.select.has_pay
