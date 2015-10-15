@@ -9,7 +9,7 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <a type="button" class="btn green red-stripe"
+	    <a type="button" class="btn green purple-stripe"
 		    x-ng-click="goto_page('#/new_wsale')">开单
 	      <i class="glyphicon glyphicon-plus"></i></a>
 	    
@@ -19,7 +19,7 @@
 
 	    <a type="button" class="btn yellow purple-stripe"
 		    x-ng-click="goto_page('#/wsale_rsn_detail')">明细
-	      <i class="glyphicon glyphicon-leaf"></i></a>
+	      <i class="glyphicon glyphicon-map-marker"></i></a>
 
 	    <a type="button" class="btn blue purple-stripe"
 		    x-ng-click="export_to()">导出
@@ -36,23 +36,24 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
-	<div class="table-toolbar">
+      <div class="portlet-body">
+      <!-- <div class="portlet-body"> -->
+      <div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4 col-xs-6">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4 col-xs-6">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
             </div> 
 	    
-            <div class="col-md-4 col-xs-12">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter">
@@ -75,16 +76,14 @@
 		<thead>
 		  <tr>
 		    <th>序号</th>
-		    <th class="danger">
-		      <span x-ng-click="toggle_base()">
-			<span x-ng-if="show.base">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
-			<span x-ng-if="!show.base">
-			  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
-		      </span>
+		    <th x-ng-click="toggle_base()" class="danger">
+		      <span x-ng-if="show.base">
+			<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+		      <span x-ng-if="!show.base">
+			单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		    </th>
-		    <th x-ng-if="show.base">交易类型</th>
-		    <th x-ng-if="show.base">门店</th>
+		    <th x-ng-if="show.base">交易</th>
+		    <th x-ng-if="show.base">店铺</th>
 		    <th x-ng-if="show.base">店员</th>
 		    <th>客户</th>
 		    
@@ -95,20 +94,25 @@
 		    <th x-ng-if="show.balance">汇款</th>
 		    <th x-ng-if="show.balance" class="warning">核销</th>
 		    <th x-ng-if="show.balance" class="danger">费用</th>
-		    <th class="info">
-		      <span x-ng-click="toggle_balance()">
-			<span x-ng-if="show.balance">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
-			<span x-ng-if="!show.balance">
-			  帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
-		      </span>
+		    <th x-ng-click="toggle_balance()" class="info">
+		      <span x-ng-if="show.balance">
+			<i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
+		      <span x-ng-if="!show.balance">
+			帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		    </th> 
 		    <th class="success">应付</th>
 		    <th>实付</th>
 		    <th class="danger">本次欠款</th> 
 		    <th>备注</th>
 		    <th>开单日期</th> 
-		    <th>操作</th>
+		    <th x-ng-click="toggle_check()">
+		      <span x-ng-if="show.check">
+			<i class="glyphicon glyphicon-backward fg-red"></i>操作</span>
+		      <span x-ng-if="!show.check">
+			操作<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		      
+		    </th>
+		    <th x-ng-if="show.check"></th>
 		  </tr>
 		</thead>
 		<tbody>
@@ -117,7 +121,7 @@
 		    <td>{{r.rsn}}</td>
 		    <td x-ng-if="show.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>开单</span>
-		      <span class="bg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-red" x-ng-switch-when=1>退货</span>
 		    </td>
 		    <td x-ng-if="show.base">{{r.shop.name}}</td>
 		    <td x-ng-if="show.base">{{r.employee.name}}</td>
@@ -130,7 +134,7 @@
 		    <td x-ng-if="show.balance">{{r.wire}}</td>
 		    <td x-ng-if="show.balance">{{r.verificate}}</td>
 		    <td x-ng-if="show.balance">
-		      <span x-ng-if="r.e_pay!==0" class="bg-blue">{{r.e_pay}}</span>
+		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
 		    <td>{{r.balance}}</td>
@@ -141,7 +145,7 @@
 		      <span x-ng-switch-when=0>
 			{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
 		      </span>
-		      <span class="bg-red" x-ng-switch-when=1>
+		      <span class="fg-red" x-ng-switch-when=1>
 			{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
 		      </span>
 		    </td>
@@ -158,26 +162,30 @@
 		    </td>
 		    <td>{{r.entry_date}}</td>
 		    
-		    <td data-title="'操作'">
+		    <td>
 		      <!-- <div class="btn-group btn-group-solid"> -->
 			<button class="btn diablo-button btn-primary"
 		    		x-ng-click="rsn_detail(r)">
-			  明细<i class="glyphicon glyphicon-leaf"></i></button>
+			  明细<i class="glyphicon glyphicon-map-marker"></i></button>
 
-			<button class="btn diablo-button btn-warning"
+			<button class="btn diablo-button yellow"
 				x-ng-disabled="r.state===1"
 		      		x-ng-click="update_detail(r)">修改
 		      	  <i class="glyphicon glyphicon-edit"></i></button>
-			<button class="btn diablo-button btn-danger"
-				x-ng-disabled="r.state===1"
-		      		x-ng-click="check_detail(r)">审核
-		      	  <i class="glyphicon glyphicon-check"></i></button> 
+			
 
 			<button class="btn diablo-button purple"
 				x-ng-disabled="disable_print"
 		    		x-ng-click="print(r)">
 			  打印<i class="glyphicon glyphicon-print"></i></button>
 		      <!-- </div> -->
+		    </td>
+
+		    <td x-ng-if="show.check">
+		      <button class="btn diablo-button btn-danger"
+				x-ng-disabled="r.state===1"
+		      		x-ng-click="check_detail(r)">审核
+		      	<i class="glyphicon glyphicon-check"></i></button> 
 		    </td>
 		    
 		  </tr>

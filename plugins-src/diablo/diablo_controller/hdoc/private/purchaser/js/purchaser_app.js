@@ -108,7 +108,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	when('/inventory/inventory_rsn_detail/fix/:rsn?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_fix_rsn_detail.html',
             controller: 'purchaserInventoryFixRsnDetailCtrl',
-	    resolve: angular.extend({}, user, brand, firm, s_group, base)
+	    resolve: angular.extend({}, user, brand, firm, s_group, color, base)
 	}). 
 	otherwise({
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',

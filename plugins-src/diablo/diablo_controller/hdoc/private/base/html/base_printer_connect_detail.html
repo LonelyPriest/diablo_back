@@ -9,7 +9,7 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid"> 
-	    <button type="button" class="btn btn-success red-stripe"
+	    <button type="button" class="btn btn-success"
 		    x-ng-click="goto_page('#/printer/connect_new')">绑定
 	      <i class="glyphicon glyphicon-plus"></i></button> 
 
@@ -21,7 +21,7 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<div class="table-toolbar"> 
 	  <!-- <div class="row form-group"> -->
 	    
@@ -74,7 +74,7 @@
 		    <th>设备号</th> 
 		    <th>接入码</th>
 		    <th>服务器名称</th>
-		    <th>服务器地址</th>
+		    <!-- <th>服务器地址</th> -->
 		    <!-- <th>所属商家</th> -->
 		    <th>所属店铺</th>
 		    <th>日期</th>
@@ -95,7 +95,7 @@
 		    <td>{{p.sn}}</td>
 		    <td>{{p.code}}</td>
 		    <td>{{p.server}}</td>
-		    <td>{{p.server_path}}</td>
+		    <!-- <td>{{p.server_path}}</td> -->
 		    <!-- <td>{{p.merchant}}</td> -->
 		    <td class="col-md-1">
 		      <div x-ng-switch on="p.shop_id">

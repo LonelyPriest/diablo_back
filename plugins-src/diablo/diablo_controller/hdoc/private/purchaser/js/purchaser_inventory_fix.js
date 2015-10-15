@@ -34,7 +34,9 @@ purchaserApp.controller("purchaserInventoryFixCtrl", function(
     $scope.inventories = [];
     $scope.inventories.push({$edit:false, $new:true});
     $scope.current_inventories = [];
-    $scope.select = {};
+    $scope.select = {
+	shop:$scope.shops[0]
+    };
     // $scope.draft  = false;
     $scope.has_saved = false;
     

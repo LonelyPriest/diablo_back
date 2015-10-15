@@ -21,11 +21,11 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
 		<input class="form-control" type="text"
@@ -51,8 +51,7 @@
 
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
+		<span class="input-group-addon">店铺</span>
 		<select class="form-control" type="text"
 	  		x-ng-model="select.shop"
 	  		x-ng-options="s as s.name for s in
@@ -116,7 +115,7 @@
 	  </div> <!--END from-group-->
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -379,7 +378,7 @@
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
-			  <i class="glyphicon glyphicon-eye-open"></i></a>
+			  <i class="glyphicon glyphicon-map-marker"></i></a>
 			
 			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"

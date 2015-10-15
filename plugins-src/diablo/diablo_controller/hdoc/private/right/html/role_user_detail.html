@@ -9,50 +9,50 @@
 	</div>
 
 	<div class="actions">
-	  <button type="button" class="btn btn-success red-stripe"
+	  <button type="button" class="btn btn-success"
 		  x-ng-click="goto_page('#/role_user/role_new')">新增
 	    <i class="glyphicon glyphicon-plus"></i></button> 
 
-	  <button type="button" class="btn blue reload red-stripe"
+	  <button type="button" class="btn blue reload"
 		  x-ng-click="refresh()">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	    <i class="icon icon-spinner"></i></button> 
 	</div>
 
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
-	  <div class="row form-group">
+	  <!-- <div class="row form-group"> -->
 
-	    <div class="col-md-6">
-	      <div class="input-group">
-		<div class="input-cont">
-		  <input type="text" class="form-control" placeholder="请输入角色名称"
-	  		 x-ng-model="filter.name"></input>
-		</div>
-		<span class="input-group-btn">
-		  <button type="button" class="btn green">
-	  	    <i class="m-icon-swapright m-icon-white"></i>
-		</span>
-	      </div>
-	    </div>
+	  <!--   <div class="col-md-6"> -->
+	  <!--     <div class="input-group"> -->
+	  <!-- 	<div class="input-cont"> -->
+	  <!-- 	  <input type="text" class="form-control" placeholder="请输入角色名称" -->
+	  <!-- 		 x-ng-model="filter.name"></input> -->
+	  <!-- 	</div> -->
+	  <!-- 	<span class="input-group-btn"> -->
+	  <!-- 	  <button type="button" class="btn green"> -->
+	  <!-- 	    <i class="m-icon-swapright m-icon-white"></i> -->
+	  <!-- 	</span> -->
+	  <!--     </div> -->
+	  <!--   </div> -->
 	    
-	    <div class="col-md-6">
-	      <div class="input-group">
-		<div class="input-cont">
-		  <input type="text" class="form-control" placeholder="请输入创建者名称"
-	  		 x-ng-model="filter.created_by"></input>
-		</div>
-		<span class="input-group-btn">
-		  <button type="button" class="btn green">
-	  	    <i class="m-icon-swapright m-icon-white"></i>
-		</span>
-	      </div>
-	    </div>
+	  <!--   <div class="col-md-6"> -->
+	  <!--     <div class="input-group"> -->
+	  <!-- 	<div class="input-cont"> -->
+	  <!-- 	  <input type="text" class="form-control" placeholder="请输入创建者名称" -->
+	  <!-- 		 x-ng-model="filter.created_by"></input> -->
+	  <!-- 	</div> -->
+	  <!-- 	<span class="input-group-btn"> -->
+	  <!-- 	  <button type="button" class="btn green"> -->
+	  <!-- 	    <i class="m-icon-swapright m-icon-white"></i> -->
+	  <!-- 	</span> -->
+	  <!--     </div> -->
+	  <!--   </div> -->
 	    
-	  </div>
+	  <!-- </div> -->
 	</div> <!--END table-toolbar-->
 
 	<!--BEGN portlet body-->
@@ -89,8 +89,8 @@
 
 		  <td>
 		    <button class="btn diablo-button btn-primary" 
-		       x-ng-click="role_detail(role)">查看
-		      <i class="glyphicon glyphicon-leaf"></i></button>
+		       x-ng-click="role_detail(role)">详情
+		      <i class="glyphicon glyphicon-map-marker"></i></button>
 		    
                     <button class="btn diablo-button btn-warning" 
 		       x-ng-click="edit_role(role)">修改

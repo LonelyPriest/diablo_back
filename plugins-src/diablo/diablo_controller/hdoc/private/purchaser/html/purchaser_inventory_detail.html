@@ -34,19 +34,19 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
@@ -131,7 +131,7 @@
 		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.shop}}</td>
 		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.entry_date}}</td>
 		    <td data-title="'操作'"> 
-                      <button class="btn btn-primary red-stripe btn-xs"
+                      <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="inv.free === 0"
 			      x-ng-click="lookup_detail(inv)">详情
 			<i class="glyphicon glyphicon-leaf"></i></button>

@@ -9,9 +9,9 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn btn-success red-stripe"
-		    x-ng-click="goto_page('#/inventory/inventory_fix_detail')">盘点详情
-	      <i class="glyphicon glyphicon-plus"></i></button>
+	    <button type="button" class="btn red purple-stripe"
+		    x-ng-click="goto_page('#/inventory/inventory_fix_detail')">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 	    
 	    <!-- <button type="button" class="btn btn-danger green-stripe" -->
 	    <!-- 	  x-ng-click="goto_page('#/wsale/reject_wsale')">退货单 -->
@@ -30,8 +30,8 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
-	<div class="table-toolbar">
+      <div class="portlet-body">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  
 	  <div class="row">
             <div class="col-md-4">
@@ -72,6 +72,9 @@
 		  <tr>
 		    <th>序号</th>
 		    <th class="danger">单号</th>
+		    <th>店铺</th>
+
+		    <th>厂商</th>
 		    <th>款号</th>
 		    <th>品牌</th>
 		    <!-- <th>颜色</th> -->
@@ -80,10 +83,7 @@
 		    <!-- <th>价格</th> -->
 		    <th>库存</th>
 		    <th>盘点</th>
-		    <th>盈余</th>
-		    
-		    <th>店铺</th>
-		    <th>厂商</th>
+		    <th>盈余</th> 
 		    <th>日期</th> 
 		    <th>操作</th>
 		  </tr>
@@ -92,6 +92,9 @@
 		  <tr ng-repeat="inv in inventories">
 		    <td>{{inv.order_id}}</td>
 		    <td>{{inv.rsn}}</td>
+		    <td>{{inv.shop.name}}</td> 
+
+		    <td>{{inv.firm.name}}</td>
 		    <td>{{inv.style_number}}</td>
 		    <td>{{inv.brand.name}}</td>
 
@@ -99,15 +102,13 @@
 		    <td class="warning">{{inv.fixed}}</td>
 		    <td class="danger">{{inv.metric}}</td>
 		    <!-- <td>{{inv.color}}</td> -->
-		    <!-- <td>{{inv.total}}</td>  -->
-		    <td>{{inv.shop.name}}</td> 
-		    <td>{{inv.firm.name}}</td>
+		    <!-- <td>{{inv.total}}</td>  --> 
 		    <td>{{inv.entry_date}}</td>
 		    <td>
-		      <a class="btn btn-primary red-stripe btn-xs"
+		      <a class="btn diablo-button btn-primary"
 			 x-ng-disabled="inv.free === 0"
 		    	 x-ng-click="rsn_detail(inv)">
-			明细<i class="glyphicon glyphicon-leaf"></i></a>
+			明细<i class="glyphicon glyphicon-map-marker"></i></a>
 		    </td>
 		  </tr> 
 		</tbody>

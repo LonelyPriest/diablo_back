@@ -10,11 +10,11 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid"> 
-	    <button type="button" class="btn btn-success red-stripe"
+	    <button type="button" class="btn btn-success purple-stripe"
 		    x-ng-click="goto_page('#/bank/new_bank_card')">新增
 	      <i class="glyphicon glyphicon-plus"></i></button> 
 
-	    <button type="button" class="btn blue reload red-stripe"
+	    <button type="button" class="btn blue reload purple-stripe"
 		    x-ng-click="refresh()">刷新
 	      <i class="icon icon-spinner fg-white"></i></button>
 	  </div>
@@ -22,7 +22,7 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  <!-- <div class="row form-group"> -->
@@ -78,10 +78,10 @@
 		    <td>{{c.entry_date}}</td>
 
 		    <td class="col-md-2"> 
-                      <button class="btn btn-warning"
+                      <button class="btn diablo-button btn-warning"
 			 x-ng-click="update_card(c)">修改
 			<i class="glyphicon glyphicon-edit"></i></button>
-                      <button class="btn btn-danger"
+                      <button class="btn diablo-button btn-danger"
 			 x-ng-click="delete_card(c)">删除
 			<i class="glyphicon glyphicon-erase"></i></button>
 		    </td>

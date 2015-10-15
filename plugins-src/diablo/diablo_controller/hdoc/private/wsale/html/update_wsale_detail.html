@@ -23,12 +23,12 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
-	  <div class="row form-group">
-	    <div class="col-xs-3 col-md-3">
+	  <div class="row diablo-form-group">
+	    <div class="col-xs-3 col-md-3 ">
 	      <div class="input-group">
 	  	<input class="form-control" type="text"
 	  	       x-ng-model="select.retailer"
@@ -92,7 +92,7 @@
 	      </div>
 	    </div>
 
-	    <div class="col-xs-3 col-md-3">
+	    <div class="col-xs-3 col-md-3 ">
 	      <div class="input-group">
 		<span class="input-group-addon">
 	  	  <i class="icon-user fg-red"></i>
@@ -108,7 +108,7 @@
 
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -180,7 +180,7 @@
 
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-sm-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -284,7 +284,9 @@
 		    <th class="text-center">序号</th>
 		    <th class="text-center">货号</th>
 		    <th class="text-center">品名</th>
-		    <th class="text-center">库存</th>
+		    <th x-ng-if="setting.check_sale"
+			class="text-center">库存
+		    </th>
 		    <!-- <th class="text-center">类别</th> -->
 		    <!-- <th class="text-center">性别</th> -->
 		    <!-- <th class="text-center">厂商</th> -->
@@ -331,7 +333,9 @@
 		    
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand.name}}</td>
-		    <td class="vert-align">{{inv.total}}</td>
+		    <td x-ng-if="setting.check_sale"
+			class="vert-align">{{inv.total}}
+		    </td>
 		    <!-- <td class="vert-align">{{inv.last_discount}}</td> -->
 		    <!-- <td class="vert-align">{{inv.type}}</td> -->
 		    <!-- <td class="vert-align">{{sexs[inv.sex]}}</td> -->
@@ -467,7 +471,7 @@
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
-			  <i class="glyphicon glyphicon-eye-open"></i></a>
+			  <i class="glyphicon glyphicon-map-marker"></i></a>
 			
 			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"

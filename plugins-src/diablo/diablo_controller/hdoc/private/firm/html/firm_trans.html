@@ -4,41 +4,41 @@
       
       <div class="portlet-title">
 	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
-	  采购流水（<span x-ng-bind=firm.name></span>）
+	  采购记录（<span x-ng-bind=firm.name></span>）
 	</div>
 	
 	<div class="actions"> 
-	  <button type="button" class="btn btn-warning"
+	  <button type="button" class="btn red"
 		  x-ng-click="go_back()">返回
 	    <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 
 	  <button type="button" class="btn blue reload red-stripe"
 		  x-ng-click="do_search(default_page)">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button>
+	    <i class="icon icon-spinner"></i></button>
 	  
 	</div>
 	
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
             </div> 
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter"></query-pattern>
@@ -60,27 +60,32 @@
 		<thead>
 		  <tr>
 		    <th>序号</th>
-		    <th>单号</th>
-		    <th class="danger">厂商</th>
-		    <th>店铺</th>
-		    <th>开单员</th>
-		    <th>采购</th>
+		    <th x-ng-click="toggle_base()">
+			<span x-ng-if="!hidden.base">
+			  <i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+			<span x-ng-if="hidden.base">
+			  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		    <th x-ng-if="!hidden.base">类型</th> 
+		    <th x-ng-if="!hidden.base">店铺</th>
+		    <th x-ng-if="!hidden.base">店员</th> 
+		    
+		    <th class="danger">厂商</th> 
 		    <th class="danger">数量</th>
-		    <th x-ng-if="!hide_column">现金</th>
-		    <th x-ng-if="!hide_column">刷卡</th>
-		    <th x-ng-if="!hide_column">汇款</th>
-		    <th x-ng-if="!hide_column"class="warning">核销</th>
-		    <th x-ng-if="!hide_column" class="warning">核销</th>
-		    <th x-ng-if="!hide_column" class="danger">费用</th>
+
+		    <th x-ng-if="!hidden.balance">现金</th>
+		    <th x-ng-if="!hidden.balance">刷卡</th>
+		    <th x-ng-if="!hidden.balance">汇款</th>
+		    <th x-ng-if="!hidden.balance" class="warning">核销</th>
+		    <th x-ng-if="!hidden.balance" class="danger">费用</th>
 
 		    <th class="info">
-		      <span x-ng-click="toggle_left()">
-			<span x-ng-if="!hide_column">
+		      <span x-ng-click="toggle_balance()">
+			<span x-ng-if="!hidden.balance">
 			  <i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
-			<span x-ng-if="hide_column">
+			<span x-ng-if="hidden.balance">
 			  帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		      </span>
-		    </th>
+		    </th> 
 		    
 		    <th class="success">应付</th>
 		    <th>实付</th>
@@ -95,19 +100,22 @@
 		  <tr ng-repeat="r in records">
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.rsn}}</td>
-		    <td>{{r.firm.name}}</td>
-		    <td>{{r.shop.name}}</td>
-		    <td>{{r.employee.name}}</td>
-		    <td x-ng-switch on="r.type">
+		    
+		    <td x-ng-if="!hidden.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>入库</span>
-		      <span class="bg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-red" x-ng-switch-when=1>退货</span>
 		    </td>
+		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
+		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
+		    
+		    <td>{{r.firm.name}}</td> 
 		    <td>{{r.total}}</td>
-		    <td x-ng-if="!hide_column">{{r.cash}}</td>
-		    <td x-ng-if="!hide_column">{{r.card}}</td>
-		    <td x-ng-if="!hide_column">{{r.wire}}</td>
-		    <td x-ng-if="!hide_column">{{r.verificate}}</td>
-		    <td x-ng-if="!hide_column">
+
+		    <td x-ng-if="!hidden.balance">{{r.cash}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.card}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.wire}}</td>
+		    <td x-ng-if="!hidden.balance">{{r.verificate}}</td>
+		    <td x-ng-if="!hidden.balance"> 
 		      <span x-ng-if="r.e_pay!==0" class="bg-blue">{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
@@ -115,15 +123,20 @@
 		    <td>{{r.balance}}</td> 
 		    <td>{{r.should_pay}}</td>
 		    <td>{{r.has_pay}}</td>
-		    <!-- r.should_pay + (r.balance - r.has_pay)-->
-		    <td x-ng-switch on="r.type">
-		      <span x-ng-switch-when=0>
-			{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
-		      </span>
-		      <span class="bg-red" x-ng-switch-when=1>
-			{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
-		      </span>
+
+		    <td>
+		      {{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
 		    </td>
+		    
+		    <!-- r.should_pay + (r.balance - r.has_pay)-->
+		    <!-- <td x-ng-switch on="r.type"> -->
+		    <!--   <span x-ng-switch-when=0> -->
+		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!--   <span class="bg-red" x-ng-switch-when=1> -->
+		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!-- </td> -->
 		    <!-- <td>{{r.price5}}</td> -->
 		    
 		    <td>
@@ -134,11 +147,11 @@
 		    </td>
 		    <td>{{r.entry_date}}</td>
 		    <td>
-		      <button class="btn btn-primary red-stripe btn-xs"
+		      <button class="btn diablo-button btn-primary"
 		    	 x-ng-click="trans_rsn_detail(r)">
-			采购详情<i class="glyphicon glyphicon-leaf"></i></button>
+			明细<i class="glyphicon glyphicon-map-marker"></i></button>
                       
-		      <button class="btn btn-danger btn-xs green-stripe"
+		      <button class="btn diablo-button btn-danger"
 			      x-ng-disabled="r.state===1"
 		      	      x-ng-click="check_trans(r)">审核
 		      	<i class="glyphicon glyphicon-check"></i></button>
@@ -147,12 +160,13 @@
 
 		  <!--Total info-->
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td colspan="6"></td>
+		    <td x-ng-if="hidden.base" colspan="4"></td>
+		    <td x-ng-if="!hidden.base" colspan="6"></td>
 		    <td class="danger">{{total_amounts}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_cash}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_card}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_wire}}</td>
-		    <td x-ng-if="!hide_column" class="success">{{total_verificate}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_cash}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_card}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_wire}}</td>
+		    <td x-ng-if="!hidden.balance">{{total_verificate}}</td>
 		    <td colspan="1"></td> 
 		    <td class="danger">{{total_spay}}</td>
 		    <td class="info">{{total_hpay}}</td>

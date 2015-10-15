@@ -9,7 +9,7 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn red green-stripe"
+	    <button type="button" class="btn red purple-stripe"
 		    x-ng-click="go_back()">返回
 	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 
@@ -25,23 +25,23 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
-	<div class="table-toolbar">
+      <div class="portlet-body">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
             </div>
 	    
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter">
@@ -66,8 +66,18 @@
 		<thead>
 		  <tr>
 		    <th>序号</th>
-		    <th class="info">单号</th>
-		    <th>采购</th>
+		    <th x-ng-click="toggle_base()">
+		      <span x-ng-if="!hidden.base">
+		    	<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+		    	<span x-ng-if="hidden.base">
+		    	  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		    </th>
+		    
+		    <th x-ng-if="!hidden.base">采购</th> 
+		    <th x-ng-if="!hidden.base">店铺</th>
+		    <th x-ng-if="!hidden.base">店员</th>
+		    
+		    <th>厂商</th>
 		    <th class="danger">款号</th>
 		    <th class="success">品牌</th>
 		    <th class="warning">类型</th>
@@ -75,9 +85,7 @@
 		    <!-- <th>价格</th>  -->
 		    <th>折扣</th>
 		    <th class="info">数量</th>
-		    <th>店员</th>
-		    <th>店铺</th>
-		    <th>厂商</th>
+		    
 		    <th>日期</th> 
 		    <th>操作</th>
 		  </tr>
@@ -86,34 +94,46 @@
 		  <tr ng-repeat="inv in inventories">
 		    <td>{{inv.order_id}}</td>
 		    <td>{{inv.rsn}}</td>
-		    <td x-ng-switch on="inv.type">
+		    <td x-ng-if="!hidden.base" x-ng-switch on="inv.type">
 		      <span x-ng-switch-when=0>入库</span>
-		      <span class="bg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-red" x-ng-switch-when=1>退货</span>
 		    </td>
+		    
+		    <td x-ng-if="!hidden.base">{{inv.shop.name}}</td>
+		    <td x-ng-if="!hidden.base">{{inv.employee.name}}</td>
+		    
+		    <td>{{inv.firm.name}}</td> 
 		    <td>{{inv.style_number}}</td>
 		    <td>{{inv.brand.name}}</td>
 		    <td>{{inv.itype.name}}</td>
 		    <td>{{inv.year}}</td>
 		    <!-- <td>{{inv.price}}</td>  -->
 		    <td>{{inv.discount}}</td>
-		    <td>{{inv.amount}}</td>
-		    <td>{{inv.employee.name}}</td>
-		    <td>{{inv.shop.name}}</td>
-		    <td>{{inv.firm.name}}</td>
+
+		    <td x-ng-switch on="inv.type">
+		      <span x-ng-switch-when=0>{{inv.amount}}</span>
+		      <span class="fg-red" x-ng-switch-when=1>{{inv.amount}}</span>
+		    </td>
+		    
+		    <!-- <td>{{inv.amount}}</td> -->
+		    
+		    
 		    <td>{{inv.entry_date}}</td>
 		    <td>
-		      <button class="btn btn-primary red-stripe btn-xs"
+		      <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="inv.free==0"
 		    	      x-ng-click="rsn_detail(inv)">
-			明细<i class="glyphicon glyphicon-leaf"></i></button>
+			详情<i class="glyphicon glyphicon-map-marker"></i></button>
 		      <!-- <button class="btn btn-warning red-stripe btn-xs" -->
 		      <!-- 	      x-ng-click="edit_rsn_detail(inv)"> -->
 		      <!-- 	修改<i class="glyphicon glyphicon-edit"></i></button> -->
 		    </td>
 		  </tr>
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td colspan="8"></td>
+		    <td x-ng-if="!hidden.base" colspan="11"></td>
+		    <td x-ng-if="hidden.base" colspan="8"></td>
 		    <td class="danger">{{total_amounts}}</td>
+		    <td colspan="2"></td>
 		  </tr>
 		</tbody>
 

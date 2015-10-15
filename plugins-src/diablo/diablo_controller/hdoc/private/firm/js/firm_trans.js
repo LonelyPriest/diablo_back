@@ -14,6 +14,19 @@ firmApp.controller('firmTransCtrl', function(
     $scope.f_add        = diablo_float_add;
     $scope.f_sub        = diablo_float_sub;
     $scope.default_page = 1;
+
+    /*
+     * hidden
+     */
+    $scope.hidden = {base:true, balance:true};
+
+    $scope.toggle_base = function(){
+	$scope.hidden.base = !$scope.hidden.base;
+    };
+    $scope.toggle_balance = function(){
+	$scope.hidden.balance = !$scope.hidden.balance;
+    };
+    
     
     var now             = $.now(); 
 
@@ -56,14 +69,6 @@ firmApp.controller('firmTransCtrl', function(
 	}
     }; 
 
-    /*
-     * hide column
-     */
-    $scope.hide_column = true;
-    $scope.toggle_left = function(){
-	$scope.hide_column = !$scope.hide_column;
-    }
-    
     /* 
      * filter operation
      */ 
@@ -244,6 +249,14 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 
     // console.log(filterEmployee);
     $scope.shopIds   = user.shopIds;
+
+    /*
+     * hidden
+     */
+    $scope.hidden      = {base:true};
+    $scope.toggle_base = function(){
+	$scope.hidden.base = !$scope.hidden.base
+    };
     
     var firm_id = parseInt($routeParams.firm);
     $scope.firm = diablo_get_object(firm_id, filterFirm);

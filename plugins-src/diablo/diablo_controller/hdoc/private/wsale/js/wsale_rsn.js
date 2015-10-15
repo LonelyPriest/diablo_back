@@ -11,6 +11,14 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     
     $scope.flot_mul = diablo_float_mul;
 
+    /*
+     * hidden
+     */
+    $scope.hidden   = {base:true}; 
+    $scope.toggle_base = function(){
+	$scope.hidden.base = !$scope.hidden.base;
+    };
+
     var dialog      = diabloUtilsService; 
     var use_storage = $routeParams.rsn ? false : true;
     
@@ -62,7 +70,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 	$scope.filters = [];
 	
 	$scope.qtime_start = function(){
-	    var shop = -1
+	    var shop = -1;
 	    if ($scope.shopIds.length === 1){
 		shop = $scope.shopIds[0];
 	    };

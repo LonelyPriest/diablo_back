@@ -1230,7 +1230,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	$scope.filters = [];
 	
 	$scope.qtime_start = function(){
-	    var shop = -1
+	    var shop = -1;
 	    if ($scope.shopIds.length === 1){
 		shop = $scope.shopIds[0];
 	    };

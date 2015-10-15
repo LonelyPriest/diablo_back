@@ -544,7 +544,7 @@ sidebar(Session) ->
 		[{"new_wsale_detail", "交易记录", "glyphicon glyphicon-download"}],
 	    
 	    SaleD =
-		[{"wsale_rsn_detail", "交易明细", "glyphicon glyphicon-leaf"}],
+		[{"wsale_rsn_detail", "交易明细", "glyphicon glyphicon-map-marker"}],
 
 	    L1 = ?menu:sidebar(level_1_menu, WSale ++ WReject ++ SaleR ++ SaleD),
 	    %% L2 = ?menu:sidebar(level_1_menu, SaleDetail),

@@ -7,30 +7,31 @@
 	  新增入库
 	</div>
 	<div class="actions">
-	  <button class="btn btn-info red-stripe"
+	  <div class="btn-group">
+	    <button class="btn btn-info purple-stripe"
 		    x-ng-disabled="disable_draft()"
 		    x-ng-click="list_draft()">获取草稿
 	      <i class="glyphicon glyphicon-send"></i></button>
-	  
-	  <button class="btn btn-success red-stripe"
-		  x-ng-disabled="disable_save()"
-		  x-ng-click="save_inventory()">保存
-	    <i class="glyphicon glyphicon-save"></i></button>
-	  <button class="btn btn-danger green-stripe"
-		  x-ng-disabled="disable_refresh"
-		  x-ng-click="refresh()">下一单
-	    <i class="glyphicon glyphicon-plus"></i></button>
+	    
+	    <button class="btn btn-success purple-stripe"
+		    x-ng-disabled="disable_save()"
+		    x-ng-click="save_inventory()">保存
+	      <i class="glyphicon glyphicon-save"></i></button>
+	    <button class="btn btn-danger purple-stripe"
+		    x-ng-disabled="disable_refresh"
+		    x-ng-click="refresh()">下一单
+	      <i class="glyphicon glyphicon-plus"></i></button>
+	  </div>
 	</div>
-	<div class="tools">
-	</div>
+	<!-- <div class="tools"></div> -->
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
 		<!-- <span class="input-group-addon"> -->
@@ -53,8 +54,7 @@
 
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-bishop fg-red"></i>店铺</span>
+		<span class="input-group-addon">店铺</span>
 	  	<input class="form-control" type="text"
 	  	       x-ng-model="select.shop"
 	  	       placeholder="请选择店铺"
@@ -100,7 +100,7 @@
 	  </div> <!--END from-group-->
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -171,7 +171,7 @@
 	  </div> <!--END row-->
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-sm-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -436,7 +436,7 @@
 			   x-ng-if="!inv.update_directory"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
-			  <i class="glyphicon glyphicon-eye-open"></i></a>
+			  <i class="glyphicon glyphicon-map-marker"></i></a>
 			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.update_directory"
 			   x-ng-click="update_inventory(inv)">修改

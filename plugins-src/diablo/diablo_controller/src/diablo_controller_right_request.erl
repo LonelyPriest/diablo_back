@@ -434,8 +434,8 @@ sidebar(Session) ->
     
     Merchant = 
 	[
-	 {{"role_user", "角色", "glyphicon glyphicon-map-marker"}, Role2 ++ Role1},
-	 {{"account_user", "帐户", "glyphicon glyphicon-user"}, Account2 ++ Account1}
+	 {{"role_user", "角色", "glyphicon glyphicon-off"}, Role2 ++ Role1},
+	 {{"account_user", "帐户", "icon icon-user"}, Account2 ++ Account1}
 	],
 
     Sidebars = 

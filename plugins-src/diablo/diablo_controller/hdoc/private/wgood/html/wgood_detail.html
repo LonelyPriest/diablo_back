@@ -9,7 +9,7 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn btn-success red-stripe"
+	    <button type="button" class="btn btn-success purple-stripe"
 	  	    x-ng-click="goto_page('#/wgood_new')">新增
 	      <i class="glyphicon glyphicon-plus"></i></button>
 
@@ -22,24 +22,24 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-sm-6 col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-sm-6 col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
             </div>
 
-	    <div class="col-sm-12 col-md-4">
+	    <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter"></query-pattern>
@@ -117,7 +117,7 @@
 		      <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="g.free===0 && !g.path"
 			      x-ng-click="lookup_detail(g)">详情
-			<i class="glyphicon glyphicon-leaf"></i></button>
+			<i class="glyphicon glyphicon-map-marker"></i></button>
 
 		      <!-- <button class="btn btn-info btn-xs red-stripe" -->
 		      <!-- 	      x-ng-click="image(g)">样图 -->
@@ -143,7 +143,7 @@
 			  共 {{total_items}} 项</span>
 		      </span>
 		      <pagination
-			 class="pull-right"
+			 class="pagination-lg pull-right"
 			 total-items="total_items"
 			 items-per-page="items_perpage"
 			 num-pages="num_pages"

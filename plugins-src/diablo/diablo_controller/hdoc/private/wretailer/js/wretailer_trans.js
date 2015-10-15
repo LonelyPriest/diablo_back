@@ -14,6 +14,17 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.goto_page = diablo_goto_page;
     $scope.float_add = diablo_float_add;
     $scope.float_sub = diablo_float_sub;
+
+    $scope.show = {base:false, balance:false, check:false};
+    
+    $scope.toggle_balance = function(){
+	$scope.show.balance = !$scope.show.balance;
+    };
+
+    $scope.toggle_base = function(){
+	$scope.show.base = !$scope.show.base;
+    };
+    
     var now          = $.now();
 
     $scope.go_back = function(){
@@ -46,14 +57,6 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		    t:        now})
 	}
     };
-
-    /*
-     * toggle column
-     */
-    $scope.hide_column = true;
-    $scope.toggle_left = function(){
-	$scope.hide_column = !$scope.hide_column;
-    }; 
     
     /* 
      * filter operation
@@ -233,10 +236,16 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
     // console.log(filterEmployee);
     var retailer_id = parseInt($routeParams.retailer);
     $scope.retailer = diablo_get_object(retailer_id, filterRetailer);
-    $scope.flot_mul = diablo_float_mul;
+    $scope.flot_mul = diablo_float_mul; 
+    $scope.shopIds  = user.shopIds;
 
-    $scope.shopIds   = user.shopIds; 
-    var now          = $.now();
+    /*
+     * hidden
+     */
+    $scope.hidden      = {base:true}; 
+    $scope.toggle_base = function(){$scope.hidden.base = !$scope.hidden.base};
+    
+    var now            = $.now();
 
     // style_number
     $scope.match_style_number = function(viewValue){

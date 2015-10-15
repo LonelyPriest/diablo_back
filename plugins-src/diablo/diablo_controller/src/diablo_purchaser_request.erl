@@ -409,7 +409,7 @@ sidebar(Session) ->
 			"inventory_reject", "采购退货", "glyphicon glyphicon-arrow-left"}, Shops),
 
 	    TransR = [{"inventory_new_detail", "采购记录", "glyphicon glyphicon-download"}],
-	    TransD = [{"inventory_rsn_detail", "采购明细", "glyphicon glyphicon-leaf"}],
+	    TransD = [{"inventory_rsn_detail", "采购明细", "glyphicon glyphicon-map-marker"}],
 
 	    InvDetail = [{"inventory_detail", "库存详情", "glyphicon glyphicon-book"}],
 

@@ -9,7 +9,7 @@
 	
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn green red-stripe"
+	    <button type="button" class="btn green purple-stripe"
 	  	    x-ng-click="add()">入库
 	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
@@ -19,7 +19,7 @@
 
 	    <button type="button" class="btn yellow purple-stripe"
 	  	    x-ng-click="inventory_detail()">库存
-	      <i class="glyphicon glyphicon-leaf"></i></button>
+	      <i class="glyphicon glyphicon-book"></i></button>
 
 	    <button type="button" class="btn blue purple-stripe"
 		  x-ng-click="export_to()">导出
@@ -33,18 +33,18 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
@@ -72,18 +72,17 @@
 		<thead>
 		  <tr>
 		    <th>序号</th>
-		    <th>单号</th>
-		    <th class="danger">
-		      <span x-ng-click="toggle_base()">
+		    <th x-ng-click="toggle_base()">
 			<span x-ng-if="!hidden.base">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>厂商</span>
+			  <i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
 			<span x-ng-if="hidden.base">
-			  厂商<i class="glyphicon glyphicon-forward fg-red"></i></span>
-		      </span>
+			  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		    </th>
+		    <th x-ng-if="!hidden.base">交易</th> 
 		    <th x-ng-if="!hidden.base">店铺</th>
-		    <th x-ng-if="!hidden.base">入单员</th>
-		    <th>采购</th>
+		    <th x-ng-if="!hidden.base">店员</th>
+		    
+		    <th class="danger">厂商</th> 
 		    <th class="danger">数量</th>
 		    
 		    <th x-ng-if="!hidden.balance">现金</th>
@@ -114,14 +113,14 @@
 		  <tr ng-repeat="r in records">
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.rsn}}</td>
-		    <td>{{r.firm.name}}</td>
+		    <td x-ng-if="!hidden.base" x-ng-switch on="r.type">
+		      <span x-ng-switch-when=0>入库</span>
+		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		    </td>
 		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
 		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
-		    <td x-ng-switch on="r.type">
-		      <span x-ng-switch-when=0>入库</span>
-		      <span class="bg-red" x-ng-switch-when=1>退货</span>
-		    </td>
 		    
+		    <td>{{r.firm.name}}</td> 
 		    <td>{{r.total}}</td>
 		    
 		    <td x-ng-if="!hidden.balance">{{r.cash}}</td>
@@ -135,17 +134,23 @@
 
 		    <td>{{r.balance}}</td>
 		    
-		    <td>{{r.should_pay}}</td>
+		    <td x-ng-switch on="r.type">
+		      <span x-ng-switch-when=0>{{r.should_pay}}</span>
+		      <span class="fg-red" x-ng-switch-when=1>{{r.should_pay}}</span>
+		    </td>
 		    <td>{{r.has_pay}}</td>
 		    <!-- r.should_pay + (r.balance - r.has_pay)-->
-		    <td x-ng-switch on="r.type">
-		      <span x-ng-switch-when=0>
-			{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
-		      </span>
-		      <span class="bg-red" x-ng-switch-when=1>
-			{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
-		      </span>
+		    <td>
+		      {{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
 		    </td>
+		    <!-- <td x-ng-switch on="r.type"> -->
+		    <!--   <span x-ng-switch-when=0> -->
+		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!--   <span x-ng-switch-when=1> -->
+		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!-- </td> -->
 		    
 		    <!-- <td>{{f_add(r.should_pay, f_sub(r.balance, r.has_pay))}}</td> -->
 		    <!-- <td>{{r.price5}}</td> -->
@@ -159,7 +164,7 @@
 		    <td> 
                       <button class="btn diablo-button btn-primary"
 			      x-ng-click="trans_detail(r)">明细
-			<i class="glyphicon glyphicon-leaf"></i></button>
+			<i class="glyphicon glyphicon-map-marker"></i></button>
 		      
 		      <button class="btn diablo-button yellow"
 		      	      x-ng-disabled="r.state===1"

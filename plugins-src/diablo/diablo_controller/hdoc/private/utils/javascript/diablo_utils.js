@@ -102,6 +102,12 @@ diabloUtils.directive('queryGroup', function () {
 	    // })
 
 	    // console.log(scope.prompt);
+	    scope.is_even = function() {
+		console.log(scope.filters.length);
+		var even = scope.filters.length % 2 === 0;
+		console.log(even);
+		return even;
+	    }
 
 	    scope.change_field = function(field){
 		// console.log(field);

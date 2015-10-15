@@ -22,11 +22,11 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
 		<input class="form-control" type="text"
@@ -47,8 +47,7 @@
 
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="icon icon-shopping-cart fg-red"></i>店铺</span>
+		<span class="input-group-addon">店铺</span>
 		<select class="form-control"
 			type="text"
 			disabled
@@ -94,7 +93,7 @@
 	  </div> <!--END from-group-->
 
 	  <!--BEGIN row-->
-	  <div class="row form-group">
+	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
@@ -127,7 +126,7 @@
 	    </div> 
 	  </div> <!--END row-->
 
-	  <div class="row form-group"> 
+	  <div class="row diablo-form-group"> 
 	    <div class="col-xs-6 col-md-6">
 	      <div class="input-group">
 	    	<span class="input-group-addon">
@@ -227,7 +226,22 @@
 		    <td class="vert-align">{{seasons[inv.season]}}</td> 
 
 		    <td class="col-md-1 vert-align">
-		      <span>{{inv.fprice}}</span> 
+		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fprice}}</div> 
+		      <form name="inv.form.fprice"
+			    ng-if="inv.$new && inv.free_color_size
+				   || !inv.$new && inv.free_update">
+			<div ng-class="{'has-error':inv.form.fprice.$invalid
+				       && !inv.form.fprice.$pristine}"> 
+			  <input class="form-control"
+				 type="number" step="0.01" 
+				 required
+				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
+				 x-ng-model="inv.fprice"
+				 popover-placement="top"
+		      		 popover-trigger="focus"
+		      		 popover="默认上次拿货价"/>
+			</div>
+		      </form>
 		    </td>
 		    
 		    <td x-ng-if="setting.show_discount" class="vert-align">{{inv.fdiscount}}</td>
@@ -287,7 +301,7 @@
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
-			  <i class="glyphicon glyphicon-eye-open"></i></a>
+			  <i class="glyphicon glyphicon-map-marker"></i></a>
 			
 			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"

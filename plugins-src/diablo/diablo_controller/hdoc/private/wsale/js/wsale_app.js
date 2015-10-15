@@ -277,10 +277,14 @@ wsaleApp.controller("wsaleNewCtrl", function(
     user, filterFirm, filterRetailer, filterEmployee,
     filterSizeGroup, filterBrand, filterType, filterColor, base){
 
-    $scope.pattern           = {money: diabloPattern.decimal_2};
+    $scope.pattern = {money: diabloPattern.decimal_2,
+		      sell:  diabloPattern.integer_except_zero};
     $scope.timeout_auto_save = undefined;
 
-    $scope.setting = {q_backend:true, show_discount:true};
+    $scope.setting = {q_backend:true,
+		      show_discount:true,
+		      check_sale:true,
+		      trace_price:true};
 
     // all right of user
     // console.log(user); 
@@ -302,7 +306,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.trace_price = function(shopId){
 	return diablo_base_setting(
 	    "ptrace_price", shopId, base, parseInt, diablo_no); 
-    }
+    };
 
     $scope.immediately_print = function(shopId){
 	return diablo_base_setting(
@@ -319,6 +323,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.show_discount = function(){
 	return diablo_base_setting(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+
+    $scope.check_sale = function(shopId){
+	return diablo_base_setting(
+	    "check_sale", shopId, base, parseInt, diablo_yes);
     };
     
     // $scope.qtime_length = function(shopId){
@@ -369,7 +378,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.shops = user.sortShops;
     if ($scope.shops.length !== 0){
 	$scope.select.shop = $scope.shops[0]; 
-	$scope.select.trace_price = $scope.trace_price($scope.select.shop.id);
+	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
+	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
 	wsaleGoodService.set_shop($scope.select.shop.id);
     }
     
@@ -382,6 +392,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
     $scope.change_shop = function(){
 	$scope.local_save();
+	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
+	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
 	wsaleGoodService.set_shop($scope.select.shop.id);
     } 
 
@@ -1330,109 +1342,140 @@ wsaleApp.controller("wsaleNewCtrl", function(
     
     $scope.add_inventory = function(inv){
 	// console.log(inv);
-	console.log($scope.select);
-
+	// console.log($scope.select);
+	console.log($scope.setting);
 	if (angular.isUndefined($scope.select.retailer)
 	    || diablo_is_empty($scope.select.retailer)){
 	    diabloUtilsService.response(
 		false, "销售开单", "开单失败：" + wsaleService.error[2192]);
 	    return;
 	};
-	
-	var promise = diabloPromise.promise; 
-	$q.all([promise(purchaserService.list_purchaser_inventory,
-			{style_number: inv.style_number,
-			 brand:        inv.brand_id,
-			 shop:         $scope.select.shop.id
-			})(),
-		promise(wsaleService.get_last_sale,
-			{style_number: inv.style_number,
-			 brand:        inv.brand_id,
-			 shop:     $scope.select.shop.id,
-			 retailer: $scope.select.retailer.id 
-			})()
-	       ])
-	// purchaserService.list_purchaser_inventory({
-	//     style_number: inv.style_number, brand: inv.brand_id,
-	//     shop: $scope.select.shop.shop_id}) 
-	    .then(function(data){
+
+	if ($scope.setting.check_sale === diablo_no
+	    && $scope.setting.trace_price === diablo_no
+	    && inv.free === 0){
+	    inv.free_color_size = true;
+	    inv.fdiscount       = inv.discount;
+	    inv.fprice          = inv[inv.sell_style.f];
+	    inv.amounts         = [{cid:0, size:0}];
+	} else {
+	    // avoid uncheck sale, but inventory is not free
+	    // $scope.setting.check_sale = true;
+	    var promise = diabloPromise.promise; 
+	    var calls   = [];
+
+	    if ($scope.setting.check_sale === diablo_yes || inv.free !== 0){
+		calls.push(promise(purchaserService.list_purchaser_inventory,
+				   {style_number: inv.style_number,
+				    brand:        inv.brand_id,
+				    shop:         $scope.select.shop.id
+				   })());
+	    }
+	    
+	    if ($scope.setting.trace_price === diablo_yes){
+		calls.push(promise(wsaleService.get_last_sale,
+				   {style_number: inv.style_number,
+				    brand:        inv.brand_id,
+				    shop:     $scope.select.shop.id,
+				    retailer: $scope.select.retailer.id 
+				   })());
+	    };
+	    
+	    $q.all(calls).then(function(data){
 		console.log(data);
 		// data[0] is the inventory belong to the shop
 		// data[1] is the last sale of the shop
-		var shop_now_inv = data[0];
-		var shop_last_inv = data[1];
-		
-		// if (shop_now_inv.length === 0 ){
-		//     diabloUtilsService.response(
-		// 	false, "销售开单", "开单失败：" + wsaleService.error[2190]);
-		//     return;
-		// };
 
-		var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-		var sort = purchaserService.sort_inventory(shop_now_inv, order_sizes, filterColor);
-		
-		inv.total   = sort.total;
-		inv.sizes   = sort.size;
-		inv.colors  = sort.color;
-		inv.amounts = sort.sort; 
-		
-		console.log(inv.sizes)
-		console.log(inv.colors);
-		console.log(inv.amounts);
+		if ($scope.setting.check_sale === diablo_yes
+		    || inv.free !== 0){
+		    var shop_now_inv = data[0];
+		    
+		    var order_sizes =
+			wgoodService.format_size_group(
+			    inv.s_group, filterSizeGroup);
+		    var sort =
+			purchaserService.sort_inventory(
+			    shop_now_inv, order_sizes, filterColor);
+		    
+		    inv.total   = sort.total;
+		    inv.sizes   = sort.size;
+		    inv.colors  = sort.color;
+		    inv.amounts = sort.sort;
 
-		
+		    console.log(inv.sizes)
+		    console.log(inv.colors);
+		    console.log(inv.amounts); 
+		} 
 		
 		// should use the price of inventory
 		// inv.fdiscount   = inv.ldiscount ? inv.ldiscount : inv.discount;
 		// inv.fprice      = inv.lprice ? inv.lprice : inv[inv.sell_style.f];
-		if ($scope.select.trace_price === diablo_yes){
+		if ($scope.setting.trace_price === diablo_yes){
 		    // last sale info
-		    inv.lprice      = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].fprice;
-		    inv.ldiscount   = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].fdiscount;
-		    inv.lsell_style = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].sell_style;
-
-		    if (angular.isDefined(inv.lsell_style) && inv.lsell_style !== -1){
-			inv.sell_style = $scope.get_sell_style(inv.lsell_style);
-		    } 
-		    // inv.sell_style  = inv.lsell_style 
-		    // 	? $scope.get_sell_style(inv.lsell_style) : inv.sell_style;
+		    var shop_last_inv = function(){
+			if ($scope.setting.check_sale === diablo_yes
+			    || inv.free !== 0){
+			    return data[1];
+			} else {
+			    return data[0];
+			}
+		    }();
 		    
-		    inv.fdiscount   = inv.ldiscount ? inv.ldiscount : inv.discount;
-		    inv.fprice      = inv.lprice ? inv.lprice : inv[inv.sell_style.f];
+		    inv.lprice      = shop_last_inv.length === 0
+			? undefined:shop_last_inv[0].fprice;
+		    
+		    inv.ldiscount   = shop_last_inv.length === 0
+			? undefined:shop_last_inv[0].fdiscount;
+		    
+		    inv.lsell_style = shop_last_inv.length === 0
+			? undefined:shop_last_inv[0].sell_style;
+
+		    if (angular.isDefined(inv.lsell_style)
+			&& inv.lsell_style !== -1){
+			inv.sell_style
+			    = $scope.get_sell_style(inv.lsell_style);
+		    } 
+
+		    inv.fdiscount   = inv.ldiscount
+			? inv.ldiscount : inv.discount;
+		    inv.fprice      = inv.lprice
+			? inv.lprice : inv[inv.sell_style.f];
 		} else{
 		    inv.fdiscount   = inv.discount;
 		    inv.fprice      = inv[inv.sell_style.f];
 		}
-		
-		var after_add = function(){
-		    inv.$edit = true;
-		    inv.$new = false;
-		    // oreder
-		    inv.order_id = $scope.inventories.length; 
-		    // add new line 
-		    $scope.inventories.unshift({$edit:false, $new:true});
-
-		    $scope.disable_refresh = false;
-		    $scope.local_save();
-		    $scope.re_calculate(); 
-		};
-		
-		var callback = function(params){
-		    var result  = add_callback(params);
-		    console.log(result);
-		    inv.amounts    = result.amounts;
-		    inv.sell_style = result.sell_style;
-		    inv.sell       = result.sell;
-		    // inv.batch      = result.batch;
-		    inv.fdiscount  = result.fdiscount;
-		    inv.fprice     = result.fprice;
-		    after_add();
-		};
 
 		if(inv.free === 0){
 		    inv.free_color_size = true;
+		    inv.amounts         = [{cid:0, size:0}];
 		} else{
 		    inv.free_color_size = false;
+
+		    var after_add = function(){
+			inv.$edit = true;
+			inv.$new = false;
+			// oreder
+			inv.order_id = $scope.inventories.length; 
+			// add new line 
+			$scope.inventories.unshift({$edit:false, $new:true});
+
+			$scope.disable_refresh = false;
+			$scope.local_save();
+			$scope.re_calculate(); 
+		    };
+		    
+		    var callback = function(params){
+			var result  = add_callback(params);
+			console.log(result);
+			inv.amounts    = result.amounts;
+			inv.sell_style = result.sell_style;
+			inv.sell       = result.sell;
+			// inv.batch      = result.batch;
+			inv.fdiscount  = result.fdiscount;
+			inv.fprice     = result.fprice;
+			after_add();
+		    };
+		    
 		    var modal_size = diablo_valid_dialog(inv.sizes);
 		    var large_size = modal_size === 'lg' ? true : false;
 		    var payload = {
@@ -1457,6 +1500,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 			"wsale-new.html", modal_size, callback, $scope, payload); 
 		}; 
 	    });
+	} 
     };
     
     /*
@@ -1613,9 +1657,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     
     $scope.disable_print = false;
 
-    $scope.show = {base:false, balance:false};
-    
-    // $scope.show_column   = false;
+    /*
+     * hidden
+     */
+    $scope.show = {base:false, balance:false, check:false};
     
     $scope.toggle_balance = function(){
 	// console.log("toggle left");
@@ -1624,6 +1669,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 
     $scope.toggle_base = function(){
 	$scope.show.base = !$scope.show.base;
+    };
+
+    $scope.toggle_check = function(){
+	$scope.show.check = !$scope.show.check;
     };
 
     
@@ -1660,7 +1709,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	$scope.filters = [];
 	
 	$scope.qtime_start = function(){
-	    var shop = -1
+	    var shop = -1;
 	    if ($scope.shopIds.length === 1){
 		shop = $scope.shopIds[0];
 	    };

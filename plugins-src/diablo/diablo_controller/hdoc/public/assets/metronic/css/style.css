@@ -1511,7 +1511,7 @@ Box portlet
 /* portlet buttons */
 .portlet.box > .portlet-body {
   background-color: #fff;
-  padding: 10px;
+  padding: 4px;
 }
 
 .portlet.box > .portlet-title {  
@@ -1919,7 +1919,7 @@ General list for item with image
 Custom tables
 ***/
 .table-toolbar {
-  margin-bottom: 15px;
+  margin-bottom: 7px;
 }
 
 .table.table-full-width {
@@ -3605,11 +3605,11 @@ Demo Utils
 }
 
 .util-btn-margin-bottom-5 .btn {
-  margin-bottom: 5px !important;
+  margin-bottom: 4px !important;
 }
 
 .util-btn-group-margin-bottom-5 .btn-group {
-  margin-bottom: 5px !important;
+  margin-bottom: 2px !important;
 }
 
 .fontawesome-demo i {

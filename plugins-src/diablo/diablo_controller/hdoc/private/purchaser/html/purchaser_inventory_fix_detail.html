@@ -4,12 +4,12 @@
       
       <div class="portlet-title">
 	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
-	  盘点详情
+	  盘点记录
 	</div>
 	
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn btn-success red-stripe"
+	    <button type="button" class="btn btn-success purple-stripe"
 	  	    x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
 	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
@@ -25,9 +25,9 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
             <div class="col-md-4">
@@ -36,7 +36,7 @@
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 diablo-pannel-padding-left diablo-pannel-padding-right">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
@@ -85,9 +85,9 @@
 		    <td>{{r.entry_date}}</td>
 		    
 		    <td> 
-                      <button class="btn btn-primary red-stripe btn-xs"
+                      <button class="btn diablo-button btn-primary"
 			      x-ng-click="rsn_detail(r)">明细
-			<i class="glyphicon glyphicon-leaf"></i></button>
+			<i class="glyphicon glyphicon-map-marker"></i></button>
 		    </td>
 		  </tr>
 		</tbody>
@@ -99,7 +99,7 @@
 			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
 			  共 {{total_items}} 项</span>
 		      </span> 
-		      <pagination class="pull-right"
+		      <pagination class="pagination-lg pull-right"
 		      		  total-items="total_items"
 		      		  items-per-page="items_perpage"
 		      		  num-pages="num_pages"

@@ -25,22 +25,18 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar">
-	  
-	  <div class="row form-group"> 
+	<div class="table-toolbar"> 
+	  <div class="row diablo-form-group"> 
 	    <div class="col-xs-4 col-md-4">
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-bed fg-red"></i></span>
-	  	<input class="form-control" type="text"
-	  	       x-ng-model="select.shop"
-		       x-ng-init="select.shop=shops[0]"
-	  	       placeholder="请选择店铺"
-	  	       typeahead-editable="false"
-	  	       typeahead="s as s.name for s in
-	  			  shops|filter:$viewValue|limitTo:8"></input> 
+		<span class="input-group-addon"><i class="glyphicon glyphicon-map-marker fg-red"></i>店铺</span>
+	  	<select class="form-control" type="text"
+	  		x-ng-model="select.shop"
+	  		x-ng-options="s as s.name for s in
+	  			      shops|filter:$viewValue|limitTo:8">
+		</select>
 	      </div>
 	    </div>
 
@@ -179,49 +175,49 @@
 		    
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid
 					  || inv.form.fix.$invalid"
 			   x-ng-click="add_free_inventory(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="!inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid"
 			   x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-warning btn-xs"
+			<a class="btn diablo-input-button btn-warning"
 			   x-ng-disabled="!inv.style_number"
 			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a>
 		      </div>
 
 		      <div ng-if="inv.$edit">
-			<a class="btn btn-primary btn-xs"
+			<a class="btn diablo-input-button btn-primary"
 			   x-ng-if="!inv.free_update"
 			   x-ng-disabled="inv.free_color_size"
 			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
 			
-			<a class="btn yellow btn-xs"
+			<a class="btn diablo-input-button yellow"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   x-ng-if="!inv.free_update"
 			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
-			<a class="btn btn-success btn-xs"
+			<a class="btn diablo-input-button btn-success"
 			   ng-if="inv.free_update"
 			   x-ng-disabled=" inv.form.fix.$invalid"
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
-			<a class="btn btn-danger btn-xs"
+			<a class="btn diablo-input-button btn-danger"
 			   ng-if="inv.free_update"
 			   x-ng-disabled=" inv.form.amount.$invalid"
 			   x-ng-click="inv.free_update=false">取消

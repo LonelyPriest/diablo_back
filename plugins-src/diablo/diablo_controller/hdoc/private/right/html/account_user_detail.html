@@ -9,11 +9,11 @@
 	
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn btn-success red-stripe"
+	    <button type="button" class="btn green"
 		    ng-click="goto_page('#/account_user/account_new')">新增
 	      <i class="glyphicon glyphicon-plus"></i></button> 
 
-	    <button type="button" class="btn blue reload red-stripe"
+	    <button type="button" class="btn blue reload purple-stripe"
 		    x-ng-click="refresh()">刷新
 	      <i class="icon icon-spinner fg-white"></i></button>
 	  </div>
@@ -23,7 +23,7 @@
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
+      <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar">
 	  
@@ -74,8 +74,8 @@
 		    
 		    <td data-title="'操作'">
 		      <button href="" class="btn diablo-button btn-primary" 
-			      x-ng-click="right_detail(account)">查看
-			<i class="glyphicon glyphicon-leaf"></i></button>
+			      x-ng-click="right_detail(account)">详情
+			<i class="glyphicon glyphicon-map-marker"></i></button>
 		      
 		      <button class="btn diablo-button btn-warning"
 			      ng-click="update_account(account)">修改

@@ -142,10 +142,14 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
     $scope, $routeParams, $location, dateFilter,
     diabloPattern, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService,
-    user, filterBrand, filterFirm, filterSizeGroup, base){
+    user, filterBrand, filterFirm, filterSizeGroup, filterColor, base){
     
     // var permitShops =  user.shopIds;
+    // $scope.shops = user.sortAvailabeShops;
+    $scope.shops   = user.sortShops.concat(user.sortBadRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds);
     $scope.goto_page = diablo_goto_page;
+    
     
     // style_number
     $scope.match_style_number = function(viewValue){
@@ -160,16 +164,21 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
     diabloFilter.add_field("style_number", $scope.match_style_number);
     diabloFilter.add_field("brand", filterBrand);
     // diabloFilter.add_field("shop", user.sortShops);
-    diabloFilter.add_field("shop", user.sortAvailabeShops);
+    diabloFilter.add_field("shop", $scope.shops);
     diabloFilter.add_field("firm", filterFirm);
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
     
     var now = $.now();
-    $scope.qtime_start = function(shopId){
+    $scope.qtime_start = function(){
+	var shop = -1
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+	
 	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
+	    "qtime_start", shop, base, diablo_set_date, diabloFilter.default_start_time(now));
     }();
     // console.log($scope.qtime_start);
     
@@ -277,7 +286,7 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
 	    console.log(result);
 	    
 	    var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-	    var sort = purchaserService.sort_inventory(result.data, order_sizes);
+	    var sort = purchaserService.sort_inventory(result.data, order_sizes, filterColor);
 	    console.log(sort);
 	    
 	    inv.sizes   = sort.size;
@@ -313,6 +322,14 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     $scope.goto_page = diablo_goto_page;
+
+    /*
+     * hidden
+     */
+    $scope.hidden      = {base:true};
+    $scope.toggle_base = function(){
+	$scope.hidden.base = !$scope.hidden.base
+    };
 
     var dialog       = diabloUtilsService;
     var use_storage  = $routeParams.rsn ? false : true;

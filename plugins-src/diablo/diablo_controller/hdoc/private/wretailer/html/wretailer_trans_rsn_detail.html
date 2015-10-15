@@ -9,35 +9,35 @@
 	</div>	
 
 	<div class="actions">
-	  <button type="button" class="btn btn-warning red-stripe"
+	  <button type="button" class="btn red"
 		  x-ng-click="back()">返回
 	    <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 	  
-	  <button type="button" class="btn blue red-stripe reload"
+	  <button type="button" class="btn blue reload"
 		  x-ng-click="do_search(default_page)">刷新
-	    <i class="glyphicon glyphicon-refresh"></i></button> 
+	    <i class="icon icon-spinner"></i></button> 
 	</div>
 	
       </div>
 
       <!--BEGIN table container-->
-      <div class="portlet-body util-btn-margin-bottom-5">
-	<div class="table-toolbar">
+      <div class="portlet-body">
+	<div class="table-toolbar util-btn-margin-bottom-5">
 	  
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>
             </div>
 	    
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter">
@@ -62,11 +62,18 @@
 		<thead>
 		  <tr>
 		    <th>序号</th>
-		    <th class="danger">单号</th>
-		    <th>店铺</th>
-		    <th>店员</th>
-		    <!-- <th class="success">客户</th> -->
-		    <th >交易类型</th>
+
+		    <th x-ng-click="toggle_base()" class="danger">
+		      <span x-ng-if="!hidden.base">
+			<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+		      <span x-ng-if="hidden.base">
+			单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		    </th>
+
+		    <th x-ng-if="!hidden.base">交易</th> 
+		    <th x-ng-if="!hidden.base">店铺</th>
+		    <th x-ng-if="!hidden.base">店员</th>
+		    
 		    <th>款号</th>
 		    <th>品牌</th>
 		    <th>类型</th>
@@ -85,13 +92,15 @@
 		  <tr ng-repeat="inv in inventories">
 		    <td>{{inv.order_id}}</td> 
 		    <td>{{inv.rsn}}</td>
-		    <td>{{inv.shop.name}}</td>
-		    <td>{{inv.employee.name}}</td>
-		    <!-- <td>{{inv.retailer.name}}</td> -->
-		    <td x-ng-switch on="inv.sell_type">
+		    
+		    <td x-ng-if="!hidden.base" x-ng-switch on="inv.sell_type">
 		      <span x-ng-switch-when=0>开单</span>
-		      <span class="bg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-red" x-ng-switch-when=1>退货</span>
 		    </td>
+		    
+		    <td x-ng-if="!hidden.base">{{inv.shop.name}}</td>
+		    <td x-ng-if="!hidden.base">{{inv.employee.name}}</td>
+		    
 		    <!-- <td x-ng-if="inv.sell_type===0" class="success">开单</td> -->
 		    <!-- <td x-ng-if="inv.sell_type===1" class="danger">退货</td> -->
 		    <td>{{inv.style_number}}</td>
@@ -106,15 +115,16 @@
 		    <td>{{inv.firm.name}}</td>
 		    <td>{{inv.entry_date}}</td>
 		    <td>
-		      <a class="btn btn-primary red-stripe btn-xs"
+		      <a class="btn diablo-button btn-primary"
 			 x-ng-disabled="inv.free === 0"
 		    	 x-ng-click="rsn_detail(inv)">
-			交易明细<i class="glyphicon glyphicon-leaf"></i></a>
+			详情<i class="glyphicon glyphicon-map-marker"></i></a>
 		    </td>
 		  </tr>
 
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td colspan="10"></td>
+		    <td x-ng-if="!hidden.base" colspan="9"></td>
+		    <td x-ng-if="hidden.base" colspan="6"></td>
 		    <td class="success">{{total_amounts}}</td>
 		    <td class="danger">{{total_balance}}</td>
 		    <td colspan="3"></td>
