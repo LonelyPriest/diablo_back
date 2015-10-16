@@ -324,6 +324,10 @@ var diablo_float_mul = function(arg1, arg2){
     return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m);
 };
 
+var diablo_round = function(value){
+    return Math.round(value);
+};
+
 var diablo_full_year = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020];
 
 var diablo_print_field = {

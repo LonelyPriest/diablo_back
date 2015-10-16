@@ -69,7 +69,7 @@
 		    <th x-ng-if="!hidden.base">店铺</th>
 		    <th x-ng-if="!hidden.base">店员</th> 
 		    
-		    <th class="danger">厂商</th> 
+		    <!-- <th class="danger">厂商</th>  -->
 		    <th class="danger">数量</th>
 
 		    <th x-ng-if="!hidden.balance">现金</th>
@@ -108,7 +108,7 @@
 		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
 		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
 		    
-		    <td>{{r.firm.name}}</td> 
+		    <!-- <td>{{r.firm.name}}</td>  -->
 		    <td>{{r.total}}</td>
 
 		    <td x-ng-if="!hidden.balance">{{r.cash}}</td>
@@ -160,17 +160,19 @@
 
 		  <!--Total info-->
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td x-ng-if="hidden.base" colspan="4"></td>
-		    <td x-ng-if="!hidden.base" colspan="6"></td>
+		    <td x-ng-if="hidden.base" colspan="2"></td>
+		    <td x-ng-if="!hidden.base" colspan="5"></td>
 		    <td class="danger">{{total_amounts}}</td>
 		    <td x-ng-if="!hidden.balance">{{total_cash}}</td>
 		    <td x-ng-if="!hidden.balance">{{total_card}}</td>
 		    <td x-ng-if="!hidden.balance">{{total_wire}}</td>
 		    <td x-ng-if="!hidden.balance">{{total_verificate}}</td>
+		    <td x-ng-if="!hidden.balance"></td> 
+		    <!-- <td x-ng-if="!hidden.balance" colspan="2"></td> -->
 		    <td colspan="1"></td> 
 		    <td class="danger">{{total_spay}}</td>
 		    <td class="info">{{total_hpay}}</td>
-		    <td colspan="3"></td>
+		    <td colspan="4"></td>
 		  </tr>
 		  
 		</tbody>

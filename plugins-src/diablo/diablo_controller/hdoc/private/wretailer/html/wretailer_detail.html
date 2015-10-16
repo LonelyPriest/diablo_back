@@ -84,7 +84,7 @@
 		  <tr ng-repeat="r in filter_retailers">
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.name}}</td>
-		    <td>{{r.balance}}</td>
+		    <td>{{round(r.balance)}}</td>
 		    <td>
 		      <div x-ng-switch on="r.mobile">
 			<span x-ng-switch-when="">暂无</span>

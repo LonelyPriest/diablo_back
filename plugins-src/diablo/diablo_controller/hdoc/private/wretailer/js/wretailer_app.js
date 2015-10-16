@@ -292,6 +292,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     filterProvince, filterCity){
     $scope.provinces = angular.copy(filterProvince);
     $scope.cities    = angular.copy(filterCity);
+    $scope.round     = diablo_round;
     
     var dialog = diabloUtilsService;
     var f_add  = diablo_float_add;
@@ -378,7 +379,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 
 	$scope.total_balance = 0;
 	angular.forEach(filters, function(f){
-	    $scope.total_balance = f_add($scope.total_balance, f.balance);
+	    $scope.total_balance =$scope.total_balance + $scope.round(f.balance);
 	});
 
 	// re pagination
@@ -416,7 +417,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    angular.forEach($scope.retailers, function(r){
 		r.province = diablo_get_object(r.pid, $scope.provinces);
 		r.city     = diablo_get_object(r.cid, $scope.cities);
-		$scope.total_balance = f_add($scope.total_balance, r.balance);
+		$scope.total_balance = $scope.total_balance + $scope.round(r.balance);
 	    })
 	    
 	    diablo_order($scope.retailers);

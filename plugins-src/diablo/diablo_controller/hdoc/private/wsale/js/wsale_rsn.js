@@ -10,6 +10,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     $scope.shopIds  = user.shopIds.concat(user.badrepoIds);
     
     $scope.flot_mul = diablo_float_mul;
+    $scope.round    = diablo_round;
 
     /*
      * hidden
@@ -142,7 +143,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 		    $scope.total_items = result.total;
 		    $scope.total_amounts = result.total === 0 ? 0 : result.t_amount;
 		    $scope.total_balance =
-			result.total === 0 ? 0 : diablo_float_mul(result.t_balance, 0.01);
+			result.total === 0 ? 0 : $scope.round(result.t_balance*0.01);
 		}
 		angular.forEach(result.data, function(d){
 		    d.brand    = diablo_get_object(d.brand_id, filterBrand);

@@ -14,6 +14,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.goto_page = diablo_goto_page;
     $scope.float_add = diablo_float_add;
     $scope.float_sub = diablo_float_sub;
+    $scope.round     = diablo_round;
 
     $scope.show = {base:false, balance:false, check:false};
     
@@ -152,8 +153,8 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		if (page === 1 && angular.isUndefined(back_page)){
 		    $scope.total_items      = result.total;
 		    $scope.total_amounts    = result.t_amount;
-		    $scope.total_spay       = result.t_spay;
-		    $scope.total_hpay       = result.t_hpay;
+		    $scope.total_spay       = $scope.round(result.t_spay);
+		    $scope.total_hpay       = $scope.round(result.t_hpay);
 		    $scope.total_cash       = result.t_cash;
 		    $scope.total_card       = result.t_card;
 		    $scope.total_wire       = result.t_wire;
@@ -238,6 +239,7 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
     $scope.retailer = diablo_get_object(retailer_id, filterRetailer);
     $scope.flot_mul = diablo_float_mul; 
     $scope.shopIds  = user.shopIds;
+    $scope.round    = diablo_round;
 
     /*
      * hidden
@@ -315,7 +317,7 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
 		    $scope.total_items = result.total;
 		    $scope.total_amounts = result.total === 0 ? 0 : result.t_amount;
 		    $scope.total_balance =
-			result.total === 0 ? 0 : diablo_float_mul(result.t_balance, 0.01); 
+			result.total === 0 ? 0 : $scope.round(result.t_balance * 0.01); 
 		}
 		angular.forEach(result.data, function(d){
 		    d.brand = diablo_get_object(d.brand_id, filterBrand);

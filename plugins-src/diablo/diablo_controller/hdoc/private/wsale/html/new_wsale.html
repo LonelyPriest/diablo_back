@@ -395,7 +395,8 @@
 
 			<td class="col-md-1 vert-align">
 			  <span x-ng-if="!inv.$new || inv.free_color_size">
-			    <div>{{inv[inv.sell_style.f]}}</div>
+			    <!-- <div>{{inv[inv.sell_style.f]}}</div> -->
+			    {{inv.fprice}}
 			    <!-- <div class="fg-red">上次：{{inv.last_fprice}}</div> -->
 			  </span>
 			</td>
@@ -424,7 +425,12 @@
 
 			<td class="col-md-1 vert-align">
 			  <div ng-if="!inv.$new && !inv.free_update">
-			    {{inv.fprice}}
+			    <div x-ng-if="inv.sell
+					&& inv.fdiscount
+					&& (inv.fprice === 0 || inv.fprice)">
+			      <span>{{float_mul(inv.fprice, (inv.fdiscount * 0.01))}}
+			      </span>
+			    </div>
 			  </div> 
 			  <form name="inv.form.fprice"
 				ng-if="inv.$new && inv.free_color_size
@@ -447,7 +453,7 @@
 
 			<!-- sell count-->
 			<td class="col-md-1 vert-align">
-			  <div ng-if="!inv.$new && !inv.free_update">
+			  <div ng-if="!inv.$new && !inv.free_update"> 
 			    {{inv.sell}}
 			  </div> 
 			  <form name="inv.form.sell"
@@ -473,11 +479,13 @@
 			  <div x-ng-if="inv.sell
 					&& inv.fdiscount
 					&& (inv.fprice === 0 || inv.fprice)">
-			    <span>
-			      {{float_mul(
-			      float_mul(inv.sell,
-			      float_mul(inv.fprice, inv.fdiscount)),  0.01)}}
-			    </span>
+			    <span>{{round(inv.fprice * inv.sell * inv.fdiscount * 0.01)}}
+			      </span>
+			    <!-- <span> -->
+			    <!--   {{float_mul( -->
+			    <!--   float_mul(inv.sell, -->
+			    <!--   float_mul(inv.fprice, inv.fdiscount)),  0.01)}} -->
+			    <!-- </span> -->
 			  </div>
 			</td>
 

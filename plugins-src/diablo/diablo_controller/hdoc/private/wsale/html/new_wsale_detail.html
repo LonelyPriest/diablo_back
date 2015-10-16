@@ -137,22 +137,27 @@
 		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
-		    <td>{{r.balance}}</td>
-		    <td>{{r.should_pay}}</td>
+		    <td>{{round(r.balance)}}</td>
+		    <td>{{round(r.should_pay)}}</td>
 		    <td>{{r.has_pay}}</td>
-		    <!-- <td>{{r.should_pay + r.balance - r.has_pay}}</td> -->
+
 		    <td x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>
-			{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
+			{{round(r.balance + r.should_pay + r.e_pay - r.has_pay)}}
 		      </span>
 		      <span class="fg-red" x-ng-switch-when=1>
-			{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
+			{{round(r.balance + r.should_pay + r.e_pay - r.has_pay)}}
 		      </span>
 		    </td>
-		    <!-- </td> -->
-		    <!-- <td> -->
-		    <!--   {{float_add(float_add(r.balance, r.should_pay), -r.has_pay)}} -->
-		    <!-- </td> -->
+		    
+		    <!-- <td x-ng-switch on="r.type"> -->
+		    <!--   <span x-ng-switch-when=0>  -->
+		    <!-- 	{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!--   <span class="fg-red" x-ng-switch-when=1> -->
+		    <!-- 	{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
+		    <!--   </span> -->
+		    <!-- </td> --> 
 		    
 		    <td>
 		      <span x-ng-switch on="r.comment">
@@ -201,11 +206,11 @@
 		    <td x-ng-if="show.balance">{{total_card}}</td>
 		    <td x-ng-if="show.balance">{{total_wire}}</td>
 		    <td x-ng-if="show.balance">{{total_verificate}}</td>
-		    <td x-ng-if="show.balance" colspan="2"></td>
-		    <td x-ng-if="!show.balance" colspan="1"></td>
+		    <td x-ng-if="show.balance"></td>
+		    <td colspan="1"></td>
 		    <td class="danger">{{total_spay}}</td>
 		    <td class="info">{{total_hpay}}</td>
-		    <td colspan="3"></td>
+		    <td colspan="4"></td>
 		  </tr>
 		</tbody>
 

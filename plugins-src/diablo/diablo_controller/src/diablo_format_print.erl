@@ -259,7 +259,8 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
 	     ({<<"count">>, _, W}, Acc) ->
 		  ?to_s(Total) ++ pading(W - width(latin1, Total)) ++ Acc;
 	     ({<<"calc">>, _, _W}, Acc) ->
-		  ?to_s(clean_zero(FPrice * Total)) ++ Acc
+		  %% ?DEBUG("round ~p", [?to_s(round(FPrice * Total))]),
+		  ?to_s(round(FPrice * Total)) ++ Acc
 	  end, [], Fields),
     ?DEBUG("row ~p", [Row]),
     Row;
@@ -308,7 +309,7 @@ row(?TABLE, A, Fields, FlatternNums, Total) ->
 		  {Mh, Ml} = middle(?TABLE, W, Total),
 		  pading(Mh) ++ ?to_s(Total) ++ pading(Ml) ++ phd("|") ++ Acc;
 	     ({<<"calc">>, _, W}, Acc) ->
-		  CleanCalc = clean_zero(FPrice * Total),
+		  CleanCalc = round(FPrice * Total),
 		  {Mh, Ml} = middle(?TABLE, W, CleanCalc),
 		  pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml) ++ phd("|") ++ Acc
 	  end, [], Fields),

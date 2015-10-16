@@ -111,7 +111,7 @@
 		    <td>{{inv.fdiscount}}</td>
 		    <td>{{inv.fprice}}</td>
 		    <td>{{inv.total}}</td>
-		    <td>{{flot_mul(inv.fprice, inv.fdiscount * inv.total * 0.01)}}</td>
+		    <td>{{round(inv.fprice *inv.fdiscount * inv.total * 0.01)}}</td>
 		    <td>{{inv.firm.name}}</td>
 		    <td>{{inv.entry_date}}</td>
 		    <td>
@@ -123,8 +123,8 @@
 		  </tr>
 
 		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td x-ng-if="!hidden.base" colspan="9"></td>
-		    <td x-ng-if="hidden.base" colspan="6"></td>
+		    <td x-ng-if="!hidden.base" colspan="10"></td>
+		    <td x-ng-if="hidden.base" colspan="7"></td>
 		    <td class="success">{{total_amounts}}</td>
 		    <td class="danger">{{total_balance}}</td>
 		    <td colspan="3"></td>

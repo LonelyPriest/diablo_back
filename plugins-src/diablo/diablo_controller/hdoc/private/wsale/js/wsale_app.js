@@ -280,6 +280,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.pattern = {money: diabloPattern.decimal_2,
 		      sell:  diabloPattern.integer_except_zero};
     $scope.timeout_auto_save = undefined;
+    $scope.round   = diablo_round;
 
     $scope.setting = {q_backend:true,
 		      show_discount:true,
@@ -1204,10 +1205,10 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.select.abs_total = 0;
 	$scope.select.should_pay = 0.00;
 	
-	var e_pay = 0.00;
+	var e_pay = 0;
 	if(angular.isDefined($scope.select.extra_pay)
 	   && $scope.select.extra_pay){
-	    e_pay = parseFloat($scope.select.extra_pay);
+	    e_pay = $scope.select.extra_pay;
 	}
 
 	console.log($scope.inventories);
@@ -1216,11 +1217,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    $scope.select.total      += parseInt(one.sell);
 	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
 
-	    var f1 = $scope.float_mul(one.fprice, one.fdiscount * 0.01);
-	    var f2 = $scope.float_mul(f1, one.sell);
-	    $scope.select.should_pay = $scope.float_add(
-	    	$scope.select.should_pay, f2);
-
+	    // var f1 = $scope.round(one.fprice * one.fdiscount * 0.01);
+	    $scope.select.should_pay
+		+= $scope.round(one.fprice * one.fdiscount * 0.01 * one.sell); 
 	    // console.log($scope.select.should_pay);
 	    // $scope.select.should_pay
 	    // 	= $scope.select.should_pay + one.fprice * one.sell * one.fdiscount * 0.01;
@@ -1228,9 +1227,12 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	
 
 	// console.log($scope.select.extra_pay);
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.float_add($scope.select.should_pay, e_pay),
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	$scope.select.left_balance
+	    = $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay; 
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.float_add($scope.select.should_pay, e_pay),
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
     };
 
     var valid_sell = function(amount){
@@ -1465,6 +1467,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		    };
 		    
 		    var callback = function(params){
+			// console.log(params);
 			var result  = add_callback(params);
 			console.log(result);
 			inv.amounts    = result.amounts;
@@ -1654,6 +1657,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.goto_page = diablo_goto_page;
     $scope.float_add = diablo_float_add;
     $scope.float_sub = diablo_float_sub;
+    $scope.round     = diablo_round;
     
     $scope.disable_print = false;
 
@@ -1792,8 +1796,9 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		if (page === 1 && angular.isUndefined(back_page)){
 		    $scope.total_items      = result.total;
 		    $scope.total_amounts    = result.t_amount;
-		    $scope.total_spay       = result.t_spay;
-		    $scope.total_hpay       = result.t_hpay;
+		    $scope.total_spay       = $scope.round(result.t_spay);
+		    // $scope.total_spay       = result.t_spay;
+		    $scope.total_hpay       = $scope.round(result.t_hpay);
 		    $scope.total_cash       = result.t_cash;
 		    $scope.total_card       = result.t_card;
 		    $scope.total_wire       = result.t_wire;

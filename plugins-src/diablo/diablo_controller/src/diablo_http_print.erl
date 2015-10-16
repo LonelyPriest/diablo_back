@@ -168,18 +168,22 @@ handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
 			  Head = title(Brand, Model, Column, ShopName)
 			      ++ address(Brand, Model, Column, ShopAddr)
 			      ++ head(Brand, Model, Column, RSN,
-				      PrintRetailer, Retailer, Employee, Date) 
+				      PrintRetailer, Retailer, Employee, Date)
+			      
 			      ++ left_pading(Brand, Model)
+			      
 			      ++ case PrintTable of
 				     ?TABLE  ->
-					 line_space('1/8')
-					     ++ line(minus, Column) ++ br(Brand);
+					 line_space('1/8');
+				     %% ++ line(minus, Column) ++ br(Brand);
 				     ?STRING ->
 					 line(equal, Column) ++ br(Brand)
 				 end,
 
 			  Body = print_content(
-				   PShop, Brand, Model, Column, Merchant, Setting, Invs, Total)
+				   PShop, Brand, Model, Column,
+				   Merchant, Setting, Invs, Total,
+				   ?v(<<"should_pay">>, Attrs, 0))
 			      ++ case PrintTable of
 				     ?TABLE  ->
 					 %% line_space(default);
@@ -248,7 +252,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 
 
-print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T) ->
+print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S) ->
     %% DateTime     = ?v(<<"datetime">>, Attrs), 
     %% Retailer     = ?v(<<"retailer">>, Print),
     %% Employee     = ?v(<<"employ">>, Print),
@@ -320,7 +324,7 @@ print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T) ->
 
     Content;
     
-print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total) -> 
+print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay) -> 
     Fields     = detail(print_format, Merchant, Shop), 
     PrintModel = ?to_i(?v(<<"pformat">>, Setting, ?COLUMN)),
     PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
@@ -360,10 +364,17 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total) ->
 	fun(?TABLE) ->
 		
 		{Mh, Ml} = middle(?TABLE, WidthTotal, Total),
+		{Mh1, Ml1} = middle(?TABLE, WidthCalc, round(ShouldPay)),
+		
 		left_pading(PBrand, Model) ++ "|" ++ pading(Len2total -2)
-		    ++ "|" ++ pading(Mh) ++ ?to_s(Total) ++ pading(Ml) ++ "|"
-		    ++ pading(WidthCalc  -1) ++ "|"
-		    ++ br(PBrand)
+		    ++ "|" ++ pading(Mh)
+		    ++ ?to_s(Total) ++ pading(Ml)
+		    
+		    ++ "|" ++ pading(Mh1)
+		    ++ ?to_s(round(ShouldPay)) ++ pading(Ml1)
+		    
+		    ++ "|" ++ br(PBrand)
+		    
 		    ++ line(add_minus, ?TABLE, ?COLUMN, Fields)
 		%% ++ line(minus, Column)
 		    ++ br(PBrand);
@@ -410,7 +421,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total) ->
 		    ++ br(PBrand),
 		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
 		BodyHead ++ BodyContent;
-	   (no_hand, ?COLUMN) -> 
+	   (no_hand, ?COLUMN) ->
+
 		BodyHead = body_head(PrintTable, ?COLUMN, PBrand, Model, Fields),
 		
 		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
@@ -426,7 +438,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total) ->
 		    %%++ left_pading(PBrand, Model) ++ pading(Len2total) ++ ?to_s(Total)
 		    ++ StasticFun(PrintTable),
 		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
-		BodyHead ++ BodyContent;
+		line(add_minus, ?TABLE, ?COLUMN, Fields) ++ br(PBrand)
+		    ++ BodyHead ++ BodyContent;
 	   (no_hand, ?ROW) -> 
 		CombinedInvs  = combine_with_size(Invs, []),
 		?DEBUG("combinedInvs~n~p", [CombinedInvs]),
@@ -608,7 +621,7 @@ format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount)
 		  <<"count">>        -> 
 		      ?to_s(Count) ++ pading(Width - width(latin1, Count)); 
 		  <<"calc">>         ->
-		      ?DEBUG("fprice ~p, count ~p", [FPrice, Count]),
+		      %% ?DEBUG("fprice ~p, count ~p", [FPrice, Count]),
 		      ?to_s(clean_zero(FPrice * Count))
 	      end ++ Acc 
       end, [], Fields);
@@ -696,7 +709,7 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount) 
 		      pading(Mh) ++ ?to_s(Count) ++ pading(Ml) ++ phd("|");
 		  <<"calc">>         ->
 		      %% ?DEBUG("fprice ~p, count ~p", [FPrice, Count]),
-		      CleanCalc = clean_zero(FPrice * Count),
+		      CleanCalc = round(FPrice * Count),
 		      {Mh, Ml} = middle(?TABLE, Width, CleanCalc),
 		      pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml) ++ phd("|")
 	      end ++ Acc 
