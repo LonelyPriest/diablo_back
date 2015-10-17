@@ -112,7 +112,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
     VerifyPay  = ?v(<<"verificate">>, Props, 0),
     Comment    = ?v(<<"comment">>, Props, ""),
     %% Action     = ?v(<<"action">>, Props), 
-    ShouldPay  = ?v(<<"should_pay">>, Props, 0),
+    ShouldPay  = round(?v(<<"should_pay">>, Props, 0)),
     HasPay     = ?v(<<"has_pay">>, Props, 0),
 
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),

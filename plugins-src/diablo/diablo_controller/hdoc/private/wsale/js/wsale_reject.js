@@ -13,6 +13,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     $scope.f_sub   = diablo_float_sub;
     $scope.f_mul   = diablo_float_mul;
     $scope.extra_pay_types   = wsaleService.extra_pay_types;
+    $scope.round   = diablo_round;
     $scope.timeout_auto_save = undefined;
     $scope.setting = {q_backend:true,
 		      show_discount:true,
@@ -63,7 +64,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     $scope.retailers = filterRetailer;
     if ($scope.retailers.length !== 0){
 	$scope.select.retailer = $scope.retailers[0];
-	$scope.select.surplus = parseFloat($scope.select.retailer.balance);
+	$scope.select.surplus = $scope.round($scope.select.retailer.balance);
 	$scope.select.left_balance = $scope.select.surplus;
     }
     
@@ -102,7 +103,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
 
     $scope.change_retailer = function(){
-	$scope.select.surplus = parseFloat($scope.select.retailer.balance);
+	$scope.select.surplus = $scope.select.retailer.balance;
 	$scope.re_calculate();
 	// $scope.refresh();
     };
@@ -402,21 +403,20 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total += parseInt(one.reject); 
-	    $scope.select.should_pay =
-		$scope.f_add(
-		    $scope.select.should_pay, 
-		    (one.reject * one.fdiscount * 0.01) * one.fprice);
+	    $scope.select.should_pay
+		+= $scope.round(one.reject * one.fdiscount * 0.01 * one.fprice);
 	}
 
 	var e_pay = 0.00;
 	if(angular.isDefined($scope.select.extra_pay)
 	   && $scope.select.extra_pay){
-	    e_pay = parseFloat($scope.select.extra_pay);
+	    e_pay = $scope.select.extra_pay;
 	}
 	
 
 	$scope.select.left_balance =
-	    $scope.f_sub($scope.select.surplus, $scope.f_add($scope.select.should_pay, e_pay));
+	    $scope.round($scope.select.surplus - $scope.select.should_pay - e_pay);
+	    // $scope.f_sub($scope.select.surplus, $scope.f_add($scope.select.should_pay, e_pay));
     };
 
     $scope.$watch("select.extra_pay", function(newValue, oldValue){

@@ -296,10 +296,11 @@
 		    
 		    <th class="text-center">单价类型</th>
 		    <th class="text-center">单价</th>
-		    <!-- <th class="text-center">折扣</th> -->
-		    <th class="text-center">成交价</th>
 		    <th x-ng-if="setting.show_discount"
 			class="text-center">折扣</th>
+		    <!-- <th class="text-center">折扣</th> -->
+		    
+		    <th class="text-center">折后价</th> 
 		    <th class="text-center">数量</th>
 		    <th class="text-center">合计</th>
 		    <th class="text-center">操作</th>
@@ -366,32 +367,11 @@
 
 		    <td class="col-md-1 vert-align">
 		      <span x-ng-if="!inv.$new || inv.free_color_size">
-			<div>{{inv[inv.sell_style.f]}}</div>
+			{{inv.fprice}}
+			<!-- <div>{{inv[inv.sell_style.f]}}</div> -->
 			<!-- <div class="fg-red">上次：{{inv.last_fprice}}</div> -->
 		      </span>
 		    </td>
-
-		    <!-- <td class="vert-align">{{inv.discount}}</td> -->
-
-		    <td class="col-md-1 vert-align">
-		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fprice}}</div> 
-		      <form name="inv.form.fprice"
-			    ng-if="inv.$new && inv.free_color_size
-				   || !inv.$new && inv.free_update">
-			<div ng-class="{'has-error':inv.form.fprice.$invalid
-				       && !inv.form.fprice.$pristine}"> 
-			  <input class="form-control"
-				 type="number" step="0.01" 
-				 required
-				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-				 x-ng-model="inv.fprice"
-				 popover-placement="top"
-				 popover-trigger="focus"
-				 popover="默认上次成交价"></input>
-			</div>
-		      </form>
-		    </td>
-
 
 		    <td x-ng-if="setting.show_discount"
 			class="col-md-1 vert-align">
@@ -409,6 +389,27 @@
 				 popover-placement="top"
 				 popover-trigger="focus"
 				 popover="默认上次折扣"></input>
+			</div>
+		      </form>
+		    </td> 
+
+		    <!-- <td class="vert-align">{{inv.discount}}</td> -->
+
+		    <td class="col-md-1 vert-align">
+		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fprice * inv.fdiscount * 0.01}}</div> 
+		      <form name="inv.form.fprice"
+			    ng-if="inv.$new && inv.free_color_size
+				   || !inv.$new && inv.free_update">
+			<div ng-class="{'has-error':inv.form.fprice.$invalid
+				       && !inv.form.fprice.$pristine}"> 
+			  <input class="form-control"
+				 type="number" step="0.01" 
+				 required
+				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
+				 x-ng-model="inv.fprice"
+				 popover-placement="top"
+				 popover-trigger="focus"
+				 popover="默认上次成交价"></input>
 			</div>
 		      </form>
 		    </td> 
@@ -438,7 +439,7 @@
 
 		    <td class="vert-align"> 
 		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount">
-			<span>{{inv.sell * inv.fprice * inv.fdiscount / 100}}</span>
+			<span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
 		      </div>
 		    </td>
 		    

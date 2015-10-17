@@ -970,7 +970,7 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
     Card         = ?v(<<"card">>, Attrs, 0),
     Wire         = ?v(<<"wire">>, Attrs, 0),
     VerifyPay    = ?v(<<"verificate">>, Attrs, 0),
-    ShouldPay    = ?v(<<"should_pay">>, Attrs, 0),
+    ShouldPay    = round(?v(<<"should_pay">>, Attrs, 0)),
     Total        = ?v(<<"total">>, Attrs, 0),
     Comment      = ?v(<<"comment">>, Attrs, []),
     EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),

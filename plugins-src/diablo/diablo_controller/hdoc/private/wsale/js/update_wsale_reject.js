@@ -21,6 +21,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     $scope.f_sub           = diablo_float_sub;
     $scope.f_mul           = diablo_float_mul;
     $scope.get_object      = diablo_get_object;
+    $scope.round           = diablo_round;
     
     $scope.setting  = {q_backend:true,
 		       show_discount:true,
@@ -48,7 +49,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    "ptrace_price", shopId, base, parseInt, diablo_no); 
     };
     
-    $scope.old_select  = {};    
+    $scope.old_select  = {};
     $scope.select      = {}; 
     $scope.inventories = []; 
 
@@ -601,21 +602,27 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total += parseInt(one.sell); 
-	    $scope.select.should_pay =
-		$scope.f_add(
-		    $scope.select.should_pay, 
-		    (one.sell * one.fdiscount * 0.01) * one.fprice);
+	    $scope.select.should_pay
+		+= $scope.round(one.sell * one.fprice * one.fdiscount * 0.01);
+		// $scope.f_add(
+		//     $scope.select.should_pay, 
+		//     (one.sell * one.fdiscount * 0.01) * one.fprice);
 	}
 
 	var e_pay = 0.00;
-	if(angular.isDefined($scope.select.extra_pay)
-	   && $scope.select.extra_pay){
-	    e_pay = parseFloat($scope.select.extra_pay);
+	if(angular.isDefined($scope.select.e_pay)
+	   && $scope.select.e_pay){
+	    e_pay = parseFloat($scope.select.e_pay);
 	}
-	
 
-	$scope.select.left_balance =
-	    $scope.f_sub($scope.select.surplus, $scope.f_add($scope.select.should_pay, e_pay));
+	// console.log($scope.select.should_pay);
+	
+	$scope.select.left_balance
+	    = $scope.round($scope.select.surplus - $scope.select.should_pay - e_pay);
+
+	console.log($scope.select);
+	// $scope.select.left_balance =
+	//     $scope.f_sub($scope.select.surplus, $scope.f_add($scope.select.should_pay, e_pay));
     };
 
     $scope.$watch("select.extra_pay", function(newValue, oldValue){

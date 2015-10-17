@@ -226,7 +226,7 @@
 		    <td class="vert-align">{{seasons[inv.season]}}</td> 
 
 		    <td class="col-md-1 vert-align">
-		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fprice}}</div> 
+		      <div x-ng-if="!inv.$new && !inv.free_update">{{inv.fprice}}</div> 
 		      <form name="inv.form.fprice"
 			    ng-if="inv.$new && inv.free_color_size
 				   || !inv.$new && inv.free_update">
@@ -270,7 +270,7 @@
 
 		    <td class="vert-align">
 		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount">
-			<span>{{inv.sell * inv.fprice * inv.fdiscount / 100}}</span>
+			<span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
 		      </div>
 		    </td>
 		    

@@ -17,6 +17,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.seasons     = diablo_season;
     $scope.sell_styles = diablo_sell_style;
     $scope.e_pay_types = wsaleService.extra_pay_types;
+    $scope.round       = diablo_round;
     
     $scope.setting     = {
 	q_backend:true, show_discount:true, check_sale:true, trace_price:true};
@@ -107,17 +108,18 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.select.total      += parseInt(one.sell);
 	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
 	    $scope.select.should_pay
-		+= one.fprice * one.sell * one.fdiscount / 100;
+		+= $scope.round(one.fprice * one.sell * one.fdiscount * 0.01);
 	}
 	
-
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.select.should_pay,
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay - $scope.select.has_pay;
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.select.should_pay,
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
     };
     
     $scope.change_retailer = function(){
-	$scope.select.surplus = parseFloat($scope.select.retailer.balance);
+	$scope.select.surplus = $scope.select.retailer.balance;
 	$scope.re_calculate(); 
     }
     
@@ -716,10 +718,12 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 		+= parseFloat($scope.select.verificate); 
 	}
 
+	$scope.select.left_balance
+	    = $scope.select.surplus + $scope.select.should_pay - $scope.select.has_pay;
 	// console.log($scope.float_add);
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.select.should_pay,
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.select.should_pay,
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
     };
     
     $scope.$watch("select.cash", function(newValue, oldValue){

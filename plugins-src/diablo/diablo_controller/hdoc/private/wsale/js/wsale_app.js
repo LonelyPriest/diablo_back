@@ -1123,9 +1123,13 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	}
 
 	// console.log($scope.float_add);
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.float_add($scope.select.should_pay, e_pay),
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
+	$scope.select.left_balance
+	    = $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay;
+	
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.float_add($scope.select.should_pay, e_pay),
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
     };
     
     $scope.$watch("select.cash", function(newValue, oldValue){
