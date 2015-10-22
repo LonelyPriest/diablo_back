@@ -89,14 +89,14 @@ time_condition(Time, TimeField, le) ->
     end.
 
 count_table(Table, Merchant, Conditions) ->
-   count_table(Table, "count(*) as total", Merchant, Conditions).
+    count_table(Table, "count(*) as total", Merchant, Conditions).
 count_table(Table, CountSql, Merchant, Conditions) -> 
     {StartTime, EndTime, NewConditions} = cut(fields_no_prifix, Conditions),
     
     Sql = "select " ++ CountSql ++ " from " ++ ?to_s(Table)
-	++ " where " ++ condition(time_no_prfix, StartTime, EndTime)
-	++ condition(proplists, NewConditions) 
-	++ " and merchant="++ ?to_s(Merchant), 
+	++ " where " ++ condition(proplists_suffix, NewConditions) 
+	++ " merchant="++ ?to_s(Merchant)
+	++ " and " ++ condition(time_no_prfix, StartTime, EndTime),
     Sql.
 
 

@@ -43,7 +43,8 @@ create table employees
     address         VARCHAR(64),
     merchant        INTEGER, -- which merchant belong to
     deleted         INTEGER default 0, -- 0: no;  1: yes
-    unique  key  index_mn (merchant, name),
+    unique  key     index_mn (merchant, name),
+    key             index_m  (merchant),
     primary key     (id)
 ) default charset=utf8;
 
@@ -75,6 +76,7 @@ create table shops
     merchant           INTEGER default -1, -- which merchant belong to
     deleted            INTEGER default 0, -- 0: no;  1: yes
     unique key index_nm (name, merchant),
+    key        index_s  (merchant),
     primary key        (id)
 ) default charset=utf8;
 
@@ -89,7 +91,8 @@ create table suppliers
     change_date     DATETIME,
     entry_date      DATETIME,
     deleted         INTEGER default 0, -- 0: no;  1: yes
-    unique key index_nm (name, merchant),
+    unique key      index_nm (name, merchant),
+    key             index_m (merchant),
     primary key     (id)
 ) default charset=utf8;
 
@@ -104,7 +107,8 @@ create table size_group(
    svi              VARCHAR(8),
    merchant         INTEGER,
    deleted          INTEGER default 0, -- 0: no;  1: yes
-   unique key index_nm (name, merchant),
+   unique key       index_nm (name, merchant),
+   key              index_m (merchant),
    primary key      (id)
 )default charset=utf8;
 
@@ -116,7 +120,8 @@ create table colors
     remark           VARCHAR(255),
     merchant         INTEGER default null,
     deleted          INTEGER default 0, -- 0: no;  1: yes
-    unique key index_nm (name, merchant),
+    unique key       index_nm (name, merchant),
+    key              index_m  (merchant),
     primary key      (id)
 ) default charset=utf8;
 
@@ -138,7 +143,8 @@ create table brands(
     merchant         INTEGER default -1,  -- brand belong to
     deleted          INTEGER default 0, -- 0: no;  1: yes
     
-    unique  key  index_nm (name, supplier, merchant), 
+    unique  key      index_nm (name, supplier, merchant),
+    key              index_m (merchant),
     primary key      (id)
 )default charset=utf8;
 
@@ -149,7 +155,8 @@ create table inv_types(
     merchant         INTEGER, -- type belong to
     deleted          INTEGER default 0, -- 0: no;  1: yes
 
-    unique  key  index_nm (name, merchant), 
+    unique  key     index_nm (name, merchant),
+    key             index_m (merchant),
     primary key      (id)
 )default charset=utf8;
 
@@ -340,7 +347,7 @@ create table w_retailer
     deleted         INTEGER default 0, -- 0: no;  1: yes
 
     unique  key  index_nm (name, merchant),
-    key          merchant (merchant),
+    key          index_m  (merchant),
     primary key     (id)
 ) default charset=utf8;
 

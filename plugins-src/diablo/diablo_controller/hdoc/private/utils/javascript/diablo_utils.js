@@ -26,6 +26,71 @@ diabloUtils.directive('ngPulsate', function () {
     }
 });
 
+// diabloUtils.directive('autoTableview', function () {
+//     return {
+// 	restrict: 'A',
+// 	link: function(scope, element, attrs){
+// 	    // console.log(diablo_viewport().width);
+// 	    var width = diablo_viewport().width;
+
+// 	    var auto_view = function(){
+// 		var width = diablo_viewport().width;
+
+// 		if (width > 992 && width < 1080){
+// 		    element.css("width", "100%")
+// 			.css("max-width", "100%")
+// 		} else if(width  >= 768 && width <= 992) {
+// 		    element.css("width", "100%")
+// 			.css("max-width", "100%")
+// 		} else {
+// 		    element.css("width", "100%")
+// 			.css("max-width", "100%")
+// 		}
+// 	    }
+
+// 	    auto_view();
+
+// 	    $(window).resize(function(){
+// 		auto_view();
+// 	    })
+// 	}
+//     }
+// });
+
+
+diabloUtils.directive('nextPage', function ($parse) {
+    return {
+	restrict: 'A',
+	link: function(scope, element, attrs){
+
+	    // console.log(scope);
+	    var hander = $parse(attrs['pageByscroll']).bind(null, scope);
+	    
+	    $(window).on("scroll", function() {
+		var scrollHeight = $(document).height();
+		var top = $(window).scrollTop();
+		var scrollPosition = $(window).height() + top;
+		
+		// console.log(scrollHeight, top);
+		// console.log($(window).height());
+		
+		if ((scrollHeight - scrollPosition) / scrollHeight === 0) {
+		    if (scope.scroll_page){
+			
+			// scope.$apply(function(){
+			//     hander();
+			// 	$('html, body').animate({
+			//             scrollTop: top
+			// 	}, 'slow')
+			// })
+		    }
+		    
+		} 
+	    });
+	}
+    }
+});
+
 
 diabloUtils.directive('capitalize', function() {
    return {

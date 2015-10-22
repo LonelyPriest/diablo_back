@@ -419,32 +419,44 @@ action(Session, Req, {"reject_w_sale"}, Payload) ->
 
 action(Session, Req, {"filter_w_sale_rsn_group"}, Payload) ->
     ?DEBUG("filter_w_sale_rsn_group with session ~p, paylaod~n~p", [Session, Payload]), 
-    Merchant           = ?session:get(merchant, Session), 
+    Merchant           = ?session:get(merchant, Session),
+    
     %% first, get rsn
-    {struct, NewConditions} = ?v(<<"fields">>, Payload), 
+    %% {struct, NewConditions} = ?v(<<"fields">>, Payload), 
     
-    {ok, Q} = ?w_sale:sale(get_rsn, Merchant, NewConditions),
-    FilterConditions =
-	?w_inventory_request:filter_condition(
-	  trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], NewConditions),
+    %% {ok, Q} = ?w_sale:sale(get_rsn, Merchant, NewConditions),
+    %% FilterConditions =
+    %% 	?w_inventory_request:filter_condition(
+    %% 	  trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], NewConditions),
     
-    case FilterConditions of
-	    [] -> ?utils:respond(
-		     200, object, Req, {[{<<"ecode">>, 0},
-					 {<<"total">>, 0},
-					 {<<"data">>, []}]});
-	_ -> 
-	    NewPayload = FilterConditions ++ proplists:delete(<<"fields">>, Payload), 
+    %% case FilterConditions of
+    %% 	    [] -> ?utils:respond(
+    %% 		     200, object, Req, {[{<<"ecode">>, 0},
+    %% 					 {<<"total">>, 0},
+    %% 					 {<<"data">>, []}]});
+    %% 	_ -> 
+    %% 	    NewPayload = FilterConditions ++ proplists:delete(<<"fields">>, Payload), 
     
-	    ?pagination:pagination(
-	       fun(Match, Conditions) ->
-		       ?w_sale:filter(total_rsn_group, ?to_a(Match), Merchant, Conditions)
-	       end,
-	       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
-		       ?w_sale:filter(
-			  rsn_group, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
-	       end, Req, NewPayload)
-    end;
+    %% 	    ?pagination:pagination(
+    %% 	       fun(Match, Conditions) ->
+    %% 		       ?w_sale:filter(total_rsn_group, ?to_a(Match), Merchant, Conditions)
+    %% 	       end,
+    %% 	       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+    %% 		       ?w_sale:filter(
+    %% 			  rsn_group, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+    %% 	       end, Req, NewPayload)
+    %% end;
+
+    ?pagination:pagination(
+       fun(Match, Conditions) ->
+    	       ?w_sale:filter(total_rsn_group,
+    			      ?to_a(Match), Merchant, Conditions)
+       end,
+       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+    	       ?w_sale:filter(
+    		  rsn_group,
+    		  Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+       end, Req, Payload);
 
 action(Session, Req, {"w_sale_rsn_detail"}, Payload) ->
     ?DEBUG("w_sale_rsn_detail with session ~p, paylaod~n~p", [Session, Payload]),

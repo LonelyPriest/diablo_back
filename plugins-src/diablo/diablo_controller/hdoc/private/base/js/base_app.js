@@ -416,7 +416,8 @@ baseApp.controller("printOptionCtrl", function(
 	    || s.ename === 'pim_print'
 	    || s.ename === 'reject_negative'
 	    || s.ename === 'check_sale'
-	    || s.ename === 'show_discount'){
+	    || s.ename === 'show_discount'
+	    || s.ename === 'se_pagination'){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};
 	if (s.ename === 'qtime_length'){

@@ -89,9 +89,16 @@
 		    
 		    <th class="success">应付</th>
 		    <th>实付</th>
-		    <th class="danger">本次欠款</th>
+
+		    <th x-ng-click="toggle_comment()" class="danger">
+		      <span x-ng-if="!hidden.comment">
+			<i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
+		      <span x-ng-if="hidden.comment">
+			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		    </th>
+		    
 		    <!-- <th>总数</th> -->
-		    <th>备注</th>
+		    <th x-ng-if="!hidden.comment">备注</th>
 		    <th>开单日期</th> 
 		    <th>操作</th>
 		  </tr>
@@ -120,12 +127,22 @@
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
 		    
-		    <td>{{r.balance}}</td> 
-		    <td>{{r.should_pay}}</td>
+		    <td>{{r.balance}}</td>
+
+		    <td x-ng-switch on="r.type">
+		      <span x-ng-switch-when=0>
+			{{round(r.should_pay)}}
+		      </span>
+		      <span class="fg-red" x-ng-switch-when=1>
+			{{round(r.should_pay)}}
+		      </span>
+		    </td> 
+		    <!-- <td>{{r.should_pay}}</td> -->
 		    <td>{{r.has_pay}}</td>
 
 		    <td>
-		      {{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}}
+		      {{r.balance + round(r.should_pay) + r.e_pay
+		      - r.has_pay - r.verificate}} 
 		    </td>
 		    
 		    <!-- r.should_pay + (r.balance - r.has_pay)-->
@@ -139,7 +156,7 @@
 		    <!-- </td> -->
 		    <!-- <td>{{r.price5}}</td> -->
 		    
-		    <td>
+		    <td x-ng-if="!hidden.comment">
 		      <span x-ng-switch on="r.comment">
 			<span x-ng-switch-when="null">无</span>
 			<span x-ng-switch-default>{{r.comment}}</span>

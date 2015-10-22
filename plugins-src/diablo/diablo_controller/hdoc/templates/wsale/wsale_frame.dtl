@@ -3,11 +3,28 @@
 {% block self_reference_css %}
 <link href="/public/assets/font-awesome/css/awesome-bootstrap-checkbox.css"
       rel="stylesheet" type="text/css"/>
+<!-- <link href="/public/assets/cikonss/cikonss.css" -->
+<!--       rel="stylesheet" type="text/css"/> -->
+
+<!-- <link href="/public/assets/grumble/css/grumble.min.css" -->
+<!--       rel="stylesheet" type="text/css"/> -->
+
+
 {% endblock %}
 
 {% block self_reference_js %}
 <!-- pinyin--> 
-<script src="/public/assets/pinyin/pinyin.js"              type="text/javascript"></script>
+<script src="/public/assets/pinyin/pinyin.js" type="text/javascript"></script>
+
+<script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script>
+
+<!-- <script src="/public/assets/hammer/hammer.js" type="text/javascript"></script> -->
+<!-- <script src="/public/assets/hammer/angular.hammer.js"  type="text/javascript"></script> -->
+
+<!-- <script src="/public/assets/grumble/js/jquery.grumble.min.js" type="text/javascript"></script> -->
+
+<!-- <script src="/public/assets/stick-up/stickUp.js" type="text/javascript"></script> -->
+
 
 
 <!-- <script src="/private/utils/javascript/diablo_utils.js"    type="text/javascript"></script> -->

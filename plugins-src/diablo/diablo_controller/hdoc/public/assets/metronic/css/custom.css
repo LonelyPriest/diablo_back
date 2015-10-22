@@ -105,3 +105,211 @@ ul.page-sidebar-menu > li.active > a {
   /*padding-top: 20px;*/
   /*padding-bottom: 15px;*/
 }
+
+.blue-hoki.btn {
+    background-color: #67809f;
+    color: #ffffff;
+}
+.blue-hoki.btn:hover, .blue-hoki.btn:focus, .blue-hoki.btn:active, .blue-hoki.btn.active {
+    background-color: #586e8b;
+    color: #ffffff;
+}
+.open .blue-hoki.btn.dropdown-toggle {
+    background-color: #586e8b;
+    color: #ffffff;
+}
+.blue-hoki.btn:active, .blue-hoki.btn.active {
+    background-color: #4e627b;
+    background-image: none;
+}
+.blue-hoki.btn:active:hover, .blue-hoki.btn.active:hover {
+    background-color: #526781;
+}
+.open .blue-hoki.btn.dropdown-toggle {
+    background-image: none;
+}
+
+.blue-hoki.btn .badge {
+    background-color: #ffffff;
+    color: #67809f;
+}
+.btn.blue-hoki-stripe {
+    border-left: 3px solid #67809f;
+}
+
+
+.red-sunglo.btn {
+    background-color: #e26a6a;
+    color: #ffffff;
+}
+.red-sunglo.btn:hover, .red-sunglo.btn:focus, .red-sunglo.btn:active, .red-sunglo.btn.active {
+    background-color: #dc4c4c;
+    color: #ffffff;
+}
+.open .red-sunglo.btn.dropdown-toggle {
+    background-color: #dc4c4c;
+    color: #ffffff;
+}
+.red-sunglo.btn:active, .red-sunglo.btn.active {
+    background-color: #d83737;
+    background-image: none;
+}
+.red-sunglo.btn:active:hover, .red-sunglo.btn.active:hover {
+    background-color: #da3f3f;
+}
+.open .red-sunglo.btn.dropdown-toggle {
+    background-image: none;
+}
+
+.red-sunglo.btn .badge {
+    background-color: #ffffff;
+    color: #e26a6a;
+}
+.btn.red-sunglo-stripe {
+    border-left: 3px solid #e26a6a;
+}
+
+
+.yellow-crusta.btn {
+    background-color: #f3c200;
+    color: #ffffff;
+}
+.yellow-crusta.btn:hover, .yellow-crusta.btn:focus, .yellow-crusta.btn:active, .yellow-crusta.btn.active {
+    background-color: #cfa500;
+    color: #ffffff;
+}
+.open .yellow-crusta.btn.dropdown-toggle {
+    background-color: #cfa500;
+    color: #ffffff;
+}
+.yellow-crusta.btn:active, .yellow-crusta.btn.active {
+    background-color: #b69100;
+    background-image: none;
+}
+.yellow-crusta.btn:active:hover, .yellow-crusta.btn.active:hover {
+    background-color: #c09900;
+}
+.open .yellow-crusta.btn.dropdown-toggle {
+    background-image: none;
+}
+
+.yellow-crusta.btn .badge {
+    background-color: #ffffff;
+    color: #f3c200;
+}
+.btn.yellow-crusta-stripe {
+    border-left: 3px solid #f3c200;
+}
+
+
+.purple-plum.btn {
+    background-color: #8775a7;
+    color: #ffffff;
+}
+.purple-plum.btn:hover, .purple-plum.btn:focus, .purple-plum.btn:active, .purple-plum.btn.active {
+    background-color: #746198;
+    color: #ffffff;
+}
+.open .purple-plum.btn.dropdown-toggle {
+    background-color: #746198;
+    color: #ffffff;
+}
+.purple-plum.btn:active, .purple-plum.btn.active {
+    background-color: #685788;
+    background-image: none;
+}
+.purple-plum.btn:active:hover, .purple-plum.btn.active:hover {
+    background-color: #6d5b8e;
+}
+.open .purple-plum.btn.dropdown-toggle {
+    background-image: none;
+}
+
+.purple-plum.btn .badge {
+    background-color: #ffffff;
+    color: #8775a7;
+}
+.btn.purple-plum-stripe {
+    border-left: 3px solid #8775a7;
+}
+
+
+.green-meadow.btn {
+    background-color: #1bbc9b;
+    color: #ffffff;
+}
+.green-meadow.btn:hover, .green-meadow.btn:focus, .green-meadow.btn:active, .green-meadow.btn.active {
+    background-color: #179d81;
+    color: #ffffff;
+}
+.open .green-meadow.btn.dropdown-toggle {
+    background-color: #179d81;
+    color: #ffffff;
+}
+.green-meadow.btn:active, .green-meadow.btn.active {
+    background-color: #13866f;
+    background-image: none;
+}
+.green-meadow.btn:active:hover, .green-meadow.btn.active:hover {
+    background-color: #158f76;
+}
+.open .green-meadow.btn.dropdown-toggle {
+    background-image: none;
+}
+
+.green-meadow.btn .badge {
+    background-color: #ffffff;
+    color: #1bbc9b;
+}
+.btn.green-meadow-stripe {
+    border-left: 3px solid #1bbc9b;
+}
+
+/* .table-slide { */
+/*     position: relative; */
+/*     left: 0px;  */
+/* } */
+
+@media (min-width: 1200px) {
+    .table-slide {
+	/* overflow-x:auto;  */
+    }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+    .table-scale {
+	/* overflow-x:hidden; */
+	position: relative;
+	left: 0px;
+	width: 130%;
+	max-width:none;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    .table-scale {
+	/* overflow-x:hidden; */
+	position: relative;
+	left: 0px;
+	width: 150%;
+	max-width:none;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .table-scale {
+	/* overflow-x:hidden; */
+	position: relative;
+	left: 0px;
+	width: 200%;
+	max-width:none;
+    }
+}
+
+body, html {
+    overflow-x:hidden;
+}
+
+.stick-thead {
+    background-color:#FFCCCC;
+}

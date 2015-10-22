@@ -216,6 +216,43 @@
 	    </div> 
 	    
 	  </div> <!--END row-->
+
+	  <!--BEGIN row-->
+	  <div class="row form-group"> 
+	    <div class="col-xs-6 col-md-6">
+	      <div class="input-group">
+	    	<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-plane fg-red"></i>费用性质</span>
+		<select class="form-control" type="text"
+			disabled
+	  		x-ng-model="select.e_pay_type"
+	  		x-ng-options="ex as ex.name for ex in
+	  			      e_pay_types|filter:$viewValue|limitTo:8">
+		</select> 
+	      </div>
+	    </div>
+	    
+	    <div class="col-sm-6 col-md-6"> 
+		<div class="input-group">
+		  <span class="input-group-addon">
+		    <i class="glyphicon glyphicon-yen fg-red"></i>关联费用</span> 
+		<form name="select.form.extraForm">
+		  <div ng-class="{'has-error':select.form.extraForm.$invalid
+				 && !select.form.extraForm.$pristine}">
+	  	    <input class="form-control" 
+			   type="number" step="0.01"
+			   placeholder="关联费用"
+			   x-ng-readonly=true
+			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
+	  		   x-ng-model="select.e_pay"
+			   popover-placement="top"
+			   popover-trigger="focus"
+			   popover="支持二位小数"></input>
+		  </div>
+		</form> 
+	      </div>
+	    </div> 
+	  </div> <!--END row-->
 	  
 	</div> <!--END table-toolbar-->
 	
@@ -225,10 +262,15 @@
 	  <div class="panel panel-default">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
-	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
-		<thead>
-		  <tr>
+	      <table id="t_new_update" class="table
+			    table-bordered
+			    table-striped table-hover
+			    table-condensed table-advanced">
+		<thead class="stick-thead"
+		       fsm-sticky-header
+		       scroll-body="'#t_new_update'"
+		       scroll-stop="50">
+		  <tr> 
 		    <th class="text-center">序号</th>
 		    <th class="text-center">货号</th>
 		    <th class="text-center">品名</th>
@@ -250,8 +292,8 @@
 		  </tr>
 		</thead>
 		<tbody>
-		  <!-- <tr class="text-center" ng-repeat="inv in inventories"> -->
-		  <tr class="text-center" ng-repeat="inv in get_inventory(current_page_index)">
+		  <tr class="text-center" ng-repeat="inv in inventories">
+		  <!-- <tr class="text-center" ng-repeat="inv in get_inventory(current_page_index)"> -->
 		    <td>{{inv.order_id}}</td>
 		    <td class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
@@ -341,7 +383,7 @@
 
 		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
-		      <span x-ng-if="!inv.$new">{{inv.total * inv.org_price}}</span>
+		      <span x-ng-if="!inv.$new">{{round(inv.total * inv.org_price)}}</span>
 		    </td>
 		    
 		    <td class="text-left vert-align">
@@ -395,23 +437,30 @@
 		      </div>
 		      
 		    </td>
+		  </tr>
+
+		  <tr x-ng-if="select.total!==0" class="text-center">
+		    <td colspan="6"></td>
+		    <td class="vert-align">{{select.total}}</td>
+		    <td class="vert-align">{{select.should_pay}}</td>
+		    <td colspan="1"></td>
 		  </tr> 
 		</tbody>
-
+		
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <pagination class="pull-right"
-				  total-items="total_items"
-				  items-per-page="items_perpage"
-				  boundary-links="true"
-				  previous-text="&lsaquo;" next-text="&rsaquo;"
-				  first-text="&laquo;" last-text="&raquo;"
-				  x-ng-model="current_page"
-				  x-ng-init="current_page=default_page"
-				  x-ng-change="page_changed(current_page)"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <pagination class="pull-right" -->
+		  <!-- 		  total-items="total_items" -->
+		  <!-- 		  items-per-page="items_perpage" -->
+		  <!-- 		  boundary-links="true" -->
+		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 		  x-ng-model="current_page" -->
+		  <!-- 		  x-ng-init="current_page=default_page" -->
+		  <!-- 		  x-ng-change="page_changed(current_page)"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->

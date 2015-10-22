@@ -575,29 +575,63 @@ inventory(fix_rsn_detail, _Merchant, Conditions) ->
 %% 	++ " where " ++ ?utils:to_sqls(proplists, CorrectC2)
 %% 	++ " order by id desc limit 1",
     
-inventory(new_rsn_groups, new, _Merchant, Conditions, PageFun) ->
-    CorrectCondition = ?utils:correct_condition(<<"a.">>, Conditions),
-    "select a.id, a.rsn, a.style_number, a.brand_id, a.type_id, a.season"
-	", a.amount, a.firm_id, a.discount, a.s_group"
-	", a.free, a.year, a.path, a.entry_date"
+inventory(new_rsn_groups, new, Merchant, Conditions, PageFun) ->
 
-	%% ", b.shop as shop_id, b.employ as employee_id, b.type"
-	
-	", a.shop_id, a.employee_id, a.type"
+    {DConditions, NConditions}
+	= ?w_good_sql:filter_condition(inventory_new, Conditions, [], []),
 
-	" from ("
-	"select a.id, a.rsn, a.style_number, a.brand as brand_id"
-	", a.type as type_id, a.season, a.amount, a.firm as firm_id"
-	", a.discount, a.s_group, a.free, a.year, a.path, a.entry_date"
+    {StartTime, EndTime, CutNConditions}
+    	= ?sql_utils:cut(fields_with_prifix, NConditions),
 
-	", b.shop as shop_id, b.employ as employee_id, b.type"
+    {_, _, CutDCondtions}
+    	= ?sql_utils:cut(fields_no_prifix, DConditions),
+
+    CorrectCutDConditions = ?utils:correct_condition(<<"b.">>, CutDCondtions),
+
+    "select b.id, b.rsn, b.style_number"
+	", b.brand as brand_id"
+	", b.type as type_id"
+	", b.season, b.amount"
+	", b.firm as firm_id"
+	", b.discount, b.s_group, b.free, b.year, b.path, b.entry_date"
+
+	", a.shop as shop_id"
+	", a.employ as employ_id"
+	", a.type"
 	
-	" from w_inventory_new_detail a"
-	%% " where " ++ ?utils:to_sqls(proplists, Conditions) ++ PageFun() ++ ") a" 
-	" inner join w_inventory_new b on a.rsn=b.rsn"
+    	" from w_inventory_new_detail b, w_inventory_new a" 
+    	" where "
+	++ ?sql_utils:condition(proplists_suffix, CorrectCutDConditions)
+	++ "b.rsn=a.rsn"
+
+    	++ ?sql_utils:condition(proplists, CutNConditions)
+    	++ " and a.merchant=" ++ ?to_s(Merchant)
+    	++ " and " ++ ?sql_utils:condition(
+			 time_with_prfix, StartTime, EndTime)
+	++ PageFun();
+    
+    %% CorrectCondition = ?utils:correct_condition(<<"a.">>, Conditions),
+    %% "select a.id, a.rsn, a.style_number, a.brand_id, a.type_id, a.season"
+    %% 	", a.amount, a.firm_id, a.discount, a.s_group"
+    %% 	", a.free, a.year, a.path, a.entry_date"
+
+    %% 	%% ", b.shop as shop_id, b.employ as employee_id, b.type"
 	
-	" where "
-	++ ?utils:to_sqls(proplists, CorrectCondition) ++ PageFun() ++ ") a"; 
+    %% 	", a.shop_id, a.employee_id, a.type"
+
+    %% 	" from ("
+    %% 	"select a.id, a.rsn, a.style_number, a.brand as brand_id"
+    %% 	", a.type as type_id, a.season, a.amount, a.firm as firm_id"
+    %% 	", a.discount, a.s_group, a.free, a.year, a.path, a.entry_date"
+
+    %% 	", b.shop as shop_id, b.employ as employee_id, b.type"
+	
+    %% 	" from w_inventory_new_detail a"
+    %% 	%% " where " ++ ?utils:to_sqls(proplists, Conditions) ++ PageFun() ++ ") a" 
+    %% 	" inner join w_inventory_new b on a.rsn=b.rsn"
+	
+    %% 	" where "
+    %% 	++ ?utils:to_sqls(proplists, CorrectCondition) ++ PageFun() ++ ") a"; 
 
 inventory(new_detail, new, Merchant, Conditions, PageFun) ->
     SortConditions = sort_condition(w_inventory_new, Merchant, Conditions),
@@ -793,13 +827,20 @@ inventory_match(all_reject, Merchant, Shop, Firm, StartTime) ->
 	++ " order by a.id".
 	
 
-inventory(update, RSN, _Merchant, _Shop, _Firm, Datetime, _Curtime, []) ->
-    ["update w_inventory_new set entry_date=\'" ++ ?to_s(Datetime) ++ "\'"
-     ++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'",
-     "update w_inventory_new_detail set entry_date=\'"
-     ++ ?to_s(Datetime) ++ "\' where rsn=\'" ++ ?to_s(RSN) ++ "\'"];
+inventory(update, RSN, _Merchant, _Shop, _Firm,
+	  Datetime,  OldDatetime, _Curtime, []) ->
+    case Datetime =:= OldDatetime of
+	true -> [];
+	false ->
+	    ["update w_inventory_new set entry_date=\'"
+	     ++ ?to_s(Datetime) ++ "\'"
+	     ++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'",
+	     "update w_inventory_new_detail set entry_date=\'"
+	     ++ ?to_s(Datetime) ++ "\' where rsn=\'" ++ ?to_s(RSN) ++ "\'"]
+    end;
 
-inventory(update, RSN, Merchant, Shop, Firm, Datetime, Curtime, Inventories) ->
+inventory(update, RSN, Merchant, Shop, Firm,
+	  Datetime, _OldDatetime, Curtime, Inventories) ->
     
     lists:foldr(
       fun({struct, Inv}, Acc0)-> 

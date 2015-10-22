@@ -77,7 +77,7 @@
     <!-- <div class="header navbar navbar-inverse navbar-fixed-top"> -->
     <!-- <div class="navwrapper"> -->
     <!-- <div class="header navbar navbar-inverse navbar-static-top"> -->
-    <div class="header navbar navbar-inverse navbar-fixed-top">
+    <div class="header navbar navbar-fixed-top">
       <div class="header-inner">
     	<span class="navbar-brand">
     	  <img src="/private/img/logo.png" alt="logo" class="img-responsive"></img>
@@ -128,7 +128,9 @@
 	
       	<div class="page-sidebar navbar-collapse collapse">
       	  <!--begin sidebar menu-->
-      	  <ul class="page-sidebar-menu">
+      	  <ul class="page-sidebar-menu"
+	      data-slide-speed="200"
+	      data-auto-scroll="true">
       	    <li class="sidebar-toggler-wrapper">
       	      <div class="sidebar-toggler hidden-xs"> </div>
     	      <!-- <div class="sidebar-toggler"> </div> -->

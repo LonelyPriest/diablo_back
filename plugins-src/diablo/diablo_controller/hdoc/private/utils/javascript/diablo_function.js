@@ -146,8 +146,14 @@ var diablo_remove_local_storage = function(l){
 /*
  * add ordered id
 */
-var diablo_order = function(objects){
+var diablo_order = function(objects, begin){
+    // console.log(begin);
     var order_id = 1;
+
+    if (angular.isDefined(begin) && diablo_set_integer(begin)){
+	order_id = begin;
+    }
+    
     angular.forEach(objects, function(obj){
 	obj.order_id = order_id;
 	order_id++;
@@ -548,4 +554,27 @@ var diablo_in_colors = function(color, colors){
     }
 
     return false;
+};
+
+
+var diablo_viewport = function () {
+    var e = window, a = 'inner';
+    if (!('innerWidth' in window)) {
+        a = 'client';
+        e = document.documentElement || document.body;
+    }
+    return {
+        width: e[a + 'Width'],
+        height: e[a + 'Height']
+    }
+};
+
+var diablo_items_per_page = function(){
+    var h = diablo_viewport().height;
+
+    if (h > 767){
+	return 15;
+    } else {
+	return 10;
+    }
 };

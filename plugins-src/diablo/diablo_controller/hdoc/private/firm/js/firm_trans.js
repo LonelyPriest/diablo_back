@@ -13,18 +13,24 @@ firmApp.controller('firmTransCtrl', function(
     $scope.goto_page    = diablo_goto_page; 
     $scope.f_add        = diablo_float_add;
     $scope.f_sub        = diablo_float_sub;
+    $scope.round        = diablo_round;
     $scope.default_page = 1;
 
     /*
      * hidden
      */
-    $scope.hidden = {base:true, balance:true};
+    $scope.hidden = {base:true, balance:true, comment:true};
 
     $scope.toggle_base = function(){
 	$scope.hidden.base = !$scope.hidden.base;
     };
+    
     $scope.toggle_balance = function(){
 	$scope.hidden.balance = !$scope.hidden.balance;
+    };
+    
+    $scope.toggle_comment = function(){
+	$scope.hidden.comment = !$scope.hidden.comment;
     };
     
     

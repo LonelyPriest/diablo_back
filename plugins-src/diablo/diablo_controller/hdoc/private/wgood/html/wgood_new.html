@@ -669,7 +669,10 @@
 	    <td class="text-center vert-align">{{c.type}}</td>
 	    <td x-ng-repeat="s in c.colors">
 	      <div class="checkbox checkbox-danger checkbox-circle">
-		<input id={{s.id}} type="checkbox" x-ng-model="s.select"></input>
+		<input id={{s.id}}
+		       type="checkbox"
+		       x-ng-model="s.select"
+		       x-ng-click="$event.stopPropagation()"></input>
 		<label for={{s.id}}>{{s.name}}</label>
 	      </div>
 	    </td>

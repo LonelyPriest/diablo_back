@@ -221,7 +221,7 @@ function filterProvider(){
 		    // console.log(firms); 
 		    return firms.map(function(f){
 			return {id: f.id, name:f.name, py:diablo_pinyin(f.name), balance:f.balance};
-		    })
+		    }) 
 		});
 	    },
 

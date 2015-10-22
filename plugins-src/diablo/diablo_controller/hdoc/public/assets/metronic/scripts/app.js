@@ -81,7 +81,13 @@ var App = function () {
         var viewport = _getViewPort();
         if (viewport.width < 992) {
             $('body').removeClass("page-sidebar-closed");
-        }
+        } else {
+	    if ($.cookie('sidebar_closed') === '1') {
+		if (!$('body').hasClass('page-sidebar-closed')){
+		    $('body').addClass('page-sidebar-closed');
+		}
+            }
+	}
     }
 
     // runs callback functions set by App.addResponsiveHandler().
@@ -1054,6 +1060,12 @@ var App = function () {
         scrollTop: function () {
             App.scrollTo();
         },
+
+	scrollDirect: function(number){
+	    jQuery('html,body').animate({
+                scrollTop: number
+            }, 'slow');
+	},
 
         // wrapper function to  block element(indicate loading)
         blockUI: function (el, centerY) {

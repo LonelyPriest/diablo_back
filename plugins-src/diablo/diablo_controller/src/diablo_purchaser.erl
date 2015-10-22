@@ -566,10 +566,10 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     Employee   = ?v(<<"employee">>, Props),
 
     Balance    = ?v(<<"balance">>, Props), 
-    Cash       = ?v(<<"cash">>, Props),
-    Card       = ?v(<<"card">>, Props),
-    Wire       = ?v(<<"wire">>, Props),
-    VerifyPay  = ?v(<<"verificate">>, Props),
+    Cash       = ?v(<<"cash">>, Props, 0),
+    Card       = ?v(<<"card">>, Props, 0),
+    Wire       = ?v(<<"wire">>, Props, 0),
+    VerifyPay  = ?v(<<"verificate">>, Props, 0),
     EPay       = ?v(<<"e_pay">>, Props, 0),
     Comment    = ?v(<<"comment">>, Props, []), 
     ShouldPay  = ?v(<<"should_pay">>, Props),
@@ -577,9 +577,10 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     
 
     OldFirm      = ?v(<<"old_firm">>, Props),
-    OldBalance   = ?v(<<"old_balance">>, Props),
+    OldBalance   = ?v(<<"old_balance">>, Props), 
+    OldVerifyPay = ?v(<<"old_verify_pay">>, Props, 0),
     OldShouldPay = ?v(<<"old_should_pay">>, Props),
-    OldHasPay    = ?v(<<"old_has_pay">>, Props, 0),
+    OldHasPay    = ?v(<<"old_has_pay">>, Props, 0), 
     OldDatatime  = ?v(<<"old_datetime">>, Props),
 
     Total      = ?v(<<"total">>, Props),
@@ -587,12 +588,10 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     %% CurTime    = ?utils:current_time(localtime),
     
     RealyShop = realy_shop(Merchant, Shop),
-    %% Sql1 = case Datetime =:= OldDatatime of
-    %% 	       true -> [];
-    %% 	       false ->
-    Sql1 = ?w_good_sql:inventory(update, RSN, Merchant, RealyShop, Firm,
-				 Datetime, CurTime, Inventories),
-    %% end,
+    
+    Sql1 = ?w_good_sql:inventory(
+	      update, RSN, Merchant, RealyShop, Firm,
+	      Datetime, OldDatatime, CurTime, Inventories), 
 
     Updates =?utils:v(employ, string, Employee)
 	++ ?utils:v(firm, integer, Firm) 
@@ -620,7 +619,8 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 		      ?utils:v(balance, float, OldBalance) ++ Updates)
 		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
 
-	    case (ShouldPay - HasPay) - (OldShouldPay - OldHasPay) of
+	    case (ShouldPay - HasPay - VerifyPay)
+		- (OldShouldPay - OldHasPay - OldVerifyPay) of
 		0 ->
 		    AllSql = Sql1 ++ [Sql2],
 		    Reply = ?sql_utils:execute(transaction, AllSql, RSN), 
@@ -646,7 +646,7 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 	    end;
 	false ->
 	    Sql0 = "select id, rsn, firm, shop, merchant, balance"
-		", should_pay, has_pay, e_pay"
+		", verificate, should_pay, has_pay, e_pay"
 		" from w_inventory_new"
 		" where shop=" ++ ?to_s(Shop)
 		++ " and merchant=" ++ ?to_s(Merchant)
@@ -659,9 +659,10 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 		    {ok, []}  -> Balance;
 		    {ok, R}   ->
 			?v(<<"balance">>, R)
-			    + ?v(<<"should_pay">>, R)
-			    + ?v(<<"e_pay">>, R)
-			    - ?v(<<"has_pay">>, R)
+			    + ?v(<<"should_pay">>, R, 0)
+			    + ?v(<<"e_pay">>, R, 0)
+			    - ?v(<<"has_pay">>, R, 0)
+			    - ?v(<<"verificate">>, R, 0)
 		end,
 	    
 	    
@@ -671,25 +672,31 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 		      ?utils:v(balance, float, NewBalance) ++ Updates)
 		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'"
 		++ " and id=" ++ ?to_s(Id),
-	    
+
+	    BackBalanceOfOldFirm
+		= OldShouldPay + EPay - OldVerifyPay - OldHasPay,
+	    BalanceOfNewFirm
+		= ShouldPay + EPay - HasPay - VerifyPay,
+		
 	    AllSql = Sql1 ++ [Sql2] ++
 		["update suppliers set balance=balance-"
-		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
+		 ++ ?to_s(BackBalanceOfOldFirm)
 		 ++ " where id=" ++ ?to_s(OldFirm),
 		 
 		 "update suppliers set balance=balance+"
-		 ++ ?to_s(ShouldPay + EPay - HasPay) 
+		 ++ ?to_s(BalanceOfNewFirm) 
 		 ++ " where id="++ ?to_s(Firm),
 
 		 "update w_inventory_new set balance=balance-"
-		 ++ ?to_s(OldShouldPay + EPay - OldHasPay)
+		 ++ ?to_s(BackBalanceOfOldFirm)
 		 ++ " where shop=" ++ ?to_s(Shop)
 		 ++ " and merchant=" ++ ?to_s(Merchant)
 		 ++ " and firm=" ++ ?to_s(OldFirm)
 		 ++ " and id>" ++ ?to_s(Id),
 	    
 		 "update w_inventory_new set balance=balance+"
-		 ++ ?to_s(ShouldPay + EPay - HasPay) 
+		 %% ++ ?to_s(ShouldPay + EPay - HasPay)
+		 ++ ?to_s(BalanceOfNewFirm)
 		 ++ " where shop=" ++ ?to_s(Shop)
 		 ++ " and merchant=" ++ ?to_s(Merchant)
 		 ++ " and firm=" ++ ?to_s(Firm)
@@ -998,18 +1005,42 @@ handle_call({get_inventory_new_rsn, Merchant, Conditions}, _From, State) ->
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
-handle_call({total_new_rsn_groups, _Merchant, Conditions}, _From, State) ->
-    ?DEBUG("total_new_rsn_groups whith conditions ~p", [Conditions]),
+handle_call({total_new_rsn_groups, Merchant, Conditions}, _From, State) ->
+    %% ?DEBUG("total_new_rsn_groups whith conditions ~p", [Conditions]),
+    %% CountSql = "select count(*) as total"
+    %% 		", SUM(amount) as t_amount"
+    %% 		" from w_inventory_new_detail"
+    %% 		" where " ++ ?utils:to_sqls(proplists, Conditions),
+
+    {DConditions, NConditions}
+	= ?w_good_sql:filter_condition(inventory_new, Conditions, [], []),
+
+    {StartTime, EndTime, CutNConditions}
+    	= ?sql_utils:cut(fields_with_prifix, NConditions),
+
+    {_, _, CutDCondtions}
+    	= ?sql_utils:cut(fields_no_prifix, DConditions),
+
+    CorrectCutDConditions = ?utils:correct_condition(<<"b.">>, CutDCondtions),
+    
     CountSql = "select count(*) as total"
-		", SUM(amount) as t_amount"
-		" from w_inventory_new_detail"
-		" where " ++ ?utils:to_sqls(proplists, Conditions),
-	    Reply = ?sql_utils:execute(s_read, CountSql),
+    	", SUM(b.amount) as t_amount"
+    	%% ", SUM(b.fprice * b.fdiscount * b.total) as t_balance" 
+    	" from w_inventory_new_detail b, w_inventory_new a" 
+    	" where "
+	++ ?sql_utils:condition(proplists_suffix, CorrectCutDConditions)
+	++ "b.rsn=a.rsn"
+
+    	++ ?sql_utils:condition(proplists, CutNConditions)
+    	++ " and a.merchant=" ++ ?to_s(Merchant)
+    	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime),
+    Reply = ?sql_utils:execute(s_read, CountSql),
     {reply, Reply, State};
     
 handle_call({filter_new_rsn_groups, Merchant,
 	     CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-    ?DEBUG("filter_new_rsn_group_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+    ?DEBUG("filter_new_rsn_group_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
 	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]), 
     Sql = ?w_good_sql:inventory(
 	     new_rsn_group_with_pagination, Merchant,

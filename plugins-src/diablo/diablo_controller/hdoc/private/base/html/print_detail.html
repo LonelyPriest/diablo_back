@@ -97,6 +97,10 @@
 			{{yes_no[s.value].cname}}
 		      </span>
 
+		      <span ng-switch-when="se_pagination">
+			{{yes_no[s.value].cname}}
+		      </span>
+
 		      <span ng-switch-when="qtypeahead">
 			{{prompt_types[s.value].cname}}
 		      </span>
@@ -301,6 +305,14 @@
 	      </select>
 
 	      <select x-ng-switch-when="pim_print"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="y as y.cname for y in params.setting.yes_no"
+		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="se_pagination"
 		      class="form-control" required
 		      name="value"
 		      x-ng-model="params.setting.value"

@@ -82,8 +82,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	}
 
 	$scope.select.left_balance =
-	    $scope.f_add($scope.select.surplus,
-			 $scope.f_sub($scope.select.should_pay, e_pay));
+	    $scope.select.surplus + $scope.select.should_pay - e_pay;
 	    // $scope.select.surplus + $scope.select.should_pay;
     };
 
@@ -524,14 +523,14 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 
     var timeout_auto_save = undefined;
     $scope.auto_save_free = function(inv){
-	
+
+	$timeout.cancel($scope.timeout_auto_save); 
 	if (angular.isUndefined(inv.amounts[0].reject_count)
 	    || !inv.amounts[0].reject_count
 	    || parseInt(inv.amounts[0].reject_count) === 0){
 	    return;
 	} 
 
-	$timeout.cancel($scope.timeout_auto_save);
 	$scope.timeout_auto_save = $timeout(function(){
 	    if (inv.$new && inv.free_color_size){
 		$scope.add_free_inventory(inv);

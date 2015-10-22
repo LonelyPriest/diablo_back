@@ -16,7 +16,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.float_sub = diablo_float_sub;
     $scope.round     = diablo_round;
 
-    $scope.show = {base:false, balance:false, check:false};
+    $scope.show = {base:false, balance:false, comment:false};
     
     $scope.toggle_balance = function(){
 	$scope.show.balance = !$scope.show.balance;
@@ -25,6 +25,10 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.toggle_base = function(){
 	$scope.show.base = !$scope.show.base;
     };
+
+    $scope.toggle_comment = function(){
+	$scope.show.comment = !$scope.show.comment;
+    }; 
     
     var now          = $.now();
 

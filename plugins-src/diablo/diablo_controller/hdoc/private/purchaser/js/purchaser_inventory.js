@@ -14,7 +14,8 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope.seasons           = diablo_season;
     $scope.float_add         = diablo_float_add;
     $scope.float_sub         = diablo_float_sub;
-    $scope.extra_pay_types   = purchaserService.extra_pay_types; 
+    $scope.extra_pay_types   = purchaserService.extra_pay_types;
+    $scope.round             = diablo_round;
     $scope.disable_refresh   = true;
     $scope.timeout_auto_save = undefined;
 
@@ -42,7 +43,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     // };
 
     $scope.q_typeahead = function(shopId){
-	console.log(shopId);
+	// console.log(shopId);
 	// default prompt comes from backend
 	return diablo_base_setting(
 	    "qtypeahead", shopId, base, parseInt, diablo_backend);
@@ -411,6 +412,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     var reset_payment = function(newValue){
 	$scope.select.has_pay = 0.00;
 	var e_pay = 0.00;
+	var verificate = 0.00;
 	
 	if(angular.isDefined($scope.select.extra_pay)
 	   && $scope.select.extra_pay){
@@ -431,12 +433,15 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 
 	if(angular.isDefined($scope.select.verificate)
 	   && $scope.select.verificate){
-	    $scope.select.has_pay += parseFloat($scope.select.verificate); 
+	    verificate = parseFloat($scope.select.verificate); 
 	}
 
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.float_add($scope.select.should_pay, e_pay),
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay - verificate;
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.float_add($scope.select.should_pay, e_pay),
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
     };
     
     $scope.$watch("select.cash", function(newValue, oldValue){
@@ -605,15 +610,24 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    e_pay = parseFloat($scope.select.extra_pay);
 	}
 
+	var verificate = 0.00;
+	if(angular.isDefined($scope.select.verificate)
+	   && $scope.select.verificate){
+	    verificate = parseFloat($scope.select.verificate);
+	}
+
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.total);
-	    $scope.select.should_pay += one.org_price * one.total;
+	    $scope.select.should_pay += $scope.round(one.org_price * one.total);
 	}; 
 
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.float_add($scope.select.should_pay, e_pay),
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay - verificate;
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.float_add($scope.select.should_pay, e_pay),
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
     };
     
     var add_callback = function(params){
@@ -823,20 +837,21 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 
     $scope.auto_save_free = function(inv){
 	// console.log(inv);
+	$timeout.cancel($scope.timeout_auto_save);
+
 	if (angular.isUndefined(inv.amount[0].count)
 	    || !inv.amount[0].count
 	    || parseInt(inv.amount[0].count) === 0){
 	    return;
 	} 
-
-	$timeout.cancel($scope.timeout_auto_save);
+	
 	$scope.timeout_auto_save = $timeout(function(){
 	    if (inv.$new && inv.free_color_size){
 		$scope.add_inventory(inv);
 	    }
 
 	    if (!inv.$new && inv.update_directory){
-		$scope.save_update(inv) 
+		$scope.save_free_update(inv) 
 	    }
 	}, 1000); 
     };
@@ -1106,15 +1121,21 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.shops   = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds = user.shopIds.concat(user.badrepoIds);
 
-    $scope.f_add = diablo_float_add;
-    $scope.f_sub = diablo_float_sub;
+    $scope.f_add   = diablo_float_add;
+    $scope.f_sub   = diablo_float_sub;
+    $scope.round   = diablo_round; 
 
-    $scope.hidden = {base:true, balance:true};
+    $scope.hidden = {base:true, balance:true, comment:true};
     $scope.toggle_base = function(){
 	$scope.hidden.base = !$scope.hidden.base;
     };
+    
     $scope.toggle_balance = function(){
 	$scope.hidden.balance = !$scope.hidden.balance;
+    };
+    
+    $scope.toggle_comment = function(){
+	$scope.hidden.comment = !$scope.hidden.comment;
     };
 
     var now    = $.now();

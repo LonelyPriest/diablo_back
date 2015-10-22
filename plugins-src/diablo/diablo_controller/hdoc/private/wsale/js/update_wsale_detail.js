@@ -110,9 +110,13 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.select.should_pay
 		+= $scope.round(one.fprice * one.sell * one.fdiscount * 0.01);
 	}
+
+	var e_pay = angular.isDefined(diablo_set_float($scope.select.e_pay))
+	    ? $scope.select.e_pay : 0;
 	
 	$scope.select.left_balance =
-	    $scope.select.surplus + $scope.select.should_pay - $scope.select.has_pay;
+	    $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay - $scope.select.verificate;
 	// $scope.select.left_balance = $scope.float_add(
 	//     $scope.select.should_pay,
 	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));
@@ -631,8 +635,10 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
 	    old_retailer:   $scope.old_select.retailer.id, 
 	    old_balance:    $scope.old_select.surplus,
+	    old_verify_pay: $scope.old_select.verificate,
 	    old_should_pay: $scope.old_select.should_pay,
-	    old_has_pay:    $scope.old_select.has_pay,
+	    old_has_pay:    $scope.old_select.has_pay, 
+	    old_datetime:   dateFilter($scope.old_select.datetime, "yyyy-MM-dd HH:mm:ss"),
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
 	    total:         seti($scope.select.total)
@@ -697,6 +703,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     var reset_payment = function(newValue){
 	// console.log("reset_payment newValue ", newValue);
 	$scope.select.has_pay = 0.00;
+	var verificate = 0.00;
+	
 	if(angular.isDefined($scope.select.cash) && $scope.select.cash){
 	    $scope.select.has_pay
 		+= parseFloat($scope.select.cash);
@@ -714,12 +722,15 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
 	if(angular.isDefined($scope.select.verificate)
 	   && $scope.select.verificate){
-	    $scope.select.has_pay
-		+= parseFloat($scope.select.verificate); 
+	    verificate = parseFloat($scope.select.verificate); 
 	}
 
+	var e_pay = angular.isDefined(diablo_set_float($scope.select.e_pay))
+	    ? $scope.select.e_pay : 0;
+
 	$scope.select.left_balance
-	    = $scope.select.surplus + $scope.select.should_pay - $scope.select.has_pay;
+	    = $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - $scope.select.has_pay - verificate;
 	// console.log($scope.float_add);
 	// $scope.select.left_balance = $scope.float_add(
 	//     $scope.select.should_pay,

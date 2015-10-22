@@ -11,7 +11,8 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.employees   = filterEmployee;
     $scope.size_groups = filterSizeGroup;
     $scope.sexs        = diablo_sex;
-    $scope.seasons     = diablo_season; 
+    $scope.seasons     = diablo_season;
+    $scope.e_pay_types = purchaserService.extra_pay_types; 
 
     $scope.has_saved   = false;
 
@@ -22,55 +23,72 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.float_add  = diablo_float_add;
     $scope.float_sub  = diablo_float_sub;
     $scope.get_object = diablo_get_object;
+    $scope.round      = diablo_round;
 
     $scope.go_back = function(){
 	diablo_goto_page("#/inventory_new_detail/" + $routeParams.ppage);
     };
+    // $('.table').floatThead();
 
     // pagination
-    $scope.colspan = 9;
-    $scope.items_perpage = 10;
-    $scope.default_page = 1;
+    // $scope.colspan = 9;
+    $scope.items_perpage = diablo_items_per_page();
+    // $scope.default_page = 1;
 
-    $scope.get_page = function(page){
-	var length = $scope.inventories.length;
-	var begin = (page - 1) * $scope.items_perpage;
-	var end = begin + $scope.items_perpage > length ?
-	    length : begin + $scope.items_perpage;
+    // $scope.get_page = function(page){
+    // 	var length = $scope.inventories.length;
+    // 	var begin = (page - 1) * $scope.items_perpage;
+    // 	var end = begin + $scope.items_perpage > length ?
+    // 	    length : begin + $scope.items_perpage;
 
-	var index = [];
-	for(var i=begin; i<end; i++){
-	    index.push(i);
-	}
-	return index;
-    };
+    // 	var index = [];
+    // 	for(var i=begin; i<end; i++){
+    // 	    index.push(i);
+    // 	}
+    // 	return index;
+    // };
 
-    $scope.get_inventory = function(index){
-	var invs = [];
-	angular.forEach(index, function(i){
-	    invs.push($scope.inventories[i]);
-	}) 
-	return invs;
-    };
+    // $scope.get_inventory = function(index){
+    // 	var invs = [];
+    // 	angular.forEach(index, function(i){
+    // 	    invs.push($scope.inventories[i]);
+    // 	}) 
+    // 	return invs;
+    // };
     
-    $scope.page_changed = function(page){
-	// console.log(page);
-	$scope.current_page_index = $scope.get_page(page);
-    }; 
+    // $scope.page_changed = function(page){
+    // 	// console.log(page);
+    // 	$scope.current_page_index = $scope.get_page(page);
+    // }; 
 
     $scope.re_calculate = function(){
 	$scope.select.total = 0;
 	$scope.select.should_pay = 0.00;
 
+	// var e_pay = 0;
+	// if(angular.isDefined($scope.select.extra_pay)
+	//    && $scope.select.extra_pay){
+	//     e_pay = $scope.select.extra_pay;
+	// }
+	
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.total);
-	    $scope.select.should_pay += one.org_price * one.total;
+	    $scope.select.should_pay += $scope.round(one.org_price * one.total);
 	}; 
 
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.select.should_pay,
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	var e_pay = angular.isDefined($scope.select.e_pay)
+	    ? parseFloat($scope.select.e_pay) : 0.00;
+
+	var verificate = angular.isDefined($scope.select.verificate)
+	    ? parseFloat($scope.select.verificate) : 0.00;
+	
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay
+	    + e_pay - $scope.select.has_pay - $scope.select.verificate;
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.select.should_pay,
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
     };
     
     $scope.change_firm = function(){
@@ -147,7 +165,18 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	$scope.old_select.verificate = base.verificate;
 	$scope.old_select.should_pay = base.should_pay;
 	$scope.old_select.has_pay    = base.has_pay;
-	$scope.old_select.e_pay      = base.e_pay;
+
+
+	if (base.e_pay_type === -1){
+	    $scope.old_select.e_pay_type = $scope.e_pay_types[0];
+	    $scope.old_select.e_pay      = undefined;
+	} else{
+	    $scope.old_select.e_pay_type
+		= diablo_get_object(base.e_pay_type, $scope.e_pay_types);
+	    $scope.old_select.e_pay      = base.e_pay; 
+	}
+	
+	// $scope.old_select.e_pay      = base.e_pay;
 	// $scope.old_select.rsn        = base.rsn;
 
 	$scope.select = angular.extend($scope.select, $scope.old_select);
@@ -202,15 +231,17 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	
 	$scope.inventories.unshift({$edit:false, $new:true});
 
-	$scope.total_items = $scope.inventories.length; 
-	$scope.current_page_index = $scope.get_page($scope.default_page);
+	// $scope.total_items = $scope.inventories.length; 
+	// $scope.current_page_index = $scope.get_page($scope.default_page);
 
 	console.log($scope.old_inventories);
 	console.log($scope.inventories);
     });
     
     var reset_payment = function(newValue){
+	// console.log("reset_payment", $scope.select);
 	$scope.select.has_pay = 0.00;
+	
 	if(angular.isDefined($scope.select.cash) && $scope.select.cash){
 	    $scope.select.has_pay += parseFloat($scope.select.cash);
 	}
@@ -223,14 +254,22 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    $scope.select.has_pay += parseFloat($scope.select.wire);
 	}
 
+	var verificate = 0.00; 
 	if(angular.isDefined($scope.select.verificate)
 	   && $scope.select.verificate){
-	    $scope.select.has_pay += parseFloat($scope.select.verificate); 
+	    verificate = parseFloat($scope.select.verificate); 
 	}
 
-	$scope.select.left_balance = $scope.float_add(
-	    $scope.select.should_pay,
-	    $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
+	var e_pay = angular.isDefined($scope.select.e_pay)
+	    ? $scope.select.e_pay : 0;
+	
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay
+	    + e_pay - $scope.select.has_pay - verificate;
+	
+	// $scope.select.left_balance = $scope.float_add(
+	//     $scope.select.should_pay,
+	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
     };
 
     $scope.$watch("select.cash", function(newValue, oldValue){
@@ -522,10 +561,13 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    e_pay:          setv($scope.select.e_pay),
 	    should_pay:     setv($scope.select.should_pay),
 	    has_pay:        setv($scope.select.has_pay),
+	    
 	    old_firm:       $scope.old_select.firm.id,
 	    old_balance:    setv($scope.old_select.surplus),
+	    old_verify_pay: setv($scope.old_select.verificate),
 	    old_should_pay: setv($scope.old_select.should_pay),
-	    old_has_pay:    setv($scope.old_select.has_pay)
+	    old_has_pay:    setv($scope.old_select.has_pay),
+	    old_datetime:   dateFilter($scope.old_select.datetime, "yyyy-MM-dd HH:mm:ss"),
 	};
 
 	console.log(added);
@@ -619,8 +661,8 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    $scope.inventories.unshift({$edit:false, $new:true});
 
 	    // pagination
-	    $scope.total_items = $scope.inventories.length; 
-	    $scope.current_page_index = $scope.get_page($scope.current_page);
+	    // $scope.total_items = $scope.inventories.length; 
+	    // $scope.current_page_index = $scope.get_page($scope.current_page);
 	    $scope.re_calculate(); 
 	};
 	
@@ -686,8 +728,8 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	}
 
 	// pagination
-	$scope.total_items = $scope.inventories.length; 
-	$scope.current_page_index = $scope.get_page($scope.current_page);
+	// $scope.total_items = $scope.inventories.length; 
+	// $scope.current_page_index = $scope.get_page($scope.current_page);
 
 	$scope.re_calculate(); 
 	
@@ -723,7 +765,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	    inv.org_price = result.org_price;
 	    
 	    // pagination
-	    $scope.current_page_index = $scope.get_page($scope.current_page); 
+	    // $scope.current_page_index = $scope.get_page($scope.current_page); 
 	    $scope.re_calculate(); 
 	};
 	

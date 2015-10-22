@@ -16,6 +16,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope.f_add           = diablo_float_add;
     $scope.f_sub           = diablo_float_sub;
     $scope.get_object      = diablo_get_object;
+    $scope.round           = diablo_round;
     
     $scope.sexs            = diablo_sex;
     $scope.seasons         = diablo_season; 
@@ -41,7 +42,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.reject);
-	    $scope.select.should_pay += one.org_price * one.reject;
+	    $scope.select.should_pay += $scope.round(one.org_price * one.reject);
 	}; 
 
 	$scope.select.left_balance = $scope.f_sub(

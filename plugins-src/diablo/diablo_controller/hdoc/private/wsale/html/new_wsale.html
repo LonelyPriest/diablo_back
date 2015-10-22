@@ -286,9 +286,12 @@
 		
 		<div class="table-responsive">
 		  <!--EBGIN table supplier-->
-		  <table class="table table-bordered
+		  <table id="t_wnew" class="table table-bordered
 				table-striped table-hover table-condensed table-advanced">
-		    <thead>
+		    <thead class="stick-thead"
+			   fsm-sticky-header
+			   scroll-body="'#t_wnew'"
+			   scroll-stop="50">
 		      <tr>
 			<th class="text-center">序号</th>
 			<th class="text-center">货号</th>

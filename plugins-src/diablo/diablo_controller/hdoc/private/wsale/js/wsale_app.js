@@ -1100,6 +1100,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     var reset_payment = function(newValue){
 	$scope.select.has_pay = 0.00;
 	var e_pay = 0.00;
+	var verificate = 0.00;
 	if(angular.isDefined($scope.select.cash) && $scope.select.cash){
 	    $scope.select.has_pay += parseFloat($scope.select.cash);
 	}
@@ -1114,7 +1115,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
 	if(angular.isDefined($scope.select.verificate)
 	   && $scope.select.verificate){
-	    $scope.select.has_pay += parseFloat($scope.select.verificate); 
+	    verificate = parseFloat($scope.select.verificate); 
 	}
 
 	if(angular.isDefined($scope.select.extra_pay)
@@ -1123,9 +1124,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	}
 
 	// console.log($scope.float_add);
-	$scope.select.left_balance
-	    = $scope.select.surplus + $scope.select.should_pay + e_pay
-	    - $scope.select.has_pay;
+	$scope.select.left_balance =
+	    $scope.select.surplus + $scope.select.should_pay + e_pay
+	    - verificate - $scope.select.has_pay;
 	
 	// $scope.select.left_balance = $scope.float_add(
 	//     $scope.float_add($scope.select.should_pay, e_pay),
@@ -1151,9 +1152,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
     });
 
     $scope.$watch("select.verificate", function(newValue, oldValue){
-	if (newValue === oldValue || angular.isUndefined(newValue)) return;
-	if ($scope.select.form.vForm.$invalid) return; 
-	reset_payment(newValue); 
+    	if (newValue === oldValue || angular.isUndefined(newValue)) return;
+    	if ($scope.select.form.vForm.$invalid) return; 
+    	reset_payment(newValue); 
     });
 
     $scope.$watch("select.extra_pay", function(newValue, oldValue){
@@ -1233,7 +1234,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	// console.log($scope.select.extra_pay);
 	$scope.select.left_balance
 	    = $scope.select.surplus + $scope.select.should_pay + e_pay
-	    - $scope.select.has_pay; 
+	    - $scope.select.has_pay - $scope.select.verificate; 
 	// $scope.select.left_balance = $scope.float_add(
 	//     $scope.float_add($scope.select.should_pay, e_pay),
 	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay)); 
@@ -1658,17 +1659,20 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 
     $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
+    $scope.records   = [];
     $scope.goto_page = diablo_goto_page;
     $scope.float_add = diablo_float_add;
     $scope.float_sub = diablo_float_sub;
     $scope.round     = diablo_round;
     
     $scope.disable_print = false;
+    $scope.allowed_slide = true;
 
     /*
      * hidden
      */
-    $scope.show = {base:false, balance:false, check:false};
+    $scope.show = {base:false, balance:false, action:true, comment:false};
+
     
     $scope.toggle_balance = function(){
 	// console.log("toggle left");
@@ -1679,10 +1683,66 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	$scope.show.base = !$scope.show.base;
     };
 
-    $scope.toggle_check = function(){
-	$scope.show.check = !$scope.show.check;
+    // $scope.toggle_check = function(){
+    // 	$scope.show.check = !$scope.show.check;
+    // };
+
+    $scope.toggle_action = function(){
+	$scope.show.action = !$scope.show.action;
     };
 
+    $scope.toggle_comment = function(){
+	$scope.show.comment = !$scope.show.comment;
+    }; 
+    
+    /*
+     * pan
+     */
+    // var pan_left;
+    // $scope.pan_start  = function (event){
+    // 	pan_left = event.element.position().left;
+    // 	// pan_top  = event.element.position().top;
+    // 	// console.log(event.element.position());
+    // };
+
+    // $scope.pan_move = function(event){
+    // 	var left  = pan_left + event.deltaX;
+    // 	var width = event.element.outerWidth() / 2.0;
+	
+    // 	if (left < 0 && left >= -width){
+    // 	    event.element.css('left', '' + left + 'px'); 
+    // 	}
+
+    // 	if (left > 0){
+    // 	    event.element.css('left', '0px');
+    // 	}
+
+    // };
+
+    // $scope.pan_end = function(event){
+    // 	// console.log(event);
+    // 	// if (!$scope.allowed_slide){
+    // 	//     return;
+    // 	// }
+	
+    // 	// var left = pan_left + event.deltaX;
+    // 	// var width = event.element.outerWidth() / 5.0;
+    // 	// console.log(left);
+    // 	// if (left < 0 && left <= -width){
+    // 	//     $scope.show.action = true;
+    // 	//     $scope.show.slide  = true;
+    // 	//     event.element.css('left', '' + '0'); 
+    // 	// } else {
+    // 	//     event.element.css('left', '0');
+    // 	// }
+
+    // 	// if (left > 0){
+    // 	//     $scope.show.action = false;
+    // 	//     $scope.show.slide  = false;
+    // 	//     event.element.css('left', '0'); 
+    // 	// }
+    // 	// console.log(event);
+    // };
     
 
     /* 
@@ -1709,7 +1769,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     var now = $.now();
 
     var storage = localStorageService.get(diablo_key_wsale_trans);
-    console.log(storage);
+    // console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
     	$scope.filters        = storage.filter;
     	$scope.qtime_start    = storage.start_time;
@@ -1727,7 +1787,18 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	}();
     };
 
-    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+
+    //
+    $scope.sequence_pagination = function(){
+	var shop = -1;
+	if ($scope.shopIds.length === 1){
+	    shop = $scope.shopIds[0];
+	};
+
+	return diablo_base_setting(
+	    "se_pagination", shop, base, parseInt, diablo_no)
+    }();
 
     // console.log($scope.time);
 
@@ -1735,7 +1806,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
      * pagination 
      */
     $scope.colspan = 19;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
 
     // console.log($routeParams);
@@ -1757,7 +1828,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	console.log(page);
 
 	$scope.current_page = page;
-	
+
 	// save condition of query 
 	localStorageService.set(
 	    diablo_key_wsale_trans,
@@ -1767,7 +1838,6 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	
 
 	// console.log($scope.time); 
-
 	if (angular.isDefined(back_page)){
 	    var stastic = localStorageService.get("wsale-trans-stastic");
 	    console.log(stastic);
@@ -1780,10 +1850,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	    $scope.total_wire       = stastic.total_wire;
 	    $scope.total_verificate = stastic.total_verificate;
 
-	    // recover
+	    // recover 
 	    $location.path("/new_wsale_detail", false);
 	    $routeParams.page = undefined;
-	    back_page = undefined;
+	    // back_page = undefined;
 	    localStorageService.remove("wsale-trans-stastic");
 	}
 	
@@ -1792,9 +1862,19 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		|| !search.shop || search.shop.length === 0){
 		search.shop = $scope.shopIds.length === 0 ? undefined : $scope.shopIds; 
 	    }
+
+	    var items    = $scope.items_perpage;
+	    var page_num = page;
+	    if (angular.isDefined(back_page)
+		&& $scope.sequence_pagination === diablo_yes){
+		items = page * $scope.items_perpage;
+		$scope.records = []; 
+		page_num = 1;
+		back_page = undefined;
+	    }
 	    
 	    wsaleService.filter_w_sale_new(
-		$scope.match, search, page, $scope.items_perpage
+		$scope.match, search, page_num, items
 	    ).then(function(result){
 		console.log(result);
 		if (page === 1 && angular.isUndefined(back_page)){
@@ -1807,9 +1887,11 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		    $scope.total_card       = result.t_card;
 		    $scope.total_wire       = result.t_wire;
 		    $scope.total_verificate = result.t_verificate;
+
+		    $scope.records = [];
 		}
 		
-		console.log($scope);
+		// console.log($scope);
 
 		angular.forEach(result.data, function(d){
 		    d.shop     = diablo_get_object(d.shop_id, $scope.shops);
@@ -1817,8 +1899,19 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		    d.retailer = diablo_get_object(d.retailer_id, filterRetailer); 
 		});
 
-		$scope.records = result.data; 
-		diablo_order_page(page, $scope.items_perpage, $scope.records);
+		if ($scope.sequence_pagination === diablo_no){
+		    $scope.records = result.data; 
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.records);
+		} else {
+		    diablo_order(
+			result.data, (page_num - 1) * $scope.items_perpage + 1);
+		    $scope.records = $scope.records.concat(result.data);
+
+		    console.log($scope.records);
+		    
+		}
+		
 	    })
 	})
     };
@@ -1827,6 +1920,15 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	// console.log($scope.num_pages);
 	// console.log($scope.current_page);
     	$scope.do_search($scope.current_page);
+    };
+
+    $scope.auto_pagination = function(){
+	if ($scope.sequence_pagination === diablo_no){
+	    return;
+	} else {
+	    $scope.current_page += 1;
+	    $scope.do_search($scope.current_page);
+	} 
     };
 
     $scope.do_search($scope.current_page);
@@ -1883,7 +1985,8 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		
 	    } else{
 	    	dialog.response(
-	    	    false, "销售单打印", "销售单打印失败：" + wsaleService.error[result.ecode]);
+	    	    false, "销售单打印",
+		    "销售单打印失败：" + wsaleService.error[result.ecode]);
 	    }
 	})
     };

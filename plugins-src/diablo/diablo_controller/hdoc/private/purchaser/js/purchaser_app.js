@@ -1,6 +1,6 @@
 var purchaserApp = angular.module(
     'purchaserApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource', 'LocalStorageModule',
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'LocalStorageModule', 'fsm',
      'diabloPattern', 'diabloNormalFilterApp', 'diabloUtils',
      'userApp', 'employApp', 'wgoodApp'])
     .config(function(localStorageServiceProvider){

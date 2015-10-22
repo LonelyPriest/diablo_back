@@ -101,28 +101,39 @@ action(Session, Req, {"filter_w_inventory_new_rsn_group"}, Payload) ->
 
     Merchant  = ?session:get(merchant, Session),
     %% first, get rsn
-    {struct, NewConditions} = ?v(<<"fields">>, Payload),
+    %% {struct, NewConditions} = ?v(<<"fields">>, Payload),
 
-    {ok, Q} = ?w_inventory:purchaser_inventory(get_inventory_new_rsn, Merchant, NewConditions),
-    FilterConditions =
-	filter_condition(trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], NewConditions),
+    %% {ok, Q} = ?w_inventory:purchaser_inventory(get_inventory_new_rsn, Merchant, NewConditions),
+    %% FilterConditions =
+    %% 	filter_condition(trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], NewConditions),
 
-    case FilterConditions of
-	[] -> ?utils:respond(
-		 200, object, Req, {[{<<"ecode">>, 0}, {<<"total">>, 0}, {<<"data">>, []}]});
-	_ -> 
-	    NewPayload = FilterConditions ++ proplists:delete(<<"fields">>, Payload), 
-	     ?pagination:pagination(
-		fun(Match, Conditions) ->
-			?w_inventory:filter(
-			   total_new_rsn_groups, ?to_a(Match), Merchant, Conditions)
-		end,
-		fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
-			?w_inventory:filter(
-			   new_rsn_groups, Match, Merchant,
-			   CurrentPage, ItemsPerPage, Conditions)
-		end, Req, NewPayload)
-    end;
+    %% case FilterConditions of
+    %% 	[] -> ?utils:respond(
+    %% 		 200, object, Req, {[{<<"ecode">>, 0}, {<<"total">>, 0}, {<<"data">>, []}]});
+    %% 	_ -> 
+    %% 	    NewPayload = FilterConditions ++ proplists:delete(<<"fields">>, Payload), 
+    %% 	     ?pagination:pagination(
+    %% 		fun(Match, Conditions) ->
+    %% 			?w_inventory:filter(
+    %% 			   total_new_rsn_groups, ?to_a(Match), Merchant, Conditions)
+    %% 		end,
+    %% 		fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+    %% 			?w_inventory:filter(
+    %% 			   new_rsn_groups, Match, Merchant,
+    %% 			   CurrentPage, ItemsPerPage, Conditions)
+    %% 		end, Req, NewPayload)
+    %% end;
+
+    ?pagination:pagination(
+       fun(Match, Conditions) ->
+	       ?w_inventory:filter(
+		  total_new_rsn_groups, ?to_a(Match), Merchant, Conditions)
+       end,
+       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+	       ?w_inventory:filter(
+		  new_rsn_groups, Match, Merchant,
+		  CurrentPage, ItemsPerPage, Conditions)
+       end, Req, Payload);
 
 action(Session, Req, {"w_inventory_new_rsn_detail"}, Payload) ->
     ?DEBUG("w_inventory_rsn_detail with session ~p, paylaod~n~p", [Session, Payload]),

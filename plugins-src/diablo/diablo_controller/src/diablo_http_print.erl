@@ -925,8 +925,9 @@ body_stastic(IsRound, Brand, Model, 50, Attrs) ->
     %% EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     %% EPay         = ?v(<<"e_pay">>, Attrs),
 
-    HasPay    = Cash + Card + Wire + VerifyPay,
-    Debt      = ShouldPay + EPay - HasPay,
+    %% HasPay    = Cash + Card + Wire + VerifyPay,
+    HasPay    = Cash + Card + Wire,
+    Debt      = ShouldPay + EPay - HasPay - VerifyPay,
     %% Debt         = ShouldPay - Cash - Card - Wire - VerifyPay,
     {DebtName, AccDet} = debt(Direct, LastBalance, Debt),
 
@@ -978,8 +979,9 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
     
     Direct       = ?v(<<"direct">>, Attrs), 
 
-    HasPay    = Cash + Card + Wire + VerifyPay, 
-    Debt      = ShouldPay + EPay - HasPay,
+    %% HasPay    = Cash + Card + Wire + VerifyPay,
+    HasPay    = Cash + Card + Wire, 
+    Debt      = ShouldPay + EPay - HasPay - VerifyPay,
     {DebtName, AccDet} = debt(Direct, LastBalance, Debt),
 
 
