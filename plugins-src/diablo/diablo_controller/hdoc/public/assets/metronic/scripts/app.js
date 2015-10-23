@@ -39,6 +39,7 @@ var App = function () {
         }
     }
 
+    
     // initializes main settings
     var handleInit = function () {
 
@@ -56,24 +57,26 @@ var App = function () {
         
         if (isIE10 || isIE9 || isIE8) {
             jQuery('html').addClass('ie'); // detect IE10 version
-        }
+        } 
 
         /*
           Virtual keyboards:
           Also, note that if you're using inputs in your modal – iOS has a rendering bug which doesn't 
           update the position of fixed elements when the virtual keyboard is triggered  
         */
-        var deviceAgent = navigator.userAgent.toLowerCase();
-        if (deviceAgent.match(/(iphone|ipod|ipad)/)) {
-            $(document).on('focus', 'input, textarea', function () {
-                $('.header').hide();
-                $('.footer').hide();
-            });
-            $(document).on('blur', 'input, textarea', function () {
-                $('.header').show();
-                $('.footer').show();
-            });
-        }
+	
+        // var deviceAgent = navigator.userAgent.toLowerCase();
+        // if (deviceAgent.match(/iphone|ipod|ipad/i)) {
+	    
+        //     $(document).on('focus', 'input, textarea', function () {
+        //         $('.header').hide();
+        //         $('.footer').hide();
+        //     });
+        //     $(document).on('blur', 'input, textarea', function () {
+        //         $('.header').show();
+        //         $('.footer').show();
+        //     });
+        // }
     }
 
     var handleSidebarState = function () {
@@ -608,23 +611,26 @@ var App = function () {
     // Handles Bootstrap Modals.
     var handleModals = function () {
         // fix stackable modal issue: when 2 or more modals opened, closing one of modal will remove .modal-open class. 
-        $('body').on('hide.bs.modal', function () {
-           if ($('.modal:visible').size() > 1 && $('html').hasClass('modal-open') == false) {
-              $('html').addClass('modal-open');
-           } else if ($('.modal:visible').size() <= 1) {
-              $('html').removeClass('modal-open');
-           }
-        });
+        // $('.modal').on('hide.bs.modal', function () {
+	//     console.log("hide");
+        //    if ($('.modal:visible').size() > 1 && $('html').hasClass('modal-open') == false) {
+        //       $('html').addClass('modal-open');
+        //    } else if ($('.modal:visible').size() <= 1) {
+        //       $('html').removeClass('modal-open');
+        //    }
+        // });
             
-        $('body').on('show.bs.modal', '.modal', function () {
-            if ($(this).hasClass("modal-scroll")) {
-                $('body').addClass("modal-open-noscroll");
-            } 
-        });
+        // $('.modal').on('shown', function () {
+	//     console.log("show");
+        //     if ($(this).hasClass("modal-scroll")) {
+        //         $('body').addClass("modal-open-noscroll");
+        //     } 
+        // });
 
-        $('body').on('hide.bs.modal', '.modal', function () {
-            $('body').removeClass("modal-open-noscroll");
-        });
+        // $('.modal').on('hidden', function () {
+	//     console.log("hide");
+        //     $('body').removeClass("modal-open-noscroll");
+        // });
     }
 
     // Handles Bootstrap Tooltips.

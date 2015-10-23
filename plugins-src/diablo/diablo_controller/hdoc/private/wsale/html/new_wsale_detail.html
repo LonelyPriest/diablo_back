@@ -21,7 +21,7 @@
 	       x-ng-click="goto_page('#/wsale_rsn_detail')">明细
 	      <i class="glyphicon glyphicon-map-marker"></i></a>
 
-	    <a type="button" class="btn blue purple-stripe"
+	    <a type="button" class="btn blue purple-stripe hidden-phone"
 	       x-ng-click="export_to()">导出
 	      <i class="glyphicon glyphicon-export"></i></a>
 
@@ -37,13 +37,13 @@
 	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4 col-sm-4 col-xs-6">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
 		 glyphicon="glyphicon glyphicon-arrow-left fg-red"
 		 time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4 col-sm-4 col-xs-6">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
 		 glyphicon="glyphicon glyphicon-arrow-right fg-red"
 		 time="time.end_time" ok="do_search(default_page)"></time-search>

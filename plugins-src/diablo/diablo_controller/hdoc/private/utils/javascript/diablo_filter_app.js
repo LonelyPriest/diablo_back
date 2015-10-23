@@ -9,6 +9,13 @@ function filterProvider(){
     // prompt
     var _prompt = {};
 
+    // cache
+    var _retailers = [];
+    var _firms     = [];
+    var _brands    = [];
+    var _types     = [];
+    var _colors    = [];
+    var _employees = [];
     
     
     this.$get = function($resource, dateFilter, wgoodService){
@@ -217,36 +224,78 @@ function filterProvider(){
 	    }, 
 
 	    get_firm: function(){
-		return wgoodService.list_purchaser_firm().then(function(firms){
-		    // console.log(firms); 
-		    return firms.map(function(f){
-			return {id: f.id, name:f.name, py:diablo_pinyin(f.name), balance:f.balance};
-		    }) 
-		});
+		if (_firms.length !== 0 ){
+		    // console.log("cache");
+		    return _firms;
+		} else {
+		    return wgoodService.list_purchaser_firm(
+		    ).then(function(firms){
+			// console.log(firms); 
+			_firms = firms.map(function(f){
+			    return {id: f.id,
+				    name:f.name,
+				    py:diablo_pinyin(f.name),
+				    balance:f.balance};
+			}); 
+			return _firms; 
+		    });
+		}
 	    },
 
 	    get_brand: function(){
-		return wgoodService.list_purchaser_brand().then(function(brands){
-		    // console.log(brands);
-		    return brands.map(function(b){
-			return {id: b.id, name:b.name, py:diablo_pinyin(b.name)};
-		    }) 
-		});
+		if (_brands.length != 0 ){
+		    // console.log("cache brands");
+		    return _brands;
+		} else {
+		    return wgoodService.list_purchaser_brand(
+		    ).then(function(brands){
+			// console.log(brands);
+			_brands =  brands.map(function(b){
+			    return {id: b.id,
+				    name:b.name, py:diablo_pinyin(b.name)};
+			})
+
+			return _brands;
+		    });    
+		}
+		
 	    },
 
 	    get_type: function(){
-		return wgoodService.list_purchaser_type().then(function(types){
-		    // console.log(types);
-		    return types.map(function(t){
-			return {id: t.id, name:t.name, py:diablo_pinyin(t.name)};
-		    })
-		});
+		if (_types.length !== 0){
+		    return _types;
+		} else {
+		    return wgoodService.list_purchaser_type(
+		    ).then(function(types){
+			// console.log(types);
+			_types =  types.map(function(t){
+			    return {id: t.id,
+				    name:t.name, py:diablo_pinyin(t.name)};
+			})
+
+			return _types;
+		    });
+		} 
 	    },
 
 	    get_color: function(){
-		return wgoodService.list_purchaser_color().then(function(colors){
-		    return colors;
-		})
+		if (_colors.length !== 0){
+		    // console.log("cache color");
+		    return _colors;
+		} else {
+		    return wgoodService.list_purchaser_color(
+		    ).then(function(colors){
+			// console.log(colors);
+			_colors = colors.map(function(c){
+			    return {id:c.id,
+				    name:c.name,
+				    tid:c.tid,
+				    type:c.type}
+			});
+
+			return _colors;
+		    })   
+		} 
 	    },
 
 	    get_color_type: function(){
@@ -265,24 +314,50 @@ function filterProvider(){
 	    },
 
 	    get_employee: function(){
-		var http = $resource("/employ/:operation", {operation: '@operation'});
-		
-		return http.query({operation: 'list_employe'}).$promise.then(function(employees){
-		    // console.log(employees);
-		    return employees.map(function(e){
-			return {name:e.name, id:e.number, py:diablo_pinyin(e.name)}
-		    }) 
-		});
+		if (_employees.length !== 0){
+		    return _employees;
+		} else {
+		    var http = $resource(
+			"/employ/:operation", {operation: '@operation'});
+		    
+		    return http.query(
+			{operation: 'list_employe'}
+		    ).$promise.then(function(employees){
+			// console.log(employees);
+			_employees =  employees.map(function(e){
+			    return {name:e.name,
+				    id:e.number,
+				    py:diablo_pinyin(e.name)}
+			});
+
+			return _employees;
+		    });
+		} 
 	    },
 
 	    get_wretailer: function(){
-		var http = $resource("/wretailer/:operation", {operation: '@operation'});
-		return http.query({operation: 'list_w_retailer'}).$promise.then(function(retailers){
-		    // console.log(retailers);
-		    return retailers.map(function(r){
-			return {name:r.name, id:r.id, py:diablo_pinyin(r.name), balance:r.balance}
-		    }) 
-		});
+		if (_retailers.length !== 0 ){
+		    return _retailers;
+		} else {
+		    var http =
+			$resource("/wretailer/:operation",
+				  {operation: '@operation'});
+		    
+		    return http.query(
+			{operation: 'list_w_retailer'}
+		    ).$promise.then(function(retailers){
+			// console.log(retailers); 
+			_retailers =  retailers.map(function(r){
+			    return {name:r.name,
+				    id:r.id,
+				    py:diablo_pinyin(r.name),
+				    balance:r.balance}
+			})
+
+			return _retailers;
+		    });    
+		}
+		
 	    }
 	    
 	}
@@ -296,6 +371,11 @@ var diabloNormalFilterApp = angular.module("diabloNormalFilterApp", [], function
 
 
 function normalFilterProvider(){
+
+    var _retailers    = [];
+    var _employees    = [];
+    var _baseSettings = [];
+    
     this.$get = function($resource){
 	var _employeeHttp = $resource("/employ/:operation", {operation: '@operation'});
 	var _retailerHttp =$resource("/wretailer/:operation", {operation: '@operation'});
@@ -314,53 +394,71 @@ function normalFilterProvider(){
 	    }, 
 	    
 	    get_employee: function(){
-		// var http = $resource("/employ/:operation", {operation: '@operation'}); 
-		return _employeeHttp.query({operation: 'list_employe'})
-		    .$promise.then(function(employees){
-			console.log(employees);
-			return employees.map(function(e){
-			    return {name:e.name, id:e.number, py:diablo_pinyin(e.name)}
-			}) 
-		    });
+		if (_employees.length !== 0){
+		    return _employees;
+		} else {
+		    return _employeeHttp.query(
+			{operation: 'list_employe'}
+		    ).$promise.then(function(employees){
+			// console.log(employees);
+			_employees = employees.map(function(e){
+			    return {name:e.name,
+				    id:e.number, py:diablo_pinyin(e.name)}
+			});
+
+			return _employees;
+		    });   
+		} 
 	    },
 
 	    get_wretailer: function(){
-		// var http = $resource("/wretailer/:operation", {operation: '@operation'});
-		return _retailerHttp.query({operation: 'list_w_retailer'})
-		    .$promise.then(function(retailers){
-			console.log(retailers);
-			return retailers.map(function(r){
-			    return {name:r.name, id:r.id, py:diablo_pinyin(r.name), balance:r.balance}
-			}) 
+		if (_retailers.length !== 0){
+		    return _retailers;
+		} else {
+		    return _retailerHttp.query(
+			{operation: 'list_w_retailer'}
+		    ).$promise.then(function(retailers){
+			// console.log(retailers);
+			_retailers = retailers.map(function(r){
+			    return {name:r.name,
+				    id:r.id,
+				    py:diablo_pinyin(r.name),
+				    balance:r.balance}
+			    });
+			return _retailers;
 		    });
+		} 
 	    },
 
 	    get_repo: function(){
-		var http = $resource("/shop/:operation", {operation: '@operation'});
-		return http.query({operation: "list_repo"}).$promise.then(function(repo){
+		var http = $resource(
+		    "/shop/:operation", {operation: '@operation'});
+		return http.query(
+		    {operation: "list_repo"}
+		).$promise.then(function(repo){
 		    console.log(repo);
 		    return repo.map(function(r){
-			return {name: r.name, id:r.id, py:diablo_pinyin(r.name)}
+			return {name: r.name,
+				id:r.id, py:diablo_pinyin(r.name)};
 		    })
 		});
 	    },
 
 	    get_province: function(){
-		// var http = $resource("/wretailer/:operation", {operation: '@operation'});
-		
 		return _provinceHttp.query({operation: 'list_w_province'})
 		    .$promise.then(function(provinces){
 			// console.log(provinces);
 			return provinces.map(function(p){
-			    return {name:p.name, id:p.id, py:diablo_pinyin(p.name)}
-			}) 
+			    return {name:p.name,
+				    id:p.id, py:diablo_pinyin(p.name)}
+			});
 		    });
 	    },
 
 	    get_city: function(){
-		// var http = $resource("/wretailer/:operation", {operation: '@operation'});
-		
-		return _cityHttp.query({operation: 'list_w_city'}).$promise.then(function(cities){
+		return _cityHttp.query(
+		    {operation: 'list_w_city'}
+		).$promise.then(function(cities){
 		    // console.log(cities);
 		    return cities.map(function(c){
 			return {name:c.name, id:c.id, py:diablo_pinyin(c.name)}
@@ -369,14 +467,20 @@ function normalFilterProvider(){
 	    },
 
 	    get_base_setting: function(){
-		// var setting = $resource("/wbase/:operation", {operation: '@operation'}); 
-		return _baseHttp.query({operation: "list_base_setting"}).$promise.then(function(ss){
-		    return ss.map(function(s){
-			return {name:s.ename, value:s.value, shop:s.shop}; 
-		    })
-		})
-	    }
-	    
+		if (_baseSettings.length !== 0 ){
+		    return _baseSettings;
+		} else {
+		    return _baseHttp.query(
+			{operation: "list_base_setting"}
+		    ).$promise.then(function(ss){
+			_baseSettings = ss.map(function(s){
+			    return {name:s.ename, value:s.value, shop:s.shop}; 
+			});
+			return _baseSettings;
+		    })    
+		}
+		
+	    } 
 	}
     }
 };

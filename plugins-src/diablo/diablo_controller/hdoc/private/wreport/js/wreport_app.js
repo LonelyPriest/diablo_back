@@ -3,9 +3,7 @@ var wreportApp = angular.module(
 		   'diabloUtils', 'userApp', 'diabloFilterApp',
 		   'diabloNormalFilterApp', 'diabloAuthenApp',
 		   'ui.bootstrap', 'wgoodApp'])
-// .config(diablo_authen);
     .config(function($httpProvider, authenProvider){
-	//  $httpProvider.responseInterceptors.push(authenProvider.interceptor);
 	$httpProvider.interceptors.push(authenProvider.interceptor);
     });
 

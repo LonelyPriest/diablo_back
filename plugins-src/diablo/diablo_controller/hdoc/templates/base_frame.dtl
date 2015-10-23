@@ -129,8 +129,7 @@
       	<div class="page-sidebar navbar-collapse collapse">
       	  <!--begin sidebar menu-->
       	  <ul class="page-sidebar-menu"
-	      data-slide-speed="200"
-	      data-auto-scroll="true">
+	      data-slide-speed="200" data-auto-scroll="true">
       	    <li class="sidebar-toggler-wrapper">
       	      <div class="sidebar-toggler hidden-xs"> </div>
     	      <!-- <div class="sidebar-toggler"> </div> -->
@@ -219,7 +218,9 @@
 	    type="text/javascript"></script> 
     
     <script src="/public/assets/bootstrap/ui-bootstrap-tpls-0.13.1.min.js"
-    	    type="text/javascript"></script> 
+    	    type="text/javascript"></script>
+    <!-- <script src="/public/assets/bootstrap/ui-bootstrap-tpls-0.14.2.js" -->
+    <!-- 	    type="text/javascript"></script> -->
 
     <script src="/public/assets/angular-local-storage/angular-local-storage.min.js"
 	    type="text/javascript"></script>

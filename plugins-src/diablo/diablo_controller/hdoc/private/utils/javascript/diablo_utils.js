@@ -1,5 +1,20 @@
 var diabloUtils = angular.module("diabloUtils", []);
 
+// diabloUtils.directive('input', [
+//     function(){
+// 	return {
+// 	    restrict: 'E',
+//             link: function(scope, element, attrs){
+// 		element.bind("blur", function(event){
+// 		    console.log("blur");
+// 		    // event.preventDefault();
+// 		    // event.stopPropagation();
+// 		})
+// 	    }
+// 	}
+//     }
+// ]);
+
 diabloUtils.directive('ngEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {
@@ -347,8 +362,10 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
-	    // backdrop: 'false',
+	    // backdrop: 'true',
 	    backdrop: 'static',
+	    // animation: true,
+	    // openedClass: "modal-open-noscroll",
 	    scope: scope,
 	    resolve:{
 		message: function(){
@@ -369,7 +386,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	    templateUrl: templateUrl,
 	    controller: 'diabloEditDialogCtrl',
 	    // backdrop: 'false',
-	    backdrop: 'static', 
+	    backdrop: 'static',
+	    openedClass: "modal-open-noscroll",
 	    size:  size,
 	    scope: scope,
 	    resolve:{
@@ -390,8 +408,8 @@ diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, mess
     console.log(message);
     $scope.success = message.success;
     $scope.title = message.title;
-    $scope.body  = message.body;
-
+    $scope.body  = message.body; 
+    
     $scope.show_cancel = angular.isDefined(message.show_cancel) ? message.show_cancel : true;
     
     $scope.cancel = function(){
@@ -407,16 +425,77 @@ diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, mess
 	    } else{
 		callback();
 	    }
-	}	    
+	}
     };
 });
 
 
 diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, message){
     // console.log($scope);
-    // console.log($modalInstance);
+    console.log($modalInstance);
     console.log(message);
 
+    var deviceAgent = navigator.userAgent.toLowerCase();
+    if (deviceAgent.match(/iphone|ipod|ipad/i)) {
+	$modalInstance.opened.then(function(){
+	    $('.header').hide();
+            $('.footer').hide();
+	    
+	    setTimeout(function () {
+	    	$('.modal')
+		    .addClass('modal-ios')
+	    	    .height($(window).height())
+	    	    .css({'margin-top': $(window).scrollTop() + 'px'});
+
+
+		// $('.modal-backdrop').css({
+                //     position: 'absolute', 
+                //     top: 0, 
+                //     left: 0,
+                //     width: '100%',
+                //     height: Math.max(
+		// 	document.body.scrollHeight,
+		// 	document.documentElement.scrollHeight,
+			
+		// 	document.body.offsetHeight,
+		// 	document.documentElement.offsetHeight,
+			
+		// 	document.body.clientHeight,
+		// 	document.documentElement.clientHeight
+                //     ) + 'px'
+		// });
+		
+	    }, 0);
+
+	    $('input').on('blur', 'input, select, textarea', function(){
+		setTimeout(function() {
+		    // This causes iOS to refresh, fixes problems when virtual keyboard closes
+		    $(window).scrollLeft(0);
+
+		    var $focused = $(':focus');
+		    // Needed in case user clicks directly from one input to another
+		    if(!$focused.is('input')) {
+			// Otherwise reset the scoll to the top of the modal
+			$(window).scrollTop($(window).scrollTop());
+		    }
+		}, 200);
+	    });
+	    
+	});
+
+	$modalInstance.result.then(function () {
+	    $('.header').show();
+            $('.footer').show(); 
+	}, function () {
+	    $('.header').show();
+            $('.footer').show(); 
+	}, function(){
+	    $('.header').show();
+            $('.footer').show(); 
+	}); 
+    }; 
+    
+    
     // $scope.out = {};
     var callback = message.callback;
     $scope.params = angular.copy(message.params);

@@ -4,8 +4,8 @@ wsaleApp.factory("wsaleGoodService", function(){
     var _firms      = [];
     var _types      = [];
     var _sizeGroups = [];
-    
-    
+    var _colors     = [];
+
     var _shop = -1;
 
     /*
@@ -49,6 +49,13 @@ wsaleApp.factory("wsaleGoodService", function(){
     };
     service.get_size_group = function(){
 	return _sizeGroups;
+    };
+
+    service.set_color = function(colors){
+	_colors = colors;
+    };
+    service.get_color = function(){
+	return _colors;
     };
 
     service.set_shop = function(shop){
@@ -187,6 +194,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
     $scope.types      = wsaleGoodService.get_type();
     $scope.firms      = wsaleGoodService.get_firm();
     $scope.groups     = wsaleGoodService.get_size_group();
+    // $scope.colors     = wsaleGoodService.get_colors();
     
     $scope.full_years = diablo_full_year;
     $scope.sexs       = diablo_sex2object;
@@ -349,17 +357,27 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 
     // color
     $scope.colors = [];
-    wgoodService.list_purchaser_color().then(function(colors){
-	console.log(colors); 
-	angular.forEach(colors, function(color){
-	    if (!in_sys_color($scope.colors, color)){
-		$scope.colors.push(
-		    {type:color.type, tid:color.tid,
-		     colors:[{name:color.name, id:color.id}]})
-	    }
-	}); 
-	console.log($scope.colors);
-    });
+    angular.forEach(wsaleGoodService.get_color(), function(color){
+	if (!in_sys_color($scope.colors, color)){
+	    $scope.colors.push(
+		{type:color.type, tid:color.tid,
+		 colors:[{name:color.name, id:color.id}]})
+	}
+    }); 
+    console.log($scope.colors);
+    
+    // $scope.colors = [];
+    // wgoodService.list_purchaser_color().then(function(colors){
+    // 	console.log(colors); 
+    // 	angular.forEach(colors, function(color){
+    // 	    if (!in_sys_color($scope.colors, color)){
+    // 		$scope.colors.push(
+    // 		    {type:color.type, tid:color.tid,
+    // 		     colors:[{name:color.name, id:color.id}]})
+    // 	    }
+    // 	}); 
+    // 	console.log($scope.colors);
+    // });
 
     
 

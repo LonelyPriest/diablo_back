@@ -306,10 +306,21 @@ ul.page-sidebar-menu > li.active > a {
     }
 }
 
-body, html {
-    overflow-x:hidden;
-}
+/* body, html { */
+/*     overflow-x:hidden; */
+/* } */
 
 .stick-thead {
     background-color:#FFCCCC;
+}
+
+.modal-ios {
+    position: absolute;
+    overflow: visible;
+}
+
+@media only screen and (max-width: 767px) {
+    .hidden-phone{
+	display: none;
+    }
 }

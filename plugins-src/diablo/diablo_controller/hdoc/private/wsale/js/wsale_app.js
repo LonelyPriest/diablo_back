@@ -302,6 +302,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     wsaleGoodService.set_type(angular.copy(filterType));
     wsaleGoodService.set_size_group(angular.copy(filterSizeGroup));
     wsaleGoodService.set_firm(angular.copy(filterFirm));
+    wsaleGoodService.set_color(angular.copy(filterColor));
 
     // base setting
     $scope.trace_price = function(shopId){
@@ -1694,7 +1695,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.toggle_comment = function(){
 	$scope.show.comment = !$scope.show.comment;
     }; 
-    
+
+    $scope.touchstart = function(e){
+	console.log(e);
+    };
     /*
      * pan
      */

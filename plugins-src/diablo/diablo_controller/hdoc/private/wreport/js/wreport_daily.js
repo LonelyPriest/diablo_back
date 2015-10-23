@@ -21,7 +21,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 
 
     var now = $.now();
-    var day = {start_time:now - diablo_day_millisecond, end_time:now}; 
+    var day = {start_time:now - diablo_day_millisecond * 2, end_time:now}; 
     var one_shop_report =
 	{t_amount:0, t_hpay:0, t_spay:0,
 	 t_cash:0, t_card:0, t_wire:0, t_verificate:0};
@@ -101,73 +101,5 @@ wreportApp.controller("wreportDailyCtrl", function(
 		last_shop_page = page;
 	    })
 	}) 
-    };
-
-    var last_employee_page = 0;
-    $scope.do_search_by_employee = function(page){
-	console.log(page);
-
-	if (page === last_employee_page){
-	    return;
-	}
-	
-	diabloFilter.do_filter([], day, function(search){
-	    search.shop = user.shopIds.length === 0 ? undefined : user.shopIds;
-	    
-	    wreportService.daily_report("by_employee", search, page).then(function(result){
-		console.log(result);
-		if (page === 1){
-		    $scope.e_total_items    = result.total 
-		    $scope.e_total_amounts  = result.t_amount;
-		    $scope.e_total_spay     = result.t_spay;
-		    $scope.e_total_hpay     = result.t_hpay;
-		}
-
-		$scope.employee_reports = result.data.map(function(d){
-		    return {t_amount: d.t_amount,
-			    t_spay:   d.t_spay,
-			    t_hpay:   d.t_hpay,
-			    employee: diablo_get_object(d.employee_id, $scope.employees)}
-		});
-
-		diablo_order_page(page, $scope.items_perpage, $scope.employee_reports);
-		
-		last_employee_page = page;
-	    }) 
-	})
-    };
-
-    var last_retailer_page = 0;
-    $scope.do_search_by_retailer = function(page){
-	console.log(page);
-
-	if (page === last_retailer_page){
-	    return;
-	}
-	
-	diabloFilter.do_filter([], day, function(search){
-	    search.shop = user.shopIds.length === 0 ? undefined : user.shopIds;
-	    
-	    wreportService.daily_report("by_retailer", search, page).then(function(result){
-		console.log(result);
-		if (page === 1){
-		    $scope.r_total_items    = result.total 
-		    $scope.r_total_amounts  = result.t_amount;
-		    $scope.r_total_spay     = result.t_spay;
-		    $scope.r_total_hpay     = result.t_hpay;
-		}
-
-		// console.log($scope.retailers);
-		$scope.retailer_reports = result.data.map(function(d){
-		    return {t_amount: d.t_amount,
-			    t_spay:   d.t_spay,
-			    t_hpay:   d.t_hpay,
-			    retailer: diablo_get_object(d.retailer_id, $scope.retailers)}
-		});
-
-		diablo_order_page(page, $scope.items_perpage, $scope.retailer_reports); 
-		last_retailer_page = page;
-	    })
-	})
-    };
+    }; 
 });
