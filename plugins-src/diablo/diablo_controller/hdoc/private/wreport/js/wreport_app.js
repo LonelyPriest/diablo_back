@@ -35,24 +35,22 @@ wreportApp.service("wreportService", function($resource, dateFilter){
 
     var http = $resource("/wreport/:operation/:type",
     			 {operation: '@operation', type: '@type'});
-
-    /*
-     * pagination
-     */
-    this.items_perpage = 5;
-    this.max_page_size = 5;
-    this.default_page = 1;
     
-    this.daily_report = function(type, condition, currentPage){
+    /*
+     * restful
+     */
+    this.daily_report = function(type, condition, itemsPerpage, currentPage){
+	console.log(itemsPerpage, currentPage);
 	return http.save({operation: "daily_wreport", type: type},
 			 {condition: condition,
 			  page:      currentPage,
-			  count:     this.items_perpage}).$promise;
+			  count:     itemsPerpage}).$promise;
     };
     
 });
 
-wreportApp.controller("wreportCtrl", function($scope){});
+wreportApp.controller("wreportCtrl", function($scope){
+});
 
 wreportApp.controller("loginOutCtrl", function($scope, $resource){
     $scope.home = function () {

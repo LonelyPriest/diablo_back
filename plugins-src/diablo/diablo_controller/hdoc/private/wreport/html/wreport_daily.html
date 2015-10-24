@@ -83,60 +83,78 @@
 	    </div>
 	  </tab>
 
-	  <tab heading="按零售商"
-	       select="do_search_by_retailer(current_retailer_page)">
+	  <tab x-ng-controller="dailyByRetailer"
+	       heading="按零售商"
+	       select="do_search(r_pagination.current_page)">
 	    <div class="panel panel-default">
 	      <div class="table-responsive">
 		<table class="table table-bordered 
-			      table-striped table-hover table-condensed table-advanced">
+			      table-striped table-hover
+			      table-condensed table-advanced">
 		  <thead>
 		    <tr>
 		      <th>序号</th>
 		      <th>零售商</th>
-		      <th>数量</th>
-		      <th class="success">应付</th>
+		      <th>欠款</th> 
+		      <!-- <th>数量</th> -->
+		      <!-- <th class="success">应付</th> -->
 		      <th class="danger">实付</th>
-		      <th class="info">核销</th> 
+		      <th>现金</th>
+		      <th>刷卡</th>
+		      <th>汇款</th>
+		      <th class="info">核销</th>
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <tr x-ng-repeat="e in retailer_reports">
-		      <td>{{e.order_id}}</td>
-		      <td>{{e.retailer.name}}</td>
-		      <td>{{e.t_amount}}</td>
-		      <td>{{e.t_spay}}</td>
-		      <td>{{e.t_hpay}}</td>
-		      <td>{{e.t_verify}}</td>
+		    <tr x-ng-repeat="r in r_data">
+		      <td>{{r.order_id}}</td>
+		      <td>{{r.retailer.name}}</td>
+		      <td>{{r.retailer.balance}}</td>
+		      <td>{{r.t_hpay}}</td>
+		      <td>{{r.t_cash}}</td>
+		      <td>{{r.t_card}}</td>
+		      <td>{{r.t_wire}}</td>
+		      <td>{{r.t_verificate}}</td>
+		      
 		    </tr>
 		    <tr>
-		      <td colspan=2></td>
-		      <td>{{r_total_amounts}}</td>
-		      <td class="success">{{r_total_spay}}</td>
-		      <td class="danger">{{r_total_hpay}}</td>
+		      <td colspan=3></td>
+		      <td class="danger">{{r_stastic.total_hpay}}</td>
+		      <td>{{r_stastic.total_cash}}</td>
+		      <td>{{r_stastic.total_card}}</td>
+		      <td>{{r_stastic.total_wire}}</td>
+		      <td>{{r_stastic.total_verificate}}</td>
 		    </tr>
 		  </tbody>
+		  
 		  <tfoot>
 		    <tr> 
-		      <td x-ng-show="e_total_items>items_perpage" colspan={{report_retailer_colspan}}>
+		      <td x-ng-show="r_stastic.total_items>r_pagination.items_perpage" colspan=9>
 			<span class="pagination">
-			  <span>显示第 {{current_retailer_page}} / {{e_num_pages}} 项结果，
-			    共 {{r_total_items}} 项</span>
+			  <span>显示第 {{r_pagination.current_page}} / {{r_pagination.total_page}} 页结果，
+			    共 {{r_stastic.total_items}} 项</span>
 			</span>
-			<pagination
-			   class="pull-right"
-			   total-items="r_total_items"
-			   items-per-page="items_perpage"
-			   num-pages="r_num_pages"
-			   max-size="max_page_size"
-			   boundary-links="true"
-			   previous-text="&lsaquo;" next-text="&rsaquo;"
-			   first-text="&laquo;" last-text="&raquo;"
-			   x-ng-model="current_employee_page"
-			   x-ng-change="do_search_by_retailer(current_retailer_page)">
-			</pagination>
+
+			<!-- <span class="pull-right"> -->
+			  <span class="btn-toolbar pull-right">
+			    <span class="btn-group btn-group-solid">
+			      <button class="btn purple-plum"
+				      x-ng-disabled="r_pagination.current_page===1"
+				      x-ng-click="pre()">
+				<i class="glyphicon glyphicon-menu-left"></i>
+			      </button>
+				<button class="btn red-sunglo"
+					x-ng-disabled="r_pagination.current_page===r_pagination.total_page"
+					x-ng-click="next()">
+				  <i class="glyphicon glyphicon-menu-right"></i>
+				</button>
+			    </span>
+			  </span> 
+			<!-- </span>  -->
 		      </td>
 		    </tr>
 		  </tfoot>
+		  
 		</table> <!--END table-->
 	      </div> <!--END table-responsive-->
 	    </div>
@@ -147,8 +165,69 @@
 	  <!--   </div> -->
 	  <!-- </tab> -->
 	  
-	  <tab heading="按款号">
+	  <tab x-ng-controller="dailyByGood"
+	       heading="按款号"
+	       select="do_search(s_pagination.current_page)">
 	    <div class="panel panel-default">
+	      <div class="table-responsive">
+		<table class="table table-bordered 
+			      table-striped table-hover
+			      table-condensed table-advanced">
+		  <thead>
+		    <tr>
+		      <th>序号</th>
+		      <th>店铺</th>
+		      <th>款号</th>
+		      <th>品牌</th>
+		      <th>数量</th>
+		      <th>库存</th> 
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr x-ng-repeat="s in s_data">
+		      <td>{{s.order_id}}</td>
+		      <td>{{s.shop.name}}</td>
+		      <td>{{s.style_number}}</td>
+		      <td>{{s.brand}}</td>
+		      <td>{{s.t_sell}}</td>
+		      <td>{{s.t_stock}}</td> 
+		    </tr>
+		    <tr x-ng-if="s_stastic.total_items !==0">
+		      <td colspan=4></td>
+		      <td>{{s_stastic.total_sell}}</td> 
+		      <td>{{s_stastic.total_stock}}</td>
+		    </tr>
+		  </tbody>
+
+		  <tfoot>
+		    <tr> 
+		      <td x-ng-show="s_stastic.total_items>s_pagination.items_perpage" colspan=9>
+			<span class="pagination">
+			  <span>显示第 {{s_pagination.current_page}} / {{s_pagination.total_page}} 页结果，
+			    共 {{s_stastic.total_items}} 项</span>
+			</span>
+
+			<!-- <span class="pull-right"> -->
+			  <span class="btn-toolbar pull-right">
+			    <span class="btn-group btn-group-solid">
+			      <button class="btn purple-plum"
+				      x-ng-disabled="s_pagination.current_page===1"
+				      x-ng-click="pre()">
+				<i class="glyphicon glyphicon-menu-left"></i>
+			      </button>
+				<button class="btn red-sunglo"
+					x-ng-disabled="s_pagination.current_page===s_pagination.total_page"
+					x-ng-click="next()">
+				  <i class="glyphicon glyphicon-menu-right"></i>
+				</button>
+			    </span>
+			  </span> 
+			<!-- </span>  -->
+		      </td>
+		    </tr>
+		  </tfoot> 
+		</table> <!--END table-->
+	      </div> <!--END table-responsive-->
 	    </div>
 	  </tab>
 	  

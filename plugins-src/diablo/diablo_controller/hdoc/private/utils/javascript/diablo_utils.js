@@ -432,68 +432,70 @@ diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, mess
 
 diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, message){
     // console.log($scope);
-    console.log($modalInstance);
-    console.log(message);
-
+    // console.log($modalInstance);
+    // console.log(message); 
+    
     var deviceAgent = navigator.userAgent.toLowerCase();
-    if (deviceAgent.match(/iphone|ipod|ipad/i)) {
-	$modalInstance.opened.then(function(){
-	    $('.header').hide();
+    if (deviceAgent.match(/iphone|ipod|ipad/i)
+    	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
+       ) {
+    	$modalInstance.opened.then(function(){
+    	    $('.header').hide();
             $('.footer').hide();
 	    
-	    setTimeout(function () {
-	    	$('.modal')
-		    .addClass('modal-ios')
-	    	    .height($(window).height())
-	    	    .css({'margin-top': $(window).scrollTop() + 'px'});
+    	    setTimeout(function () {
+    	    	$('.modal')
+    		    .addClass('modal-ios')
+    	    	    .height($(window).height())
+    	    	    .css({'margin-top': $(window).scrollTop() + 'px'});
 
 
-		// $('.modal-backdrop').css({
+    		// $('.modal-backdrop').css({
                 //     position: 'absolute', 
                 //     top: 0, 
                 //     left: 0,
                 //     width: '100%',
                 //     height: Math.max(
-		// 	document.body.scrollHeight,
-		// 	document.documentElement.scrollHeight,
+    		// 	document.body.scrollHeight,
+    		// 	document.documentElement.scrollHeight,
 			
-		// 	document.body.offsetHeight,
-		// 	document.documentElement.offsetHeight,
+    		// 	document.body.offsetHeight,
+    		// 	document.documentElement.offsetHeight,
 			
-		// 	document.body.clientHeight,
-		// 	document.documentElement.clientHeight
+    		// 	document.body.clientHeight,
+    		// 	document.documentElement.clientHeight
                 //     ) + 'px'
-		// });
+    		// });
 		
-	    }, 0);
+    	    }, 0);
 
-	    $('input').on('blur', 'input, select, textarea', function(){
-		setTimeout(function() {
-		    // This causes iOS to refresh, fixes problems when virtual keyboard closes
-		    $(window).scrollLeft(0);
+    	    $('input').on('blur', 'input, select, textarea', function(){
+    		setTimeout(function() {
+    		    // This causes iOS to refresh, fixes problems when virtual keyboard closes
+    		    $(window).scrollLeft(0);
 
-		    var $focused = $(':focus');
-		    // Needed in case user clicks directly from one input to another
-		    if(!$focused.is('input')) {
-			// Otherwise reset the scoll to the top of the modal
-			$(window).scrollTop($(window).scrollTop());
-		    }
-		}, 200);
-	    });
+    		    var $focused = $(':focus');
+    		    // Needed in case user clicks directly from one input to another
+    		    if(!$focused.is('input')) {
+    			// Otherwise reset the scoll to the top of the modal
+    			$(window).scrollTop($(window).scrollTop());
+    		    }
+    		}, 0);
+    	    });
 	    
-	});
+    	});
 
-	$modalInstance.result.then(function () {
-	    $('.header').show();
+    	$modalInstance.result.then(function () {
+            $('.header').show();
             $('.footer').show(); 
-	}, function () {
-	    $('.header').show();
+    	}, function () {
+            $('.header').show();
             $('.footer').show(); 
-	}, function(){
-	    $('.header').show();
+    	}, function(){
+            $('.header').show();
             $('.footer').show(); 
-	}); 
-    }; 
+    	});
+    };
     
     
     // $scope.out = {};

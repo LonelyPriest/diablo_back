@@ -30,19 +30,21 @@
 %%%===================================================================
 
 report(total, by_shop, Merchant, Conditions) ->
-    gen_server:call(?SERVER, {total, by_shop, Merchant, Conditions});
-report(total, by_employee, Merchant, Conditions) ->
-    gen_server:call(?SERVER, {total, by_employee, Merchant, Conditions});
+    gen_server:call(?SERVER, {total, by_shop, Merchant, Conditions}); 
 report(total, by_retailer, Merchant, Conditions) ->
-    gen_server:call(?SERVER, {total, by_retailer, Merchant, Conditions}).
+    gen_server:call(?SERVER, {total, by_retailer, Merchant, Conditions});
+report(total, by_good, Merchant, Conditions) ->
+    gen_server:call(?SERVER, {total, by_good, Merchant, Conditions}).
 
 report(by_shop, Merchant, CurrentPage, ItemsPerPage, Conditions) ->
-    gen_server:call(?SERVER, {by_shop, Merchant, CurrentPage, ItemsPerPage, Conditions});
-report(by_employee, Merchant, CurrentPage, ItemsPerPage, Conditions) ->
-    gen_server:call(?SERVER, {by_employee, Merchant, CurrentPage, ItemsPerPage, Conditions});
+    gen_server:call(
+      ?SERVER, {by_shop, Merchant, CurrentPage, ItemsPerPage, Conditions}); 
 report(by_retailer, Merchant, CurrentPage, ItemsPerPage, Conditions) ->
-    gen_server:call(?SERVER, {by_retailer, Merchant, CurrentPage, ItemsPerPage, Conditions}).
-
+    gen_server:call(
+      ?SERVER, {by_retailer, Merchant, CurrentPage, ItemsPerPage, Conditions});
+report(by_good, Merchant, CurrentPage, ItemsPerPage, Conditions) ->
+    gen_server:call(
+      ?SERVER, {by_good, Merchant, CurrentPage, ItemsPerPage, Conditions}).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -55,7 +57,7 @@ init([]) ->
     {ok, #state{}}.
 
 handle_call({total, by_shop, Merchant, Conditions}, _From, State) ->
-    CountSql = "count(distinct shop) as total"
+    CountSql = "count(distinct shop, merchant) as total"
 	", sum(total) as t_amount"
 	", sum(should_pay) as t_spay"
 	", sum(has_pay) as t_hpay"
@@ -67,39 +69,82 @@ handle_call({total, by_shop, Merchant, Conditions}, _From, State) ->
     Reply = ?sql_utils:execute(s_read, Sql),
     {reply, Reply, State};
 
-%% handle_call({total, by_employee, Merchant, Conditions}, _From, State) ->
-%%     CountSql = "count(distinct employ) as total"
-%% 	", sum(total) as t_amount"
-%% 	", sum(should_pay) as t_spay"
-%% 	", sum(has_pay) as t_hpay",
-%%     Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant, Conditions), 
-%%     Reply = ?sql_utils:execute(s_read, Sql),
-%%     {reply, Reply, State};
+handle_call({total, by_retailer, Merchant, Conditions}, _From, State) ->
+    %% 0: has_pay > 0
+    SortConditions = ?w_sale:sort_condition(
+			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]),
+    
+    CountSql = "select count(distinct shop, merchant, retailer) as total"
+    %% ", sum(total) as t_amount"
+    %% ", sum(should_pay) as t_spay"
+	", sum(cash) as t_cash"
+	", sum(card) as t_card"
+	", sum(wire) as t_wire"
+	", sum(verificate) as t_verificate"
+	", sum(has_pay) as t_hpay"
+	" from w_sale a"
+	" where " ++ SortConditions,
+    %% Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant, Conditions), 
+    Reply = ?sql_utils:execute(s_read, CountSql),
+    {reply, Reply, State};
 
-%% handle_call({total, by_retailer, Merchant, Conditions}, _From, State) ->
-%%     CountSql = "count(distinct retailer) as total"
-%% 	", sum(total) as t_amount"
-%% 	", sum(should_pay) as t_spay"
-%% 	", sum(has_pay) as t_hpay",
-%%     Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant, Conditions), 
-%%     Reply = ?sql_utils:execute(s_read, Sql),
-%%     {reply, Reply, State};
 
-handle_call({by_shop, Merchant, CurrentPage, ItemsPerPage, Conditions}, _From, State) ->
+handle_call({total, by_good, Merchant, Conditions}, _From, State) ->
+    {DConditions, SConditions}
+	= ?w_sale:filter_condition(wsale, Conditions, [], []),
+
+    {_, _, CutDCondtions}
+	= ?sql_utils:cut(fields_no_prifix, DConditions),
+    {StartTime, EndTime, CutSConditions}
+    	= ?sql_utils:cut(fields_no_prifix, SConditions),
+
+    CorrectCutDConditions = ?utils:correct_condition(<<"a.">>, CutDCondtions),
+    CorrectCutSConditions = ?utils:correct_condition(<<"b.">>, CutSConditions),
+
+    Sql =
+	"select count(distinct a.style_number, a.brand, b.shop, b.merchant)"
+	" as total"
+	", sum(a.total) as t_sell"
+	%% ", sum(c.amount) as t_stock"
+	" from w_sale_detail a, w_sale b"
+	" where "
+	++ ?sql_utils:condition(proplists_suffix, CorrectCutDConditions)
+	++ "a.rsn=b.rsn"
+
+	++ ?sql_utils:condition(proplists, CorrectCutSConditions)
+    	++ " and b.merchant=" ++ ?to_s(Merchant)
+    	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime),
+	%% ++ " and b.merchant=c.merchant"
+	%% ++ " and b.shop=c.shop"
+	
+	%% ++ " and a.style_number=c.style_number"
+	%% ++ " and a.brand=c.brand",
+    
+    Reply = ?sql_utils:execute(s_read, Sql),
+    {reply, Reply, State};
+
+
+handle_call({by_shop, Merchant, CurrentPage, ItemsPerPage, Conditions},
+	    _From, State) ->
     Sql = ?w_report_sql:sale(
-	     new_by_shop_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage),
+	     new_by_shop_with_pagination,
+	     Merchant, Conditions, CurrentPage, ItemsPerPage),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
-handle_call({by_employee, Merchant, CurrentPage, ItemsPerPage, Conditions}, _From, State) ->
+handle_call({by_retailer, Merchant, CurrentPage, ItemsPerPage, Conditions},
+	    _From, State) ->
     Sql = ?w_report_sql:sale(
-	     new_by_employee_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage),
+	     new_by_retailer_with_pagination,
+	     Merchant, Conditions, CurrentPage, ItemsPerPage),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
-handle_call({by_retailer, Merchant, CurrentPage, ItemsPerPage, Conditions}, _From, State) ->
+handle_call({by_good, Merchant, CurrentPage, ItemsPerPage, Conditions},
+	    _From, State) ->
     Sql = ?w_report_sql:sale(
-	     new_by_retailer_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage),
+	     new_by_good_with_pagination,
+	     Merchant, Conditions, CurrentPage, ItemsPerPage),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
     

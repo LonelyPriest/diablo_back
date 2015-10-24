@@ -24,6 +24,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
+-export([sort_condition/3, filter_condition/4]).
 
 -define(SERVER, ?MODULE). 
 
@@ -1472,6 +1473,7 @@ sort_condition(wsale, Merchant, Conditions) ->
 
     ?sql_utils:condition(proplists_suffix, NewConditions)
 	++ "a.merchant=" ++ ?to_s(Merchant)
+	%% 0: has_pay > 0, 1: has_pay < 0
 	++ case HasPay of
 	       [] -> [];
 	       0 -> " and a.has_pay>0";

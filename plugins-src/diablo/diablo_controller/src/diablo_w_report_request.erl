@@ -72,6 +72,7 @@ action(Session, Req, {"daily_wreport", Type}, Payload) ->
        fun(_Match, Conditions) ->
 	       ?w_report:report(total, ?to_a(Type), Merchant, Conditions)
        end,
+       
        fun(_Match, CurrentPage, ItemsPerPage, Conditions) ->
 	       ?w_report:report(
 		  ?to_a(Type), Merchant, CurrentPage, ItemsPerPage, Conditions)

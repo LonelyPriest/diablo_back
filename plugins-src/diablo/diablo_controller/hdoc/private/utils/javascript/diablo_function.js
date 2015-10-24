@@ -512,7 +512,7 @@ var diablo_base_setting = function(name, shop, base_settings, transfer, defaultV
 };
 
 diablo_set_float = function(v){
-    if (angular.isUndefined(v) || isNaN(v) || (!v && v !== 0)){
+    if (angular.isUndefined(v) || isNaN(v) || (!v && v != 0)){
 	return undefined;
     } else{
 	return parseFloat(v)

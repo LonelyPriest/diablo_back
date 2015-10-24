@@ -58,7 +58,7 @@ var App = function () {
         if (isIE10 || isIE9 || isIE8) {
             jQuery('html').addClass('ie'); // detect IE10 version
         } 
-
+	
         /*
           Virtual keyboards:
           Also, note that if you're using inputs in your modal – iOS has a rendering bug which doesn't 
@@ -77,6 +77,32 @@ var App = function () {
         //         $('.footer').show();
         //     });
         // }
+
+	// navigator.sayswho= (function(){
+	//     var ua= navigator.userAgent, tem;
+	    
+	//     var m = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+	    
+	//     if(/trident/i.test(m[1])){
+	// 	tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+	// 	return 'IE '+(tem[1] || '');
+	//     }
+	    
+	//     if(m[1]=== 'Chrome'){
+	// 	tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+	// 	if(tem!= null) {
+	// 	    return tem.slice(1).join(' ').replace('OPR', 'Opera');
+	// 	}
+	//     }
+	    
+	//     m = m[2] ? [m[1], m[2]]
+	// 	: [navigator.appName, navigator.appVersion, '-?'];
+	//     if((tem= ua.match(/version\/(\d+)/i))!= null){
+	// 	M.splice(1, 1, tem[1]);
+	//     }
+	    
+	//     return m.join(' ');
+	// })();
     }
 
     var handleSidebarState = function () {

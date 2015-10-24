@@ -199,7 +199,7 @@ handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
 			  Content = Head ++ Body ++ Stastic ++ Foot,
 
 			  DBody = 
-			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1037"]) of
+			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1037", "1031"]) of
 				  true -> 
 				      %% no page
 				      %% ?DEBUG("no page with sn ~p", [SN]),

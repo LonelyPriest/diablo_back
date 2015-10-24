@@ -119,7 +119,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 	    localStorageService.set(
 		diablo_key_wsale_trans_detail,
 		{filter:$scope.filters,
-		 time:diablo_get_time($scope.time.start_time),
+		 start_time:diablo_get_time($scope.time.start_time),
 		 page:page, t:now});
 	};
 	

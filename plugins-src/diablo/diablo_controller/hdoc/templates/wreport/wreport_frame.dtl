@@ -18,15 +18,21 @@
 <script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
 
 <!-- employ -->
-<script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script>
+<!-- <script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script> -->
 <script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script>
+
+
 <!-- purchaser-->
 <!-- <script src="/private/purchaser/js/purchaser_app.js"       type="text/javascript"></script> -->
 <!-- retailer -->
-<script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script> 
+<!-- <script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script>  -->
+
 <!-- self -->
-<script src="/private/wreport/js/wreport_app.js"       type="text/javascript"></script>
-<script src="/private/wreport/js/wreport_daily.js"     type="text/javascript"></script> 
+<script src="/private/wreport/js/wreport_app.js" type="text/javascript"></script>
+
+<script src="/private/wreport/js/wreport_comm_service.js" type="text/javascript"></script>
+
+<script src="/private/wreport/js/wreport_daily.js" type="text/javascript"></script> 
 
 
 {% endblock %}
