@@ -131,7 +131,9 @@ execute(read, Sql) ->
     end;
 
 execute(s_read, Sql) ->
-    case ?mysql:fetch(read, Sql) of
+    R = ?mysql:fetch(read, Sql),
+    ?DEBUG("r ~p", [R]),
+    case R of
 	{ok, []} ->
 	    {ok, []};
 	{ok, {Results}} ->

@@ -286,6 +286,7 @@
 		  <span x-ng-show="sequence_pagination"
 			class="pull-right" next-page>
 		    <button class="btn red-sunglo"
+			    x-ng-disabled="current_page===num_pages"
 			    x-ng-click="auto_pagination()">
 		      <i class="glyphicon glyphicon-menu-down"></i>
 		    </button>

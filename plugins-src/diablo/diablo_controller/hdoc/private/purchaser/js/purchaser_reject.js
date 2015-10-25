@@ -16,6 +16,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.employees         = filterEmployee;
     $scope.extra_pay_types   = purchaserService.extra_pay_types;
     $scope.timeout_auto_save = undefined;
+    $scope.round             = diablo_round;
 
     var now = $.now();
 
@@ -83,6 +84,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 
 	$scope.select.left_balance =
 	    $scope.select.surplus + $scope.select.should_pay - e_pay;
+
+	$scope.select.left_balance = $scope.round($scope.select.left_balance);
 	    // $scope.select.surplus + $scope.select.should_pay;
     };
 

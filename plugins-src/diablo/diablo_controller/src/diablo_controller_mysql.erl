@@ -29,17 +29,22 @@
 
 fetch(read, Sql)->
     %% gen_server:call(?MODULE, {fetch_read, ?to_b(SQL)}), 
-    start(read, ?to_b(Sql));
+    %% start(read, ?to_b(Sql));
+    read(conn, Sql);
     
 fetch(write, Sql) ->
     %% gen_server:call(?MODULE, {fetch_write, ?to_b(SQL)});
-    start(write, ?to_b(Sql));
+    %% start(write, ?to_b(Sql));
+    write(conn, Sql);
+
 fetch(insert, Sql) ->
     %% gen_server:call(?MODULE, {fetch_insert, ?to_b(SQL)});
-    start(insert, ?to_b(Sql));
+    %% start(insert, ?to_b(Sql));
+    insert(conn, Sql);
 fetch(transaction, Sqls) when is_list(Sqls)-> 
     %% gen_server:call(?MODULE, {transaction, SQLS}).
-    start(transaction, Sqls).
+    %% start(transaction, Sqls).
+    transaction(conn, Sqls).
 
 
 trans(SQLS) ->
@@ -241,13 +246,14 @@ exec_funs([F|T], _Res)->
     exec_funs(T, F()).
 
 start(Action, Sql) ->
+    ?DEBUG("action ~p~nsql ~p", [Action, Sql]),
     Self = self(),
     spawn(?MODULE, wait, [conn, Self, {Action, Sql}]),
     receive
-	R -> R
+    	{Self, R} -> R
     after 5000 ->
-	    ?WARN("==== Sql timeout ======~n~p", [Sql]),
-	    {error, timeout}
+    	    ?WARN("==== Sql timeout ======~n~p", [Sql]),
+    	    {error, timeout}
     end.
 
 wait(Pool, Parent, {Action, Sql}) ->
@@ -256,16 +262,16 @@ wait(Pool, Parent, {Action, Sql}) ->
 	read ->
 	    R = read(Pool, ?to_b(Sql)),
 	    %% timer:sleep(6000),
-	    Parent ! R;
+	    Parent ! {Parent, R};
 	write ->
 	    R = write(Pool, ?to_b(Sql)),
-	    Parent ! R;
+	    Parent ! {Parent, R};
 	insert ->
 	    R = insert(Pool, ?to_b(Sql)),
-	    Parent ! R;
+	    Parent ! {Parent, R};
 	transaction  when is_list(Sql) ->
 	    R = transaction(Pool, Sql),
-	    Parent ! R 
+	    Parent ! {Parent, R} 
     end.
 
 read(Pool, Sql) ->

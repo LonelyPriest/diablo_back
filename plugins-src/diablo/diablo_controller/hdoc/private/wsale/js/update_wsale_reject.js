@@ -620,7 +620,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	$scope.select.left_balance
 	    = $scope.round($scope.select.surplus - $scope.select.should_pay - e_pay);
 
-	console.log($scope.select);
+	// console.log($scope.select);
 	// $scope.select.left_balance =
 	//     $scope.f_sub($scope.select.surplus, $scope.f_add($scope.select.should_pay, e_pay));
     };

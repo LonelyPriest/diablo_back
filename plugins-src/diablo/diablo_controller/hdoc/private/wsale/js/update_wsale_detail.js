@@ -117,6 +117,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	$scope.select.left_balance =
 	    $scope.select.surplus + $scope.select.should_pay + e_pay
 	    - $scope.select.has_pay - $scope.select.verificate;
+
+	$scope.select.left_balance = $scope.round($scope.select.left_balance);
 	// $scope.select.left_balance = $scope.float_add(
 	//     $scope.select.should_pay,
 	//     $scope.float_sub($scope.select.surplus, $scope.select.has_pay));

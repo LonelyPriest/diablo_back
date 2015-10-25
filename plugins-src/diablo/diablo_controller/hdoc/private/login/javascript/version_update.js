@@ -1,6 +1,6 @@
 var version_update = function(){
     var updates = [
-	{date: "2015-10-23",
+	{date: "2015-10-26",
 	 content:[
 	     "增加日报表功能",
 	     "数据四舍五入计算",

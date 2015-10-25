@@ -23,7 +23,8 @@ wreportApp.controller("wreportDailyCtrl", function(
     $scope.current_shop_page   = 1;
     
     var now = $.now();
-    var day = {start_time:now - diablo_day_millisecond, end_time:now}; 
+    // var day = {start_time:now - diablo_day_millisecond, end_time:now};
+    var day = {start_time:now, end_time:now}; 
     var one_shop_report =
 	{t_amount:0, t_hpay:0, t_spay:0,
 	 t_cash:0, t_card:0, t_wire:0, t_verificate:0};
@@ -139,8 +140,9 @@ wreportApp.controller("dailyByRetailer", function(
 
     var last_page = 0;
     var now = $.now();
-    var day = {start_time:now - diablo_day_millisecond, end_time:now};
+    // var day = {start_time:now - diablo_day_millisecond, end_time:now};
 
+    var day = {start_time:now, end_time:now};
     $scope.pre = function(){
 	$scope.r_pagination.current_page -= 1;
 	$scope.do_search($scope.r_pagination.current_page);
@@ -231,8 +233,9 @@ wreportApp.controller("dailyByGood", function(
 
     var last_page = 0;
     var now = $.now();
-    var day = {start_time:now - diablo_day_millisecond, end_time:now};
-
+    // var day = {start_time:now - diablo_day_millisecond, end_time:now};
+    var day = {start_time:now, end_time:now};
+    
     $scope.pre = function(){
 	$scope.s_pagination.current_page -= 1;
 	$scope.do_search($scope.s_pagination.current_page);

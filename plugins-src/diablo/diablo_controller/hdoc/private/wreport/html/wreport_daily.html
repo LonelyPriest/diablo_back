@@ -117,7 +117,7 @@
 		      <td>{{r.t_verificate}}</td>
 		      
 		    </tr>
-		    <tr>
+		    <tr x-ng-if="r_stastic.total_items!==0">
 		      <td colspan=3></td>
 		      <td class="danger">{{r_stastic.total_hpay}}</td>
 		      <td>{{r_stastic.total_cash}}</td>
@@ -192,7 +192,7 @@
 		      <td>{{s.t_sell}}</td>
 		      <td>{{s.t_stock}}</td> 
 		    </tr>
-		    <tr x-ng-if="s_stastic.total_items !==0">
+		    <tr x-ng-if="s_stastic.total_items!==0">
 		      <td colspan=4></td>
 		      <td>{{s_stastic.total_sell}}</td> 
 		      <td>{{s_stastic.total_stock}}</td>
