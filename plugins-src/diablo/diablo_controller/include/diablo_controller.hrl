@@ -362,6 +362,9 @@
 %% profile
 -define(w_user_profile, diablo_wuser_profile).
 
+%% pool
+-define(wpool, diablo_work_pool_sup).
+
 -define(value(Key, Proplists), diablo_controller_utils:value_from_proplists(Key, Proplists)).
 -define(value(Key, Proplists, Default), proplists:get_value(Key, Proplists, Default)).
 -define(v(K, L), ?value(K, L)).

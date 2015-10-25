@@ -261,15 +261,14 @@
 
 	      </table> <!--END table-->
 
-	      <div>
-	      	<span x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-	      	      <!-- <span class="col-md-4 col-sm-12 col-xs-12"> -->
-	      		<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-	      		  共 {{total_items}} 项</span>
-	      	      <!-- </span> -->
-	      	</span>
-		
-	      	<!-- <span class="col-md-8 col-sm-12 col-xs-12"> -->
+	      <div x-ng-show="total_items>items_perpage">
+	      	<spancolspan={{colspan}}>
+	      	  <!-- <span class="col-md-4 col-sm-12 col-xs-12"> -->
+	      	  <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      	    共 {{total_items}} 项</span>
+	      	  <!-- </span> -->
+		  
+	      	  <!-- <span class="col-md-8 col-sm-12 col-xs-12"> -->
 	      	  <pagination x-ng-show="!sequence_pagination"
 			      class="pagination-lg pull-right"
 	      		      total-items="total_items"
@@ -283,16 +282,14 @@
 	      		      x-ng-change="page_changed()">
 	      	  </pagination>
 
-		
+		  
 		  <span x-ng-show="sequence_pagination"
 			class="pull-right" next-page>
 		    <button class="btn red-sunglo"
 			    x-ng-click="auto_pagination()">
 		      <i class="glyphicon glyphicon-menu-down"></i>
 		    </button>
-		  </span>
-		  
-	      	<!-- </span> -->
+		  </span> 
 	      </div>
 
 	      

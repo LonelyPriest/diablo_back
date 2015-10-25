@@ -14,7 +14,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 -export([sale/3, sale/4]).
 -export([rsn_detail/3]).
 -export([filter/4, filter/6, export/3]).
@@ -34,27 +34,37 @@
 %%% API
 %%%===================================================================
 sale(new, Merchant, Inventories, Props) ->
-    gen_server:call(?SERVER, {new_sale, Merchant, Inventories, Props});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {new_sale, Merchant, Inventories, Props});
 sale(update, Merchant, Inventories, Props) ->
-    gen_server:call(?SERVER, {update_sale, Merchant, Inventories, Props});    
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {update_sale, Merchant, Inventories, Props});    
 %% view the sale history of retailer
 sale(history_retailer, Merchant, Retailer, Goods) ->
-    gen_server:call(?SERVER, {history_retailer, Merchant, Retailer, Goods});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {history_retailer, Merchant, Retailer, Goods});
 sale(reject, Merchant, Inventories, Props) ->
-    gen_server:call(?SERVER, {reject_sale, Merchant, Inventories, Props}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {reject_sale, Merchant, Inventories, Props}).
 
 sale(check, Merchant, RSN) ->
-    gen_server:call(?SERVER, {check_new, Merchant, RSN});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {check_new, Merchant, RSN});
 sale(list_new, Merchant, Condition) ->
-    gen_server:call(?SERVER, {list_new, Merchant, Condition});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {list_new, Merchant, Condition});
 sale(get_new, Merchant, RSN) ->
-    gen_server:call(?SERVER, {get_new, Merchant, RSN});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {get_new, Merchant, RSN});
 sale(last, Merchant, Condition) ->
-    gen_server:call(?SERVER, {last_sale, Merchant, Condition});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {last_sale, Merchant, Condition});
 sale(trans_detail, Merchant, Condition) ->
-    gen_server:call(?SERVER, {trans_detail, Merchant, Condition});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {trans_detail, Merchant, Condition});
 sale(get_rsn, Merchant, Condition) ->
-    gen_server:call(?SERVER, {get_sale_rsn, Merchant, Condition}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {get_sale_rsn, Merchant, Condition}).
 
 
 %% rsn_group(rsn, Merchant) ->
@@ -62,33 +72,40 @@ sale(get_rsn, Merchant, Condition) ->
 %% rsn_group(rsn, Merchant, RSN) ->
 %%     gen_server:call(?SERVER, {rsn_group, Merchant, RSN}).
 rsn_detail(rsn, Merchant, Condition) ->
-    gen_server:call(?SERVER, {rsn_detail, Merchant, Condition}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {rsn_detail, Merchant, Condition}).
 
 
 filter(total_news, 'and', Merchant, Fields) ->
-    gen_server:call(?SERVER, {total_news, Merchant, Fields});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {total_news, Merchant, Fields});
 %% filter(total_rejects, 'and', Merchant, Fields) ->
 %%     gen_server:call(?SERVER, {total_rejects, Merchant, Fields});
 filter(total_rsn_group, 'and', Merchant, Fields) ->
-    gen_server:call(?SERVER, {total_rsn_group, Merchant, Fields}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {total_rsn_group, Merchant, Fields}).
 
 filter(news, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(
-      ?SERVER, {filter_news, Merchant, CurrentPage, ItemsPerPage, Fields});
+      Name, {filter_news, Merchant, CurrentPage, ItemsPerPage, Fields});
 %% filter(rejects, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
 %%     gen_server:call(
 %%       ?SERVER, {filter_rejects, Merchant, CurrentPage, ItemsPerPage, Fields});
 filter(rsn_group, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(
-      ?SERVER, {filter_rsn_group, Merchant, CurrentPage, ItemsPerPage, Fields}).
+      Name, {filter_rsn_group, Merchant, CurrentPage, ItemsPerPage, Fields}).
 
 export(trans, Merchant, Condition) ->
-    gen_server:call(?SERVER, {new_trans_export, Merchant, Condition});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {new_trans_export, Merchant, Condition});
 export(trans_note, Merchant, Condition) ->
-    gen_server:call(?SERVER, {new_trans_note_export, Merchant, Condition}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {new_trans_note_export, Merchant, Condition}).
 
-start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+start_link(Name) ->
+    gen_server:start_link({local, Name}, ?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -846,12 +863,13 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-
 handle_info(_Info, State) ->
+    ?DEBUG("handle_info: info ~p", [_Info]),
     {noreply, State}.
 
 
 terminate(_Reason, _State) ->
+    ?DEBUG("terminate: reason ~p", [_Reason]),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->

@@ -3,7 +3,7 @@
               {id,"diablo_controller"},
               {vsn,"1.0.0"},
               {modules,[diablo_controller,diablo_controller_sup,
-                        diablo_controller_http_server,
+                        diablo_work_pool_sup,diablo_controller_http_server,
                         diablo_controller_http_route,diablo_controller_error,
                         diablo_controller_mysql,diablo_controller_utils,
                         diablo_controller_menu,

@@ -218,18 +218,19 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 	
 	{ok, TypeId} = ?attr:type(new, Merchant, Type), 
 	case ?w_inventory:purchaser_good(
-		new, [{<<"merchant">>, Merchant},
-		      {<<"brand_id">>, BrandId},
-		      {<<"type_id">>, TypeId},
-		      {<<"path">>,
-		       case ImageData of
-			   <<>> -> [];
-			   _ ->
-			   filename:join(
-			     ["image", ?to_s(Merchant),
-			      ?to_s(StyleNumber) ++ "-" ++ ?to_s(BrandId) ++ ".png"])
-		       end
-		      }|Good]) of
+		new, Merchant,
+		[{<<"brand_id">>, BrandId},
+		 {<<"type_id">>, TypeId},
+		 {<<"path">>,
+		  case ImageData of
+		      <<>> -> [];
+		      _ ->
+			  filename:join(
+			    ["image", ?to_s(Merchant),
+			     ?to_s(StyleNumber)
+			     ++ "-" ++ ?to_s(BrandId) ++ ".png"])
+		  end
+		 }|Good]) of
 	    {ok, DBId} -> 
 		?utils:respond(200, Req,
 			       ?succ(add_purchaser_good, DBId),
@@ -287,9 +288,9 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 		end,
 	    
 	    case ?w_inventory:purchaser_good(
-		    update, [{<<"merchant">>, Merchant},
-			     {<<"type_id">>, TypeId},
-			     {<<"path">>, ImagePath}|Good]) of
+		    update, Merchant,
+		    [{<<"type_id">>, TypeId},
+		     {<<"path">>, ImagePath}|Good]) of
 		{ok, StyleNumber} -> 
 		    ?utils:respond(200, Req, ?succ(update_purchaser_good, StyleNumber));
 		{error, Error} ->

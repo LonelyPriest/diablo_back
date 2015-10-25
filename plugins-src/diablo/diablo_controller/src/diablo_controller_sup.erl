@@ -8,6 +8,9 @@
 %%%-------------------------------------------------------------------
 -module(diablo_controller_sup).
 
+-include("../../../../include/knife.hrl").
+-include("diablo_controller.hrl").
+
 -behaviour(supervisor).
 
 %% API
@@ -48,9 +51,9 @@ init([]) ->
     	      {diablo_controller_mysql, start_link, []},
     	      Restart, Shutdown, Type, [diablo_controller_mysql]},
 
-    Member = {diablo_controller_member,
-    	      {diablo_controller_member, start_link, []},
-    	      Restart, Shutdown, Type, [diablo_controller_member]},
+    %% Member = {diablo_controller_member,
+    %% 	      {diablo_controller_member, start_link, []},
+    %% 	      Restart, Shutdown, Type, [diablo_controller_member]},
 
     Employ = {diablo_controller_employ,
     	      {diablo_controller_employ, start_link, []},
@@ -72,17 +75,17 @@ init([]) ->
     	      {diablo_controller_supplier, start_link, []},
     	      Restart, Shutdown, Type, [diablo_controller_supplier]},
 
-    Inventory = {diablo_controller_inventory,
-    	      {diablo_controller_inventory, start_link, []},
-    	      Restart, Shutdown, Type, [diablo_controller_inventory]},
+    %% Inventory = {diablo_controller_inventory,
+    %% 	      {diablo_controller_inventory, start_link, []},
+    %% 	      Restart, Shutdown, Type, [diablo_controller_inventory]},
 
     InventorySN = {diablo_controller_inventory_sn,
 		 {diablo_controller_inventory_sn, start_link, []},
 		 Restart, Shutdown, Type, [diablo_controller_inventory_sn]},
 
-    Sale = {diablo_controller_sale,
-    	      {diablo_controller_sale, start_link, []},
-    	      Restart, Shutdown, Type, [diablo_controller_sale]},
+    %% Sale = {diablo_controller_sale,
+    %% 	      {diablo_controller_sale, start_link, []},
+    %% 	      Restart, Shutdown, Type, [diablo_controller_sale]},
 
     Login = {diablo_controller_login,
 	     {diablo_controller_login, start_link, []},
@@ -101,25 +104,25 @@ init([]) ->
 	       Restart, Shutdown, Type, [diablo_controller_authen]},
 
     %% ablout wholesale 
-    WInventory =
-	{diablo_purchaser,
-	 {diablo_purchaser, start_link, []},
-	 Restart, Shutdown, Type, [diablo_purchaser]},
+    %% WInventory =
+    %% 	{diablo_purchaser,
+    %% 	 {diablo_purchaser, start_link, []},
+    %% 	 Restart, Shutdown, Type, [diablo_purchaser]},
 
     WRetailer =
 	{diablo_w_retailer,
 	 {diablo_w_retailer, start_link, []},
 	 Restart, Shutdown, Type, [diablo_w_retailer]},
 
-    WSale =
-	{diablo_w_sale,
-	 {diablo_w_sale, start_link, []},
-	 Restart, Shutdown, Type, [diablo_w_sale]},
+    %% WSale =
+    %% 	{diablo_w_sale,
+    %% 	 {diablo_w_sale, start_link, []},
+    %% 	 Restart, Shutdown, Type, [diablo_w_sale]},
 
-    WSaleDraft =
-	{diablo_w_sale_draft,
-	 {diablo_w_sale_draft, start_link, []},
-	 Restart, Shutdown, Type, [diablo_w_sale_draft]},
+    %% WSaleDraft =
+    %% 	{diablo_w_sale_draft,
+    %% 	 {diablo_w_sale_draft, start_link, []},
+    %% 	 Restart, Shutdown, Type, [diablo_w_sale_draft]},
 
     WPrint =
 	{diablo_w_print,
@@ -144,9 +147,9 @@ init([]) ->
     
     %% wifi printer
     HttpPrint =
-	{diablo_http_print,
-	 {diablo_http_print, start_link, []},
-	 Restart, Shutdown, Type, [diablo_http_print]},
+    	{diablo_http_print,
+    	 {diablo_http_print, start_link, []},
+    	 Restart, Shutdown, Type, [diablo_http_print]},
 
     %% wreport
     WReport = 
@@ -154,14 +157,48 @@ init([]) ->
 	 {diablo_w_report, start_link, []},
 	 Restart, Shutdown, Type, [diablo_w_report]},
     
-    WholeSale = [WInventory, WRetailer, WSale, WSaleDraft,
-		 WPrint, WBase, WProfile, HttpPrint, WReport],
+    %% WholeSale = [WInventory, WRetailer, WSale, WSaleDraft,
+    %% 		 WPrint, WBase, WProfile, HttpPrint, WReport],
 
-    {ok, {SupFlags, [IConv, Mysql, Member, Employ, Merchant,
-		     Shop, Right, Supplier, Inventory,
-		     InventorySN, Sale, Login, Session,
-		     RightTree, Authen, Attr] ++ WholeSale}}.
+    WholeSale = [WRetailer, WPrint, WBase, WProfile, HttpPrint, WReport],
+
+    WInvSup = ?to_a(?to_s(?w_inventory) ++ "_sup"),
+    WInvPoolSup = {WInvSup,
+		   {diablo_work_pool_sup, start_link, [?w_inventory]},
+		   Restart, Shutdown, supervisor, [WInvSup]},
+
+
+    WSaleSup = ?to_a(?to_s(?w_sale) ++ "_sup"), 
+    WSalePoolSup = {WSaleSup,
+		    {diablo_work_pool_sup, start_link, [?w_sale]},
+		    Restart, Shutdown, supervisor, [WSaleSup]},
+
+    PoolSup = [WInvPoolSup, WSalePoolSup],
+
+    {ok, {SupFlags, [IConv, Mysql, Employ, Merchant,
+    		     Shop, Right, Supplier,
+    		     InventorySN, Login, Session,
+    		     RightTree, Authen, Attr]
+	  ++ WholeSale ++ PoolSup}}.
+
+    %% {ok, {SupFlags, [IConv, Mysql, Employ, Merchant,
+    %% 		     Shop, Right, Supplier,
+    %% 		     InventorySN, Login, Session,
+    %% 		     RightTree, Authen, Attr] ++ WholeSale}}.
+    
+    %% {ok, {SupFlags, [IConv, Mysql, Employ, Merchant,
+    %% 		     Shop, Right, Supplier,
+    %% 		     InventorySN, Login, Session,
+    %% 		     RightTree, Authen, Attr] ++ WholeSale}}.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+%% start_work_pool_sup() ->
+%%     Spec = {
+%%       diablo_merchant_work_sup,
+%%       {diablo_merchant_work_sup, start_link, []},
+%%       permanent, 2000, supervisor, [diablo_merchant_work_sup]
+%%      },
+
+%%     supervisor:start_child(?SERVER, Spec).

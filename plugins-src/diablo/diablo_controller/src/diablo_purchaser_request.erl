@@ -656,7 +656,7 @@ do_write(stock, Do, Count, [H|T]) ->
 
     L = "\r\n"
 	++ ?to_s(Count) ++ ?d
-	++ " " ++ ?to_s(StyleNumber) ++ ?d
+	++ " " ++ string:strip(?to_s(StyleNumber)) ++ ?d
 	++ ?to_s(Brand) ++ ?d
 	++ ?to_s(Type) ++ ?d
     %% ++ ?to_s(Color) ++ ?d

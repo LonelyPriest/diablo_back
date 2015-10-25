@@ -104,6 +104,8 @@ execute(write, Sql, OkReturn) ->
     case ?mysql:fetch(write, Sql) of
 	{ok, _} ->
 	    {ok, OkReturn};
+	{error, timeout} ->
+	    {error, ?err(db_timeout, timeout)};
 	{error, {_, Error}} ->
 	    {error, ?err(db_error, Error)}
     end;
@@ -112,6 +114,8 @@ execute(transaction, Sqls, OkReturn) ->
     case ?mysql:fetch(transaction, Sqls) of
 	{ok, _} ->
 	    {ok, OkReturn};
+	{error, timeout} ->
+	    {error, ?err(db_timeout, timeout)};
 	{error, Error} ->
 	    {error, ?err(db_error, Error)} 
     end.
@@ -120,6 +124,8 @@ execute(read, Sql) ->
     case ?mysql:fetch(read, Sql) of
 	{ok, Results} ->
 	    {ok, ?to_tl(Results)};
+	{error, timeout} ->
+	    {error, ?err(db_timeout, timeout)};
 	{error, {_, Error}} ->
 	    {error, ?err(db_error, Error)}
     end;
@@ -131,6 +137,8 @@ execute(s_read, Sql) ->
 	{ok, {Results}} ->
 	    %% ?DEBUG("s_read sql result ~p", [Results]),
 	    {ok, Results};
+	{error, timeout} ->
+	    {error, ?err(db_timeout, timeout)};
 	{error, {_, Error}} ->
 	    {error, ?err(db_error, Error)}
     end;
@@ -139,7 +147,9 @@ execute(insert, Sql) ->
     case ?mysql:fetch(insert, Sql) of
 	{ok, InsertId} ->
 	    {ok, InsertId};
+	{error, timeout} ->
+	    {error, ?err(db_error, timeout)}; 
 	{error, {_, Error}} ->
 	    {error, ?err(db_error, Error)}
     end.
-
+	    

@@ -16,7 +16,7 @@
 %% API
 -export([start_link/0]).
 
--export([fetch/2, get_connection/0, sql_result/3, row_result/3]).
+-export([fetch/2, get_connection/0, sql_result/3, row_result/3, wait/3]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -27,15 +27,21 @@
 
 -record(state, {conn_pool = undefined}).
 
-fetch(read, SQL)->
-    gen_server:call(?MODULE, {fetch_read, ?to_b(SQL)});
-fetch(write, SQL) ->
-    gen_server:call(?MODULE, {fetch_write, ?to_b(SQL)});
-fetch(insert, SQL) ->
-    gen_server:call(?MODULE, {fetch_insert, ?to_b(SQL)});
-fetch(transaction, SQLS) when is_list(SQLS)->
-    %% ?DEBUG("transaction with sqls ~tp", [SQLS]),
-    gen_server:call(?MODULE, {transaction, SQLS}). 
+fetch(read, Sql)->
+    %% gen_server:call(?MODULE, {fetch_read, ?to_b(SQL)}), 
+    start(read, ?to_b(Sql));
+    
+fetch(write, Sql) ->
+    %% gen_server:call(?MODULE, {fetch_write, ?to_b(SQL)});
+    start(write, ?to_b(Sql));
+fetch(insert, Sql) ->
+    %% gen_server:call(?MODULE, {fetch_insert, ?to_b(SQL)});
+    start(insert, ?to_b(Sql));
+fetch(transaction, Sqls) when is_list(Sqls)-> 
+    %% gen_server:call(?MODULE, {transaction, SQLS}).
+    start(transaction, Sqls).
+
+
 trans(SQLS) ->
     gen_server:call(?MODULE, {test_trans, SQLS}).
 
@@ -233,4 +239,96 @@ exec_funs(_Funs, {error, Error}) ->
     throw({error,Error});
 exec_funs([F|T], _Res)->
     exec_funs(T, F()).
-    
+
+start(Action, Sql) ->
+    Self = self(),
+    spawn(?MODULE, wait, [conn, Self, {Action, Sql}]),
+    receive
+	R -> R
+    after 5000 ->
+	    ?WARN("==== Sql timeout ======~n~p", [Sql]),
+	    {error, timeout}
+    end.
+
+wait(Pool, Parent, {Action, Sql}) ->
+    ?DEBUG("wait with pool ~p, Action ~p", [Pool, Action]),
+    case Action of
+	read ->
+	    R = read(Pool, ?to_b(Sql)),
+	    %% timer:sleep(6000),
+	    Parent ! R;
+	write ->
+	    R = write(Pool, ?to_b(Sql)),
+	    Parent ! R;
+	insert ->
+	    R = insert(Pool, ?to_b(Sql)),
+	    Parent ! R;
+	transaction  when is_list(Sql) ->
+	    R = transaction(Pool, Sql),
+	    Parent ! R 
+    end.
+
+read(Pool, Sql) ->
+    Result =
+        case mysql:fetch(Pool, Sql) of
+            {data, #mysql_result{rows=[]}} ->
+		{ok, []};
+
+	    {data, #mysql_result{fieldinfo=FieldInfo, rows=Rows}} ->
+                Fields = [Field || {_, Field, _, _} <- FieldInfo],
+                %% ?DEBUG("fields ~p~nRows ~p", [Fields, Rows]),
+                {ok, sql_result(Fields, Rows, [])};
+
+            {error, #mysql_result{error=Error, errcode=ErrCode}} ->
+                {error, {ErrCode, Error}}
+        end,
+    Result.
+
+write(Pool, Sql) ->
+    Result = 
+	case mysql:fetch(Pool, Sql) of
+	    {updated, #mysql_result{affectedrows=AffectedRows}} ->
+		{ok, {write, AffectedRows}};
+	    {error, #mysql_result{error=Error, errcode=ErrCode}} ->
+		{error, {ErrCode, Error}}
+	end,
+    ?DEBUG("write with sql=~ts~nresult ~p", [Sql, Result]),
+
+    Result.
+
+insert(Pool, Sql) ->
+    Result = 
+	case mysql:fetch(Pool, Sql) of
+	    {updated, #mysql_result{insertid=InsertId}} ->
+		?DEBUG("insert id=~p", [InsertId]),
+		{ok, InsertId};
+	    {error, #mysql_result{error=Error, errcode=ErrCode}} ->
+		{error, {ErrCode, Error}}
+	end,
+    ?DEBUG("fetch_write with sql=~ts~nresult ~p", [Sql, Result]),
+
+    Result.
+
+
+transaction(Pool, Sqls) ->
+    Funs = 
+    	lists:foldr(
+    	  fun(Sql, Acc) ->
+    		  [fun() -> mysql:fetch(?to_b(Sql)) end|Acc]
+    	  end, [], Sqls),
+
+
+    %% TransFun = fun() -> [F() || F <- Funs] end,
+    TransFun = fun() -> exec_funs(Funs, []) end,
+
+    Reply = 
+	case mysql:transaction(Pool, TransFun) of
+	    {atomic, Result} ->
+		{ok, Result};
+	    {aborted, {{error, Error}, RollbackResult}} ->
+		?DEBUG("transaction failed: ~nerror ~p, rollback result ~p",
+		       [Error, RollbackResult]),
+		{error, Error#mysql_result.error}
+	end,
+    ?DEBUG("transaction Reply ~p", [Reply]),
+    Reply.

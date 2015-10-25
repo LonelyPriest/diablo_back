@@ -365,6 +365,8 @@ error(base_invalid_update_passwd, User) ->
 %% DB
 error(db_error, EInfo) ->
     {9001, "DB error: " ++ ?to_s(EInfo)};
+error(db_timeout, _) ->
+    {9001, "DB timeout."}; 
 %% not enought right
 error(not_enought_right, Action) ->
     {9901, "not enougth right of action " ++ ?to_s(Action)};

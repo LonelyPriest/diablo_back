@@ -132,7 +132,7 @@ dispatch(Req, DocRoot) ->
 			Req:not_found()
 		end 
 	end
-    catch 
+    catch
         Type:What ->
 	    ?DEBUG("request fialed: ~p:~p", [Type, What]),
             Report = ["web request failed",
