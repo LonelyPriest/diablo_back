@@ -64,8 +64,8 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default"> 
-	    
+	  <div class="panel panel-default table-panel"> 
+
 	    <div class="table-responsive"> 
 	      <table id="t_wnew"
 		     class="table table-bordered
@@ -106,35 +106,20 @@
 		    <th class="success">应付</th>
 		    <th>实付</th>
 		    <th x-ng-click="toggle_comment()" class="danger">
-		    <span x-ng-if="show.comment">
-		      <i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
+		      <span x-ng-if="show.comment">
+			<i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
 		      <span x-ng-if="!show.comment">
 			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		    </th> 
 		    <th x-ng-if="show.comment">备注</th>
-		    <th>开单日期</th>
-		    <!-- <th x-ng-click="toggle_action()"> -->
-		    <!--   <span x-ng-if="show.action"> -->
-		    <!-- 	<i class="glyphicon glyphicon-backward fg-red"></i>打印 -->
-		    <!--   </span> -->
-		    <!--   <span x-ng-if="!show.action"> -->
-		    <!-- 	打印<i class="glyphicon glyphicon-forward fg-red"></i> -->
-		    <!--   </span>  -->
-		    <!-- </th> -->
+		    <th>开单日期</th> 
 		    <th>打印</th>
-		    <th x-ng-if="show.action">操作</th>
-		    <!-- <th x-ng-if="show.action" x-ng-click="toggle_check()"> -->
-		    <!--   <span x-ng-if="show.check"> -->
-		    <!-- 	<i class="glyphicon glyphicon-backward fg-red"></i>操作</span> -->
-		    <!--   <span x-ng-if="!show.check"> -->
-		    <!-- 	操作<i class="glyphicon glyphicon-forward fg-red"></i></span> -->
-		    
-		    <!-- </th> --> 
+		    <th x-ng-if="show.action">操作</th> 
 		  </tr>
 		</thead>
 		
 		<tbody>
-		  <tr x-ng-repeat="r in records">
+		  <tr x-ng-repeat="r in records track by r.id">
 		    <td>{{r.order_id}}</td>
 		    <td>{{r.rsn}}</td>
 		    <td x-ng-if="show.base" x-ng-switch on="r.type">
@@ -196,10 +181,10 @@
 		    </td>
 		    
 		    <td x-ng-if="show.action">
-		      <!-- <div class="btn-group btn-group-solid"> -->
 		      <button class="btn diablo-button btn-primary"
 		    	      x-ng-click="rsn_detail(r)">
-			明细<i class="glyphicon glyphicon-map-marker"></i></button>
+			明细<i class="glyphicon glyphicon-map-marker"></i>
+		      </button>
 
 		      <button class="btn diablo-button yellow-crusta"
 			      x-ng-disabled="r.state===1"
@@ -237,67 +222,46 @@
 		  </tr>
 		</tbody>
 
-		<!-- <tfoot> -->
-		<!--   <tr> -->
-		<!--     <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		<!--       <span class="pagination"> -->
-		<!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		<!-- 	  共 {{total_items}} 项</span> -->
-		<!--       </span> -->
-		<!--       <pagination class="pagination-lg pull-right" -->
-		<!-- 		  total-items="total_items" -->
-		<!-- 		  items-per-page="items_perpage" -->
-		<!-- 		  num-pages="num_pages" -->
-		<!-- 		  max-size="max_page_size" -->
-		<!-- 		  boundary-links="true" -->
-		<!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		<!-- 		  first-text="&laquo;" last-text="&raquo;" -->
-		<!-- 		  x-ng-model="current_page" -->
-		<!-- 		  x-ng-change="page_changed()"> -->
-		<!--       </pagination> -->
-		<!--     </td> -->
-		<!--   </tr> -->
-		<!-- </tfoot> -->
-
+		<tfoot> 
+		</tfoot> 
 	      </table> <!--END table-->
-
-	      <div x-ng-show="total_items>items_perpage">
-	      	<spancolspan={{colspan}}>
-	      	  <!-- <span class="col-md-4 col-sm-12 col-xs-12"> -->
-	      	  <span>显示第 {{current_page}} / {{num_pages}} 项结果，
-	      	    共 {{total_items}} 项</span>
-	      	  <!-- </span> -->
-		  
-	      	  <!-- <span class="col-md-8 col-sm-12 col-xs-12"> -->
-	      	  <pagination x-ng-show="!sequence_pagination"
-			      class="pagination-lg pull-right"
-	      		      total-items="total_items"
-	      		      items-per-page="items_perpage"
-	      		      num-pages="num_pages"
-	      		      max-size="max_page_size"
-	      		      boundary-links="true"
-	      		      previous-text="&lsaquo;" next-text="&rsaquo;"
-	      		      first-text="&laquo;" last-text="&raquo;"
-	      		      x-ng-model="current_page"
-	      		      x-ng-change="page_changed()">
-	      	  </pagination>
-
-		  
-		  <span x-ng-show="sequence_pagination"
-			class="pull-right" next-page>
-		    <button class="btn red-sunglo"
-			    x-ng-disabled="current_page===num_pages"
-			    x-ng-click="auto_pagination()">
-		      <i class="glyphicon glyphicon-menu-down"></i>
-		    </button>
-		  </span> 
-	      </div>
-
-	      
 	      
 	    </div> <!--END table-responsive-->
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    <div>
+	      <sapn>
+		<span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		  共 {{total_items}} 项</span>
+		
+		<pagination x-ng-show="!sequence_pagination"
+			    class="table-pagination pagination-lg pull-right "
+	      		    total-items="total_items"
+	      		    items-per-page="items_perpage"
+	      		    num-pages="num_pages"
+	      		    max-size="max_page_size"
+	      		    boundary-links="true"
+	      		    previous-text="&lsaquo;" next-text="&rsaquo;"
+	      		    first-text="&laquo;" last-text="&raquo;"
+	      		    x-ng-model="current_page"
+	      		    x-ng-change="page_changed()">
+		</pagination>
+
+		<span x-ng-if="sequence_pagination"
+		      class="pull-right">
+		  <button class="btn red-sunglo btn-next-page"
+			  x-ng-disabled="current_page===num_pages"
+			  x-ng-click="auto_pagination()">
+		    <i class="glyphicon glyphicon-menu-down"></i>
+		  </button>
+		</span>
+	    </div>
+	  </div>
+	</div>
+	
       </div> <!--END table container-->
       
     </div>

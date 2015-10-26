@@ -2,7 +2,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope, $location, $routeParams, $q, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
     filterBrand, filterFirm, filterType, filterColor){
-    console.log(filterBrand);
+    // console.log(filterBrand);
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
     $scope.full_years = diablo_full_year;
@@ -47,8 +47,8 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     var dialog = diabloUtilsService;
     var promise = diabloPromise.promise;
 
-    console.log($scope.types);
-    console.log($scope.firms);
+    // console.log($scope.types);
+    // console.log($scope.firms);
     wgoodService.get_purchaser_good_by_id($routeParams.id).then(function(good){
 	console.log(good); 
 	// reset
@@ -98,8 +98,8 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	    $scope.good.color_desc = "均色";
 	} 
 
-	console.log($scope.selectColors);
-	console.log($scope.good);
+	// console.log($scope.selectColors);
+	// console.log($scope.good);
     });
 
     $scope.delete_image = function(){
@@ -174,7 +174,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     }); 
 
     wgoodService.list_color_type().then(function(data){
-	console.log(data);
+	// console.log(data);
 	$scope.colorTypes = data;
     }); 
     

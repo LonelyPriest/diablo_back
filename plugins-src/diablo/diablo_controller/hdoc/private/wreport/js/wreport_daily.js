@@ -140,7 +140,7 @@ wreportApp.controller("dailyByRetailer", function(
 
     var last_page = 0;
     var now = $.now();
-    // var day = {start_time:now - diablo_day_millisecond, end_time:now};
+    // var day = {start_time:now - 30 * diablo_day_millisecond, end_time:now};
 
     var day = {start_time:now, end_time:now};
     $scope.pre = function(){
@@ -178,18 +178,26 @@ wreportApp.controller("dailyByRetailer", function(
 		    $scope.r_stastic.total_wire  = result.t_wire;
 		    $scope.r_stastic.total_verificate = result.t_verificate;
 		    $scope.r_stastic.total_hpay = $scope.round(result.t_hpay);
+		    
+		    $scope.r_data = [];
 		}
 
-		$scope.r_data = angular.copy(result.data);
+		// $scope.r_data = angular.copy(result.data);
 
-		angular.forEach($scope.r_data, function(r){
+		angular.forEach(result.data, function(r){
 		    r.shop = diablo_get_object(r.shop_id, $scope.sortShops);
 		    r.retailer = diablo_get_object(
 			r.retailer_id, $scope.retailers);
 		});
 
-		diablo_order_page(
-		    page, $scope.r_pagination.items_perpage, $scope.r_data);
+		diablo_order(
+		    result.data,
+		    (page - 1) * $scope.r_pagination.items_perpage + 1);
+
+		$scope.r_data = $scope.r_data.concat(result.data);
+		
+		// diablo_order_page(
+		//     page, $scope.r_pagination.items_perpage, $scope.r_data);
 		
 		// console.log($scope.r_data);
 		$scope.r_pagination.last_page = page;
@@ -233,7 +241,7 @@ wreportApp.controller("dailyByGood", function(
 
     var last_page = 0;
     var now = $.now();
-    // var day = {start_time:now - diablo_day_millisecond, end_time:now};
+    // var day = {start_time:now - 30*diablo_day_millisecond, end_time:now};
     var day = {start_time:now, end_time:now};
     
     $scope.pre = function(){
@@ -258,29 +266,34 @@ wreportApp.controller("dailyByGood", function(
 		"by_good", search, $scope.s_pagination.items_perpage, page
 	    ).then(function(result){
 		console.log(result); 
-		// var report_data = angular.copy(result.data);
-
+		// var report_data = angular.copy(result.data); 
 		if (page === 1){
-		    
 		    $scope.s_pagination.total_page =
 			Math.ceil(
 			    result.total / $scope.s_pagination.items_perpage);
 
 		    $scope.s_stastic.total_items = result.total;
 		    $scope.s_stastic.total_sell  = result.t_sell;
-		    $scope.s_stastic.total_stock = result.t_stock; 
+		    $scope.s_stastic.total_stock = result.t_stock;
+		    $scope.s_data = [];
 		}
 
-		$scope.s_data = angular.copy(result.data);
+		// $scope.s_data = angular.copy(result.data);
 
-		angular.forEach($scope.s_data, function(s){
-		    s.shop = diablo_get_object(s.shop_id, $scope.sortShops); 
-		});
+		// angular.forEach($scope.result.data, function(s){
+		//     s.shop = diablo_get_object(s.shop_id, $scope.sortShops); 
+		// });
 
-		diablo_order_page(
-		    page, $scope.s_pagination.items_perpage, $scope.s_data);
+		// diablo_order_page(
+		//     page, $scope.s_pagination.items_perpage, $scope.s_data);
 		
-		console.log($scope.s_data);
+		// console.log($scope.s_data);
+		diablo_order(
+		    result.data,
+		    (page - 1) * $scope.s_pagination.items_perpage + 1);
+
+		$scope.s_data = $scope.s_data.concat(result.data);
+		
 		$scope.s_pagination.last_page = page;
 		
 	    })

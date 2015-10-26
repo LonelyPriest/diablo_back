@@ -917,6 +917,8 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     $scope.toggle_price = function(){
 	$scope.hidden.p3_5 = !$scope.hidden.p3_5;
     };
+
+    // console.log($scope.hidden);
     
     /*
      * filter
@@ -933,16 +935,15 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var now = $.now();
-    $scope.qtime_start = function(shopId){
-	return diablo_base_setting(
-	    "qtime_start", shopId, base, diablo_set_date, diabloFilter.default_start_time(now));
-    }();
+    $scope.qtime_start = diablo_base_setting(
+	"qtime_start", -1, base, diablo_set_date,
+	diabloFilter.default_start_time(now));
     
     $scope.time   = diabloFilter.default_time($scope.qtime_start);
     
     // pagination
     $scope.colspan = 15;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
     $scope.default_page = 1;
 

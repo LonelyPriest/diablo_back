@@ -47,7 +47,7 @@ purchaser_good(new, Merchant, Attrs) ->
     gen_server:call(Name, {new_good, Merchant, Attrs}); 
 purchaser_good(update, Merchant, Attrs) ->
     Name = ?wpool:get(?MODULE, Merchant), 
-    gen_server:call(Name, {update_good, Attrs});
+    gen_server:call(Name, {update_good, Merchant, Attrs});
 
 purchaser_good(lookup, Merchant, GoodId) ->
     Name = ?wpool:get(?MODULE, Merchant), 
@@ -396,7 +396,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		    end,
 		{reply, Reply, State}; 
 	    _Any -> 
-		{reply, {error, ?err(purchaser_good_exist, StyleNumber)}, State}
+		{reply, {error, ?err(purchaser_good_exist, GoodId)}, State}
 	end
     catch
 	_:{badmatch, {error, {_ECode, Err}}} ->

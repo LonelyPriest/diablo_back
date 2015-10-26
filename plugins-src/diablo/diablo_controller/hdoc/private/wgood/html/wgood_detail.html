@@ -56,11 +56,12 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
@@ -71,7 +72,7 @@
 		    <!-- <th class="text-center">性别</th> -->
 		    <!-- <th class="text-center">季节</th> -->
 		    <th>年度</th>
-		    <th x-ng-if="show_orgprice">进货价</th>
+		    <th x-ng-if="hidden.org_price">进货价</th>
 		    <th>吊牌价</th>
 		    <th>
 		      <span x-ng-click="toggle_price()">
@@ -100,7 +101,7 @@
 		    <!-- <td>{{g.sex}}</td>  -->
 		    <!-- <td>{{g.season}}</td> -->
 		    <td>{{g.year}}</td> 
-		    <td x-ng-if="show_orgprice">{{g.org_price}}</td>
+		    <td x-ng-if="hidden.org_price">{{g.org_price}}</td>
 		    <td>{{g.tag_price}}</td>
 		    <td>{{g.pkg_price}}</td>
 		    <td x-ng-if="!hidden.p3_5">{{g.price3}}</td>
@@ -136,32 +137,56 @@
 		</tbody>
 
 		<tfoot>
-		  <tr> 
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-			  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination
-			 class="pagination-lg pull-right"
-			 total-items="total_items"
-			 items-per-page="items_perpage"
-			 num-pages="num_pages"
-			 max-size="max_page_size"
-			 boundary-links="true"
-			 previous-text="&lsaquo;" next-text="&rsaquo;"
-			 first-text="&laquo;" last-text="&raquo;"
-			 x-ng-model="current_page"
-			 x-ng-init="current_page=default_page"
-			 x-ng-change="page_changed(current_page)"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr>  -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination -->
+		  <!-- 	 class="pagination-lg pull-right" -->
+		  <!-- 	 total-items="total_items" -->
+		  <!-- 	 items-per-page="items_perpage" -->
+		  <!-- 	 num-pages="num_pages" -->
+		  <!-- 	 max-size="max_page_size" -->
+		  <!-- 	 boundary-links="true" -->
+		  <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 	 x-ng-model="current_page" -->
+		  <!-- 	 x-ng-init="current_page=default_page" -->
+		  <!-- 	 x-ng-change="page_changed(current_page)"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
 	    </div> <!--END table responsive--> 
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      共 {{total_items}} 项
+	    </span>
+	    
+	    <pagination
+		 class="pagination-lg table-pagination pull-right"
+		 total-items="total_items"
+		 items-per-page="items_perpage"
+		 num-pages="num_pages"
+		 max-size="max_page_size"
+		 boundary-links="true"
+		 previous-text="&lsaquo;" next-text="&rsaquo;"
+		 first-text="&laquo;" last-text="&raquo;"
+		 x-ng-model="current_page"
+		 x-ng-init="current_page=default_page"
+		 x-ng-change="page_changed(current_page)">
+	    </pagination>
+	    
+	  </div>
+	</div>
+		  
       </div> <!--END table container-->
       
     </div>

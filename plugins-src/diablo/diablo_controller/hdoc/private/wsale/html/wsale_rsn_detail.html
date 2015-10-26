@@ -60,7 +60,7 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
@@ -143,31 +143,73 @@
 		</tbody>
 
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-		  	<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-		  	  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination class="pagination-lg pull-right"
-		  		  total-items="total_items"
-		  		  items-per-page="items_perpage"
-		  		  num-pages="num_pages"
-		  		  max-size="max_page_size"
-		  		  boundary-links="true"
-		  		  previous-text="&lsaquo;" next-text="&rsaquo;"
-		  		  first-text="&laquo;" last-text="&raquo;"
-		  		  x-ng-model="current_page"
-		  		  x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination x-ng-if="!setting.se_pagination" -->
+		  <!-- 		  class="pagination-lg pull-right" -->
+		  <!-- 		  total-items="total_items" -->
+		  <!-- 		  items-per-page="items_perpage" -->
+		  <!-- 		  num-pages="num_pages" -->
+		  <!-- 		  max-size="max_page_size" -->
+		  <!-- 		  boundary-links="true" -->
+		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 		  x-ng-model="current_page" -->
+		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
+
+		  <!--     <span x-ng-if="setting.se_pagination" -->
+		  <!-- 	    class="pull-right"> -->
+		  <!-- 	<button class="btn red-sunglo btn-next-page" -->
+		  <!-- 		x-ng-disabled="current_page===num_pages" -->
+		  <!-- 		x-ng-click="auto_pagination()"> -->
+		  <!-- 	  <i class="glyphicon glyphicon-menu-down"></i> -->
+		  <!-- 	</button> -->
+		  <!--     </span> -->
+		      
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
-	      </table> <!--END supplier table-->
-	    </div> <!--END table responsive-->
-	    
+	      </table> <!--END table--> 
+	    </div> <!--END table responsive--> 
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      共 {{total_items}} 项
+	    </span>
+	      
+	    <pagination x-ng-show="!setting.se_pagination"
+			  class="pagination-lg table-pagination pull-right"
+		  	  total-items="total_items"
+		  	  items-per-page="items_perpage"
+		  	  num-pages="num_pages"
+		  	  max-size="max_page_size"
+		  	  boundary-links="true"
+		  	  previous-text="&lsaquo;" next-text="&rsaquo;"
+		  	  first-text="&laquo;" last-text="&raquo;"
+		  	  x-ng-model="current_page"
+		  	  x-ng-change="page_changed()">
+	    </pagination>
+	      
+	    <span x-ng-if="setting.se_pagination"
+		  class="pull-right">
+	      <button class="btn red-sunglo btn-next-page"
+		      x-ng-disabled="current_page===num_pages"
+		      x-ng-click="auto_pagination()">
+		<i class="glyphicon glyphicon-menu-down"></i>
+	      </button>
+	    </span>
+	      
+	  </div>
+	</div>
+	
       </div> <!--END table container-->
       
     </div>

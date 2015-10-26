@@ -346,11 +346,11 @@ baseApp.controller("printOptionCtrl", function(
 		console.log(result)
 		if (result.ecode === 0){
 		    dialog.response_with_callback(
-			true, "新增打印选项", "打印选项 " + s.name.cname + " 新增成功！！",
+			true, "新增系统选项", "系统选项 " + s.name.cname + " 新增成功！！",
 			$scope, function(){$scope.refresh($scope.select.shop)});
 		} else {
 		    dialog.response(
-			false, "新增打印选项", "新增打印选项失败："
+			false, "新增系统选项", "新增系统选项失败："
 			    + baseService.error[result.ecode]); 
 		}
 	    })
@@ -389,11 +389,11 @@ baseApp.controller("printOptionCtrl", function(
 		console.log(state);
 		if (state.ecode == 0){
 		    dialog.response_with_callback(
-			true, "打印选项编辑", "打印选项 " + s.cname + " 编辑成功！！",
+			true, "系统选项编辑", "系统选项 " + s.cname + " 编辑成功！！",
 			$scope, function(){$scope.refresh($scope.select.shop)});
 		} else{
 		    dialog.response(
-			false, "打印选项编辑", "打印选项 " + s.cname + " 编辑失败："
+			false, "系统选项编辑", "系统选项 " + s.cname + " 编辑失败："
 			    + baseService.error[state.ecode]); 
 		}
 	    })
@@ -417,7 +417,8 @@ baseApp.controller("printOptionCtrl", function(
 	    || s.ename === 'reject_negative'
 	    || s.ename === 'check_sale'
 	    || s.ename === 'show_discount'
-	    || s.ename === 'se_pagination'){
+	    || s.ename === 'se_pagination'
+	    || s.ename === 'stock_alarm'){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};
 	if (s.ename === 'qtime_length'){

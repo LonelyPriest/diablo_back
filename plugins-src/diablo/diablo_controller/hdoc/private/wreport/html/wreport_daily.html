@@ -86,7 +86,7 @@
 	  <tab x-ng-controller="dailyByRetailer"
 	       heading="按零售商"
 	       select="do_search(r_pagination.current_page)">
-	    <div class="panel panel-default">
+	    <div class="panel panel-default table-panel">
 	      <div class="table-responsive">
 		<table class="table table-bordered 
 			      table-striped table-hover
@@ -128,36 +128,63 @@
 		  </tbody>
 		  
 		  <tfoot>
-		    <tr> 
-		      <td x-ng-show="r_stastic.total_items>r_pagination.items_perpage" colspan=9>
-			<span class="pagination">
-			  <span>显示第 {{r_pagination.current_page}} / {{r_pagination.total_page}} 页结果，
-			    共 {{r_stastic.total_items}} 项</span>
-			</span>
+		    <!-- <tr>  -->
+		    <!--   <td x-ng-show="r_stastic.total_items>r_pagination.items_perpage" colspan=9> -->
+		    <!-- 	<span class="pagination"> -->
+		    <!-- 	  <span>显示第 {{r_pagination.current_page}} / {{r_pagination.total_page}} 页结果， -->
+		    <!-- 	    共 {{r_stastic.total_items}} 项</span> -->
+		    <!-- 	</span> -->
 
-			<!-- <span class="pull-right"> -->
-			  <span class="btn-toolbar pull-right">
-			    <span class="btn-group btn-group-solid">
-			      <button class="btn purple-plum"
-				      x-ng-disabled="r_pagination.current_page===1"
-				      x-ng-click="pre()">
-				<i class="glyphicon glyphicon-menu-left"></i>
-			      </button>
-				<button class="btn red-sunglo"
-					x-ng-disabled="r_pagination.current_page===r_pagination.total_page"
-					x-ng-click="next()">
-				  <i class="glyphicon glyphicon-menu-right"></i>
-				</button>
-			    </span>
-			  </span> 
-			<!-- </span>  -->
-		      </td>
-		    </tr>
+		    <!-- 	<\!-- <span class="pull-right"> -\-> -->
+		    <!-- 	  <span class="btn-toolbar pull-right"> -->
+		    <!-- 	    <span class="btn-group btn-group-solid"> -->
+		    <!-- 	      <button class="btn purple-plum" -->
+		    <!-- 		      x-ng-disabled="r_pagination.current_page===1" -->
+		    <!-- 		      x-ng-click="pre()"> -->
+		    <!-- 		<i class="glyphicon glyphicon-menu-left"></i> -->
+		    <!-- 	      </button> -->
+		    <!-- 		<button class="btn red-sunglo" -->
+		    <!-- 			x-ng-disabled="r_pagination.current_page===r_pagination.total_page" -->
+		    <!-- 			x-ng-click="next()"> -->
+		    <!-- 		  <i class="glyphicon glyphicon-menu-right"></i> -->
+		    <!-- 		</button> -->
+		    <!-- 	    </span> -->
+		    <!-- 	  </span>  -->
+		    <!-- 	<\!-- </span>  -\-> -->
+		    <!--   </td> -->
+		    <!-- </tr> -->
 		  </tfoot>
 		  
 		</table> <!--END table-->
 	      </div> <!--END table-responsive-->
 	    </div>
+
+	    <div x-ng-show="r_stastic.total_items>r_pagination.items_perpage"
+		 class="row">
+	      <div class="col-md-12, col-sm-12, col-xs-12"> 
+	    
+		<span>显示第 {{r_pagination.current_page}} / {{r_pagination.total_page}} 页结果， 共 {{r_stastic.total_items}} 项
+		</span>
+
+		<span class="pull-right">
+		  <span class="btn-group btn-group-solid">
+		    <!-- <button class="btn purple-plum btn-left-page" -->
+		    <!-- 	    x-ng-disabled="r_pagination.current_page===1" -->
+		    <!-- 	    x-ng-click="pre()"> -->
+		    <!--   <i class="glyphicon glyphicon-menu-left"></i> -->
+		    <!-- </button> -->
+		    <button class="btn red-sunglo btn-next-page"
+		    	    x-ng-disabled="r_pagination.current_page
+					   ===r_pagination.total_page"
+		    	    x-ng-click="next()">
+		      <i class="glyphicon glyphicon-menu-down"></i>
+		    </button>
+		  </span>
+		</span>
+	
+	      </div>
+	    </div>
+		    
 	  </tab>
 
 	  <!-- <tab heading="按厂商"> -->
@@ -168,7 +195,7 @@
 	  <tab x-ng-controller="dailyByGood"
 	       heading="按款号"
 	       select="do_search(s_pagination.current_page)">
-	    <div class="panel panel-default">
+	    <div class="panel panel-default table-panel">
 	      <div class="table-responsive">
 		<table class="table table-bordered 
 			      table-striped table-hover
@@ -200,34 +227,60 @@
 		  </tbody>
 
 		  <tfoot>
-		    <tr> 
-		      <td x-ng-show="s_stastic.total_items>s_pagination.items_perpage" colspan=9>
-			<span class="pagination">
-			  <span>显示第 {{s_pagination.current_page}} / {{s_pagination.total_page}} 页结果，
-			    共 {{s_stastic.total_items}} 项</span>
-			</span>
+		    <!-- <tr>  -->
+		    <!--   <td x-ng-show="s_stastic.total_items>s_pagination.items_perpage" colspan=9> -->
+		    <!-- 	<span class="pagination"> -->
+		    <!-- 	  <span>显示第 {{s_pagination.current_page}} / {{s_pagination.total_page}} 页结果， -->
+		    <!-- 	    共 {{s_stastic.total_items}} 项</span> -->
+		    <!-- 	</span> -->
 
-			<!-- <span class="pull-right"> -->
-			  <span class="btn-toolbar pull-right">
-			    <span class="btn-group btn-group-solid">
-			      <button class="btn purple-plum"
-				      x-ng-disabled="s_pagination.current_page===1"
-				      x-ng-click="pre()">
-				<i class="glyphicon glyphicon-menu-left"></i>
-			      </button>
-				<button class="btn red-sunglo"
-					x-ng-disabled="s_pagination.current_page===s_pagination.total_page"
-					x-ng-click="next()">
-				  <i class="glyphicon glyphicon-menu-right"></i>
-				</button>
-			    </span>
-			  </span> 
-			<!-- </span>  -->
-		      </td>
-		    </tr>
+		    <!-- 	<\!-- <span class="pull-right"> -\-> -->
+		    <!-- 	  <span class="btn-toolbar pull-right"> -->
+		    <!-- 	    <span class="btn-group btn-group-solid"> -->
+		    <!-- 	      <button class="btn purple-plum" -->
+		    <!-- 		      x-ng-disabled="s_pagination.current_page===1" -->
+		    <!-- 		      x-ng-click="pre()"> -->
+		    <!-- 		<i class="glyphicon glyphicon-menu-left"></i> -->
+		    <!-- 	      </button> -->
+		    <!-- 		<button class="btn red-sunglo" -->
+		    <!-- 			x-ng-disabled="s_pagination.current_page===s_pagination.total_page" -->
+		    <!-- 			x-ng-click="next()"> -->
+		    <!-- 		  <i class="glyphicon glyphicon-menu-right"></i> -->
+		    <!-- 		</button> -->
+		    <!-- 	    </span> -->
+		    <!-- 	  </span>  -->
+		    <!-- 	<\!-- </span>  -\-> -->
+		    <!--   </td> -->
+		    <!-- </tr> -->
 		  </tfoot> 
 		</table> <!--END table-->
-	      </div> <!--END table-responsive-->
+	      </div> <!--END table-responsive--> 
+	    </div> <!-- END panel-->
+	    
+	    <div x-ng-show="s_stastic.total_items>s_pagination.items_perpage"
+		   class="row">
+	      <div class="col-md-12, col-sm-12, col-xs-12"> 
+	    
+		<span>显示第 {{s_pagination.current_page}} / {{s_pagination.total_page}} 页结果， 共 {{s_stastic.total_items}} 项
+		</span>
+
+		<span class="pull-right">
+		  <span class="btn-group btn-group-solid">
+		    <!-- <button class="btn purple-plum btn-left-page" -->
+		    <!-- 	    x-ng-disabled="r_pagination.current_page===1" -->
+		    <!-- 	    x-ng-click="pre()"> -->
+		    <!--   <i class="glyphicon glyphicon-menu-left"></i> -->
+		    <!-- </button> -->
+		    <button class="btn red-sunglo btn-next-page"
+		    	    x-ng-disabled="s_pagination.current_page
+					   ===s_pagination.total_page"
+		    	    x-ng-click="next()">
+		      <i class="glyphicon glyphicon-menu-down"></i>
+		    </button>
+		  </span>
+		</span>
+	
+	      </div>
 	    </div>
 	  </tab>
 	  

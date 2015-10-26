@@ -145,21 +145,69 @@ diabloUtils.directive('ngModelOnblur', function() {
     };
 });
 
-diabloUtils.directive('stickUpTable', function () {
+
+diabloUtils.directive('infiniteScroll', ['$rootScope', '$window', '$timeout', function($rootScope, $window, $timeout){
     return {
-	restrict: 'AE',
-	link: function(scope, element, attrs){
-	    // console.log(element);
-	    // element.stickyTableHeaders();
-	    element.stickUp({
-		topMargin: null,
-		zIndex: 10,
-		onStick: function(settings) {},
-		unStick: function(settings) {}
-	    })
+	link: function(scope, elem, attrs) {
+	    var checkWhenEnabled, handler, scrollDistance, scrollEnabled;
+	    $window = angular.element($window);
+	    scrollDistance = 0;
+	    if (attrs.infiniteScrollDistance != null) {
+		scope.$watch(attrs.infiniteScrollDistance, function(value) {
+		    return scrollDistance = parseInt(value, 10);
+		});
+	    }
+	    scrollEnabled = true;
+	    checkWhenEnabled = false;
+	    if (attrs.infiniteScrollDisabled != null) {
+		scope.$watch(attrs.infiniteScrollDisabled, function(value) {
+		    scrollEnabled = !value;
+		    if (scrollEnabled && checkWhenEnabled) {
+			checkWhenEnabled = false;
+			return handler();
+		    }
+		});
+	    }
+	    handler = function() {
+		var elementBottom, remaining, shouldScroll, windowBottom;
+		windowBottom = $window.height() + $window.scrollTop();
+		elementBottom = elem.offset().top + elem.height();
+		remaining = elementBottom - windowBottom;
+
+		// console.log(windowBottom);
+		// console.log(elementBottom);
+		// console.log(remaining);
+		shouldScroll = remaining + 110 <= $window.height() * scrollDistance;
+		// shouldScroll = remaining <= -110;
+		// shouldScroll = 
+		if (shouldScroll && scrollEnabled) {
+		    if ($rootScope.$$phase) {
+			return scope.$eval(attrs.infiniteScroll);
+		    } else {
+			return scope.$apply(attrs.infiniteScroll);
+		    }
+		} else if (shouldScroll) {
+		    return checkWhenEnabled = true;
+		}
+	    };
+	    
+	    $window.on('scroll', handler);
+	    scope.$on('$destroy', function() {
+		return $window.off('scroll', handler);
+	    });
+	    
+	    return $timeout((function() {
+		if (attrs.infiniteScrollImmediateCheck) {
+		    if (scope.$eval(attrs.infiniteScrollImmediateCheck)) {
+			return handler();
+		    }
+		} else {
+		    return handler();
+		}
+	    }), 0);
 	}
-    }
-});
+    };
+}]);
 
 diabloUtils.directive('queryGroup', function () {
     return {
@@ -236,7 +284,7 @@ diabloUtils.directive('queryPattern', function () {
 	    	})
 	    });
 
-	    console.log(scope.filters);
+	    // console.log(scope.filters);
 	    
 	    // add a filter
 	    scope.add_filter = function(){
@@ -709,7 +757,7 @@ diabloUtils.directive('drawDefaultImg', function () {
 
 diabloUtils.directive('imageDraw', function ($q) {
     function postLinkFn (scope, element, attrs){
-	console.log(scope);
+	// console.log(scope);
 	var ctx = element.get(0).getContext("2d");
 
 	scope.$watch("orgImage.image", function(newValue, oldValue){

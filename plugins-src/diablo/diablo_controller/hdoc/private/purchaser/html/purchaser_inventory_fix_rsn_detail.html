@@ -63,7 +63,7 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
@@ -98,9 +98,16 @@
 		    <td>{{inv.style_number}}</td>
 		    <td>{{inv.brand.name}}</td>
 
-		    <td class="success">{{inv.exist}}</td>
-		    <td class="warning">{{inv.fixed}}</td>
-		    <td class="danger">{{inv.metric}}</td>
+		    <td>{{inv.exist}}</td>
+		    <td>{{inv.fixed}}</td>
+		    <td>
+		      <span x-ng-if="inv.metric<0" class="fg-red">
+			{{inv.metric}}
+		      </span>
+		      <span x-ng-if="inv.metric>=0">
+			{{inv.metric}}
+		      </span> 
+		    </td>
 		    <!-- <td>{{inv.color}}</td> -->
 		    <!-- <td>{{inv.total}}</td>  --> 
 		    <td>{{inv.entry_date}}</td>
@@ -114,25 +121,25 @@
 		</tbody>
 
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-		  	<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-		  	  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination class="pull-right"
-		  		  total-items="total_items"
-		  		  items-per-page="items_perpage"
-		  		  num-pages="num_pages"
-		  		  max-size="max_page_size"
-		  		  boundary-links="true"
-		  		  previous-text="&lsaquo;" next-text="&rsaquo;"
-		  		  first-text="&laquo;" last-text="&raquo;"
-		  		  x-ng-model="current_page"
-		  		  x-ng-init="current_page=default_page"
-		  		  x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination class="pull-right" -->
+		  <!-- 		  total-items="total_items" -->
+		  <!-- 		  items-per-page="items_perpage" -->
+		  <!-- 		  num-pages="num_pages" -->
+		  <!-- 		  max-size="max_page_size" -->
+		  <!-- 		  boundary-links="true" -->
+		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 		  x-ng-model="current_page" -->
+		  <!-- 		  x-ng-init="current_page=default_page" -->
+		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -140,6 +147,28 @@
 	    
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		  	  共 {{total_items}} 项
+	    </span>
+	
+	    <pagination class="pagination-lg table-pagination pull-right "
+		  	total-items="total_items"
+		  	items-per-page="items_perpage"
+		  	num-pages="num_pages"
+		  	max-size="max_page_size"
+		  	boundary-links="true"
+		  	previous-text="&lsaquo;" next-text="&rsaquo;"
+		  	first-text="&laquo;" last-text="&raquo;"
+		  	x-ng-model="current_page"
+		  	x-ng-init="current_page=default_page"
+		  	x-ng-change="page_changed()"></pagination>
+	  </div>
+	</div>
+		  
       </div> <!--END table container-->
       
     </div>

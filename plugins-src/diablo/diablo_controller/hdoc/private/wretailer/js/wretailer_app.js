@@ -336,7 +336,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
      */
     $scope.colspan = 9;
     $scope.max_page_size = 10;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.default_page = 1;
 
     var storage = localStorageService.get(diablo_key_retailer);
@@ -354,7 +354,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     
     $scope.page_changed = function(){
 	// console.log(page);
-	console.log($scope.current_page);
+	// console.log($scope.current_page);
 	$scope.save_to_local();
 	$scope.filter_retailers = diabloPagination.get_page($scope.current_page);
     }
@@ -406,7 +406,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     };
     
     $scope.do_refresh = function(page, search){
-	console.log(page);
+	// console.log(page);
 	$scope.current_page = page;
 	$scope.search       = search;
 	

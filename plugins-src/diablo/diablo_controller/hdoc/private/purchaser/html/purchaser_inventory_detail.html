@@ -67,7 +67,7 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
@@ -82,7 +82,8 @@
 		    <th>厂商</th>
 		    <th>季节</th>
 		    <th>年度</th>
-		    <th x-ng-if="show_orgprice" class="success">进货价</th>
+		    <th x-ng-if="setting.show_orgprice"
+			class="success">进货价</th>
 		    <th>吊牌价</th>
 		    <!-- <th>批发价</th> -->
 
@@ -108,33 +109,174 @@
 		</thead>
 		<tbody>
 		  <tr ng-repeat="inv in inventories track by inv.id">
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.order_id}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.style_number}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.brand.name}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.type.name}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{sexs[inv.sex]}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.firm.name}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{seasons[inv.season]}}</td>
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.order_id}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.order_id}}
+		    </td>
+
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.style_number}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.style_number}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.brand.name}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.brand.name}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.type.name}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.type.name}}
+		    </td>
 		    
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.year}}</td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{sexs[inv.sex]}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{sexs[inv.sex]}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.firm.name}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.firm.name}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{seasons[inv.season]}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{seasons[inv.season]}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.year}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.year}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm
+				 && setting.show_orgprice" class="danger">
+		      {{inv.org_price}}
+		    </td>
+		    <td x-ng-if="(!setting.alarm || !inv.isAlarm)
+				 && setting.show_orgprice">
+		      {{inv.org_price}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.tag_price}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.tag_price}}
+		    </td>
+
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.pkg_price}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.pkg_price}}
+		    </td>
+
+		    <td x-ng-if="!hide_column
+				 && inv.isAlarm
+				 && setting.alarm" class="danger">
+		      {{inv.price3}}
+		    </td>
+		    <td x-ng-if="!hide_column
+				 && (!setting.alarm || !inv.isAlarm)">
+		      {{inv.price3}}
+		    </td>
+
+		    <td x-ng-if="!hide_column
+				 && inv.isAlarm
+				 && setting.alarm" class="danger">
+		      {{inv.price4}}
+		    </td>
+		    <td x-ng-if="!hide_column
+				 && (!setting.alarm || !inv.isAlarm)">
+		      {{inv.price4}}
+		    </td>
+
+		    <td x-ng-if="!hide_column
+				 && inv.isAlarm
+				 && setting.alarm" class="danger">
+		      {{inv.price5}}
+		    </td>
+		    <td x-ng-if="!hide_column
+				 && (!setting.alarm || !inv.isAlarm)">
+		      {{inv.price5}}
+		    </td>
+
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.discount}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.discount}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.amount}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.amount}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.shop}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.shop}}
+		    </td>
+
+		    <td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+		      {{inv.entry_date}}
+		    </td>
+		    <td x-ng-if="!setting.alarm || !inv.isAlarm">
+		      {{inv.entry_date}}
+		    </td>
 		    
-		    <td x-ng-if="show_orgprice" class={{is_alarm(inv.isAlarm)}}>{{inv.org_price}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.tag_price}}</td>
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.order_id}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.style_number}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.brand.name}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.type.name}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{sexs[inv.sex]}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.firm.name}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{seasons[inv.season]}}</td> -->
 		    
-		    <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.pkg_price}}</td>
-		    <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.price3}}</td>
-		    <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.price4}}</td>
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.year}}</td> -->
 		    
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.price5}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.discount}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.amount}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.shop}}</td>
-		    <td class={{is_alarm(inv.isAlarm)}}>{{inv.entry_date}}</td>
+		    <!-- <td x-ng-if="show_orgprice" class={{is_alarm(inv.isAlarm)}}>{{inv.org_price}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.tag_price}}</td> -->
+		    
+		    <!-- <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.pkg_price}}</td> -->
+		    <!-- <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.price3}}</td> -->
+		    <!-- <td x-ng-if="!hide_column" class={{is_alarm(inv.isAlarm)}}>{{inv.price4}}</td> -->
+		    
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.price5}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.discount}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.amount}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.shop}}</td> -->
+		    <!-- <td class={{is_alarm(inv.isAlarm)}}>{{inv.entry_date}}</td> -->
 		    <td data-title="'操作'"> 
                       <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="inv.free === 0"
 			      x-ng-click="lookup_detail(inv)">详情
-			<i class="glyphicon glyphicon-leaf"></i></button>
+			<i class="glyphicon glyphicon-map-marker"></i></button>
 		    </td>
 		  </tr>
 		  <tr x-ng-if="total_items!==0" class="bg-white">
@@ -146,24 +288,24 @@
 		</tbody>
 
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-			  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination class="pagination-lg pull-right"
-				  total-items="total_items"
-				  items-per-page="items_perpage"
-				  num-pages="num_pages"
-				  max-size="max_page_size"
-				  boundary-links="true"
-				  previous-text="&lsaquo;" next-text="&rsaquo;"
-				  first-text="&laquo;" last-text="&raquo;"
-				  x-ng-model="current_page"
-				  x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination class="pagination-lg pull-right" -->
+		  <!-- 		  total-items="total_items" -->
+		  <!-- 		  items-per-page="items_perpage" -->
+		  <!-- 		  num-pages="num_pages" -->
+		  <!-- 		  max-size="max_page_size" -->
+		  <!-- 		  boundary-links="true" -->
+		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 		  x-ng-model="current_page" -->
+		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -171,6 +313,26 @@
 	    
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12"> 
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      共 {{total_items}} 项
+	    </span>
+	    <pagination class="pagination-lg table-pagination pull-right"
+		  	total-items="total_items"
+		  	items-per-page="items_perpage"
+		  	num-pages="num_pages"
+		  	max-size="max_page_size"
+		  	boundary-links="true"
+		  	previous-text="&lsaquo;" next-text="&rsaquo;"
+		  	first-text="&laquo;" last-text="&raquo;"
+		  	x-ng-model="current_page"
+		  	x-ng-change="page_changed()">
+	    </pagination>
+	  </div>
+	</div>
+		  
       </div> <!--END table container-->
       
     </div>

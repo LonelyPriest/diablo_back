@@ -216,7 +216,7 @@ firmApp.controller("firmDetailCtrl", function(
      */
     $scope.colspan       = 7;
     $scope.max_page_size = 10;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.default_page  = 1;
 
     var storage = localStorageService.get(diablo_key_firm);

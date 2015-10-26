@@ -62,11 +62,12 @@
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
@@ -74,7 +75,7 @@
 		    <th class="danger">欠款</th>
 		    <th>联系方式</th>
 		    <th>所在省（直辖市）</th>
-		    <th>所在城市市</th>
+		    <th>所在市</th>
 		    <th>联系地址</th>
 		    <th>日期</th>
 		    <th>操作</th>
@@ -130,25 +131,25 @@
 		</tbody>
 
 		<tfoot>
-		  <tr> 
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-			  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination
-			 class="pagination-lg pull-right"
-			 total-items="total_items"
-			 items-per-page="items_perpage"
-			 num-pages="num_pages"
-			 max-size="max_page_size"
-			 boundary-links="true"
-			 previous-text="&lsaquo;" next-text="&rsaquo;"
-			 first-text="&laquo;" last-text="&raquo;"
-			 x-ng-model="current_page"
-			 x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr>  -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination -->
+		  <!-- 	 class="pagination-lg pull-right" -->
+		  <!-- 	 total-items="total_items" -->
+		  <!-- 	 items-per-page="items_perpage" -->
+		  <!-- 	 num-pages="num_pages" -->
+		  <!-- 	 max-size="max_page_size" -->
+		  <!-- 	 boundary-links="true" -->
+		  <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 	 x-ng-model="current_page" -->
+		  <!-- 	 x-ng-change="page_changed()"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -156,6 +157,26 @@
 	    
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+	
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12"> 
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      共 {{total_items}} 项</span>
+	    <pagination
+	       class="pagination-lg table-pagination pull-right"
+	       total-items="total_items"
+	       items-per-page="items_perpage"
+	       num-pages="num_pages"
+	       max-size="max_page_size"
+	       boundary-links="true"
+	       previous-text="&lsaquo;" next-text="&rsaquo;"
+	       first-text="&laquo;" last-text="&raquo;"
+	       x-ng-model="current_page"
+	       x-ng-change="page_changed()">
+	    </pagination>
+	  </div>
+	</div>
+		  
       </div> <!--END table container-->
       
     </div>
@@ -170,7 +191,8 @@
       <span class="sr-only"></span>
     </button>
     
-    <h4 class="modal-title"><span class="label label-sm label-primary">零售商编辑</span></h4>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">零售商编辑</span></h4>
   </div>
 
   <div class="modal-body">

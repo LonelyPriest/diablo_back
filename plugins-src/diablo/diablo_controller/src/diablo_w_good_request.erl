@@ -254,7 +254,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
     
     OStyleNumber = ?v(<<"o_style_number">>, Good),
     OBrandId     = ?v(<<"o_brand">>, Good),
-    Type        = ?v(<<"type">>, Good),
+    Type         = ?v(<<"type">>, Good),
     %% Brand = ?v(<<"brand">>, Payload),
     %% Firm  = ?v(<<"firm_id">>, Payload),
 
@@ -291,8 +291,9 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 		    update, Merchant,
 		    [{<<"type_id">>, TypeId},
 		     {<<"path">>, ImagePath}|Good]) of
-		{ok, StyleNumber} -> 
-		    ?utils:respond(200, Req, ?succ(update_purchaser_good, StyleNumber));
+		{ok, GoodId} -> 
+		    ?utils:respond(200, Req,
+				   ?succ(update_purchaser_good, GoodId));
 		{error, Error} ->
 		    ?utils:respond(200, Req, Error)
 	    end;

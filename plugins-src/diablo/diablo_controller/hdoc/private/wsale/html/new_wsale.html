@@ -8,6 +8,11 @@
 	</div>
 	<div class="actions">
 	  <div class="btn-group">
+	    <button type="button" class="btn red"
+		    x-ng-click="back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i>
+	    </button>
+	    
 	    <!-- <button class="btn btn-warning red-stripe" -->
 	    <!-- 	    x-ng-disabled="disable_draft()" -->
 	    <!-- 	    x-ng-click="wsale_draft()">存为草稿 -->
@@ -398,8 +403,8 @@
 
 			<td class="col-md-1 vert-align">
 			  <span x-ng-if="!inv.$new || inv.free_color_size">
-			    <!-- <div>{{inv[inv.sell_style.f]}}</div> -->
-			    {{inv.fprice}}
+			    <div>{{inv[inv.sell_style.f]}}</div>
+			    <!-- {{inv.fprice}} -->
 			    <!-- <div class="fg-red">上次：{{inv.last_fprice}}</div> -->
 			  </span>
 			</td>
@@ -669,7 +674,7 @@
 			    共 {{total_items}} 项</span>
 			</span>
 			<pagination
-			   class="pull-right"
+			   class="pagination-lg pull-right"
 			   total-items="total_items"
 			   items-per-page="items_perpage"
 			   num-pages="num_pages"

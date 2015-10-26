@@ -91,7 +91,7 @@ firmApp.controller('firmTransCtrl', function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var storage = localStorageService.get(diablo_key_firm_trans);
-    console.log(storage);
+    // console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
 	$scope.filters      = storage.filter;
 	$scope.qtime_start  = storage.start_time; 
@@ -116,7 +116,7 @@ firmApp.controller('firmTransCtrl', function(
      * pagination 
      */
     $scope.colspan = 18;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
     
     var back_page = diablo_set_integer($routeParams.page);
@@ -131,7 +131,7 @@ firmApp.controller('firmTransCtrl', function(
     };
 
     $scope.do_search = function(page){
-	console.log(page);
+	// console.log(page);
 	$scope.current_page = page;
 	
 	// save
@@ -168,7 +168,7 @@ firmApp.controller('firmTransCtrl', function(
 	    firmService.filter_w_inventory_new(
 		$scope.match, search, page, $scope.items_perpage
 	    ).then(function(result){
-		    console.log(result);
+		    // console.log(result);
 		    if (page === 1 && angular.isUndefined(back_page)){
 			$scope.total_items      = result.total
 			$scope.total_amounts    = result.t_amount;
@@ -315,7 +315,7 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
      * pagination 
      */
     $scope.colspan = 14;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
     $scope.default_page = 1; 
 
@@ -350,6 +350,7 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 		    });
 		    
 		    diablo_order_page(page, $scope.items_perpage, $scope.inventories);
+		    $scope.current_page = page;
 		})
 	}) 
     }

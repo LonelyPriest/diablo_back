@@ -249,9 +249,14 @@
 		      <form name="inv.form.reject"
 			    ng-if="inv.$new && inv.free_color_size
 				   || !inv.$new && inv.free_update">
-			<div x-ng-class="{'has-error':inv.form.reject.$invalid
-				       && !inv.form.reject.$pristine
-				       || !valid_free(inv)}"}>
+			<div class="input-group">
+			  <span class="input-group-addon
+				       modal-input-group-addon">
+			    {{inv.total}}
+			    </span>
+			  <div x-ng-class="{'has-error':inv.form.reject.$invalid
+					   && !inv.form.reject.$pristine
+					   || !valid_free(inv)}"> 
 			  <input class="form-control"
 				 type="number" step="1" 
 				 required
@@ -261,6 +266,7 @@
 				 popover-placement="top"
 				 popover-trigger="focus"
 				 popover="均色均码直接输入数量"/>
+			  </div>
 		      </form>
 		    </td>
 
@@ -275,7 +281,8 @@
 			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="inv.free_color_size"
 			   x-ng-disabled="inv.form.good.$invalid
-					  || inv.form.reject.$invalid"
+					  || inv.form.reject.$invalid
+					  || !valid_free(inv)"
 			   x-ng-click="add_free_inventory(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
@@ -310,13 +317,13 @@
 
 			<a class="btn diablo-input-button btn-success"
 			   ng-if="inv.free_update"
-			   x-ng-disabled=" inv.form.amount.$invalid"
+			   x-ng-disabled="inv.form.reject.$invalid
+					  || !valid_free(inv)"
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			
 			<a class="btn diablo-input-button btn-danger"
 			   ng-if="inv.free_update"
-			   x-ng-disabled=" inv.form.amount.$invalid"
 			   x-ng-click="inv.free_update=false">取消
 			  <i class="glyphicon glyphicon-erase"></i></a> 
 		      </div>

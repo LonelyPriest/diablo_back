@@ -17,6 +17,7 @@
 -export([start_link/0]).
 
 -export([fetch/2, get_connection/0, sql_result/3, row_result/3, wait/3]).
+-export([start/2]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,

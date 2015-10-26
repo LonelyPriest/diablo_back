@@ -342,7 +342,8 @@
 
 			<a class="btn diablo-input-button btn-success"
 			   x-ng-if="inv.free_update"
-			   x-ng-disabled=" inv.form.reject.$invalid"
+			   x-ng-disabled="inv.form.reject.$invalid
+					  || !valid_free_size_reject(inv)"
 			   x-ng-click="save_free_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			

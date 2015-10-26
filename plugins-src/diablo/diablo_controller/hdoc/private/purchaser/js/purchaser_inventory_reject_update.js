@@ -2,7 +2,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope, $q, $routeParams, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterBrand, filterFirm, filterType, filterEmployee,
-    filterSizeGroup, filterColor){
+    filterSizeGroup, filterColor, base){
     console.log(user);
 
     // $scope.shops     = user.sortShops;
@@ -22,9 +22,17 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope.seasons         = diablo_season; 
     $scope.e_pay_types     = purchaserService.extra_pay_types;
 
+    $scope.setting         = {
+	reject_negative: false
+    };
+
     $scope.go_back = function(){
 	diablo_goto_page("#/inventory_new_detail/" + $routeParams.ppage);
     };
+
+    // base setting
+    $scope.setting.reject_negative = diablo_base_setting(
+	"reject_negative", -1, base, parseInt, diablo_no);
 
     var dialog = diabloUtilsService;
     var setv   = diablo_set_float;
@@ -519,20 +527,16 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     }; 
 
     $scope.valid_free = function(inv){
-	var ret = false;
-	if (inv.free === 0){
-	     ret = true;
-	}
-	else {
-	    if (angular.isDefined(inv.amounts)
-    		&& angular.isDefined(inv.amounts[0].reject) 
-    		&& parseInt(inv.amounts[0].reject) > inv.total){
-    		ret =  false;
-    	    }
-	    ret =  true; 
-	}
 
-	return ret;
+	// console.log(inv);
+	if (angular.isDefined(inv.amounts)
+    	    && angular.isDefined(inv.amounts[0].reject)
+	    && !$scope.setting.reject_negative
+    	    && parseInt(inv.amounts[0].reject) > inv.total){
+	    return false;
+    	}
+	
+	return true;
     };
     
     var valid_all = function(amounts){
@@ -544,7 +548,8 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		unchanged++;
 	    }
 	    else {
-		if (diablo_set_integer(amount.reject) > amount.count){
+		if (!$scope.setting.reject_negative &&
+		    diablo_set_integer(amount.reject) > amount.count){
 		    // unchanged++
 		    return false;
 		}
@@ -555,6 +560,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     };
 
     var select_amount = function(invs, selected){
+	// console.log(invs);
 	var select_amounts = [];
 	var colors = [];
 	var total = 0;
@@ -614,11 +620,13 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
 	    var sort = purchaserService.sort_inventory(invs, order_sizes, filterColor);
 	    
-	    // inv.total   = sort.total;
+	    inv.total   = sort.total;
 	    inv.sizes   = sort.size;
 	    inv.colors  = sort.color;
 	    // inv.amounts = sort.sort;
 	    inv.select_amounts = sort.sort;
+
+	    console.log(inv);
 
 	    var add_callback = function(params){
 		console.log(params.amounts);
@@ -715,12 +723,12 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
      * update inventory
      */
     $scope.update_inventory = function(inv){
+	console.log(inv);
 	inv.$update = true; 
 	if (inv.free_color_size){
-	    inv.free_update = true;
-	    return;
+	    inv.free_update = true; 
 	}
-	
+
 	var callback = function(params){
 	    inv.amounts = params.amounts;
 	    inv.reject  = 0;
@@ -732,17 +740,21 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    
 	    $scope.re_calculate(); 
 	};
-
+	
 	var payload = {sizes:        inv.sizes,
 		       // colors:       inv.colors, 
 		       get_amount:   get_amount,
-		       valid:        valid_all}; 
+		       valid:        valid_all};
+	
 	if (angular.isDefined(inv.select_amounts)){
-	    // payload.amounts = inv.select_amounts;
-	    payload.amounts = inv.amounts;
-	    payload.colors = inv.colors;
-	    dialog.edit_with_modal(
-		"inventory-new.html", 'normal', callback, $scope, payload);
+	    if (inv.free_color_size){
+		// nothing
+	    } else {
+		payload.amounts = inv.amounts;
+		payload.colors = inv.colors;
+		dialog.edit_with_modal(
+		    "inventory-new.html", 'normal', callback, $scope, payload);
+	    } 
 	} else {
 	    purchaserService.list_purchaser_inventory({
 		style_number:inv.style_number,
@@ -756,15 +768,21 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		inv.select_amounts = s.select_amounts;
 		inv.total  = s.total;
 		inv.colors = s.colors;
-		
-		var payload = {sizes:        inv.sizes,
+
+		// console.log(inv);
+		if (inv.free_color_size){
+		    // return;
+		} else {
+		    payload = {sizes:        inv.sizes,
 			       colors:       inv.colors, 
 			       amounts:      inv.select_amounts,
 			       get_amount:   get_amount,
 			       valid:        valid_all}; 
-		dialog.edit_with_modal(
-		    "inventory-new.html", 'normal',
-		    callback, $scope, payload)
+		    dialog.edit_with_modal(
+			"inventory-new.html", 'normal',
+			callback, $scope, payload)
+		}
+		
 	    });
 	} 
     };

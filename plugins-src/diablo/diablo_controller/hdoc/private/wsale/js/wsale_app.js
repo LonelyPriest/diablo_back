@@ -277,10 +277,15 @@ wsaleApp.controller("wsaleNewCtrl", function(
     user, filterFirm, filterRetailer, filterEmployee,
     filterSizeGroup, filterBrand, filterType, filterColor, base){
 
-    $scope.pattern = {money: diabloPattern.decimal_2,
-		      sell:  diabloPattern.integer_except_zero};
+    $scope.pattern  = {money: diabloPattern.decimal_2,
+		       sell:  diabloPattern.integer_except_zero};
+    
     $scope.timeout_auto_save = undefined;
-    $scope.round   = diablo_round;
+    $scope.round             = diablo_round;
+    
+    $scope.back  = function(){
+	diablo_goto_page("#/new_wsale_detail");
+    };
 
     $scope.setting = {q_backend:true,
 		      show_discount:true,
@@ -1702,9 +1707,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	$scope.show.comment = !$scope.show.comment;
     }; 
 
-    $scope.touchstart = function(e){
-	console.log(e);
-    };
+    // $scope.touchstart = function(e){
+    // 	console.log(e);
+    // };
+    
     /*
      * pan
      */
@@ -1801,13 +1807,13 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 
     //
     $scope.sequence_pagination = function(){
-	var shop = -1;
-	if ($scope.shopIds.length === 1){
-	    shop = $scope.shopIds[0];
-	};
+	// var shop = -1;
+	// if ($scope.shopIds.length === 1){
+	//     shop = $scope.shopIds[0];
+	// };
 
 	return diablo_base_setting(
-	    "se_pagination", shop, base, parseInt, diablo_no)
+	    "se_pagination", -1, base, parseInt, diablo_no)
     }();
 
     // console.log($scope.time);
@@ -1918,7 +1924,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 			result.data, (page_num - 1) * $scope.items_perpage + 1);
 		    $scope.records = $scope.records.concat(result.data);
 
-		    console.log($scope.records);
+		    // console.log($scope.records);
 		    
 		}
 		
@@ -1928,7 +1934,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     
     $scope.page_changed = function(){
 	// console.log($scope.num_pages);
-	// console.log($scope.current_page);
+	console.log($scope.current_page);
     	$scope.do_search($scope.current_page);
     };
 

@@ -11,6 +11,7 @@ purchaserApp.controller("purchaserInventoryFixCtrl", function(
     
     $scope.sexs = diablo_sex;
     $scope.seasons = diablo_season;
+
     
     // employees
     $scope.employees = filterEmployee;
@@ -661,7 +662,15 @@ purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
     user, filterEmployee, base){
     console.log(user);
 
-    $scope.goto_page = diablo_goto_page; 
+    $scope.goto_page = diablo_goto_page;
+
+    $scope.go_fix = function(){
+	$scope.goto_page('#/inventory/inventory_fix');
+    };
+
+    $scope.go_fix_rsn = function(){
+	$scope.goto_page('#/inventory/inventory_rsn_detail/fix');
+    };
 
     /*
     ** filter
@@ -697,7 +706,8 @@ purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
      */
     $scope.colspan = 15;
     $scope.items_perpage = 10;
-    $scope.default_page = 1; 
+    $scope.default_page = 1;
+    // $scope.current_page = $scope.default_page;
 
     $scope.do_search = function(page){
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
@@ -720,6 +730,8 @@ purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
 		    $scope.records = result.data;
 		    diablo_order_page(page, $scope.items_perpage, $scope.records);
 		})
+
+	    $scope.current_page = page;
 	    
 	})
     };

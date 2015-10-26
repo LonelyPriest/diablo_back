@@ -105,3 +105,28 @@ input[type="number"] {
   padding-right: 5px;
   padding-left: 5px;
 }
+
+/* @media only screen and (min-width: 1200px){ */
+.btn-next-page {
+    /* background-color: antiquewhite; */
+    padding:5px 7px 0px 7px  !important;
+    /* margin-right: 1px; */
+}
+
+.btn-left-page {
+    padding:5px 10px 0px 4px  !important;
+}
+
+/* .btn-right-page { */
+/*     padding:5px 10px 0px 4px  !important; */
+/* } */
+
+.table-panel {
+    margin-bottom: 5px !important;
+}
+
+.table-pagination {
+    margin: 0px !important;
+}
+/* } */
+

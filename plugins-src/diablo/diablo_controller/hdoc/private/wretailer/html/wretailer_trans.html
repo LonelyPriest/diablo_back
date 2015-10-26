@@ -3,7 +3,8 @@
     <div class="portlet box purple">
       
       <div class="portlet-title">
-	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
 	  交易记录（<span x-ng-bind=retailer.name></span>）
 	</div>	
 
@@ -26,13 +27,15 @@
             <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div> 
 	    
             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -43,26 +46,33 @@
             </div>
 	  </div> <!--END row-->
 
-	  <query-group filters="filters" prompt="prompt" ok="do_search(default_page)"></query-group>
+	  <query-group filters="filters"
+		       prompt="prompt"
+		       ok="do_search(default_page)">
+	  </query-group>
 	  
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr> 
 		    <th>序号</th>
 		    <th x-ng-click="toggle_base()" class="danger">
 		      <span x-ng-if="show.base">
-			<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+			<i class="glyphicon glyphicon-backward fg-red"></i>
+			单号
+		      </span>
 		      <span x-ng-if="!show.base">
-			单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			单号<i class="glyphicon glyphicon-forward fg-red"></i>
+		      </span>
 		    </th>
 		    <th x-ng-if="show.base">交易</th>
 		    <th x-ng-if="show.base">店铺</th>
@@ -77,18 +87,26 @@
 		    <th x-ng-if="show.balance" class="danger">费用</th>
 		    <th x-ng-click="toggle_balance()" class="info">
 		      <span x-ng-if="show.balance">
-			<i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
+			<i class="glyphicon glyphicon-backward fg-red"></i>
+			帐户欠款
+		      </span>
 		      <span x-ng-if="!show.balance">
-			帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			帐户欠款
+			<i class="glyphicon glyphicon-forward fg-red"></i>
+		      </span>
 		    </th> 
 		    <th class="success">应付</th>
 		    <th>实付</th>
 
 		    <th x-ng-click="toggle_comment()" class="danger">
 		    <span x-ng-if="show.comment">
-		      <i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
+		      <i class="glyphicon glyphicon-backward fg-red"></i>
+		      本次欠款
+		    </span>
 		      <span x-ng-if="!show.comment">
-			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			本次欠款
+			<i class="glyphicon glyphicon-forward fg-red"></i>
+		      </span>
 		    </th> 
 		    <th x-ng-if="show.comment">备注</th>
 		    
@@ -116,7 +134,9 @@
 		    <td x-ng-if="show.balance">{{r.wire}}</td>
 		    <td x-ng-if="show.balance">{{r.verificate}}</td>
 		    <td x-ng-if="show.balance">
-		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">{{r.e_pay}}</span>
+		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">
+			{{r.e_pay}}
+		      </span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td> 
 		    
@@ -196,24 +216,24 @@
 		</tbody>
 
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-			  共 {{total_items}} 项</span>
-		      </span>
-		      <pagination class="pagination-lg pull-right"
-				  total-items="total_items"
-				  items-per-page="items_perpage"
-				  num-pages="num_pages"
-				  max-size="max_page_size"
-				  boundary-links="true"
-				  previous-text="&lsaquo;" next-text="&rsaquo;"
-				  first-text="&laquo;" last-text="&raquo;"
-				  x-ng-model="current_page"
-				  x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span> -->
+		  <!--     <pagination class="pagination-lg pull-right" -->
+		  <!-- 		  total-items="total_items" -->
+		  <!-- 		  items-per-page="items_perpage" -->
+		  <!-- 		  num-pages="num_pages" -->
+		  <!-- 		  max-size="max_page_size" -->
+		  <!-- 		  boundary-links="true" -->
+		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!-- 		  x-ng-model="current_page" -->
+		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -221,6 +241,26 @@
 	    
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		  	  共 {{total_items}} 项
+	    </span>
+	    <pagination class="pagination-lg table-pagination pull-right"
+		  	total-items="total_items"
+		  	items-per-page="items_perpage"
+		  	num-pages="num_pages"
+		  	max-size="max_page_size"
+		  	boundary-links="true"
+		  	previous-text="&lsaquo;" next-text="&rsaquo;"
+		  	first-text="&laquo;" last-text="&raquo;"
+		  	x-ng-model="current_page"
+		  	x-ng-change="page_changed()">
+	    </pagination>
+	  </div>
+	</div>
+		  
       </div> <!--END table container-->
       
     </div>

@@ -17,6 +17,9 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.extra_pay_types   = purchaserService.extra_pay_types;
     $scope.timeout_auto_save = undefined;
     $scope.round             = diablo_round;
+    $scope.setting           = {
+	reject_negative: false
+    };
 
     var now = $.now();
 
@@ -123,7 +126,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 
 
     $scope.q_typeahead = function(shopId){
-	console.log(shopId);
+	// console.log(shopId);
 	// default prompt comes from backend
 	return diablo_base_setting(
 	    "qtypeahead", shopId, base, parseInt, diablo_backend);
@@ -135,7 +138,12 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	return diablo_base_setting(
 	    "qtime_start", shopId, base, function(v){return v},
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
-    }; 
+    };
+
+    $scope.setting.reject_negative = diablo_base_setting(
+	"reject_negative", -1, base, parseInt, diablo_no);
+
+    // console.log($scope.setting);
 
     $scope.get_all_prompt_inventory = function(){
 	diabloFilter.match_all_w_reject_inventory(
@@ -328,7 +336,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.valid_free_size_reject = function(inv){
     	if (angular.isDefined(inv.amounts)
     	    && angular.isDefined(inv.amounts[0].reject_count) 
-    	    && parseInt(inv.amounts[0].reject_count) > inv.total){
+    	    && !$scope.setting.reject_negative
+	    && parseInt(inv.amounts[0].reject_count) > inv.total){
     	    return false;
     	}
     	return true;
@@ -344,7 +353,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 		unchanged++;
 	    }
 	    else {
-		if (diablo_set_integer(amount.reject_count) > amount.count){
+		if ( !$scope.setting.reject_negative
+		     && diablo_set_integer(amount.reject_count)>amount.count){
 		    // unchanged++
 		    return false;
 		}
@@ -532,7 +542,12 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	    || !inv.amounts[0].reject_count
 	    || parseInt(inv.amounts[0].reject_count) === 0){
 	    return;
-	} 
+	}
+
+	if (!$scope.setting.reject_negative
+	    && parseInt(inv.amounts[0].reject_count) > inv.total){
+	    return;
+	}
 
 	$scope.timeout_auto_save = $timeout(function(){
 	    if (inv.$new && inv.free_color_size){

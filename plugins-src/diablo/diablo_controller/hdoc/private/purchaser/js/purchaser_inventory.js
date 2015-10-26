@@ -874,7 +874,11 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     $scope.seasons   = diablo_season;
     $scope.goto_page = diablo_goto_page;
 
-    $scope.show_orgprice = rightAuthen.show_orgprice(user.type);
+    $scope.setting = {
+	show_orgprice: rightAuthen.show_orgprice(user.type),
+	alarm:         false
+    };
+    
     // console.log($scope.show_orgprice);
 
     // $scope.shops = user.sortShops;
@@ -929,6 +933,13 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     };
 
     $scope.time   = diabloFilter.default_time($scope.qtime_start);
+
+    // alarm, use default shop
+    $scope.setting.alarm = diablo_base_setting(
+	"stock_alarm", -1, base, parseInt, diablo_no);
+
+    // console.log($scope.setting);
+    
     // console.log($scope.time); 
 
     // $scope.qtime_start = function(){
@@ -949,7 +960,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
      * pagination 
      */
     $scope.colspan = 18;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
     
     // default the first page
@@ -960,10 +971,10 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	$scope.do_search($scope.current_page);
     }
 
-    $scope.is_alarm = function(alarm){
-	// console.log(alarm);
-	return alarm ? "danger" : "";
-    }
+    // $scope.is_alarm = function(alarm){
+    // 	// console.log(alarm);
+    // 	return alarm ? "danger" : "";
+    // }
     
     
     // filter
@@ -1282,7 +1293,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
      * pagination 
      */
     $scope.colspan = 18;
-    $scope.items_perpage = 10;
+    $scope.items_perpage = diablo_items_per_page();
     $scope.max_page_size = 10;
     $scope.default_page = 1;
 

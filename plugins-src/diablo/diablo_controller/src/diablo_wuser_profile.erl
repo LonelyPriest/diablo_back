@@ -656,7 +656,8 @@ handle_call({set_default, Merchant}, _From, State) ->
 	      {"reject_negative", "零库存退货",    "0",  "0"},
 	      {"check_sale",      "检测库存销售",  "1",  "0"},
 	      {"show_discount",   "开单显示折扣",  "1",  "0"},
-	      {"se_pagination",   "顺序翻页",      "0",  "0"}
+	      {"se_pagination",   "顺序翻页",      "0",  "0"},
+	      {"stock_alarm",     "库存告警",      "0",  "0"}
 	     ],
     
     

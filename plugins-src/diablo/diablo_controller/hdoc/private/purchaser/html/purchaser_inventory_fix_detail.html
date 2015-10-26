@@ -3,18 +3,19 @@
     <div class="portlet box purple">
       
       <div class="portlet-title">
-	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
 	  盘点记录
 	</div>
 	
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
 	    <button type="button" class="btn btn-success purple-stripe"
-	  	    x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
+	  	    x-ng-click="go_fix()">盘点
 	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
 	    <button type="button" class="btn btn-warning purple-stripe"
-	  	    x-ng-click="goto_page('#/inventory/inventory_rsn_detail/fix')">盘点明细
+	  	    x-ng-click="go_fix_rsn()">盘点明细
 	      <i class="glyphicon glyphicon-leaf"></i></button>
 
 	    <button type="button" class="btn blue reload purple-stripe"
@@ -30,36 +31,44 @@
 	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
-            <div class="col-md-4 diablo-pannel-padding-left diablo-pannel-padding-right">
+            <div class="col-md-4 col-sm-4 col-xs-12
+			diablo-pannel-padding-left
+			diablo-pannel-padding-right">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div> 
 
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
                              filter="filter"></query-pattern>
             </div>
 	  </div> <!--END row-->
 
-	  <query-group filters="filters" prompt="prompt" ok="do_search(default_page)"></query-group>
+	  <query-group filters="filters"
+		       prompt="prompt"
+		       ok="do_search(default_page)">
+	  </query-group>
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
-	  <div class="panel panel-default">
+	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive"> 
 	      <!--EBGIN table -->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
@@ -81,7 +90,14 @@
 		    <td>{{r.employee.name}}</td>
 		    <td>{{r.exist}}</td>
 		    <td>{{r.fixed}}</td>
-		    <td>{{r.metric}}</td> 
+		    <td>
+		      <span x-ng-if="r.metric<0" class="fg-red">
+			{{r.metric}}
+		      </span>
+		      <span x-ng-if="r.metric>=0">
+			{{r.metric}}
+		      </span> 
+		    </td> 
 		    <td>{{r.entry_date}}</td>
 		    
 		    <td> 
@@ -93,25 +109,25 @@
 		</tbody>
 
 		<tfoot>
-		  <tr>
-		    <td x-ng-show="total_items>items_perpage" colspan={{colspan}}>
-		      <span class="pagination">
-			<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-			  共 {{total_items}} 项</span>
-		      </span> 
-		      <pagination class="pagination-lg pull-right"
-		      		  total-items="total_items"
-		      		  items-per-page="items_perpage"
-		      		  num-pages="num_pages"
-		      		  max-size="max_page_size"
-		      		  boundary-links="true"
-		      		  previous-text="&lsaquo;" next-text="&rsaquo;"
-		      		  first-text="&laquo;" last-text="&raquo;"
-		      		  x-ng-model="current_page"
-		      		  x-ng-init="current_page=default_page"
-		      		  x-ng-change="page_changed()"></pagination>
-		    </td>
-		  </tr>
+		  <!-- <tr> -->
+		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		  <!--     <span class="pagination"> -->
+		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		  <!-- 	  共 {{total_items}} 项</span> -->
+		  <!--     </span>  -->
+		  <!--     <pagination class="pagination-lg pull-right" -->
+		  <!--     		  total-items="total_items" -->
+		  <!--     		  items-per-page="items_perpage" -->
+		  <!--     		  num-pages="num_pages" -->
+		  <!--     		  max-size="max_page_size" -->
+		  <!--     		  boundary-links="true" -->
+		  <!--     		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		  <!--     		  first-text="&laquo;" last-text="&raquo;" -->
+		  <!--     		  x-ng-model="current_page" -->
+		  <!--     		  x-ng-init="current_page=default_page" -->
+		  <!--     		  x-ng-change="page_changed()"></pagination> -->
+		  <!--   </td> -->
+		  <!-- </tr> -->
 		</tfoot> 
 		
 	      </table> <!--END supplier table-->
@@ -119,6 +135,27 @@
 	    
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      共 {{total_items}} 项</span>
+	    
+	    <pagination class="pagination-lg table-pagination pull-right"
+		      	total-items="total_items"
+		      	items-per-page="items_perpage"
+		      	num-pages="num_pages"
+		      	max-size="max_page_size"
+		      	boundary-links="true"
+		      	previous-text="&lsaquo;" next-text="&rsaquo;"
+		      	first-text="&laquo;" last-text="&raquo;"
+		      	x-ng-model="current_page"
+		      	x-ng-change="page_changed()">
+	    </pagination>
+	  </div>
+	</div>
+	
       </div> <!--END table container-->
       
     </div>

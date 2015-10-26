@@ -11,6 +11,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     
     $scope.flot_mul = diablo_float_mul;
     $scope.round    = diablo_round;
+    $scope.setting  = {};
 
     /*
      * hidden
@@ -70,19 +71,18 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     } else{
 	$scope.filters = [];
 	
-	$scope.qtime_start = function(){
-	    var shop = -1;
-	    if ($scope.shopIds.length === 1){
-		shop = $scope.shopIds[0];
-	    };
-	    return diablo_base_setting(
-		"qtime_start", shop, base, diablo_set_date,
-		diabloFilter.default_start_time(now));
-	}(); 
-	// console.log($scope.time);
+	$scope.qtime_start =
+	    diablo_base_setting("qtime_start", -1, base, diablo_set_date,
+				diabloFilter.default_start_time(now)); 
     };
 
-    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+    $scope.time   = diabloFilter.default_time($scope.qtime_start);
+
+    $scope.setting.se_pagination = 
+	diablo_base_setting("se_pagination", -1, base, parseInt, diablo_no);
+
+    // console.log($scope.setting);
+    
 
     // filter
     diabloFilter.reset_field(); 
@@ -144,6 +144,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 		    $scope.total_amounts = result.total === 0 ? 0 : result.t_amount;
 		    $scope.total_balance =
 			result.total === 0 ? 0 : $scope.round(result.t_balance*0.01);
+		    $scope.inventories = [];
 		}
 		angular.forEach(result.data, function(d){
 		    d.brand    = diablo_get_object(d.brand_id, filterBrand);
@@ -158,9 +159,20 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 		    // 	    float_add(float_add(r.balance, r.should_pay + r.e_pay), -r.has_pay)
 		    // 	}
 		    // }()
-		})
-		$scope.inventories = result.data;
-		diablo_order_page(page, $scope.items_perpage, $scope.inventories);
+		});
+
+		if ($scope.setting.se_pagination === diablo_no){
+		    $scope.inventories = result.data;
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.inventories);
+		} else {
+		    diablo_order(
+			result.data, (page - 1) * $scope.items_perpage + 1);
+		    $scope.inventories = $scope.inventories.concat(result.data);
+		}
+
+		$scope.current_page = page;
+		
 	    })
 	})
     }; 
@@ -168,7 +180,13 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     // default the first page
     $scope.do_search($scope.default_page);
 
+    $scope.auto_pagination = function(){
+	$scope.current_page += 1;
+	$scope.do_search($scope.current_page);
+    };
+    
     $scope.page_changed = function(){
+	console.log($scope.current_page);
 	$scope.do_search($scope.current_page);
     } 
 
