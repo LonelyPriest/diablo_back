@@ -8,6 +8,10 @@
 	</div>
 	<div class="actions">
 	  <div class="btn-group">
+	    <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	    
 	    <button class="btn btn-success purple-stripe"
 		    x-ng-disabled="disable_save()"
 		    x-ng-click="save_inventory()">保存
@@ -297,7 +301,14 @@
 
 		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
-		      <span x-ng-if="!inv.$new">{{inv.org_price * inv.reject}}</span>
+		      <span x-ng-if="!inv.$new">
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.org_price * inv.reject)}}
+			</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.org_price * inv.reject}}
+			</span>
+		      </span>
 		    </td>
 		    
 		    
@@ -355,6 +366,13 @@
 		      </div>
 		      
 		    </td>
+		  </tr>
+
+		  <tr x-ng-if="select.total!==0" class="text-center">
+		    <td colspan="7"></td>
+		    <td class="vert-align">{{select.total}}</td>
+		    <td class="vert-align">{{select.should_pay}}</td>
+		    <td colspan="1"></td>
 		  </tr>
 		</tbody>
 		

@@ -383,7 +383,14 @@
 
 		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
-		      <span x-ng-if="!inv.$new">{{round(inv.total * inv.org_price)}}</span>
+		      <span x-ng-if="!inv.$new">
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.total * inv.org_price)}}
+			</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.total * inv.org_price}}
+			</span>
+		      </span>
 		    </td>
 		    
 		    <td class="text-left vert-align">

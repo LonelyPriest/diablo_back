@@ -503,9 +503,15 @@
 			<td class="vert-align">
 			  <div x-ng-if="inv.sell
 					&& inv.fdiscount
-					&& (inv.fprice === 0 || inv.fprice)">
-			    <span>{{round(inv.fprice * inv.sell * inv.fdiscount * 0.01)}}
-			      </span>
+					&& (inv.fprice === 0 || inv.fprice) ">
+			    <span x-ng-if="setting.round===1">
+			      {{round(inv.fprice * inv.sell * inv.fdiscount * 0.01)}}
+			    </span>
+
+			    <span x-ng-if="setting.round===0">
+			      {{inv.fprice * inv.sell * inv.fdiscount * 0.01}}
+			    </span>
+			    
 			    <!-- <span> -->
 			    <!--   {{float_mul( -->
 			    <!--   float_mul(inv.sell, -->

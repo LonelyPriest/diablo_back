@@ -2,7 +2,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope, $q, $routeParams, diabloPromise, dateFilter, diabloPattern,
     diabloUtilsService, diabloFilter, wgoodService, purchaserService,
     user, filterBrand, filterFirm, filterType, filterEmployee,
-    filterSizeGroup, filterColor){
+    filterSizeGroup, filterColor, base){
 
     $scope.shops       = user.sortShops;
     $scope.brands      = filterBrand;
@@ -25,8 +25,18 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
     $scope.get_object = diablo_get_object;
     $scope.round      = diablo_round;
 
+    $scope.setting    = {
+	round: diablo_round_record
+    };
+
     $scope.go_back = function(){
 	diablo_goto_page("#/inventory_new_detail/" + $routeParams.ppage);
+    };
+
+    $scope.p_round = function(shopId){
+	// console.log(shopId);
+	return diablo_base_setting(
+	    "pround", shopId, base, parseInt, diablo_round_record);
     };
     // $('.table').floatThead();
 
@@ -74,8 +84,14 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.total);
-	    $scope.select.should_pay += $scope.round(one.org_price * one.total);
-	}; 
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay += $scope.round(one.org_price * one.total); 
+	    } else {
+		$scope.select.should_pay += one.org_price * one.total; 
+	    }
+	};
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = angular.isDefined($scope.select.e_pay)
 	    ? parseFloat($scope.select.e_pay) : 0.00;
@@ -182,6 +198,10 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	// $scope.old_select.rsn        = base.rsn;
 
 	$scope.select = angular.extend($scope.select, $scope.old_select);
+
+
+	// base setting
+	$scope.setting.round = $scope.p_round($scope.select.shop.id);
 
 	var length = invs.length;
 	var sorts  = [];

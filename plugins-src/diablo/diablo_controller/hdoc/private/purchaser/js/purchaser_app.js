@@ -65,7 +65,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	when('/update_new_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail_update.html',
             controller: 'purchaserInventoryNewUpdateCtrl',
-	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color)
+	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
 	}).
 	//
 	when('/inventory_reject', {

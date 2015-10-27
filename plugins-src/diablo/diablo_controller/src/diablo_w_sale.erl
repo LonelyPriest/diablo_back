@@ -579,7 +579,8 @@ handle_call({total_news, Merchant, Fields}, _From, State) ->
     {reply, Reply, State}; 
 
 handle_call({filter_news, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-    ?DEBUG("filter_new_with_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+    ?DEBUG("filter_new_with_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
 	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]),
     Sql = filter_table(w_sale_with_page, Merchant, CurrentPage, ItemsPerPage, Fields), 
     Reply =  ?sql_utils:execute(read, Sql),
@@ -1427,20 +1428,29 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 count_table(w_sale, Merchant, Conditions) -> 
     SortConditions = sort_condition(wsale, Merchant, Conditions),
 
-    SubSql = "select a.rsn, a.total, a.should_pay, a.has_pay"
-	", a.cash, a.card, a.wire, a.verificate"
-	" from w_sale a"
-	" where " ++ SortConditions, 
-    
     CountSql = "select count(*) as total"
-    	", sum(total) as t_amount"
-    	", sum(should_pay) as t_spay"
-    	", sum(has_pay) as t_hpay"
-    	", sum(cash) as t_cash"
-    	", sum(card) as t_card"
-    	", sum(wire) as t_wire"
-    	", sum(verificate) as t_verificate from ("
-	++  SubSql ++ ") b",
+    	", sum(a.total) as t_amount"
+    	", sum(a.should_pay) as t_spay"
+    	", sum(a.has_pay) as t_hpay"
+    	", sum(a.cash) as t_cash"
+    	", sum(a.card) as t_card"
+    	", sum(a.wire) as t_wire"
+    	", sum(a.verificate) as t_verificate"
+	" from w_sale a where " ++ SortConditions,
+    %% SubSql = "select a.rsn, a.total, a.should_pay, a.has_pay"
+    %% 	", a.cash, a.card, a.wire, a.verificate"
+    %% 	" from w_sale a"
+    %% 	" where " ++ SortConditions, 
+    
+    %% CountSql = "select count(*) as total"
+    %% 	", sum(total) as t_amount"
+    %% 	", sum(should_pay) as t_spay"
+    %% 	", sum(has_pay) as t_hpay"
+    %% 	", sum(cash) as t_cash"
+    %% 	", sum(card) as t_card"
+    %% 	", sum(wire) as t_wire"
+    %% 	", sum(verificate) as t_verificate from ("
+    %% 	++  SubSql ++ ") b",
     CountSql.
 
 filter_table(w_sale, Merchant, Conditions) ->

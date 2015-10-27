@@ -3,9 +3,13 @@ var diablo_delay = 1000; //ms
 
 var diablo_yes = 1;
 var diablo_no = 0;
+
 var diablo_frontend = 0;
 var diablo_backend = 1;
 var diablo_badrepo = 1;
+
+var diablo_round_record = 0;
+var diablo_round_row = 1;
 
 /*
  * storage key

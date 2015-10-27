@@ -63,9 +63,14 @@
 	  <div class="panel panel-default table-panel">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
-	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
-		<thead>
+	      <table id="t_rsn_detail"
+		     class="table table-bordered
+			    table-striped table-hover
+			    table-condensed table-advanced">
+		<thead class="stick-thead"
+		       fsm-sticky-header
+		       scroll-body="'#t_rsn_detail'"
+		       scroll-stop="50">
 		  <tr>
 		    <th>序号</th>
 		    <th x-ng-click="toggle_base()" class="danger">
@@ -121,7 +126,14 @@
 		      <span class="fg-red" x-ng-switch-when=1>
 			{{inv.total}}</span>
 		    </td>
-		    <td>{{round(inv.fprice * inv.fdiscount * 0.01 * inv.total)}}</td>
+		    <td>
+		      <span x-ng-if="setting.round===1">
+			{{round(inv.fprice * inv.fdiscount * 0.01 * inv.total)}}
+		      </span>
+		      <span x-ng-if="setting.round===0">
+			{{inv.fprice * inv.fdiscount * 0.01 * inv.total}}
+		      </span>
+		    </td> 
 		    <td>{{inv.comment}}</td>
 		    <td>{{inv.entry_date}}</td>
 		    <td>

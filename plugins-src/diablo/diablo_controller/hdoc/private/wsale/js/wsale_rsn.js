@@ -11,7 +11,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     
     $scope.flot_mul = diablo_float_mul;
     $scope.round    = diablo_round;
-    $scope.setting  = {};
+    $scope.setting  = {round:diablo_round_record};
 
     /*
      * hidden
@@ -78,6 +78,10 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 
     $scope.time   = diabloFilter.default_time($scope.qtime_start);
 
+    // base setting
+    $scope.setting.round = diablo_base_setting(
+	"pround", -1, base, parseInt, diablo_round_record);
+    
     $scope.setting.se_pagination = 
 	diablo_base_setting("se_pagination", -1, base, parseInt, diablo_no);
 

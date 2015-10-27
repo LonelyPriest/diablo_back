@@ -27,155 +27,184 @@
       <!--BEGIN table container-->
       <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
-	<div class="table-toolbar util-btn-margin-bottom-5">
+	<div class="table-toolbar"> 
+	  <!-- <\!--BEGIN form-group-\-> -->
+	  <!-- <div class="row"> -->
+	  <!--   <div class="col-xs-12 col-ms-12 col-md-12"> -->
+	  <!--     <div class="input-group"> -->
+	  <!-- 	<span class="input-group-addon bg-green"> -->
+	  <!-- 	  <i class="glyphicon glyphicon-hand-right fg-white"></i> -->
+	  <!-- 	</span> -->
+	  <!-- 	<input -->
+	  <!-- 	   class="form-control" -->
+	  <!-- 	   placeholder="支持名称/省/市/手机/地址查询" -->
+	  <!-- 	   typeahead-editable="false" -->
+	  <!-- 	   typeahead-on-select="on_select_retailer($item, $model, $label)" -->
+	  <!-- 	   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20" -->
+	  <!-- 	   x-ng-model="search"></input> -->
+	  <!--     </div> -->
+	  <!--   </div>  -->
+	  <!-- </div> <\!--END row-\-> -->
 	  
-	  <!--BEGIN form-group-->
-	  <div class="row">
-	    <div class="col-xs-12 col-ms-12 col-md-12">
-	      <div class="input-group">
-		<span class="input-group-addon bg-green">
-		  <i class="glyphicon glyphicon-hand-right fg-white"></i>
-		</span>
-		<input
-		   class="form-control"
-		   placeholder="支持名称/省/市/手机/地址查询"
-		   typeahead-editable="false"
-		   typeahead-on-select="on_select_retailer($item, $model, $label)"
-		   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20"
-		   x-ng-model="search"></input>
-	      </div>
-	    </div>
-
-	    <!-- <div class="col-xs-6 col-md-6"> -->
-	    <!--   <div class="input-group"> -->
-	    <!-- 	<span class="input-group-addon bg-green"> -->
-	    <!-- 	  <i class="glyphicon glyphicon-hand-right fg-white"></i> -->
-	    <!-- 	</span> -->
-	    <!-- 	  <input type="text" class="form-control" placeholder="请输入零售商联系方式" -->
-	    <!-- 		 x-ng-model="filter.phone"></input> -->
-	    <!--   </div> -->
-	    <!-- </div> -->
-	    
-	  </div> <!--END form-group-->	  
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 
 	<div class="portlet-body">
-	  <!--BEGIN panel-->
-	  <div class="panel panel-default table-panel">
-	    <div class="table-responsive">
-	      <!--EBGIN table supplier-->
-	      <table class="table table-bordered
-			    table-striped table-hover
-			    table-condensed table-advanced">
-		<thead>
-		  <tr>
-		    <th>序号</th>
-		    <th>名称</th>
-		    <th class="danger">欠款</th>
-		    <th>联系方式</th>
-		    <th>所在省（直辖市）</th>
-		    <th>所在市</th>
-		    <th>联系地址</th>
-		    <th>日期</th>
-		    <th>操作</th>
-		  </tr>
-		</thead>
-		<tbody>
-		  <tr ng-repeat="r in filter_retailers">
-		    <td>{{r.order_id}}</td>
-		    <td>{{r.name}}</td>
-		    <td>{{round(r.balance)}}</td>
-		    <td>
-		      <div x-ng-switch on="r.mobile">
-			<span x-ng-switch-when="">暂无</span>
-			<span x-ng-switch-default>{{r.mobile}}</span>
-		      </div>
-		    </td>
-		    <td>
-		      <div x-ng-switch on="r.pid">
-			<span x-ng-switch-when=-1>暂无</span>
-			<span x-ng-switch-default>{{r.province.name}}</span>
-		      </div>
-		    </td>
-		    <td>
-		      <div x-ng-switch on="r.cid">
-			<span x-ng-switch-when=-1>暂无</span>
-			<span x-ng-switch-default>{{r.city.name}}</span>
-		      </div>
-		    </td>
-		    <td>{{r.address}}</td>
-		    <td>{{r.entry_date}}</td>
-
-		    <td>
-		      <button class="btn diablo-button purple"
-			      x-ng-click="trans_info(r)">对帐
-			<i class="glyphicon glyphicon-check"></i></button>
-		      
-                      <button class="btn diablo-button btn-warning"
-			 x-ng-click="update_retailer(r)">修改
-			<i class="glyphicon glyphicon-edit"></i></button>
-		      
-                      <button href="" class="btn diablo-button btn-danger"
-			 x-ng-click="delete_retailer(r)">删除
-			<i class="glyphicon glyphicon-erase"></i></button>
-		    </td>
-		  </tr>
-
-		  <tr x-ng-if="total_items!==0" class="bg-white">
-		    <td colspan="2"></td>
-		    <td class="fg-red">{{total_balance}}</td> 
-		    <td colspan="6"></td>
-		  </tr>
-		  
-		</tbody>
-
-		<tfoot>
-		  <!-- <tr>  -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <span class="pagination"> -->
-		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		  <!-- 	  共 {{total_items}} 项</span> -->
-		  <!--     </span> -->
-		  <!--     <pagination -->
-		  <!-- 	 class="pagination-lg pull-right" -->
-		  <!-- 	 total-items="total_items" -->
-		  <!-- 	 items-per-page="items_perpage" -->
-		  <!-- 	 num-pages="num_pages" -->
-		  <!-- 	 max-size="max_page_size" -->
-		  <!-- 	 boundary-links="true" -->
-		  <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 	 x-ng-model="current_page" -->
-		  <!-- 	 x-ng-change="page_changed()"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
-		</tfoot>
-		
-	      </table> <!--END supplier table-->
-	    </div> <!--END table responsive-->
+	  <tabset>
 	    
-	  </div> <!--END panel-->
+	    <tab>
+	      <tab-heading>详情</tab-heading>
+	      <div class="table-toolbar util-btn-margin-bottom-5">
+		<div class="row">
+		  <div class="col-xs-12 col-ms-12 col-md-12">
+		    <div class="input-group">
+		      <span class="input-group-addon">
+			<i class="glyphicon glyphicon-search fg-red"></i>
+		      </span>
+		      <input
+			 class="form-control"
+			 placeholder="支持名称/省/市/手机/地址查询"
+			 typeahead-editable="false"
+			 typeahead-on-select="on_select_retailer($item, $model, $label)"
+			 typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20"
+			 x-ng-model="search"></input>
+		    </div>
+		  </div>
+		</div> <!--END row-->
+	      </div>
+
+	      <!--BEGIN panel-->
+
+	      <div class="panel panel-default table-panel"> 
+		<div class="table-responsive">
+		  <!--EBGIN table supplier-->
+		  <table class="table table-bordered
+				table-striped table-hover
+				table-condensed table-advanced">
+		    <thead>
+		      <tr>
+			<th>序号</th>
+			<th>名称</th>
+			<th class="danger">欠款</th>
+			<th>联系方式</th>
+			<th>所在省（直辖市）</th>
+			<th>所在市</th>
+			<th>联系地址</th>
+			<th>日期</th>
+			<th>操作</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr ng-repeat="r in filter_retailers">
+			<td>{{r.order_id}}</td>
+			<td>{{r.name}}</td>
+			<td>{{round(r.balance)}}</td>
+			<td>
+			  <div x-ng-switch on="r.mobile">
+			    <span x-ng-switch-when="">暂无</span>
+			    <span x-ng-switch-default>{{r.mobile}}</span>
+			  </div>
+			</td>
+			<td>
+			  <div x-ng-switch on="r.pid">
+			    <span x-ng-switch-when=-1>暂无</span>
+			    <span x-ng-switch-default>{{r.province.name}}</span>
+			  </div>
+			</td>
+			<td>
+			  <div x-ng-switch on="r.cid">
+			    <span x-ng-switch-when=-1>暂无</span>
+			    <span x-ng-switch-default>{{r.city.name}}</span>
+			  </div>
+			</td>
+			<td>{{r.address}}</td>
+			<td>{{r.entry_date}}</td>
+
+			<td>
+			  <button class="btn diablo-button purple"
+				  x-ng-click="trans_info(r)">对帐
+			    <i class="glyphicon glyphicon-check"></i></button>
+			  
+			  <button class="btn diablo-button btn-warning"
+				  x-ng-click="update_retailer(r)">修改
+			    <i class="glyphicon glyphicon-edit"></i></button>
+			  
+			  <button href="" class="btn diablo-button btn-danger"
+				  x-ng-click="delete_retailer(r)">删除
+			    <i class="glyphicon glyphicon-erase"></i></button>
+			</td>
+		      </tr>
+
+		      <tr x-ng-if="total_items!==0" class="bg-white">
+			<td colspan="2"></td>
+			<td class="fg-red">{{total_balance}}</td> 
+			<td colspan="6"></td>
+		      </tr>
+		      
+		    </tbody>
+
+		    <tfoot>
+		      <!-- <tr>  -->
+		      <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
+		      <!--     <span class="pagination"> -->
+		      <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
+		      <!-- 	  共 {{total_items}} 项</span> -->
+		      <!--     </span> -->
+		      <!--     <pagination -->
+		      <!-- 	 class="pagination-lg pull-right" -->
+		      <!-- 	 total-items="total_items" -->
+		      <!-- 	 items-per-page="items_perpage" -->
+		      <!-- 	 num-pages="num_pages" -->
+		      <!-- 	 max-size="max_page_size" -->
+		      <!-- 	 boundary-links="true" -->
+		      <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
+		      <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
+		      <!-- 	 x-ng-model="current_page" -->
+		      <!-- 	 x-ng-change="page_changed()"></pagination> -->
+		      <!--   </td> -->
+		      <!-- </tr> -->
+		    </tfoot>
+		    
+		  </table> <!--END supplier table-->
+		</div> <!--END table responsive-->
+		
+	      </div> <!--END panel-->
+
+	      <div x-ng-show="total_items>items_perpage" class="row">
+		<div class="col-md-12, col-sm-12, col-xs-12"> 
+		  <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		    共 {{total_items}} 项</span>
+		  <pagination
+		     class="pagination-lg table-pagination pull-right"
+		     total-items="total_items"
+		     items-per-page="items_perpage"
+		     num-pages="num_pages"
+		     max-size="max_page_size"
+		     boundary-links="true"
+		     previous-text="&lsaquo;" next-text="&rsaquo;"
+		     first-text="&laquo;" last-text="&raquo;"
+		     x-ng-model="current_page"
+		     x-ng-change="page_changed()">
+		  </pagination>
+		</div>
+	      </div> 
+	    </tab>
+
+	    <tab>
+	      <tab-heading>地理分布
+		<i class="glyphicon glyphicon-map-marker"></i>
+	      </tab-heading>
+	      
+	      <div class="panel panel-default"> 
+		<diablo-map></diablo-map> 
+	      </div>
+	    </tab>
+	    
+	  </tabset>
+	  
 	</div> <!--END portlet body-->
 	
-	<div x-ng-show="total_items>items_perpage" class="row">
-	  <div class="col-md-12, col-sm-12, col-xs-12"> 
-	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
-	      共 {{total_items}} 项</span>
-	    <pagination
-	       class="pagination-lg table-pagination pull-right"
-	       total-items="total_items"
-	       items-per-page="items_perpage"
-	       num-pages="num_pages"
-	       max-size="max_page_size"
-	       boundary-links="true"
-	       previous-text="&lsaquo;" next-text="&rsaquo;"
-	       first-text="&laquo;" last-text="&raquo;"
-	       x-ng-model="current_page"
-	       x-ng-change="page_changed()">
-	    </pagination>
-	  </div>
-	</div>
+	
 		  
       </div> <!--END table container-->
       

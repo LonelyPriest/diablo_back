@@ -20,7 +20,11 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.round       = diablo_round;
     
     $scope.setting     = {
-	q_backend:true, show_discount:true, check_sale:true, trace_price:true};
+	q_backend:true,
+	show_discount:true,
+	check_sale:true,
+	trace_price:true,
+	round: diablo_round_record};
 
     // $scope.old_base    = {};
     $scope.old_select  = {};
@@ -40,6 +44,11 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.trace_price = function(shopId){
 	return diablo_base_setting(
 	    "ptrace_price", shopId, base, parseInt, diablo_no); 
+    };
+
+    $scope.p_round = function(){
+	return diablo_base_setting(
+	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
     };
 
     $scope.check_sale = function(shopId){
@@ -107,9 +116,21 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.sell);
 	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
-	    $scope.select.should_pay
-		+= $scope.round(one.fprice * one.sell * one.fdiscount * 0.01);
+
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(
+			one.fprice * one.fdiscount * 0.01 * one.sell);
+	    } else {
+		$scope.select.should_pay
+		    += one.fprice * one.fdiscount * 0.01 * one.sell; 
+	    }
+	    
+	    // $scope.select.should_pay
+	    // 	+= $scope.round(one.fprice * one.sell * one.fdiscount * 0.01);
 	}
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = angular.isDefined(diablo_set_float($scope.select.e_pay))
 	    ? $scope.select.e_pay : 0;
@@ -256,6 +277,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.setting.check_sale    = $scope.check_sale($scope.select.shop.id);
 	    $scope.setting.trace_price   = $scope.trace_price($scope.select.shop.id);
 	    $scope.setting.show_discount = $scope.show_discount();
+	    $scope.setting.round         = $scope.p_round();
 	    console.log($scope.setting);
 
 	    // console.log($scope.select);

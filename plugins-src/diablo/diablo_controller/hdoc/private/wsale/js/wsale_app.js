@@ -287,10 +287,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	diablo_goto_page("#/new_wsale_detail");
     };
 
-    $scope.setting = {q_backend:true,
-		      show_discount:true,
-		      check_sale:true,
-		      trace_price:true};
+    $scope.setting = {q_backend     :true,
+		      show_discount :true,
+		      check_sale    :true,
+		      trace_price   :true,
+		      round         :diablo_round_record};
 
     // all right of user
     // console.log(user); 
@@ -330,6 +331,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.show_discount = function(){
 	return diablo_base_setting(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+
+    $scope.p_round = function(){
+	return diablo_base_setting(
+	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
     };
 
     $scope.check_sale = function(shopId){
@@ -401,6 +407,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.local_save();
 	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
 	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
+	$scope.setting.show_discount = $scope.show_discount();
+	$scope.setting.round         = $scope.p_round();
+	
 	wsaleGoodService.set_shop($scope.select.shop.id);
     } 
 
@@ -524,6 +533,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     // console.log($scope.qtime_start);
 
     $scope.setting.show_discount = $scope.show_discount();
+    $scope.setting.round         = $scope.p_round();
 
     $scope.setting.q_backend = $scope.q_typeahead($scope.select.shop.id);
     if (!$scope.setting.q_backend){
@@ -1230,12 +1240,21 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
 
 	    // var f1 = $scope.round(one.fprice * one.fdiscount * 0.01);
-	    $scope.select.should_pay
-		+= $scope.round(one.fprice * one.fdiscount * 0.01 * one.sell); 
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(
+			one.fprice * one.fdiscount * 0.01 * one.sell);
+	    } else {
+		$scope.select.should_pay
+		    += one.fprice * one.fdiscount * 0.01 * one.sell; 
+	    }
+	    
 	    // console.log($scope.select.should_pay);
 	    // $scope.select.should_pay
 	    // 	= $scope.select.should_pay + one.fprice * one.sell * one.fdiscount * 0.01;
 	}
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay); 
 	
 
 	// console.log($scope.select.extra_pay);

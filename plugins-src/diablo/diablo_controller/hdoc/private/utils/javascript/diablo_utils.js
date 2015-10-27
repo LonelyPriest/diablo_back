@@ -145,6 +145,52 @@ diabloUtils.directive('ngModelOnblur', function() {
     };
 });
 
+diabloUtils.directive("diabloMap", function($parse, $compile){
+    function postLinkFn (scope, element, attrs){
+	// $compile(element);
+	// if (scope.active){
+	
+	var ctx = element[0];
+	// console.log(element[0]);
+	// ctx.css({height:500px});
+	var map = new BMap.Map(ctx);
+	// var point = new BMap.Point(113.141581,27.834504); 
+	// map.centerAndZoom(point, 7);
+	map.centerAndZoom("湖南省", 9);
+	map.addControl(new BMap.NavigationControl());
+	// }
+
+	var geo = new BMap.Geocoder();
+	geo.getPoint("株洲市", function(p){
+	    if (p){
+		map.centerAndZoom(p, 9);
+		map.addOverlay(new BMap.Marker(p));
+	    }
+	}, "湖南省")
+	
+	
+    };
+    
+    return{
+	restrict: 'E',
+	// template: '<canvas width="800" height="400"></canvas>',
+	// template: '<div style="width:800px;height:400px"></div>',
+	template: '<div></div>', 
+	replace: true,
+	transclude: true,
+	// require: "ngModel",
+	scope: {
+	    active: '=',
+	},
+
+	compile: function(element, attrs){
+	    element.css({height:$(document).height()});
+	    // element.attr("width", $(document).width()/2);
+	    // element.attr("height", $(document).height()/2);
+	    return postLinkFn;
+	}
+    }
+});
 
 diabloUtils.directive('infiniteScroll', ['$rootScope', '$window', '$timeout', function($rootScope, $window, $timeout){
     return {

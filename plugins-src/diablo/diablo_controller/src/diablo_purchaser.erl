@@ -1387,20 +1387,22 @@ sql(wfix, RSN, DateTime, Merchant, Shop, Inventories) ->
       end, [], Inventories).
 
 count_table(w_inventory_new, Merchant, Conditions) -> 
-    SubSql = "select a.rsn, a.total, a.should_pay, a.has_pay"
-	", a.cash, a.card, a.wire, a.verificate"
-	" from w_inventory_new a"
-	" where " ++ ?w_good_sql:sort_condition(w_inventory_new, Merchant, Conditions),
+    %% SubSql = "select a.rsn, a.total, a.should_pay, a.has_pay"
+    %% 	", a.cash, a.card, a.wire, a.verificate"
+    %% 	" from w_inventory_new a"
+    %% 	" where "
+    %% 	++ ?w_good_sql:sort_condition(w_inventory_new, Merchant, Conditions),
 
     CountSql = "select count(*) as total"
-    	", sum(total) as t_amount"
-    	", sum(should_pay) as t_spay"
-    	", sum(has_pay) as t_hpay"
-    	", sum(cash) as t_cash"
-    	", sum(card) as t_card"
-    	", sum(wire) as t_wire"
-    	", sum(verificate) as t_verificate from ("
-	++ SubSql ++ ") a",
+    	", sum(a.total) as t_amount"
+    	", sum(a.should_pay) as t_spay"
+    	", sum(a.has_pay) as t_hpay"
+    	", sum(a.cash) as t_cash"
+    	", sum(a.card) as t_card"
+    	", sum(a.wire) as t_wire"
+    	", sum(a.verificate) as t_verificate"
+	" from w_inventory_new a where "
+	++ ?w_good_sql:sort_condition(w_inventory_new, Merchant, Conditions),
     CountSql.
 
 

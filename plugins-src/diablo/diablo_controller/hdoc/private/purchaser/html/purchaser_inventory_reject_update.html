@@ -272,7 +272,14 @@
 
 		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
-		      <span x-ng-if="!inv.$new">{{inv.org_price * inv.reject}}</span>
+		      <span x-ng-if="!inv.$new">
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.org_price * inv.reject)}}
+			</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.org_price * inv.reject}}
+			</span>
+		      </span>
 		    </td>
 		    
 		    

@@ -3,7 +3,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterBrand, filterFirm, filterType, filterEmployee,
     filterSizeGroup, filterColor, base){
-    console.log(user);
+    // console.log(user);
 
     // $scope.shops     = user.sortShops;
     $scope.shops           = user.sortBadRepoes.concat(user.sortShops);
@@ -23,16 +23,24 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope.e_pay_types     = purchaserService.extra_pay_types;
 
     $scope.setting         = {
-	reject_negative: false
+	reject_negative: false,
+	round: diablo_round_record
+    };
+
+    $scope.reject_negative = function(shopId){
+	return diablo_base_setting(
+	    "reject_negative", shopId, base, parseInt, diablo_no)
+    };
+    
+    $scope.p_round = function(shopId){
+	// console.log(shopId);
+	return diablo_base_setting(
+	    "pround", shopId, base, parseInt, diablo_round_record);
     };
 
     $scope.go_back = function(){
 	diablo_goto_page("#/inventory_new_detail/" + $routeParams.ppage);
     };
-
-    // base setting
-    $scope.setting.reject_negative = diablo_base_setting(
-	"reject_negative", -1, base, parseInt, diablo_no);
 
     var dialog = diabloUtilsService;
     var setv   = diablo_set_float;
@@ -50,8 +58,15 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.reject);
-	    $scope.select.should_pay += $scope.round(one.org_price * one.reject);
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(one.org_price * one.reject);
+	    } else {
+		$scope.select.should_pay += one.org_price * one.reject;
+	    }
 	};
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = 0.00;
 	if(angular.isDefined($scope.select.e_pay)
@@ -148,6 +163,11 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	$scope.old_select.rsn          = base.rsn;
 
 	$scope.select = angular.extend($scope.select, $scope.old_select);
+
+	// base setting
+	$scope.setting.reject_negative
+	    = $scope.reject_negative($scope.select.shop.id);
+	$scope.setting.round = $scope.p_round($scope.select.shop.id);
 
 	var length = invs.length;
 	var sorts  = [];

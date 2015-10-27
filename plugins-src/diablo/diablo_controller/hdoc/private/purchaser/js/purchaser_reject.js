@@ -2,7 +2,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
-    console.log(user);
+    // console.log(user);
 
     // $scope.shops     = user.sortShops;
     $scope.shops             = user.sortBadRepoes.concat(user.sortShops);
@@ -18,7 +18,12 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.timeout_auto_save = undefined;
     $scope.round             = diablo_round;
     $scope.setting           = {
-	reject_negative: false
+	reject_negative: false,
+	round: diablo_round_record
+    };
+
+    $scope.go_back = function(){
+	diablo_goto_page("#/inventory_new_detail");
     };
 
     var now = $.now();
@@ -49,7 +54,12 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     };
 
     $scope.change_shop = function(){
-	console.log($scope.select.shop);
+	// console.log($scope.select.shop);
+	$scope.setting.reject_negative = diablo_base_setting(
+	    "reject_negative", $scope.select.shop.id, base, parseInt, diablo_no);
+
+	$scope.setting.round = diablo_base_setting(
+	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
 	if ($scope.q_prompt === diablo_frontend){
 	    $scope.get_all_prompt_inventory();
 	}
@@ -76,8 +86,15 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.reject);
-	    $scope.select.should_pay -= one.org_price * one.reject;
+
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay -= $scope.round(one.org_price * one.reject);
+	    } else {
+		$scope.select.should_pay -= one.org_price * one.reject; 
+	    } 
 	}
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = 0.00;
 	if(angular.isDefined($scope.select.extra_pay)
@@ -112,6 +129,12 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     if ($scope.shops.length !== 0){
 	$scope.select.shop = $scope.shops[0];
     }
+
+    $scope.setting.reject_negative = diablo_base_setting(
+	"reject_negative", $scope.select.shop.id, base, parseInt, diablo_no);
+
+    $scope.setting.round = diablo_base_setting(
+	"pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
     
     // calender
     $scope.open_calendar = function(event){
@@ -140,9 +163,6 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
     };
 
-    $scope.setting.reject_negative = diablo_base_setting(
-	"reject_negative", -1, base, parseInt, diablo_no);
-
     // console.log($scope.setting);
 
     $scope.get_all_prompt_inventory = function(){
@@ -158,7 +178,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 			  "，" + inv.brand + "，" + inv.type})
 	    });
 
-	    console.log($scope.all_prompt_inventory);
+	    // console.log($scope.all_prompt_inventory);
 	});
     };
     

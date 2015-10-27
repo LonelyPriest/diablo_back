@@ -269,8 +269,11 @@
 		    </td>
 
 		    <td class="vert-align">
-		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount">
-			<span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
+		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount"> 
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.sell * inv.fprice * inv.fdiscount * 0.01}}</span>
 		      </div>
 		    </td>
 		    
@@ -393,7 +396,7 @@
 	      <input class="form-control text-center"
 		     type="number" step="0.01" 
 		     required
-		     x-ng-pattern="/^\d+$/"
+		     x-ng-pattern="/^\d+(.\d{1,2})?$/"
 		     x-ng-model="params.fprice"></input>
 	    </div> 
 	  </form> 

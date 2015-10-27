@@ -330,6 +330,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    ) 
 	};
     };
+    
 
     /*
      * pagination

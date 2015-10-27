@@ -444,7 +444,14 @@
 
 		    <td class="vert-align"> 
 		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount">
-			<span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.fprice * inv.sell * inv.fdiscount * 0.01)}}
+			</span>
+
+			<span x-ng-if="setting.round===0">
+			  {{inv.fprice * inv.sell * inv.fdiscount * 0.01}}
+			</span> 
+			<!-- <span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span> -->
 		      </div>
 		    </td>
 		    

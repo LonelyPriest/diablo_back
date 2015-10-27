@@ -280,9 +280,9 @@ wreportApp.controller("dailyByGood", function(
 
 		// $scope.s_data = angular.copy(result.data);
 
-		// angular.forEach($scope.result.data, function(s){
-		//     s.shop = diablo_get_object(s.shop_id, $scope.sortShops); 
-		// });
+		angular.forEach(result.data, function(s){
+		    s.shop = diablo_get_object(s.shop_id, $scope.sortShops); 
+		});
 
 		// diablo_order_page(
 		//     page, $scope.s_pagination.items_perpage, $scope.s_data);

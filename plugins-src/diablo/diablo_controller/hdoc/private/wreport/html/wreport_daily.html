@@ -88,10 +88,14 @@
 	       select="do_search(r_pagination.current_page)">
 	    <div class="panel panel-default table-panel">
 	      <div class="table-responsive">
-		<table class="table table-bordered 
+		<table id="by_retailer"
+		       class="table table-bordered 
 			      table-striped table-hover
 			      table-condensed table-advanced">
-		  <thead>
+		  <thead class="stick-thead"
+			 fsm-sticky-header
+			 scroll-body="'#by_retailer'"
+			 scroll-stop="50">
 		    <tr>
 		      <th>序号</th>
 		      <th>零售商</th>
@@ -197,10 +201,14 @@
 	       select="do_search(s_pagination.current_page)">
 	    <div class="panel panel-default table-panel">
 	      <div class="table-responsive">
-		<table class="table table-bordered 
+		<table id="by_stylenumber"
+		       class="table table-bordered 
 			      table-striped table-hover
 			      table-condensed table-advanced">
-		  <thead>
+		  <thead class="stick-thead"
+			 fsm-sticky-header
+			 scroll-body="'#by_stylenumber'"
+			 scroll-stop="50">
 		    <tr>
 		      <th>序号</th>
 		      <th>店铺</th>

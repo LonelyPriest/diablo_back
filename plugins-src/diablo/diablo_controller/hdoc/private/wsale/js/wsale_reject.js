@@ -18,7 +18,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     $scope.setting = {q_backend:true,
 		      show_discount:true,
 		      check_sale:true,
-		      trace_price:true};
+		      trace_price:true,
+		      round:diablo_round_record};
 
     $scope.pattern = {reject:diabloPattern.positive_num,
 		      price:diabloPattern.positive_decimal_2};
@@ -41,9 +42,18 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
     };
 
+    $scope.p_round = function(){
+	return diablo_base_setting(
+	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
+    };
+    
     $scope.show_discount = function(){
 	return diablo_base_setting(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+
+    $scope.go_back = function(){
+	diablo_goto_page("#/new_wsale_detail");
     };
 
     var now = $.now();
@@ -120,7 +130,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
 
     $scope.setting.show_discount = $scope.show_discount();
-    $scope.setting.q_backend = $scope.q_typeahead();
+    $scope.setting.round         = $scope.p_round();
+    
+    $scope.setting.q_backend     = $scope.q_typeahead();
     if (!$scope.setting.q_backend){
 	diabloNormalFilter.match_all_w_inventory(
 	    {shop:$scope.select.shop.id,
@@ -402,10 +414,20 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
-	    $scope.select.total += parseInt(one.reject); 
-	    $scope.select.should_pay
-		+= $scope.round(one.reject * one.fdiscount * 0.01 * one.fprice);
+	    $scope.select.total += parseInt(one.reject);
+
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(
+			one.reject * one.fdiscount * 0.01 * one.fprice);
+	    } else {
+		$scope.select.should_pay
+		    += one.reject * one.fdiscount * 0.01 * one.fprice;
+	    }
+	    
 	}
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = 0.00;
 	if(angular.isDefined($scope.select.extra_pay)

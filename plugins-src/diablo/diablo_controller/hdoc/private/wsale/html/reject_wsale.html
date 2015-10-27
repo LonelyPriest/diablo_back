@@ -7,6 +7,10 @@
 	  销售退货
 	</div>
 	<div class="actions">
+	  <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	  
 	  <button class="btn btn-success purple-stripe"
 		  x-ng-disabled="disable_save()"
 		  x-ng-click="save_inventory()">保存
@@ -349,7 +353,12 @@
 		    <td class="vert-align">
 		      <div x-ng-if="inv.reject">
 			<!-- <span>{{inv.reject * inv[inv.sell_style.f] * inv.discount / 100}}</span> -->
-			<span>{{round(inv.reject * inv.fprice * inv.fdiscount *  0.01)}}</span>
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.reject * inv.fprice * inv.fdiscount *  0.01)}}
+			</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.reject * inv.fprice * inv.fdiscount *  0.01}}
+			</span>
 		      </div>
 		    </td>
 		    

@@ -8,7 +8,11 @@
 	</div>
 	<div class="actions">
 	  <div class="btn-group">
-	    <button class="btn btn-info purple-stripe"
+	    <button type="button" class="btn red"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	    
+	    <button class="btn btn-info purple-stripe" 
 		    x-ng-disabled="disable_draft()"
 		    x-ng-click="list_draft()">获取草稿
 	      <i class="glyphicon glyphicon-send"></i></button>
@@ -410,7 +414,12 @@
 		    <td class="vert-align">
 		      <span x-ng-if="inv.$new"></span>
 		      <span x-ng-if="!inv.$new">
-			{{round(inv.total * inv.org_price)}}
+			<span x-ng-if="setting.round===1">
+			  {{round(inv.total * inv.org_price)}}
+			</span>
+			<span x-ng-if="setting.round===0">
+			  {{inv.total * inv.org_price}}
+			</span>
 		      </span>
 		    </td>
 		    

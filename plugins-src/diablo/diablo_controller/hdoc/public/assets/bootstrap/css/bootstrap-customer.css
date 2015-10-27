@@ -130,3 +130,5 @@ input[type="number"] {
 }
 /* } */
 
+
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

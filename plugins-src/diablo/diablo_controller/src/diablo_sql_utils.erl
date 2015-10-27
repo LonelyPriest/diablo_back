@@ -130,10 +130,8 @@ execute(read, Sql) ->
 	    {error, ?err(db_error, Error)}
     end;
 
-execute(s_read, Sql) ->
-    R = ?mysql:fetch(read, Sql),
-    ?DEBUG("r ~p", [R]),
-    case R of
+execute(s_read, Sql) -> 
+    case ?mysql:fetch(read, Sql) of
 	{ok, []} ->
 	    {ok, []};
 	{ok, {Results}} ->

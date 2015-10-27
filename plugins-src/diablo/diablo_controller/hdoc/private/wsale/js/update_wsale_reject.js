@@ -26,7 +26,8 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     $scope.setting  = {q_backend:true,
 		       show_discount:true,
 		       check_sale:true,
-		       trace_price: true};
+		       trace_price:true,
+		       round:diablo_round_record};
     
     var dialog      = diabloUtilsService;
 
@@ -39,6 +40,11 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
     };
 
+    $scope.p_round = function(){
+	return diablo_base_setting(
+	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
+    };
+    
     $scope.check_sale = function(shopId){
 	return diablo_base_setting(
 	    "check_sale", shopId, base, parseInt, diablo_yes);
@@ -167,6 +173,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    // console.log($scope.select);
 	    // setting
 	    $scope.setting.show_discount = $scope.show_discount();
+	    $scope.setting.round         = $scope.p_round();
 	    $scope.setting.check_sale    = $scope.check_sale($scope.select.shop.id);
 	    $scope.setting.trace_price		 = $scope.trace_price($scope.select.shop.id);
 	    console.log($scope.setting);
@@ -601,13 +608,20 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
-	    $scope.select.total += parseInt(one.sell); 
-	    $scope.select.should_pay
-		+= $scope.round(one.sell * one.fprice * one.fdiscount * 0.01);
-		// $scope.f_add(
-		//     $scope.select.should_pay, 
-		//     (one.sell * one.fdiscount * 0.01) * one.fprice);
+	    $scope.select.total += parseInt(one.sell);
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(one.sell * one.fprice * one.fdiscount * 0.01);
+	    } else {
+		$scope.select.should_pay
+		    += one.sell * one.fprice * one.fdiscount * 0.01;
+	    } 
+	    // $scope.f_add(
+	    //     $scope.select.should_pay, 
+	    //     (one.sell * one.fdiscount * 0.01) * one.fprice);
 	}
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	var e_pay = 0.00;
 	if(angular.isDefined($scope.select.e_pay)

@@ -96,6 +96,11 @@ baseApp.service("baseService", function($resource){
 			{cname:"1年",   value: 365},
 			{cname:"2年",   value: 730}];
 
+    this.round_names = [
+	{cname:"整单四舍五入", value: 0},
+	{cname:"单款四舍五入", value: 1}
+    ];
+
     var http = $resource("/wbase/:operation/:id", {operation: '@operation'},
 			 {
 			     query_by_post: {method: 'POST', isArray: true}
@@ -256,7 +261,8 @@ baseApp.controller("printOptionCtrl", function(
     $scope.print_formats = baseService.print_formats;
     $scope.yes_no        = baseService.yes_no;
     $scope.time_length   = baseService.time_length;
-    $scope.prompt_types  = baseService.prompt_types; 
+    $scope.prompt_types  = baseService.prompt_types;
+    $scope.round_names   = baseService.round_names;
     console.log($scope.print_formats);
 
     $scope.show_switch = function(name){
@@ -409,9 +415,13 @@ baseApp.controller("printOptionCtrl", function(
 	if (s.ename === 'qtypeahead'){
 	    angular.extend(s, {prompt_types: $scope.prompt_types}); 
 	};
+	if (s.ename === 'pround'){
+	    angular.extend(s, {round_names: $scope.round_names}); 
+	};
+	
 	if (s.ename === 'ptable'
 	    || s.ename === 'pretailer'
-	    || s.ename === 'pround'
+	    // || s.ename === 'pround'
 	    || s.ename === 'ptrace_price'
 	    || s.ename === 'pim_print'
 	    || s.ename === 'reject_negative'

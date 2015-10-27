@@ -19,6 +19,10 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope.disable_refresh   = true;
     $scope.timeout_auto_save = undefined;
 
+    $scope.setting  = {
+	round:diablo_round_record
+    };
+    
     $scope.q_prompt        = diablo_backend;
     
     $scope.right_update_orgprice = function(){
@@ -48,6 +52,17 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	return diablo_base_setting(
 	    "qtypeahead", shopId, base, parseInt, diablo_backend);
     };
+
+    $scope.p_round = function(shopId){
+	// console.log(shopId);
+	return diablo_base_setting(
+	    "pround", shopId, base, parseInt, diablo_round_record);
+    };
+
+    $scope.go_back = function(){
+	diablo_goto_page("#/inventory_new_detail");
+    };
+	
 
     $scope.change_firm = function(){
 	console.log($scope.select.firm);
@@ -121,6 +136,11 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     if ($scope.employees.length !== 0){
 	$scope.select.employee = $scope.employees[0];
     }
+
+
+    $scope.setting.round = $scope.p_round($scope.select.shop.id);
+
+    // console.log($scope.setting);
 
     // $scope.get_inventory = function(index){
     // 	$scope.current_inventories = []; 
@@ -621,8 +641,16 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
 	    $scope.select.total      += parseInt(one.total);
-	    $scope.select.should_pay += $scope.round(one.org_price * one.total);
-	}; 
+
+	    if ($scope.setting.round === diablo_round_row){
+		$scope.select.should_pay
+		    += $scope.round(one.org_price * one.total);
+	    } else {
+		$scope.select.should_pay += one.org_price * one.total; 
+	    }
+	};
+
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
 	$scope.select.left_balance =
 	    $scope.select.surplus + $scope.select.should_pay + e_pay

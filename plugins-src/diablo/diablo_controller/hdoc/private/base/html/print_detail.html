@@ -81,7 +81,7 @@
 		      </span>
 
 		      <span ng-switch-when="pround">
-			{{yes_no[s.value].cname}}
+			{{round_names[s.value].cname}}
 		      </span>
 		      
 		      <span ng-switch-when="ptrace_price">
@@ -297,8 +297,8 @@
 		      class="form-control" required
 		      name="value"
 		      x-ng-model="params.setting.value"
-		      x-ng-options="t as t.cname for t in params.setting.yes_no"
-		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
+		      x-ng-options="t as t.cname for t in params.setting.round_names"
+		      x-ng-init="params.setting.value=params.setting.round_names[params.setting.value]">
 	      </select>
 
 	      <select x-ng-switch-when="ptrace_price"
