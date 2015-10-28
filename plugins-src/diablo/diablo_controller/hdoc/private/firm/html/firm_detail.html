@@ -34,8 +34,8 @@
 
 	    <div class="col-xs-12 col-ms-12 col-md-12">
 	      <div class="input-group">
-		<span class="input-group-addon bg-green">
-		  <i class="glyphicon glyphicon-hand-right fg-white"></i>
+		<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-search fg-red"></i>
 		</span>
 		<input
 		   class="form-control"
@@ -131,9 +131,8 @@
 	    </div> <!--END table responsive-->
 	    
 	  </div> <!--END panel-->
-	</div> <!--END portlet body-->
 
-	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div x-ng-show="total_items>items_perpage" class="row">
 	  <div class="col-md-12, col-sm-12, col-xs-12">
 	
 	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
@@ -152,6 +151,10 @@
 	    </pagination>
 	  </div>
 	</div>
+	  
+	</div> <!--END portlet body-->
+
+	
 	
       </div> <!--END table container-->
       

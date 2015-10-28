@@ -78,7 +78,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var storage = localStorageService.get(diablo_key_retailer_trans);
-    console.log(storage);
+    // console.log(storage);
     if (angular.isDefined(storage) && storage !== null){
 	$scope.filters      = storage.filter;
 	$scope.qtime_start  = storage.start_time; 

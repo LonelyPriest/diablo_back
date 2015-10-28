@@ -214,7 +214,7 @@ handle_call({new_city, City, Province}, _From, State) ->
     end;
 
 handle_call(list_city, _From, State)->
-    Sql = "select id, name from city where deleted=" ++  ?to_s(?NO),
+    Sql = "select id, name, province as pid from city where deleted=" ++  ?to_s(?NO),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 

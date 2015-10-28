@@ -1726,60 +1726,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	$scope.show.comment = !$scope.show.comment;
     }; 
 
-    // $scope.touchstart = function(e){
-    // 	console.log(e);
-    // };
     
-    /*
-     * pan
-     */
-    // var pan_left;
-    // $scope.pan_start  = function (event){
-    // 	pan_left = event.element.position().left;
-    // 	// pan_top  = event.element.position().top;
-    // 	// console.log(event.element.position());
-    // };
-
-    // $scope.pan_move = function(event){
-    // 	var left  = pan_left + event.deltaX;
-    // 	var width = event.element.outerWidth() / 2.0;
-	
-    // 	if (left < 0 && left >= -width){
-    // 	    event.element.css('left', '' + left + 'px'); 
-    // 	}
-
-    // 	if (left > 0){
-    // 	    event.element.css('left', '0px');
-    // 	}
-
-    // };
-
-    // $scope.pan_end = function(event){
-    // 	// console.log(event);
-    // 	// if (!$scope.allowed_slide){
-    // 	//     return;
-    // 	// }
-	
-    // 	// var left = pan_left + event.deltaX;
-    // 	// var width = event.element.outerWidth() / 5.0;
-    // 	// console.log(left);
-    // 	// if (left < 0 && left <= -width){
-    // 	//     $scope.show.action = true;
-    // 	//     $scope.show.slide  = true;
-    // 	//     event.element.css('left', '' + '0'); 
-    // 	// } else {
-    // 	//     event.element.css('left', '0');
-    // 	// }
-
-    // 	// if (left > 0){
-    // 	//     $scope.show.action = false;
-    // 	//     $scope.show.slide  = false;
-    // 	//     event.element.css('left', '0'); 
-    // 	// }
-    // 	// console.log(event);
-    // };
-    
-
     /* 
      * filter operation
      */
@@ -1888,7 +1835,9 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	    // recover 
 	    $location.path("/new_wsale_detail", false);
 	    $routeParams.page = undefined;
-	    // back_page = undefined;
+	    if ($scope.sequence_pagination === diablo_no){
+		back_page = undefined; 
+	    }
 	    localStorageService.remove("wsale-trans-stastic");
 	}
 	

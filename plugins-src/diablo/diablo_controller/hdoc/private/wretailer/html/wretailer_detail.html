@@ -143,62 +143,45 @@
 		      
 		    </tbody>
 
-		    <tfoot>
-		      <!-- <tr>  -->
-		      <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		      <!--     <span class="pagination"> -->
-		      <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		      <!-- 	  共 {{total_items}} 项</span> -->
-		      <!--     </span> -->
-		      <!--     <pagination -->
-		      <!-- 	 class="pagination-lg pull-right" -->
-		      <!-- 	 total-items="total_items" -->
-		      <!-- 	 items-per-page="items_perpage" -->
-		      <!-- 	 num-pages="num_pages" -->
-		      <!-- 	 max-size="max_page_size" -->
-		      <!-- 	 boundary-links="true" -->
-		      <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		      <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
-		      <!-- 	 x-ng-model="current_page" -->
-		      <!-- 	 x-ng-change="page_changed()"></pagination> -->
-		      <!--   </td> -->
-		      <!-- </tr> -->
-		    </tfoot>
+		    <tfoot></tfoot>
 		    
-		  </table> <!--END supplier table-->
+		  </table> <!--END table-->
 		</div> <!--END table responsive-->
 		
 	      </div> <!--END panel-->
 
-	      <div x-ng-show="total_items>items_perpage" class="row">
-		<div class="col-md-12, col-sm-12, col-xs-12"> 
-		  <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+	      <div x-ng-show="total_items>pagination.items_perpage"
+		   class="row">
+		<div class="col-md-12, col-sm-12, col-xs-12">
+		  <span>显示第 {{pagination.current_page}} / {{num_pages}} 项结果，
 		    共 {{total_items}} 项</span>
 		  <pagination
 		     class="pagination-lg table-pagination pull-right"
 		     total-items="total_items"
-		     items-per-page="items_perpage"
+		     items-per-page="pagination.items_perpage"
 		     num-pages="num_pages"
-		     max-size="max_page_size"
+		     max-size="pagination.max_page_size"
 		     boundary-links="true"
 		     previous-text="&lsaquo;" next-text="&rsaquo;"
 		     first-text="&laquo;" last-text="&raquo;"
-		     x-ng-model="current_page"
-		     x-ng-change="page_changed()">
+		     x-ng-model="pagination.current_page"
+		     x-ng-change="page_changed(pagination.current_page)">
 		  </pagination>
 		</div>
 	      </div> 
 	    </tab>
 
-	    <tab>
-	      <tab-heading>地理分布
-		<i class="glyphicon glyphicon-map-marker"></i>
-	      </tab-heading>
+	    <!-- <tab> -->
+	    <!--   <tab-heading>地理分布 -->
+	    <!-- 	<i class="glyphicon glyphicon-map-marker"></i> -->
+	    <!--   </tab-heading> -->
 	      
-	      <div class="panel panel-default"> 
-		<diablo-map></diablo-map> 
-	      </div>
-	    </tab>
+	    <!--   <\!-- <div class="panel panel-default"> -\-> -->
+	    <!--   <div class="row"> -->
+	    <!-- 	<diablo-map></diablo-map> -->
+	    <!--   </div> -->
+	    <!--   <\!-- </div> -\-> -->
+	    <!-- </tab> -->
 	    
 	  </tabset>
 	  
@@ -324,11 +307,12 @@
 		   name="city" 
 		   placeholder="请输入省所对应的城市（直辖市无需输入）"
 		   x-ng-model="params.retailer.city"
+		   typeahead-editable="false"
 		   typeahead="c as c.name for c in
 			      params.cities|filter:$viewValue|limitTo:8"></input>
 	  </div> 
 	  <div ng-show="!rForm.city.$pristine && !params.check_city(params.retailer.city)">
-	    <span class="fg-red">请输入中文字符串</span>
+	    <span class="fg-red">所在城市只能从列表选择</span>
 	  </div>
 	</div>
 

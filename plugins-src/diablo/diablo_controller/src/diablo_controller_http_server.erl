@@ -116,7 +116,9 @@ dispatch(Req, DocRoot) ->
 			case filelib:is_file(
 			       filename:join([DocRoot, Path])) of
 			    true ->
-				Req:serve_file(Path, DocRoot);
+				Req:serve_file(
+				  Path, DocRoot,
+				  [{'Cache-Control',"max-age=14400"}]);
 			    false->
 				Req:not_found()
 			end;

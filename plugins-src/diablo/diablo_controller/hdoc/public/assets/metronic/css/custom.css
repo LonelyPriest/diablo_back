@@ -311,7 +311,8 @@ ul.page-sidebar-menu > li.active > a {
 /* } */
 
 .stick-thead {
-    background-color:#FFCCCC;
+    /* background-color:#FFCCCC; */
+    background-color:#CCFFCC;
 }
 
 .modal-ios {

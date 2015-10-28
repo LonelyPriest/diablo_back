@@ -8,7 +8,7 @@
 
 {% block self_reference_js %}
 
-<script src="http://api.map.baidu.com/api?v=1.5&ak=7tbBTUE4wBX9pvVIt46lVbfp" type="text/javascript"></script>
+<script src="http://api.map.baidu.com/api?v=2.0&ak=7tbBTUE4wBX9pvVIt46lVbfp" type="text/javascript"></script>
 
 <!-- <script src="http://api.map.baidu.com/api?v=1.4" type="text/javascript"></script> -->
 

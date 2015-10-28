@@ -893,7 +893,7 @@ join_with_comma([H|T], Acc) ->
     join_with_comma(T, Acc ++ ?to_s(H) ++ ",").
 
 
-amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
+amount_new(RSN, Merchant, Shop, Firm, Date, CurDateTime, Inv, Amounts) ->
     ?DEBUG("new inventory with rsn ~p~namounts ~p", [RSN, Amounts]), 
     StyleNumber = ?v(<<"style_number">>, Inv),
     Brand       = ?v(<<"brand">>, Inv),
@@ -901,7 +901,7 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
     Sex         = ?v(<<"sex">>, Inv),
     Year        = case ?v(<<"year">>, Inv) of
 		      undefined ->
-			  [CurYear|_] = string:tokens(?to_s(DateTime), "-"),
+			  [CurYear|_] = string:tokens(?to_s(Date), "-"),
 			  CurYear;
 		      CurYear -> CurYear
 		  end, 
@@ -964,9 +964,9 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
 		 ++ ?to_s(AlarmDay) ++ ","
 		 ++ ?to_s(Shop) ++ ","
 		 ++ ?to_s(Merchant) ++ ","
-		 ++ "\"" ++ ?to_s(DateTime) ++ "\","
+		 ++ "\"" ++ ?to_s(Date) ++ "\","
 		 ++ "\"" ++ ?to_s(CurDateTime) ++ "\","
-		 ++ "\"" ++ ?to_s(DateTime) ++ "\")"]; 
+		 ++ "\"" ++ ?to_s(Date) ++ "\")"]; 
 	    {ok, R} ->
 		["update w_inventory set"
 		 " amount=amount+" ++ ?to_s(Total)
@@ -978,7 +978,7 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
 		 %% ++ ", price5=" ++ ?to_s(P5)
 		 %% ++ ", discount=" ++ ?to_s(Discount)
 		 ++ ", change_date=" ++ "\"" ++ ?to_s(CurDateTime) ++ "\""
-		 ++ ", entry_date=" ++ "\"" ++ ?to_s(DateTime) ++ "\""
+		 ++ ", entry_date=" ++ "\"" ++ ?to_s(Date) ++ "\""
 		 ++ " where id=" ++ ?to_s(?v(<<"id">>, R))];
 	    {error, Error} ->
 		throw({db_error, Error})
@@ -1020,7 +1020,7 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
 		 ++ ?to_s(P5) ++ ","
 		 ++ ?to_s(Discount) ++ ","
 		 ++ "\"" ++ ?to_s(Path) ++ "\"," 
-		 ++ "\"" ++ ?to_s(DateTime) ++ "\")"];
+		 ++ "\"" ++ ?to_s(CurDateTime) ++ "\")"];
 	    {ok, R20} ->
 		["update w_inventory_new_detail set amount=amount+" ++ ?to_s(Total)
 		 ++ " where id=" ++ ?to_s(?v(<<"id">>, R20))];
@@ -1068,11 +1068,11 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
 			     ++ ?to_s(Shop)  ++ ","
 			     ++ ?to_s(Merchant) ++ ","
 			     ++ ?to_s(Count) ++ "," 
-			     ++ "\"" ++ ?to_s(DateTime) ++ "\")"; 
+			     ++ "\"" ++ ?to_s(CurDateTime) ++ "\")"; 
 		     {ok, R00} ->
 			 "update w_inventory_amount set"
 			     " total=total+" ++ ?to_s(Count) 
-			     ++ ", entry_date=" ++ "\"" ++ ?to_s(DateTime) ++ "\""
+			     ++ ", entry_date=" ++ "\"" ++ ?to_s(CurDateTime) ++ "\""
 			     ++ " where id=" ++ ?to_s(?v(<<"id">>, R00));
 		     {error, E00} ->
 			 throw({db_error, E00})
@@ -1089,10 +1089,11 @@ amount_new(RSN, Merchant, Shop, Firm, DateTime, CurDateTime, Inv, Amounts) ->
 			     ++ ?to_s(Color) ++ ","
 			     ++ "\'" ++ ?to_s(Size)  ++ "\',"
 			     ++ ?to_s(Count) ++ "," 
-			     ++ "\"" ++ ?to_s(DateTime) ++ "\")";
+			     ++ "\"" ++ ?to_s(CurDateTime) ++ "\")";
 		     {ok, R01} ->
-			 "update w_inventory_new_detail_amount set total=total+"
-			     ++ ?to_s(Count)
+			 "update w_inventory_new_detail_amount"
+			     " set total=total+" ++ ?to_s(Count)
+			     ++ ", entry_date=" ++ ?to_s(CurDateTime)
 			     ++ " where id=" ++ ?to_s(?v(<<"id">>, R01));
 		     {error, E00} ->
 			 throw({db_error, E00})

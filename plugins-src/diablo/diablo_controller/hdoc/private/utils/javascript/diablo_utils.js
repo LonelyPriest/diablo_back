@@ -147,27 +147,147 @@ diabloUtils.directive('ngModelOnblur', function() {
 
 diabloUtils.directive("diabloMap", function($parse, $compile){
     function postLinkFn (scope, element, attrs){
+	// console.log(element);
 	// $compile(element);
 	// if (scope.active){
-	
-	var ctx = element[0];
-	// console.log(element[0]);
-	// ctx.css({height:500px});
-	var map = new BMap.Map(ctx);
-	// var point = new BMap.Point(113.141581,27.834504); 
-	// map.centerAndZoom(point, 7);
-	map.centerAndZoom("湖南省", 9);
-	map.addControl(new BMap.NavigationControl());
-	// }
+	var ctx = element[0]; 
+	var map = new BMap.Map(ctx, {});
+	var style = {
+	    styleJson:[
+		{
+                    "featureType": "land",
+                    "elementType": "geometry",
+                    "stylers": {
+                        // "color": "#e7f7fc"
+			"color": "#ccccccc"
+                    }
+		},
+		{
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#96b5d6"
+                    }
+		},
+		{
+                    "featureType": "green",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#b0d3dd"
+                    }
+		},
+		{
+                    "featureType": "highway",
+                    "elementType": "geometry.fill",
+                    "stylers": {
+                        "color": "#a6cfcf"
+                    }
+		},
+		{
+                    "featureType": "highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": {
+                        "color": "#7dabb3"
+                    }
+		},
+		{
+                    "featureType": "arterial",
+                    "elementType": "geometry.fill",
+                    "stylers": {
+                        "color": "#e7f7fc"
+                    }
+		},
+		{
+                    "featureType": "arterial",
+                    "elementType": "geometry.stroke",
+                    "stylers": {
+                        "color": "#b0d5d4"
+                    }
+		},
+		{
+                    "featureType": "local",
+                    "elementType": "labels.text.fill",
+                    "stylers": {
+                        "color": "#7a959a"
+                    }
+		},
+		{
+                    "featureType": "local",
+                    "elementType": "labels.text.stroke",
+                    "stylers": {
+                        "color": "#d6e4e5"
+                    }
+		},
+		{
+                    "featureType": "arterial",
+                    "elementType": "labels.text.fill",
+                    "stylers": {
+                        "color": "#374a46"
+                    }
+		},
+		{
+                    "featureType": "highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": {
+                        "color": "#374a46"
+                    }
+		},
+		{
+                    "featureType": "railway",
+                    "elementType": "labels.icon",
+                    "stylers": {
+                        "color": "#ffffff",
+                        "hue": "#ffffff"
+                    }
+		},
+		{
+                    "featureType": "road",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+		}
+	    ]
+	};
 
+	map.setMapStyle(style);
+	
+	map.disableScrollWheelZoom();
+
+	// map.centerAndZoom(new BMap.Point(116.404, 39.915), 8); 
+	map.centerAndZoom("株洲", 9);
+
+	// var cr = new BMap.CopyrightControl({anchor: BMAP_ANCHOR_TOP_RIGHT});
+	// map.addControl(cr);
+	// var bs = map.getBounds(); 
+	
+	// map.addControl(new BMap.NavigationControl());
+	
 	var geo = new BMap.Geocoder();
-	geo.getPoint("株洲市", function(p){
+	geo.getPoint("株洲", function(p){
 	    if (p){
 		map.centerAndZoom(p, 9);
-		map.addOverlay(new BMap.Marker(p));
+		var marker = new BMap.Marker(p);
+		// marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+		marker.setZIndex(10000);
+		map.addOverlay(marker);
 	    }
-	}, "湖南省")
-	
+	}, "湖南省");
+
+	// console.log(scope.retailer);
+	angular.forEach(scope.retailer, function(r){
+	    if (r.pid !== -1 && r.cid !== -1){
+		geo.getPoint(r.city.name, function(p){
+		    if (p){
+			var marker = new BMap.Marker(p);
+			// marker.setTitle(r.address);
+			map.addOverlay(marker);
+		    } else {
+			// console.log(r);
+		    } 
+		}, r.province.name)
+	    } 
+	})
 	
     };
     
@@ -180,11 +300,14 @@ diabloUtils.directive("diabloMap", function($parse, $compile){
 	transclude: true,
 	// require: "ngModel",
 	scope: {
-	    active: '=',
+	    retailer: '=',
 	},
 
 	compile: function(element, attrs){
-	    element.css({height:$(document).height()});
+	    // console.log(element);
+	    element.css({height:diablo_viewport().height});
+	    // element.css({height:"100%"} );
+	    // element.css({height:"880px", width:"800px"});
 	    // element.attr("width", $(document).width()/2);
 	    // element.attr("height", $(document).height()/2);
 	    return postLinkFn;

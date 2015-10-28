@@ -290,7 +290,7 @@ firmApp.controller("firmDetailCtrl", function(
 	$scope.search       = search;
 	
 	firmService.list_firm().then(function(data){
-	    console.log(data);
+	    // console.log(data);
 	    $scope.firms = angular.copy(data);
 	    $scope.total_balance = 0;
 	    angular.forEach($scope.firms, function(f){

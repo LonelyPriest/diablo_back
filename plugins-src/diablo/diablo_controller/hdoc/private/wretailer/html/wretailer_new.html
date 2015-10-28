@@ -153,16 +153,25 @@
 	    <div class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">所在城市</label>
 	      <div class="col-sm-6 col-md-6">
-		<input type="text"
-		       class="form-control"
-		       name="city" 
-		       placeholder="请输入省所对应的城市（直辖市无需输入）"
-		       x-ng-model="retailer.city"
-		       typeahead="c as c.name for c in
-				  cities|filter:$viewValue|limitTo:8"></input>
-	      </div> 
-	      <div ng-show="!retailerNewForm.city.$pristine && !check_city(retailer.city, retailer.province)">
-		<span class="fg-red">请输入中文字符串，所在省（直辖市）必须输入</span>
+		<div x-ng-class="{'has-error':retailerNewForm.city.$invalid &&
+				 !retailerNewForm.city.$pristine
+				 || !check_city(retailer.city, retailer.province)
+				 }">
+		  <input type="text"
+			 class="form-control"
+			 name="city" 
+			 placeholder="请输入省所对应的城市（直辖市无需输入），只能从列表选择"
+			 typeahead-editable="false"
+			 x-ng-model="retailer.city"
+			 typeahead="c as c.name for c in
+				    city_of_province(retailer.province.id)|filter:$viewValue|limitTo:8"/>
+		</div>
+	      </div>
+	      
+	      <div ng-show="retailerNewForm.city.$invalid &&
+			    !retailerNewForm.city.$pristine
+			    || !check_city(retailer.city, retailer.province)">
+		<span class="fg-red">所在省（直辖市）必须输入，只能从列表选择</span>
 	      </div>
 	    </div>
 	    

@@ -521,8 +521,9 @@ handle_call({match_all_inventory, Merchant, Shop, Conditions}, _From, State) ->
 %% new
 handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
     ?DEBUG("new_inventory: merchant ~p~n, Inventories ~p, props ~p",
-	   [Merchant, Inventories, Props]), 
-    DateTime    = ?utils:current_time(localtime),
+	   [Merchant, Inventories, Props]),
+    
+    DateTime  = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)),
     %% Year       = ?utils:current_time(year),
     
     Shop       = ?v(<<"shop">>, Props),
@@ -582,7 +583,7 @@ handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
 		++ ?to_s(EPayType) ++ ","
 		++ ?to_s(EPay) ++ ","
 		++ ?to_s(?NEW_INVENTORY) ++ ","
-		++ "\"" ++ DateTime ++ "\");",
+		++ "\"" ++ ?to_s(DateTime) ++ "\");",
 
 	    case ShouldPay + EPay - (Cash + Card + Wire + VerifyPay) of
 		0 ->

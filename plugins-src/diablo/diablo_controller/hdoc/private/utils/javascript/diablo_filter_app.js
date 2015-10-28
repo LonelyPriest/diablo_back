@@ -372,9 +372,9 @@ var diabloNormalFilterApp = angular.module("diabloNormalFilterApp", [], function
 
 function normalFilterProvider(){
 
-    var _retailers    = [];
-    var _employees    = [];
-    var _baseSettings = [];
+    var _retailers     = [];
+    var _employees     = [];
+    var _baseSettings  = [];
     
     this.$get = function($resource){
 	var _employeeHttp = $resource("/employ/:operation", {operation: '@operation'});
@@ -423,12 +423,14 @@ function normalFilterProvider(){
 			    return {name:r.name,
 				    id:r.id,
 				    py:diablo_pinyin(r.name),
-				    balance:r.balance}
+				    balance:r.balance,
+				    cid: r.cid,
+				    pid: r.pid}
 			    });
 			return _retailers;
 		    });
 		} 
-	    },
+	    }, 
 
 	    get_repo: function(){
 		var http = $resource(
@@ -461,7 +463,10 @@ function normalFilterProvider(){
 		).$promise.then(function(cities){
 		    // console.log(cities);
 		    return cities.map(function(c){
-			return {name:c.name, id:c.id, py:diablo_pinyin(c.name)}
+			return {name:c.name,
+				id:c.id,
+				py:diablo_pinyin(c.name),
+				pid:c.pid}
 		    }) 
 		});
 	    },

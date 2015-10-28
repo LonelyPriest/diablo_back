@@ -11,6 +11,8 @@
 {% block self_reference_js %}
 <!-- pinyin--> 
 <script src="/public/assets/pinyin/pinyin.js"                 type="text/javascript"></script>
+<script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script>
+
 <script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
 
 <!-- right app -->

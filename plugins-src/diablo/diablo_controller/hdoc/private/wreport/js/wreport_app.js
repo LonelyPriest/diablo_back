@@ -1,7 +1,7 @@
 var wreportApp = angular.module(
     "wreportApp", ['ngRoute', 'ngResource', 'diabloPattern',
 		   'diabloUtils', 'userApp', 'diabloFilterApp',
-		   'diabloNormalFilterApp', 'diabloAuthenApp',
+		   'diabloNormalFilterApp', 'diabloAuthenApp', 'fsm',
 		   'ui.bootstrap', 'wgoodApp'])
     .config(function($httpProvider, authenProvider){
 	$httpProvider.interceptors.push(authenProvider.interceptor);

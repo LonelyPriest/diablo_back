@@ -548,6 +548,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    firm:          $scope.select.firm.id,
 	    shop:          $scope.select.shop.id,
 	    date:          dateFilter($scope.select.date, "yyyy-MM-dd"),
+	    datetime:      dateFilter($scope.select.date, "yyyy-MM-dd HH:mm:ss"),
 	    employee:      $scope.select.employee.id,
 	    comment:       $scope.select.comment,
 	    total:         $scope.select.total ? parseInt($scope.select.total):undefined,
