@@ -24,14 +24,27 @@
 	<!--BEGIN from -->
 	<form class="form-horizontal" name="goodForm" novalidate>
 	  <!--BEGIN form body-->
-	  <div class="form-body"> 
+	  <div class="form-body">
+	    
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">店铺</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <select class="form-control"
+			  disabled
+			  x-ng-model="good.shop"
+			  x-ng-options="s as s.name for s in shops"></select>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	    </div>
+	    
 	    <div class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">款号</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">
 		  <!-- <span class="input-group-addon">款号</span> -->
 		  <input type="text"
-			 readonly
 			 class="form-control"
 			 name="style_number"
 			 required
@@ -39,13 +52,15 @@
 			 placeholder="请输入2-10位款号" 
 			 x-ng-model="good.style_number"
 			 x-ng-pattern="pattern.style_number"
-			 x-ng-enter=""></input>
+			 x-ng-enter=""/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>
 	      <div ng-show="goodForm.style_number.$invalid
 			    && !goodForm.style_number.$pristine">
-		<span class="fg-red">款号只能是字母，数字或横杠，2-10个字符</span>
+		<span class="fg-red">
+		  款号只能是字母，数字或横杠，2-10个字符
+		</span>
 	      </div>
 	    </div>
 
@@ -56,7 +71,6 @@
 		<div class="input-group">
 		  <!-- <span class="input-group-addon">品牌</span> -->
 		  <input type="text"
-			 readonly
 			 class="form-control"
 			 name="brand"
 			 required
@@ -65,7 +79,7 @@
 			 x-ng-pattern="pattern.brand"
 			 x-ng-enter=""
 			 typeahead="b.name for b in
-				    brands|filter:$viewValue|limitTo:8"></input>
+				    brands|filter:$viewValue|limitTo:8" />
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -88,12 +102,15 @@
 			 x-ng-enter=""
 			 x-ng-model="good.type"
 			 typeahead="t as t.name for t in
-				    types|filter:$viewValue|limitTo:8"></input>
+				    types|filter:$viewValue|limitTo:8"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>
-	      <div ng-show="goodForm.type.$invalid && !goodForm.type.$pristine">
-		<span style="color:red">请输入以中文，字母或数字，必须以中文开头</span>
+	      <div ng-show="goodForm.type.$invalid
+			    && !goodForm.type.$pristine">
+		<span style="color:red">
+		  请输入以中文，字母或数字，必须以中文开头
+		</span>
 	      </div>
 	    </div>
 	    
@@ -112,7 +129,7 @@
 			 x-ng-enter=""
 			 typeahead-editable="false"
 			 typeahead="f as f.name for f in
-				    firms|filter:$viewValue|limitTo:8"></input>
+				    firms|filter:$viewValue|limitTo:8"/>
 		  <span class="input-group-btn">
 		    <button class="btn btn-success" x-ng-click="new_firm()">
 		      <i class="glyphicon glyphicon-plus"></i></button>
@@ -181,7 +198,7 @@
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
 			 x-ng-model="good.org_price"
-			 x-ng-init="good.org_price=0"></input>
+			 x-ng-init="good.org_price=0"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>	      
 		<div ng-show="goodForm.org_price.$invalid && !goodForm.org_price.$pristine">
@@ -203,7 +220,7 @@
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
 			 x-ng-model="good.tag_price"
-			 x-ng-init="good.tag_price=0"></input>
+			 x-ng-init="good.tag_price=0"/>
 		  <span class="input-group-addon bg-white fg-red">*</span> 
 		</div>
 	      </div>
@@ -226,7 +243,7 @@
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-model="good.pkg_price"
-			 x-ng-init="good.pkg_price=0"></input>
+			 x-ng-init="good.pkg_price=0"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>
@@ -249,7 +266,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.price3"></input>
+			 x-ng-model="good.price3"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -270,7 +287,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.price4"></input>
+			 x-ng-model="good.price4"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -292,7 +309,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.price5"></input>
+			 x-ng-model="good.price5"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -317,7 +334,7 @@
 			   placeholder="两位整数，无折扣请输入100"
 			   x-ng-pattern="/^\d{2,3}$/"
 			   x-ng-model="good.discount"
-			   x-ng-init="good.discount=100"></input>
+			   x-ng-init="good.discount=100"/>
 		  </div>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
@@ -341,11 +358,13 @@
 		    <button class="btn btn-primary"
 			    x-ng-disabled="good.free===0"
 			    x-ng-click="select_color()">
-		      <i class="glyphicon glyphicon-arrow-right"></i></button>
+		      <i class="glyphicon glyphicon-arrow-right"></i>
+		    </button>
 		    <button class="btn btn-success"
 			    x-ng-disabled="good.free===0"
 			    x-ng-click="new_color()">
-		      <i class="glyphicon glyphicon-plus"></i></button>
+		      <i class="glyphicon glyphicon-plus"></i>
+		    </button>
 		  </span>
 		</div>
 	      </div>

@@ -287,9 +287,8 @@ handle_call({new_good, Merchant, Attrs}, _Form, State) ->
 	case ?sql_utils:execute(s_read, Sql) of
 	    {ok, []} ->
 		RealyShop = realy_shop(Merchant, Shop),
-		Sql1 = ?w_good_sql:good_new(Merchant, UseZero, RealyShop, Attrs),
-
-		%% initial, make sure the good can be selled with zero inventory 
+		Sql1 = ?w_good_sql:good_new(
+			  Merchant, UseZero, RealyShop, Attrs),
 		?sql_utils:execute(transaction, Sql1, StyleNumber);
 	    {ok, _} ->
 		{error, ?err(purchaser_good_exist, StyleNumber)};
@@ -301,15 +300,15 @@ handle_call({new_good, Merchant, Attrs}, _Form, State) ->
 handle_call({update_good, Merchant, Attrs}, _Form, State) ->
     ?DEBUG("update_good with merchant ~p~nattrs~n~p", [Merchant, Attrs]),
     GoodId         = ?v(<<"good_id">>, Attrs),
-    %% Merchant       = ?v(<<"merchant">>, Attrs),
-    
-    StyleNumber    = ?v(<<"style_number">>, Attrs),
-    BrandId        = ?v(<<"brand_id">>, Attrs),
+    Shop           = ?v(<<"shop">>, Attrs),
+
     OrgStyleNumber = ?v(<<"o_style_number">>, Attrs),
     OrgBrand       = ?v(<<"o_brand">>, Attrs),
+
+    StyleNumber    = ?v(<<"style_number">>, Attrs),
+    Brand          = ?v(<<"brand_id">>, Attrs),
     
-    TypeId         = ?v(<<"type_id">>, Attrs),
-    
+    TypeId         = ?v(<<"type_id">>, Attrs), 
     Firm           = ?v(<<"firm_id">>, Attrs), 
     Sex            = ?v(<<"sex">>, Attrs),
     Season         = ?v(<<"season">>, Attrs),
@@ -327,80 +326,208 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
     Path           = ?v(<<"path">>, Attrs),
     
     %% Date     = ?utils:current_time(localdate),
-    DateTime = ?utils:current_time(localtime), 
+    DateTime = ?utils:current_time(localtime),
 
-    try
-	case 
-	    case StyleNumber =:= undefined orelse BrandId =:= undefined of
-		true ->
-		    [];
-		_ ->
-		    Sql = "select style_number, brand from w_inventory_good"
-			" where style_number=" ++ "\"" ++ ?to_s(StyleNumber) ++ "\""
-			++ " and brand=" ++ ?to_s(BrandId)
-			++ " and merchant=" ++ ?to_s(Merchant) ++ ";",
-		    {ok, R} = ?mysql:fetch(read, Sql),
-		    R
-	    end
-	of
-	    [] ->
-		Update1 =
-		    ?utils:v(type, integer, TypeId)
-		    ++ ?utils:v(firm, integer, Firm)
-		    ++ ?utils:v(sex, integer, Sex)
-		    ++ ?utils:v(year, integer, Year)
-		    ++ ?utils:v(season, integer, Season)
-		    ++ ?utils:v(org_price, float, OrgPrice)
-		    ++ ?utils:v(tag_price, float, TagPrice)
-		    ++ ?utils:v(pkg_price, float, PkgPrice)
-		    ++ ?utils:v(price3, float, P3)
-		    ++ ?utils:v(price4, float, P4)
-		    ++ ?utils:v(price5, float, P5)
-		    ++ ?utils:v(discount, integer, Discount)
-		    
-		    ++ ?utils:v(path, string, Path),
-		    %% ++ ?utils:v(change_date, string, DateTime),
+    UpdateBase =
+	%% ?utils:v(type, string, StyleNumber)
+	%% ++ ?utils:v(type, integer, Brand)
+	?utils:v(type, integer, TypeId)
+	++ ?utils:v(firm, integer, Firm)
+	++ ?utils:v(sex, integer, Sex)
+	++ ?utils:v(year, integer, Year)
+	++ ?utils:v(season, integer, Season)
+	++ ?utils:v(org_price, float, OrgPrice)
+	++ ?utils:v(tag_price, float, TagPrice)
+	++ ?utils:v(pkg_price, float, PkgPrice)
+	++ ?utils:v(price3, float, P3)
+	++ ?utils:v(price4, float, P4)
+	++ ?utils:v(price5, float, P5)
+	++ ?utils:v(discount, integer, Discount) 
+	++ ?utils:v(path, string, Path),
+	%% ++ ?utils:v(change_date, string, DateTime),
+
+    UpdateGood = UpdateBase
+	++ case ?utils:v(color, string, Colors) of
+	       [] -> [];
+	       U -> U ++ ?utils:v(free, integer, 1)
+	   end ++ ?utils:v(change_date, string, DateTime),
+
+    Sql1 = 
+	"update w_inventory_good set "
+	++ ?utils:to_sqls(proplists, comma, UpdateGood)
+	++ " where id=" ++ ?to_s(GoodId) 
+	++ " and merchant=" ++ ?to_s(Merchant),
+
+    RBrand = fun(undefined) -> OrgBrand; (_) -> Brand end,
+    RStyleNumber = fun(undefined) -> ?to_s(OrgStyleNumber);
+		      (_) -> ?to_s(StyleNumber) end,
 		
-		UpdateGood = Update1
-		    ++ case ?utils:v(color, string, Colors) of
-			   [] -> [];
-			   U -> U ++ ?utils:v(free, integer, 1)
-		       end
-		    ++ ?utils:v(change_date, string, DateTime),
-		    %% ?utils:v(style_number, string, StyleNumber)
-		    %% ++ ?utils:v(brand, integer, BrandId)
+    C = fun(true, S, B) ->
+		"style_number=\'" ++ ?to_s(S) ++ "\'"
+		    ++ " and brand=" ++ ?to_s(B)
+		    ++ " and shop="  ++ ?to_s(Shop)
+		    ++ " and merchant=" ++ ?to_s(Merchant) ;
+	   (false, S, B) ->
+		"style_number=\'" ++ ?to_s(S) ++ "\'"
+		    ++ " and brand=" ++ ?to_s(B)
+		    ++ " and merchant=" ++ ?to_s(Merchant) 
+	end,
+    
+
+    RC = fun(S, B) ->
+		 "style_number=\'" ++ ?to_s(S) ++ "\'"
+		     ++ " and brand=" ++ ?to_s(B)
+		     ++ " and rsn like \'"
+		     "M-" ++ ?to_s(Merchant) ++ "-S-" ++ ?to_s(Shop) ++ "\'"
+	 end,
+    
+    case StyleNumber =:= undefined andalso Brand =:= undefined of
+	true ->
+	    case UpdateBase of
+		[] ->
+		    {reply, ?sql_utils:execute(write, Sql1, GoodId), State};
+		_  ->
+		    UpdateInv = UpdateBase
+			++?utils:v(change_date, string, DateTime),
+		    Sql2 = "update w_inventory set "
+			++ ?utils:to_sqls(proplists, comma, UpdateInv)
+			++ " where " ++ C(true, OrgStyleNumber, OrgBrand),
 		    
-
-		?DEBUG("updates ~p", [UpdateGood]),
-
-		Sql1 = 
-		    "update w_inventory_good set "
-		    ++ ?utils:to_sqls(proplists, comma, UpdateGood)
-		    ++ " where id=" ++ ?to_s(GoodId) 
-		    ++ " and merchant=" ++ ?to_s(Merchant),
-
-		%% color can not be modified
-		Reply =
-		    case Update1 of
-			[] ->
-			    ?sql_utils:execute(write, Sql1, GoodId);
-			_ ->
-			    UpdateInv = Update1
-				++?utils:v(change_date, string, DateTime),
-			    Sql2 = "update w_inventory set "
-				++ ?utils:to_sqls(proplists, comma, UpdateInv)
-				++ " where style_number=\'" ++ ?to_s(OrgStyleNumber) ++ "\'"
-				++ " and brand=" ++ ?to_s(OrgBrand)
-				++ " and merchant=" ++ ?to_s(Merchant),
-			    ?sql_utils:execute(transaction, [Sql1, Sql2], GoodId)
+		    {reply,
+		     ?sql_utils:execute(
+			transaction, [Sql1, Sql2], GoodId), State}
+	    end;
+	false ->
+	    try
+		Update2 =
+		    ?utils:v(style_number, string, StyleNumber)
+		    ++ ?utils:v(brand, integer, Brand),
+		
+		%% update w_inventory_good 
+		Sql00 = 
+		    case ?sql_utils:execute(
+			    s_read,
+			    "select id, style_number, brand "
+			    "from w_inventory_good"
+			    " where "
+			    ++ C(false,
+				 RStyleNumber(StyleNumber), RBrand(Brand))) of
+			{ok, []} ->
+			    ["update w_inventory_good set "
+			      ++ ?utils:to_sqls(proplists, comma,
+						Update2 ++ UpdateGood)
+			      ++ " where id=" ++ ?to_s(GoodId) 
+			      ++ " and merchant=" ++ ?to_s(Merchant)];
+			{ok, G} ->
+			    ["delete from w_inventory_good where id="
+			      ++ ?to_s(GoodId) ,
+			      
+			      "update w_inventory_good set "
+			      ++ ?utils:to_sqls(proplists, comma, UpdateGood)
+			      ++ " where id=" ++ ?to_s(?v(<<"id">>, G))]
 		    end,
-		{reply, Reply, State}; 
-	    _Any -> 
-		{reply, {error, ?err(purchaser_good_exist, GoodId)}, State}
-	end
-    catch
-	_:{badmatch, {error, {_ECode, Err}}} ->
-	    {reply, {error, ?err(db_error, Err)}, State}
+		?DEBUG("Sql00 ~p", [Sql00]),
+
+		%% update w_inventory_new 
+		Sql10 = 
+		    ["update w_inventory_new_detail set "
+		     ++ ?utils:to_sqls(
+			   proplists, comma,
+			   Update2 ++ ?utils:v(path, string, Path))
+		     ++ " where " ++ RC(OrgStyleNumber, OrgBrand),
+
+		     "update w_inventory_new_detail_amount set "
+		     ++ ?utils:to_sqls(proplists, comma, Update2)
+		     ++ " where "
+		     ++ RC(OrgStyleNumber, OrgBrand)],
+		    
+		?DEBUG("Sql10 ~p", [Sql10]),
+		
+		%% update w_inventory
+		UpdateInv = UpdateBase
+		    ++?utils:v(change_date, string, DateTime),
+		Sql12 = 
+		    case ?sql_utils:execute(
+			    s_read,
+			    "select id, style_number, brand from w_inventory"
+			    " where "
+			    ++ C(true,
+				 RStyleNumber(StyleNumber), RBrand(Brand))) of
+			{ok, []} -> 
+			    ["update w_inventory set "
+			     ++ ?utils:to_sqls(
+				   proplists, comma, Update2 ++ UpdateInv)
+			     ++ " where "
+			     ++ C(true, OrgStyleNumber, OrgBrand),
+
+			     "update w_inventory_amount set "
+			     ++ ?utils:to_sqls(proplists, comma, Update2)
+			     ++ " where "
+			     ++ C(true, OrgStyleNumber, OrgBrand)];
+			{ok, S} ->
+			    ["update w_inventory a inner join("
+			     "select style_number, brand, amount"
+			     " from w_inventory"
+			     " where "
+			     ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
+			     %% " on a.style_number=b.style_number"
+			     %% " and a.brand=b.brand"
+			     %% " and a.shop=b.shop"
+			     %% " and a.merchant=b.merchant"
+			     " set a.amount=a.amount+b.amount,"
+			     ++ ?utils:to_sqls(proplists, comma, UpdateInv)
+			     ++ " where a.id=" ++ ?to_s(?v(<<"id">>, S)),
+			     %% ++ " and a.merchant=" ++ ?to_s(Merchant),
+			     
+			     "update w_inventory_amount a inner join("
+			     "select "
+			     ++ "\'" ++ RStyleNumber(StyleNumber) ++ "\'"
+			     " as style_number"
+			     ++ ", " ++ ?to_s(RBrand(Brand))
+			     ++ " as brand"
+			     ++ ", color, size, shop, merchant, total"
+			     " from w_inventory_amount where "
+			     ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
+			     " on a.style_number=b.style_number"
+			     " and a.brand=b.brand"
+			     " and a.color=b.color"
+			     " and a.size=b.size"
+			     " and a.shop=b.shop"
+			     " and a.merchant=b.merchant"
+			     " set a.total=a.total+b.total"
+			     " where a.merchant=" ++ ?to_s(Merchant),
+
+			     " delete from w_inventory"
+			     " where " ++ C(true, OrgStyleNumber, OrgBrand),
+			     " delete from w_inventory_amount"
+			     " where " ++ C(true, OrgStyleNumber, OrgBrand)];
+			Error12 -> Error12
+		    end,
+
+		?DEBUG("Sql12 ~p", [Sql12]),
+
+		Sql14 =
+		    [ "update w_sale_detail set "
+		      ++ ?utils:to_sqls(
+			    proplists, comma,
+			    Update2 ++ ?utils:v(path, string, Path))
+		      ++ " where "
+		      ++ RC(OrgStyleNumber, OrgBrand),
+
+		      "update w_sale_detail_amount set "
+		      ++ ?utils:to_sqls(proplists, comma, Update2)
+		      ++ " where "
+		      ++ RC(OrgStyleNumber, OrgBrand)],
+		
+		?DEBUG("Sql14 ~p", [Sql14]),
+
+		AllSql = Sql00 ++ Sql10 ++ Sql12 ++ Sql14,
+		{reply,
+		 ?sql_utils:execute(transaction, AllSql, GoodId), State}
+	    catch
+		_:{badmatch, Error} ->
+		    {reply, Error, State}
+	    end 
     end;
 
 handle_call({delete_good, Merchant, GoodId}, _Form, State) ->
@@ -592,7 +719,7 @@ handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
 		    {reply, Reply, State};
 		Metric -> 
 		    Sql3 = "update suppliers set balance=balance+" ++ ?to_s(Metric)
-			++ ", change_date=" ++ "\"" ++ DateTime ++ "\""
+			++ ", change_date=" ++ "\"" ++ ?to_s(DateTime) ++ "\""
 			++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
 
 		    AllSql = [Sql2, Sql3|Sql1], 

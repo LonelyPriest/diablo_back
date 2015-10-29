@@ -31,17 +31,17 @@
 fetch(read, Sql)->
     %% gen_server:call(?MODULE, {fetch_read, ?to_b(SQL)}), 
     %% start(read, ?to_b(Sql));
-    read(conn, Sql);
+    read(conn, ?to_b(Sql));
     
 fetch(write, Sql) ->
     %% gen_server:call(?MODULE, {fetch_write, ?to_b(SQL)});
     %% start(write, ?to_b(Sql));
-    write(conn, Sql);
+    write(conn, ?to_b(Sql));
 
 fetch(insert, Sql) ->
     %% gen_server:call(?MODULE, {fetch_insert, ?to_b(SQL)});
     %% start(insert, ?to_b(Sql));
-    insert(conn, Sql);
+    insert(conn, ?to_b(Sql));
 fetch(transaction, Sqls) when is_list(Sqls)-> 
     %% gen_server:call(?MODULE, {transaction, SQLS}).
     %% start(transaction, Sqls).

@@ -250,57 +250,97 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 action(Session, Req, {"update_w_good"}, Payload) -> 
     Merchant = ?session:get(merchant, Session), 
     {struct, Good} = ?v(<<"good">>, Payload),
-    ?DEBUG("update purchaser good with session ~p, good~n~p", [Session, Good]),
+    ?DEBUG("update purchaser good with session ~p, good~n~p",
+	   [Session, Good]),
     
     OStyleNumber = ?v(<<"o_style_number">>, Good),
     OBrandId     = ?v(<<"o_brand">>, Good),
-    Type         = ?v(<<"type">>, Good),
-    %% Brand = ?v(<<"brand">>, Payload),
-    %% Firm  = ?v(<<"firm_id">>, Payload),
+    OImagePath   = ?v(<<"o_path">>, Good),
+    OFirm        = ?v(<<"o_firm">>, Good),
 
-    case 
-	case Type of
-	    undefined -> {ok, undefined};
-	    Type ->
-		?attr:type(new, Merchant, Type)
-	end
-    of
-	{ok, TypeId} ->
-	    ImagePath = 
-		case ?v(<<"image">>, Payload) of
-		    undefined -> undefined;
-		    ImageData -> 
-			{file, Here} = code:is_loaded(?MODULE),
-			ImageDir = filename:join(
-				     [filename:dirname(filename:dirname(Here)),
-				      "hdoc", "image", ?to_s(Merchant)]),
-			ImageName = ?to_s(OStyleNumber) ++ "-" ++ ?to_s(OBrandId) ++ ".png",
-			ImageFile = filename:join([ImageDir, ImageName]),
-
-			case filelib:ensure_dir(ImageFile) of
-			    ok -> ok;
-			    {error, _} -> ok = file:make_dir(ImageDir)
-			end,
-
-			?DEBUG("ImageDir ~p", [ImageDir]), 
-			ok = file:write_file(ImageFile, base64:decode(ImageData)),
-			filename:join(["image", ?to_s(Merchant), ImageName])
-		end,
-	    
-	    case ?w_inventory:purchaser_good(
-		    update, Merchant,
-		    [{<<"type_id">>, TypeId},
-		     {<<"path">>, ImagePath}|Good]) of
-		{ok, GoodId} -> 
-		    ?utils:respond(200, Req,
-				   ?succ(update_purchaser_good, GoodId));
-		{error, Error} ->
-		    ?utils:respond(200, Req, Error)
-	    end;
-	{error, Error} ->
-	    ?utils:respond(200, Req, Error)
-    end; 
+    StyleNumber = ?v(<<"style_number">>, Payload),
     
+    try
+	TypeId = case ?v(<<"type">>, Good) of
+		     undefined -> undefined;
+		     Type -> {ok, TId} = ?attr:type(new, Merchant, Type),
+			     TId
+		 end,
+
+	BrandId = case ?v(<<"brand">>, Good) of
+		      undefined -> undefined;
+		      Brand ->
+			  Firm = case ?v(<<"firm">>, Payload) of
+				     undefined -> OFirm;
+				     _Firm     -> _Firm
+				 end,
+			  {ok, BId} = ?attr:brand(new, Merchant, Brand, Firm),
+			  BId
+		  end, 
+
+	OldPath = image(path, Merchant, OStyleNumber, OBrandId),
+	
+	NewPath= case {StyleNumber, BrandId} of
+		     {undefined, undefined}      ->
+			 OldPath;
+		     {StyleNumber, undefined}    ->
+			 image(path, Merchant, StyleNumber, OBrandId);
+		     {undefined, BrandId}        ->
+			 image(path, Merchant, OStyleNumber, BrandId);
+		     {StyleNumber, BrandId}      ->
+			 image(path, Merchant, StyleNumber, BrandId)
+	    end,
+	
+	ImagePath =
+	    case ?v(<<"image">>, Payload) of 
+		undefined ->
+		    case NewPath =:= OldPath of
+			true  -> undefined; 
+			false ->
+			    case ?to_s(OImagePath) of
+				[] -> undefined;
+				_  ->
+				    ok = mk_image_dir(NewPath, Merchant), 
+				    {ok, _} = file:copy(OldPath, NewPath),
+				    ok = file:delete(OldPath),
+				    NewPath
+			    end 
+		    end;
+		ImageData -> 
+		    case NewPath =:= OldPath of
+			true ->
+			    ok = file:write_file(
+				   OldPath, base64:decode(ImageData));
+			false ->
+			    ok = file:delete(OldPath),
+			    ok = mk_image_dir(NewPath, Merchant), 
+
+			    ?DEBUG("ImageDir ~p", [NewPath]), 
+			    ok = file:write_file(
+				   NewPath, base64:decode(ImageData))
+		    end,
+		    filename:join(["image", file:basename(NewPath)])
+	    end,
+
+	case ?w_inventory:purchaser_good(
+		update, Merchant,
+		[{<<"brand_id">>, BrandId},
+		 {<<"type_id">>, TypeId},
+		 {<<"path">>, ImagePath} |Good]) of
+	    {ok, GoodId} -> 
+		?utils:respond(
+		   200, Req, ?succ(update_purchaser_good, GoodId));
+	    {error, Error} ->
+		?utils:respond(200, Req, Error)
+	end
+    catch
+	_:{badmatch, {error, {_, _}=FError}} ->
+	    ?WARN("failed to update good: Error ~p", [FError]),
+	    ?utils:respond(200, Req, FError);
+	_:{badmatch, {error, FError}} ->
+	    ?WARN("failed to update good: Error ~p", [FError]),
+	    ?utils:respond(200, Req, ?err(file_op_error, FError))
+    end; 
 
 action(Session, Req, {"filter_w_good"}, Payload) ->
     ?DEBUG("filter_w_good with session ~p~nPayload ~p", [Session, Payload]),
@@ -353,4 +393,26 @@ object_responed(Fun, Req) ->
 	{error, Error} ->
 	    ?utils:respond(200, Req, Error)
     end.
-	    
+
+image(path, Merchant, StyleNumber, BrandId) ->
+    filename:join([image(dir, Merchant),
+		   image(name, StyleNumber, BrandId)]).
+
+image(dir, Merchant) ->
+    {file, Here} = code:is_loaded(?MODULE),
+    filename:join([filename:dirname(filename:dirname(Here)),
+		   "hdoc",
+		   "image",
+		   ?to_s(Merchant)]).
+
+image(name, StyleNumber, BrandId) ->
+    lists:concat([?to_s(StyleNumber), "-", ?to_s(BrandId), ".png"]).
+
+
+mk_image_dir(Path, Merchant) ->
+    case filelib:ensure_dir(Path) of
+	ok -> ok;
+	{error, _} ->
+	    ok = file:make_dir(image(dir, Merchant)),
+	    ok
+    end.

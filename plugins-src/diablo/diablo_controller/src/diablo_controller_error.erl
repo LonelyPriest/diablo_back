@@ -366,12 +366,16 @@ error(base_invalid_update_passwd, User) ->
 error(db_error, EInfo) ->
     {9001, "DB error: " ++ ?to_s(EInfo)};
 error(db_timeout, _) ->
-    {9001, "DB timeout."}; 
+    {9001, "DB timeout."};
+%% unkown method
+error(unkown_operation, Method) ->
+    {9002, "unkown operation: " ++ ?to_s(Method)};
 %% not enought right
 error(not_enought_right, Action) ->
     {9901, "not enougth right of action " ++ ?to_s(Action)};
 error(operation_invalid_session, Error) ->
     {9902, "operation with invalid session with error " ++ ?to_s(Error)};
-%% unkown method
-error(unkown_operation, Method) ->
-    {9002, "unkown operation: " ++ ?to_s(Method)}.
+
+error(file_op_error, Error) ->
+    {9101, "failed to operator file: ~p", [Error]}.
+

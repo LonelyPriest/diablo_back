@@ -267,7 +267,14 @@ diabloUtils.directive("diabloMap", function($parse, $compile){
 	geo.getPoint("株洲", function(p){
 	    if (p){
 		map.centerAndZoom(p, 9);
-		var marker = new BMap.Marker(p);
+		 var myIcon =
+		    new BMap.Icon(
+			"http://api.map.baidu.com/img/markers.png",
+			new BMap.Size(23, 25), {  
+			    offset: new BMap.Size(10, 25),
+			    imageOffset: new BMap.Size(0, 0 - 10 * 25)});
+		
+		var marker = new BMap.Marker(p, {icon:myIcon});
 		// marker.setAnimation(BMAP_ANIMATION_BOUNCE);
 		marker.setZIndex(10000);
 		map.addOverlay(marker);

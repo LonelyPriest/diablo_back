@@ -41,7 +41,7 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	when('/wgood_update/:id?', {
 	    templateUrl: '/private/wgood/html/wgood_update.html',
             controller: 'wgoodUpdateCtrl',
-	    resolve: angular.extend({}, brand, firm, type, color)
+	    resolve: angular.extend({}, brand, firm, type, color, user)
 	}).
 	when('/wgood_new', {
 	    templateUrl: '/private/wgood/html/wgood_new.html',
@@ -512,7 +512,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
     // color
     $scope.colors = [];
     wgoodService.list_purchaser_color().then(function(colors){
-	console.log(colors); 
+	// console.log(colors); 
 	angular.forEach(colors, function(color){
 	    if (!in_sys_color($scope.colors, color)){
 		$scope.colors.push(
