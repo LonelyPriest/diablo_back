@@ -32,8 +32,9 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.select      = {}; 
     $scope.inventories = [];
     
-    $scope.float_add  = diablo_float_add;
-    $scope.float_sub  = diablo_float_sub;
+    $scope.f_add  = diablo_float_add;
+    $scope.f_sub  = diablo_float_sub;
+    $scope.f_mul  = diablo_float_mul;
     $scope.get_object = diablo_get_object;
 
     $scope.show_discount = function(){

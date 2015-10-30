@@ -221,10 +221,11 @@ filter(fix_rsn_groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
 			   Merchant, CurrentPage, ItemsPerPage, Fields});
 
 %% inventory
-filter(groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+filter({groups, Mode}, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(
-      Name, {filter_groups, Merchant, CurrentPage, ItemsPerPage, Fields});
+      Name, {filter_groups, Mode, Merchant,
+	     CurrentPage, ItemsPerPage, Fields});
 
 %% good
 filter(goods, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
@@ -378,7 +379,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		 "style_number=\'" ++ ?to_s(S) ++ "\'"
 		     ++ " and brand=" ++ ?to_s(B)
 		     ++ " and rsn like \'"
-		     "M-" ++ ?to_s(Merchant) ++ "-S-" ++ ?to_s(Shop) ++ "\'"
+		     "M-" ++ ?to_s(Merchant) ++ "-S-" ++ ?to_s(Shop) ++ "%\'"
 	 end,
     
     case StyleNumber =:= undefined andalso Brand =:= undefined of
@@ -397,7 +398,59 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		     ?sql_utils:execute(
 			transaction, [Sql1, Sql2], GoodId), State}
 	    end;
-	false ->
+	false -> 
+	    FindFun =
+		fun(Color, Size) ->
+			"select id, style_number, brand, color, size"
+			    " from w_inventory_amount"
+			    " where style_number=\'"
+			    ++ (RStyleNumber(StyleNumber)) ++ "\'"
+			    ++ " and brand=" ++ ?to_s(RBrand(Brand))
+			    ++ " and color=" ++ ?to_s(Color)
+			    ++ " and size=" ++ ?to_s(Size)
+			    ++ " and shop=" ++ ?to_s(Shop)
+			    ++ " and merchant=" ++ ?to_s(Merchant) 
+		end,
+
+	    InsertFun =
+		fun(Color, Size, Total) ->
+			"insert into w_inventory_amount("
+			    "style_number, brand, color, size, shop, merchant"
+			    ", total, entry_date"
+			    ") values("
+			    "\'" ++ (RStyleNumber(StyleNumber)) ++ "\'"
+			    ", " ++ ?to_s(Brand) ++ 
+			    ", " ++ ?to_s(Color) ++ 
+			    ", " ++ ?to_s(Size) ++
+			    ", " ++ ?to_s(Shop) ++
+			    ", " ++ ?to_s(Merchant) ++
+			    ", " ++ ?to_s(Total) ++
+			    ", \'" ++ ?to_s(DateTime) ++ "\')"
+		end,
+
+	    UpdateFun =
+		fun(UId, Total) ->
+			"update w_inventory_amount"
+			    " set total=total+" ++ ?to_s(Total)
+			    ++ " where id=" ++ ?to_s(UId)
+		end,
+	    
+	    FoldrFun =
+		fun({R}, Acc) ->
+			Color = ?v(<<"color">>, R),
+			Size  = ?v(<<"size">>, R),
+			Total = ?v(<<"total">>, R),
+			case ?sql_utils:execute(
+				s_read,
+				FindFun(Color, Size)) of
+			    {ok, []} ->
+				[InsertFun(Color, Size, Total)|Acc];
+			    {ok, F} ->
+				UId = ?v(<<"id">>, F),
+				[UpdateFun(UId, Total)|Acc]
+			end
+		end,
+	    
 	    try
 		Update2 =
 		    ?utils:v(style_number, string, StyleNumber)
@@ -445,7 +498,8 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		
 		%% update w_inventory
 		UpdateInv = UpdateBase
-		    ++?utils:v(change_date, string, DateTime),
+		    ++?utils:v(change_date, string, DateTime), 
+
 		Sql12 = 
 		    case ?sql_utils:execute(
 			    s_read,
@@ -465,45 +519,59 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 			     ++ " where "
 			     ++ C(true, OrgStyleNumber, OrgBrand)];
 			{ok, S} ->
-			    ["update w_inventory a inner join("
-			     "select style_number, brand, amount"
-			     " from w_inventory"
-			     " where "
-			     ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
-			     %% " on a.style_number=b.style_number"
-			     %% " and a.brand=b.brand"
-			     %% " and a.shop=b.shop"
-			     %% " and a.merchant=b.merchant"
-			     " set a.amount=a.amount+b.amount,"
-			     ++ ?utils:to_sqls(proplists, comma, UpdateInv)
-			     ++ " where a.id=" ++ ?to_s(?v(<<"id">>, S)),
-			     %% ++ " and a.merchant=" ++ ?to_s(Merchant),
-			     
-			     "update w_inventory_amount a inner join("
-			     "select "
-			     ++ "\'" ++ RStyleNumber(StyleNumber) ++ "\'"
-			     " as style_number"
-			     ++ ", " ++ ?to_s(RBrand(Brand))
-			     ++ " as brand"
-			     ++ ", color, size, shop, merchant, total"
-			     " from w_inventory_amount where "
-			     ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
-			     " on a.style_number=b.style_number"
-			     " and a.brand=b.brand"
-			     " and a.color=b.color"
-			     " and a.size=b.size"
-			     " and a.shop=b.shop"
-			     " and a.merchant=b.merchant"
-			     " set a.total=a.total+b.total"
-			     " where a.merchant=" ++ ?to_s(Merchant),
-
-			     " delete from w_inventory"
-			     " where " ++ C(true, OrgStyleNumber, OrgBrand),
-			     " delete from w_inventory_amount"
-			     " where " ++ C(true, OrgStyleNumber, OrgBrand)];
-			Error12 -> Error12
+			    Sqla = 
+				["update w_inventory a inner join("
+				 "select style_number, brand, amount, sell"
+				 " from w_inventory"
+				 " where "
+				 ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
+				 %% " on a.style_number=b.style_number"
+				 %% " and a.brand=b.brand"
+				 %% " and a.shop=b.shop"
+				 %% " and a.merchant=b.merchant"
+				 " set a.amount=a.amount+b.amount,"
+				 "a.sell=a.sell+b.sell"
+				 ++ ?utils:to_sqls(
+				       proplists, comma, UpdateInv)
+				 ++ " where a.id=" ++ ?to_s(?v(<<"id">>, S))],
+			    
+			    Sqlb = 
+				case ?sql_utils:execute(
+					read, "select id, style_number, brand"
+					", color, size, total"
+					" from w_inventory_amount"
+					" where "
+					++ C(true,
+					     OrgStyleNumber, OrgBrand)) of
+				    {ok, Rs} -> 
+					lists:foldr(FoldrFun, [], Rs)
+				end,
+			    %% "update w_inventory_amount a inner join("
+			    %% "select "
+			    %% ++ "\'" ++ RStyleNumber(StyleNumber) ++ "\'"
+			    %% " as style_number"
+			    %% ++ ", " ++ ?to_s(RBrand(Brand))
+			    %% ++ " as brand"
+			    %% ++ ", color, size, shop, merchant, total"
+			    %% " from w_inventory_amount where "
+			    %% ++ C(true, OrgStyleNumber, OrgBrand) ++ ") b"
+			    %% " on a.style_number=b.style_number"
+			    %% " and a.brand=b.brand"
+			    %% " and a.color=b.color"
+			    %% " and a.size=b.size"
+			    %% " and a.shop=b.shop"
+			    %% " and a.merchant=b.merchant"
+			    %% " set a.total=a.total+b.total"
+			    %% " where a.merchant=" ++ ?to_s(Merchant),
+			    Sqla ++ Sqlb ++ 
+				[" delete from w_inventory"
+				 " where "
+				 ++ C(true, OrgStyleNumber, OrgBrand),
+				 " delete from w_inventory_amount"
+				 " where "
+				 ++ C(true, OrgStyleNumber, OrgBrand)]
 		    end,
-
+		
 		?DEBUG("Sql12 ~p", [Sql12]),
 
 		Sql14 =
@@ -527,9 +595,9 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 	    catch
 		_:{badmatch, Error} ->
 		    {reply, Error, State}
-	    end 
+	    end
     end;
-
+		
 handle_call({delete_good, Merchant, GoodId}, _Form, State) ->
     ?DEBUG("delete_good with merchant ~p, goodId ~p", [Merchant, GoodId]),
     Sql = ?w_good_sql:good(delete, Merchant, GoodId), 
@@ -1161,18 +1229,22 @@ handle_call({filter_goods, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, 
 %% inventory
 handle_call({total_groups, Merchant, Fields}, _From, State) ->
     CountSql = "count(*) as total"
-	", sum(amount) as t_amount",
+	", sum(amount) as t_amount"
+	", sum(sell) as t_sell",
     Sql = ?sql_utils:count_table(
 	     w_inventory, CountSql, Merchant, realy_conditions(Merchant, Fields)), 
     Reply = ?sql_utils:execute(s_read, Sql),
     {reply, Reply, State}; 
 
-handle_call({filter_groups, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-    ?DEBUG("filter_groups_with_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
-	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]),
+handle_call({filter_groups, Mode, Merchant,
+	     CurrentPage, ItemsPerPage, Fields}, _From, State) ->
+    ?DEBUG("filter_groups_with_and: mode ~p, currentPage ~p, ItemsPerpage ~p"
+	   ", Merchant ~p~nfields ~p",
+	   [Mode, CurrentPage, ItemsPerPage, Merchant, Fields]),
     C = realy_conditions(Merchant, Fields),
     Sql = ?w_good_sql:inventory(
-	     group_detail_with_pagination, Merchant, C, CurrentPage, ItemsPerPage), 
+	     {group_detail_with_pagination, Mode},
+	     Merchant, C, CurrentPage, ItemsPerPage), 
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 

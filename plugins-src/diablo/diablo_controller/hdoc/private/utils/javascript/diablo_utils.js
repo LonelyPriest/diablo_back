@@ -41,37 +41,95 @@ diabloUtils.directive('ngPulsate', function () {
     }
 });
 
-// diabloUtils.directive('autoTableview', function () {
-//     return {
-// 	restrict: 'A',
-// 	link: function(scope, element, attrs){
-// 	    // console.log(diablo_viewport().width);
-// 	    var width = diablo_viewport().width;
+diabloUtils.directive("barChart", function($parse, $compile){
+    function postLinkFn (scope, element, attrs){
+	
+	var ctx = element.get(0).getContext("2d"); 
+	var chart = new Chart(ctx);
 
-// 	    var auto_view = function(){
-// 		var width = diablo_viewport().width;
+	var colorLeft = "rgba(220,220,220,0.5)";
+	var strokeColorLeft = "rgba(220,220,220,1)";
+	
+	var colorRight = "rgba(151,187,205,0.5)";
+	var strokeColorRight = "rgba(151,187,205,1)";
+	
+	var barLeft = function(dataLeft){
+	    return {
+		fillColor: colorLeft,
+		strokeColor: strokeColorLeft,
+		data: dataLeft
+	    }
+	};
 
-// 		if (width > 992 && width < 1080){
-// 		    element.css("width", "100%")
-// 			.css("max-width", "100%")
-// 		} else if(width  >= 768 && width <= 992) {
-// 		    element.css("width", "100%")
-// 			.css("max-width", "100%")
-// 		} else {
-// 		    element.css("width", "100%")
-// 			.css("max-width", "100%")
-// 		}
-// 	    }
+	var barRight = function(dataRight){
+	    return {
+		fillColor: colorRight,
+		strokeColor: strokeColorRight,
+		data: dataRight
+	    }
+	};
 
-// 	    auto_view();
+	var barData = function(chartData){
+	    return {
+		labels: chartData.label,
+		datasets: [
+		    barLeft(chartData.left),
+		    barRight(chartData.right)
+		]
+	    }
+	};
+	
+	if (angular.isDefined(scope.chartData)){
+	    scope.barChart = chart.Bar(barData(scope.chartData), {
+		datasetFill: false
+	    });
+	}
+	
+	scope.$watch("chartData", function(newValue, oldValue){
+	    console.log(newValue);
+	    console.log(oldValue);
+	    if (angular.isUndefined(newValue)
+	       && angular.isUndefined(oldValue)){
+		return;
+	    };
+	    
+	    if (!angular.equals(newValue, oldValue)){
+		if (angular.isDefined(scope.barChart)){
+		    scope.barChart.destroy();
+		    scope.barChart = chart.Bar(barData(newValue), {
+			datasetFill: false
+		    });
+		} else{
+		    scope.barChart = chart.Bar(barData(newValue), {
+			datasetFill: false
+		    });
+		}
+		
+	    };
 
-// 	    $(window).resize(function(){
-// 		auto_view();
-// 	    })
-// 	}
-//     }
-// });
+	    // chart.Line(scope.chartData);
+	}, false);
+    };
+    
+    return{
+	restrict: 'AE',
+	// template: '<canvas height="400" width="300"></canvas>',
+	template: '<canvas class="canvas"></canvas>', 
+	replace: true,
+	transclude: true,
+	// require: "ngModel",
+	scope: {
+	    chartData: '=',
+	},
 
+	compile: function(element, attrs){
+	    element.attr("Width", $(document).width());
+	    element.attr("Height", $(document).height()/2);
+	    // element.attr("height", diablo_viewport().height);
+	    return postLinkFn;
+	}
+    }
+}); 
 
 diabloUtils.directive('nextPage', function ($parse) {
     return {
@@ -255,7 +313,7 @@ diabloUtils.directive("diabloMap", function($parse, $compile){
 	map.disableScrollWheelZoom();
 
 	// map.centerAndZoom(new BMap.Point(116.404, 39.915), 8); 
-	map.centerAndZoom("株洲", 9);
+	map.centerAndZoom("株洲", 8);
 
 	// var cr = new BMap.CopyrightControl({anchor: BMAP_ANCHOR_TOP_RIGHT});
 	// map.addControl(cr);
@@ -266,7 +324,7 @@ diabloUtils.directive("diabloMap", function($parse, $compile){
 	var geo = new BMap.Geocoder();
 	geo.getPoint("株洲", function(p){
 	    if (p){
-		map.centerAndZoom(p, 9);
+		map.centerAndZoom(p, 8);
 		 var myIcon =
 		    new BMap.Icon(
 			"http://api.map.baidu.com/img/markers.png",

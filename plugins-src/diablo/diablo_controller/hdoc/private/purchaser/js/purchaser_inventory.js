@@ -895,7 +895,28 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     diabloUtilsService, diabloPromise, purchaserService, wgoodService,
     localStorageService, user, filterBrand, filterFirm, filterType,
     filterSizeGroup, filterColor, base){
+    $scope.chart = {
+	active:false, 
+    };
 
+    // var data = {
+    // 	labels : ["January","February","March","April","May","June","July"],
+    // 	datasets : [
+    // 	    {
+    // 		fillColor : "rgba(220,220,220,0.5)",
+    // 		strokeColor : "rgba(220,220,220,1)",
+    // 		data : [65,59,90,81,56,55,40]
+    // 	    },
+    // 	    {
+    // 		fillColor : "rgba(151,187,205,0.5)",
+    // 		strokeColor : "rgba(151,187,205,1)",
+    // 		data : [28,48,40,19,96,27,100]
+    // 	    }
+    // 	]
+    // };
+
+    // $scope.chart.data = data;
+    
     $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     
@@ -907,7 +928,10 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	show_orgprice: rightAuthen.show_orgprice(user.type),
 	alarm:         false
     };
-    
+
+    $scope.$watch("chart.active", function(newValue, oldValue){
+	console.log(newValue, oldValue);
+    }, false)
     // console.log($scope.show_orgprice);
 
     // $scope.shops = user.sortShops;
@@ -996,9 +1020,15 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     $scope.default_page = 1;
     $scope.current_page = $scope.default_page;
     
-    $scope.page_changed = function(){
+    $scope.page_changed = function(page){
+	$scope.current_page = page;
 	$scope.do_search($scope.current_page);
     }
+
+    $scope.chart_sell_mode = function(){
+	// console.log("chart mode");
+	$scope.do_search($scope.default_page, 1);
+    };
 
     // $scope.is_alarm = function(alarm){
     // 	// console.log(alarm);
@@ -1018,7 +1048,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     var now_date = diablo_now_date();
     
-    $scope.do_search = function(page){
+    $scope.do_search = function(page, mode){
 	$scope.current_page = page;
 
 	localStorageService.set(
@@ -1031,11 +1061,27 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	    add_search_condition(search);
 	    
 	    purchaserService.filter_purchaser_inventory_group(
-		$scope.match, search, page, $scope.items_perpage).then(function(result){
-		    console.log(result); 
+		mode, $scope.match, search, page, $scope.items_perpage
+	    ).then(function(result){
+		console.log(result);
+
+		if (mode === 1){
+		    var labels  = [];
+		    var totals  = [];
+		    var sells   = [];
+		    angular.forEach(result.data, function(d){
+			labels.push(d.style_number);
+			totals.push(d.amount + d.sell);
+			sells.push(d.sell);
+		    }); 
+		    $scope.chart.data={
+			label:labels, left:totals, right:sells};
+		    
+		} else {
 		    if (page === 1){
-		    	$scope.total_items = result.total;
+			$scope.total_items = result.total;
 			$scope.total_amount = result.t_amount;
+			$scope.total_sell   = result.t_sell;
 		    }
 		    angular.forEach(result.data, function(d){
 			if (now_date.getTime() - diablo_set_date(d.last_sell)
@@ -1053,8 +1099,10 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 			d.firm  = diablo_get_object(d.firm_id, filterFirm);
 			// d.shop  = diablo_get_object(d.shop_id, user.sortShops);
 		    })
-		    diablo_order_page(page, $scope.items_perpage, $scope.inventories); 
-		})
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.inventories); 
+		}
+	    })
 	});
     };
     

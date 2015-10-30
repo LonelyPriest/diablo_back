@@ -353,9 +353,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
     
     $scope.sexs            = diablo_sex;
     $scope.seasons         = diablo_season;
-    $scope.float_add       = diablo_float_add;
-    $scope.float_sub       = diablo_float_sub;
-    $scope.float_mul       = diablo_float_mul;
+    $scope.f_add           = diablo_float_add;
+    $scope.f_sub           = diablo_float_sub;
+    $scope.f_mul           = diablo_float_mul;
     $scope.wsale_mode      = wsaleService.wsale_mode;
     $scope.extra_pay_types = wsaleService.extra_pay_types; 
     $scope.disable_refresh = true;
@@ -1691,9 +1691,11 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     $scope.records   = [];
+    
     $scope.goto_page = diablo_goto_page;
-    $scope.float_add = diablo_float_add;
-    $scope.float_sub = diablo_float_sub;
+    $scope.f_add     = diablo_float_add;
+    $scope.f_sub     = diablo_float_sub;
+    $scope.f_mul     = diablo_float_mul;
     $scope.round     = diablo_round;
     
     $scope.disable_print = false;

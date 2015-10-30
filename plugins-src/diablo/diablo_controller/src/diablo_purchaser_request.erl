@@ -224,6 +224,7 @@ action(Session, Req, {"reject_w_inventory"}, Payload) ->
 action(Session, Req, {"filter_w_inventory_group"}, Payload) -> 
     ?DEBUG("filter_w_inventory_group with session ~p, paylaod~n~p", [Session, Payload]), 
     Merchant = ?session:get(merchant, Session),
+    Mode     = ?v(<<"mode">>, Payload, 0),
     
     ?pagination:pagination(
        fun(Match, Conditions) ->
@@ -231,7 +232,8 @@ action(Session, Req, {"filter_w_inventory_group"}, Payload) ->
        end,
        fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
 	       ?w_inventory:filter(
-		  groups, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+		  {groups, mode(Mode)}, Match, Merchant,
+		  CurrentPage, ItemsPerPage, Conditions)
        end, Req, Payload); 
 
 action(Session, Req, {"list_w_inventory"}, Payload) ->
@@ -694,3 +696,7 @@ season(0) -> "春";
 season(1) -> "夏";
 season(2) -> "秋";
 season(3) -> "冬".
+
+mode(0) -> use_id;
+mode(1) -> use_sell.
+    

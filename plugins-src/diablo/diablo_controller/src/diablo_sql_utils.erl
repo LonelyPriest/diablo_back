@@ -58,6 +58,14 @@ condition(page_desc, CurrentPage, ItemsPerPage) ->
 	++ " limit " ++ ?to_s((CurrentPage-1)*ItemsPerPage)
     	++ ", " ++ ?to_s(ItemsPerPage).
 
+condition(page_desc, use_id, CurrentPage, ItemsPerPage) ->
+    condition(page_desc, CurrentPage, ItemsPerPage);
+condition(page_desc, use_sell, CurrentPage, ItemsPerPage) ->
+    " order by sell desc"
+	++ " limit " ++ ?to_s((CurrentPage-1)*ItemsPerPage)
+    	++ ", " ++ ?to_s(ItemsPerPage).
+
+
 condition(proplists, []) ->
     [];
 condition(proplists, Conditions) -> 

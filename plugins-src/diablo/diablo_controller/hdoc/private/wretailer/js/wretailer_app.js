@@ -77,11 +77,11 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 	    controller: 'wretailerTransCtrl',
 	    resolve: angular.extend({}, retailer, employee, user, base)
 	}).
-	when('/wretailer_top', {
-	    templateUrl: '/private/wretailer/html/wretailer_top.html',
-	    controller: 'wretailerTopCtrl',
-	    resolve: angular.extend({}, retailer, province, city)
-	}).
+	// when('/wretailer_top', {
+	//     templateUrl: '/private/wretailer/html/wretailer_top.html',
+	//     controller: 'wretailerTopCtrl',
+	//     resolve: angular.extend({}, retailer, province, city)
+	// }).
 	when('/wretailer_trans_rsn/:retailer?/:rsn?/:ppage?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans_rsn_detail.html',
 	    controller: 'wretailerTransRsnDetailCtrl',
@@ -321,6 +321,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     $scope.cities     = angular.copy(filterCity);
     $scope.round      = diablo_round;
     $scope.pagination = {};
+    $scope.map        = {active:false};
     
     var dialog = diabloUtilsService;
     var f_add  = diablo_float_add;
@@ -627,18 +628,18 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     }
 });
 
-wretailerApp.controller("wretailerTopCtrl", function(
-    $scope, wretailerService, filterRetailer, filterProvince, filterCity){
-    $scope.retailers  = filterRetailer;
-    $scope.provinces  = filterProvince;
-    $scope.cities     = filterCity;
+// wretailerApp.controller("wretailerTopCtrl", function(
+//     $scope, wretailerService, filterRetailer, filterProvince, filterCity){
+//     $scope.retailers  = filterRetailer;
+//     $scope.provinces  = filterProvince;
+//     $scope.cities     = filterCity;
 
-    angular.forEach($scope.retailers, function(r){
-	r.province = diablo_get_object(r.pid, $scope.provinces);
-	r.city     = diablo_get_object(r.cid, $scope.cities);
-    });
+//     angular.forEach($scope.retailers, function(r){
+// 	r.province = diablo_get_object(r.pid, $scope.provinces);
+// 	r.city     = diablo_get_object(r.cid, $scope.cities);
+//     });
    
-});
+// });
 
 wretailerApp.controller("wretailerCtrl", function($scope, localStorageService){
     diablo_remove_local_storage(localStorageService);

@@ -28,24 +28,6 @@
       <div class="portlet-body">
 	<!--BEGIN table-toolbar-->
 	<div class="table-toolbar"> 
-	  <!-- <\!--BEGIN form-group-\-> -->
-	  <!-- <div class="row"> -->
-	  <!--   <div class="col-xs-12 col-ms-12 col-md-12"> -->
-	  <!--     <div class="input-group"> -->
-	  <!-- 	<span class="input-group-addon bg-green"> -->
-	  <!-- 	  <i class="glyphicon glyphicon-hand-right fg-white"></i> -->
-	  <!-- 	</span> -->
-	  <!-- 	<input -->
-	  <!-- 	   class="form-control" -->
-	  <!-- 	   placeholder="支持名称/省/市/手机/地址查询" -->
-	  <!-- 	   typeahead-editable="false" -->
-	  <!-- 	   typeahead-on-select="on_select_retailer($item, $model, $label)" -->
-	  <!-- 	   typeahead="s as s.name for s in prompts|filter:$viewValue|limitTo:20" -->
-	  <!-- 	   x-ng-model="search"></input> -->
-	  <!--     </div> -->
-	  <!--   </div>  -->
-	  <!-- </div> <\!--END row-\-> -->
-	  
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 
@@ -171,19 +153,22 @@
 	      </div> 
 	    </tab>
 
-	    <!-- <tab> -->
-	    <!--   <tab-heading>地理分布 -->
-	    <!-- 	<i class="glyphicon glyphicon-map-marker"></i> -->
-	    <!--   </tab-heading> -->
+	    <tab active="map.active">
+	      <tab-heading>地理分布
+	    	<i class="glyphicon glyphicon-map-marker"></i>
+	      </tab-heading>
 	      
-	    <!--   <\!-- <div class="panel panel-default"> -\-> -->
-	    <!--   <div class="row"> -->
-	    <!-- 	<diablo-map></diablo-map> -->
-	    <!--   </div> -->
-	    <!--   <\!-- </div> -\-> -->
-	    <!-- </tab> -->
-	    
+	      <!-- <div class="panel panel-default"> -->
+	      <!-- <div class="row"> -->
+	      <!-- 	<diablo-map></diablo-map> -->
+	      <!-- </div> -->
+	      <!-- </div> -->
+	    </tab> 
 	  </tabset>
+
+	  <div x-ng-if="map.active" class="panel panel-default">
+	    <diablo-map retailer="retailers"></diablo-map>
+	  </div>
 	  
 	</div> <!--END portlet body-->
 	

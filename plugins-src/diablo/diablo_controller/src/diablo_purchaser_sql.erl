@@ -705,9 +705,13 @@ inventory(fix_rsn_groups, fix, Merchant, Conditions, PageFun) ->
 	"(select rsn, employ, shop from w_inventory_fix"
 	" where " ++ C11 ++ ") b on a.rsn=b.rsn";
 
-inventory(group_detail_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) -> 
+inventory({group_detail_with_pagination, Mode},
+	  Merchant, Conditions, CurrentPage, ItemsPerPage) -> 
     inventory(group_detail, Merchant, Conditions,
-	fun() -> ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage) end);
+	fun() ->
+		?sql_utils:condition(
+		   page_desc, Mode, CurrentPage, ItemsPerPage)
+	end);
 
 inventory(new_detail_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) -> 
     inventory(new_detail, new, Merchant, Conditions,

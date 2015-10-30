@@ -118,8 +118,9 @@ action(Session, Req, {"update_w_retailer", Id}, Payload) ->
 		
 
 sidebar(Session) -> 
-    S1 = [{"wretailer_detail", "零售商详情", "glyphicon glyphicon-book"},
-	  {"wretailer_top", "零售商分布", "glyphicon glyphicon-map-marker"}],
+    S1 = [{"wretailer_detail", "零售商详情", "glyphicon glyphicon-book"}
+	  %%  {"wretailer_top", "零售商分布", "glyphicon glyphicon-map-marker"}
+	 ],
     
     S2 = 
 	case ?right_auth:authen(?new_w_retailer, Session) of

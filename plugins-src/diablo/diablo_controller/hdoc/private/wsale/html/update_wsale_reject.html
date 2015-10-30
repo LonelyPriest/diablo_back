@@ -273,7 +273,7 @@
 			<span x-ng-if="setting.round===1">
 			  {{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
 			<span x-ng-if="setting.round===0">
-			  {{inv.sell * inv.fprice * inv.fdiscount * 0.01}}</span>
+			  {{f_mul(inv.fprice * inv.fdiscount * inv.sell, 0.01)}}</span>
 		      </div>
 		    </td>
 		    

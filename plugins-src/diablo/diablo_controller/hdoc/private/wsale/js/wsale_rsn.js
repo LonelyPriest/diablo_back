@@ -4,12 +4,11 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     user, filterBrand, filterRetailer, filterEmployee,
     filterFirm, filterSizeGroup, filterType, filterColor, base){
     // console.log($routeParams);
-
     // console.log(filterEmployee);
     $scope.shops    = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds  = user.shopIds.concat(user.badrepoIds);
     
-    $scope.flot_mul = diablo_float_mul;
+    $scope.f_mul    = diablo_float_mul;
     $scope.round    = diablo_round;
     $scope.setting  = {round:diablo_round_record};
 
