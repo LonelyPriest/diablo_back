@@ -605,9 +605,11 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		CombinedInvs  = combine_with_size(Invs, []),
 		?DEBUG("combinedInvs~n~p", [CombinedInvs]),
 		lists:foldr(
-		  fun({SizeGroup, UsedSizes, Amounts}, Acc0)->
-			  ?DEBUG("SizeGroup ~p, used sizes ~p", [SizeGroup, UsedSizes]),
-			  GS = [ ?to_i(G) || G <- string:tokens(?to_s(SizeGroup), ",")],
+		  fun({SizeGroup, {UsedSizes, Amounts}}, Acc0)->
+			  ?DEBUG("SizeGroup ~p, used sizes ~p",
+				 [SizeGroup, UsedSizes]),
+			  GS = [?to_i(G) ||
+				   G <- string:tokens(?to_s(SizeGroup), ",")],
 			  
 			  AllSize = lists:foldr(
 				      fun(G, Acc) ->
@@ -617,7 +619,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 			  ?DEBUG("lenght gs ~p", [length(GS)]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
-			      	  true -> [Us || Us <- AllSize, lists:member(Us, UsedSizes)];
+			      	  true -> [Us || Us <- AllSize,
+						 lists:member(Us, UsedSizes)];
 			      	  false -> AllSize
 			      end,
 			  
@@ -632,7 +635,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					      proplists:delete(
 						<<"colors">>, A))),
 				      {[{<<"color">>, CName}|N],
-				       sort_amount(CID, Sizes, ?v(<<"amounts">>, A))}
+				       sort_amount(
+					 CID, Sizes, ?v(<<"amounts">>, A))}
 			      end,
 			  
 			  SortAmounts = 
@@ -648,28 +652,35 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 
 			  FlatternAmounts =
 			      flattern(amount,
-				       {PrintTable, Column, length(Sizes), Fields},
-				       SortAmounts),
-			  ?DEBUG("flattern amounts ~ts", [?to_b(FlatternAmounts)]),
+				       {PrintTable, Column, length(Sizes),
+					Fields}, SortAmounts),
+			  ?DEBUG("flattern amounts ~ts",
+				 [?to_b(FlatternAmounts)]),
 
 			  {true, SizeWidth} = field(size, Fields), 
-			  FlatternSizes = flattern(size, {PrintTable, SizeWidth}, Sizes),
+			  FlatternSizes =
+			      flattern(size, {PrintTable, SizeWidth}, Sizes),
 			  
 			  ?DEBUG("flattern sizes ~p", [FlatternSizes]),
 			  
 			  Head = body_head(PrintTable, ?ROW, PBrand,
 					   Model, Fields, FlatternSizes),
-			  ?DEBUG("Head ~ts", [?to_b(Head)]),
-			  %% RealyColumn = ?f_print:column(?TABLE, length(Sizes), Fields),
+			  
+			  %% ?DEBUG("Head ~ts", [?to_b(Head)]),
+			  %% RealyColumn =
+			  %% ?f_print:column(?TABLE, length(Sizes), Fields),
 
 			  TableLine =
 			      case PrintTable of
 				  ?TABLE ->
-				      line(add_minus, ?TABLE, ?ROW, length(Sizes), Fields);
+				      line(add_minus, ?TABLE, ?ROW,
+					   length(Sizes), Fields);
 				  ?STRING -> [] 
 			      end,
-			  Head
-			      ++ row({PrintTable, PBrand, Model, TableLine}, FlatternAmounts)
+			  TableLine ++ br(PBrand)
+			      ++ Head
+			      ++ row({PrintTable, PBrand, Model, TableLine},
+				     FlatternAmounts)
 			      ++ Acc0 
 		  end, "", CombinedInvs)
 	end,
@@ -1062,7 +1073,8 @@ body_stastic(_IsRound, Brand, Model, 33, Attrs) ->
 	++ ?f_print:left_pading(Brand, Model) ++ ?f_print:line(minus, 33)
 	++ ?f_print:br(Brand)
 	
-	++ ?f_print:left_pading(Brand, Model) ++ "上次欠款：" ++ ?to_s(LastBalance) 
+	++ ?f_print:left_pading(Brand, Model) ++ "上次欠款："
+	++ ?to_s(LastBalance) 
 	++ ?f_print:br(Brand)
 	
 	++ ?f_print:left_pading(Brand, Model) ++ DebtName ++ ?to_s(Debt)
@@ -1196,7 +1208,8 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
 	++ ?f_print:pading(2) ++ "累计欠款：" ++ decorate_data(block)
 	++ round(IsRound, AccDet) ++ decorate_data(cancel_block)
 	
-	++ ?f_print:br(Brand) ++ ?f_print:line(minus, Column) ++ ?f_print:br(Brand).
+	++ ?f_print:br(Brand) ++ ?f_print:line(minus, Column)
+	++ ?f_print:br(Brand).
 
 body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
     ?DEBUG("start to build body_foot", []), 
@@ -1280,7 +1293,8 @@ row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
 			 ++ TableLine ++ br(Brand)
 			 ++ CInfo ++ br(Brand) ++ Acc
 	     end, "", T)
-	++ TableLine ++ br(Brand);
+	%% ++ TableLine ++ br(Brand)
+	++ TableLine ++ br(Brand); 
 
 row({?STRING, Brand, Model, _Column}, FlatternAmounts) ->
     lists:foldr(
@@ -1313,21 +1327,20 @@ combine_with_size([{struct, Inv}|T], Combined) ->
 	   {<<"fprice">>, FPrice},
 	   {<<"amounts">>, Amounts}]},
 
-    UsedSize = 
-	lists:foldr(fun({struct, M}, Acc) ->
-			    [?v(<<"size">>, M)|Acc]
-		   end, [], Amounts),
+    UsedSize = lists:foldr(fun({struct, M}, Acc)
+			      -> [?v(<<"size">>, M)|Acc]
+			   end, [], Amounts),
 	
     %% SellTotal   = ?v(<<"sell_total">>, Inv),
     
-    case [ A || {S, A} <- Combined, S =:= SizeGroup ] of
+    case [ A || {S, {_, A}} <- Combined, S =:= SizeGroup ] of
 	[] ->
-	    NewAmount = {SizeGroup, UsedSize, [A1]},
+	    NewAmount = {SizeGroup, {UsedSize, [A1]}},
 	    combine_with_size(T, [NewAmount|Combined]);
 	[A] ->
-	    {_, Sizes, _} = proplists:get(SizeGroup, Combined, []),
+	    {Sizes, _} = ?v(SizeGroup, Combined),
 	    
-	    NewAmount   = {SizeGroup, lists:usort(Sizes ++ UsedSize), [A1|A]},
+	    NewAmount  = {SizeGroup, {lists:usort(Sizes ++ UsedSize), [A1|A]}},
 	    NewCombined = proplists:delete(SizeGroup, Combined),
 	    combine_with_size(T, [NewAmount|NewCombined])
     end.

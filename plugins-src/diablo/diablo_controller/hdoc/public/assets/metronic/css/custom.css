@@ -332,5 +332,13 @@ ul.page-sidebar-menu > li.active > a {
 }
 
 .canvas-stastic {
-    margin: 0 !important;
+    margin: 0px !important;
+}
+
+.canvas-btn-pre {
+    padding:0px 10 0px 10px !important;
+}
+
+.canvas-btn-next {
+    padding:0px 10px 0px 10px !important;
 }

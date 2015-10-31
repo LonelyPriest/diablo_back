@@ -44,14 +44,16 @@
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)">
+                 time="time.start_time"
+		 ok="do_search(default_page)">
 	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)">
+                 time="time.end_time"
+		 ok="do_search(default_page)">
 	      </time-search>
             </div> 
 
@@ -73,7 +75,7 @@
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
 	  <tabset> 
-	    <tab>
+	    <tab active="tab_active.time">
 	      <tab-heading>时间分布</tab-heading>
 	      <div class="panel panel-default table-panel"> 
 		<div class="table-responsive">
@@ -315,22 +317,37 @@
 	    </tab>
 
 	    <tab heading="销售分布"
-		 active="chart.active"
-		 select="chart_sell_mode()"> 
+		 active="tab_active.chart"
+		 select="chart_mode(default_page)"> 
 	    </tab>
 	    
 	  </tabset> 
 	  
-	  <div x-ng-if="chart.active" class="panel panel-default">
-	    <div >
-	      <p class="canvas-stastic">
-		灰色：<span class="fg-green">总存库</span>
-		&nbsp&nbsp&nbsp&nbsp浅蓝色：
-		<span class="fg-red">已售出数量</span>
-	      </p>
+	  <div x-ng-if="tab_active.chart" class="panel panel-default">
+	    <div class="row">
+	      <div class="col-md-9 col-sm-9 col-xs-9">
+		<p class="canvas-stastic">
+		  灰色：<span class="fg-green">总存库</span>
+		  &nbsp&nbsp&nbsp&nbsp浅蓝色：
+		  <span class="fg-red">已售出数量</span> 
+		</p>
+	      </div>
+
+	      <div class="col-md-3 col-sm-3 col-xs-3">
+		<div class="btn-group btn-group-solid pull-right">
+		  <button class="btn green-meadow canvas-btn-next"
+			  x-ng-disabled="tab_page.page_of_chart===1"
+			  x-ng-click="chart_mode(tab_page.page_of_chart -1)">
+		    <i class="glyphicon glyphicon-menu-left"></i></button>
+		  
+		  <button class="btn red-sunglo canvas-btn-next"
+			  x-ng-click="chart_mode(tab_page.page_of_chart + 1)">
+		    <i class="glyphicon glyphicon-menu-right"></i></button>
+		</div>
+	      </div>
 	    </div>
 	    
-	    <bar-chart chart-data="chart.data"></bar-chart>
+	    <bar-chart chart-data="chart_data.bar"></bar-chart>
 	  </div>
 	      
 	</div> <!--END portlet body--> 

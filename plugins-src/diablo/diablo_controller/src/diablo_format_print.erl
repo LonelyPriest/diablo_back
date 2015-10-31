@@ -17,7 +17,8 @@ flattern(size, {IsTable, Width}, Sizes) ->
     flattern(size, {IsTable, Width}, Sizes, "");
 
 flattern(amount_array, {IsTable, Column, SizeNum, Fields}, Amounts) ->
-    flattern(amount_array, {IsTable, Column, SizeNum, Fields}, Amounts, [], 0, 0); 
+    flattern(
+      amount_array, {IsTable, Column, SizeNum, Fields}, Amounts, [], 0, 0); 
 flattern(amount, {IsTable, Column, SizeNum, Fields}, Amounts) ->
     flattern(amount, {IsTable,Column, SizeNum, Fields}, Amounts, [], 0, 0).
 
@@ -52,12 +53,17 @@ flattern(amount, {IsTable, Column, SizeNum, Fields}, [H|T], Flattern, MTotals, M
 	{true, Width} = field(size, Fields),
 	{FlatternNums, Total} = flattern(nums, {IsTable, Width}, Nums, "", 0),
 	case Total of
-	    0 ->  flattern(amount, {IsTable, Column, SizeNum, Fields}, T, Flattern, MTotals, MStastic);
+	    0 ->  flattern(amount, {IsTable, Column, SizeNum, Fields},
+			   T, Flattern, MTotals, MStastic);
 	    Total ->
 		FPrice = ?v(<<"fprice">>, A),
+		FDiscount = ?v(<<"fdiscount">>, A),
 		Row = row(IsTable, A, Fields, FlatternNums, Total),
-		flattern(amount, {IsTable, Column, SizeNum, Fields}, T, Flattern ++ [Row],
-			 Total + MTotals, FPrice * Total + MStastic)
+		flattern(amount, {IsTable, Column, SizeNum, Fields},
+			 T,
+			 Flattern ++ [Row],
+			 Total + MTotals,
+			 FPrice * Total * FDiscount * 0.01 + MStastic)
 	end
     catch
 	error:{badmatch, {false, _}}->
@@ -208,10 +214,12 @@ column(stastic, {IsTable, SizeNum, Fields}, Totals, Calcs) ->
     {true, WidthCalc}  = field(calc, Fields),
 
     Offset = WidthSize * SizeNum + OffsetCount,
-    ?DEBUG("offestcount ~p, width count ~p, width size ~p, offfest ~p, width calc ~p",
-	   [OffsetCount, WidthCount, WidthSize, Offset, WidthCalc]),
+    %% ?DEBUG("offestcount ~p, width count ~p, width size ~p"
+    %% 	   ", offfest ~p, width calc ~p",
+    %% 	   [OffsetCount, WidthCount, WidthSize, Offset, WidthCalc]),
 
     CleanCalc = ?to_s(clean_zero(Calcs)),
+    %% CleanCalc = ?to_s(clean_zero(Calcs)),
     CleanTotal = ?to_s(Totals),
 
     case IsTable of
@@ -227,21 +235,22 @@ column(stastic, {IsTable, SizeNum, Fields}, Totals, Calcs) ->
     end.
 
 row(?STRING, A, Fields, FlatternNums, Total) ->
-    ?DEBUG("A ~p", [A]),
+    %% ?DEBUG("A ~p", [A]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
     Type        = ?v(<<"type">>, A), 
     Color       = ?v(<<"color">>, A),
     Price       = ?v(<<"fprice">>, A), 
     Discount    = ?v(<<"fdiscount">>, A),
-    FPrice      = Price * Discount / 100,
+    FPrice      = Price * Discount * 0.01,
 
     Row = 
 	lists:foldr(
 	  fun({<<"brand">>, _, W}, Acc) ->
 		  ?to_s(Brand) ++ pading(W - width(chinese, Brand)) ++ Acc;
 	     ({<<"style_number">>, _, W}, Acc) ->
-		  ?to_s(StyleNumber) ++ pading(W - width(latin1, StyleNumber)) ++ Acc;
+		  ?to_s(StyleNumber)
+		      ++ pading(W - width(latin1, StyleNumber)) ++ Acc;
 	     ({<<"type">>, _, W}, Acc) ->
 		  ?to_s(Type) ++ pading(W - width(chinese, Type)) ++ Acc;
 	     ({<<"color">>, _, W}, Acc) ->
@@ -260,60 +269,70 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
 		  ?to_s(Total) ++ pading(W - width(latin1, Total)) ++ Acc;
 	     ({<<"calc">>, _, _W}, Acc) ->
 		  %% ?DEBUG("round ~p", [?to_s(round(FPrice * Total))]),
-		  ?to_s(round(FPrice * Total)) ++ Acc
+		  ?to_s(clean_zero(FPrice * Total)) ++ Acc
 	  end, [], Fields),
     ?DEBUG("row ~p", [Row]),
     Row;
 
 row(?TABLE, A, Fields, FlatternNums, Total) ->
-    ?DEBUG("A ~p", [A]),
+    %% ?DEBUG("A ~p", [A]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
     Type        = ?v(<<"type">>, A), 
     Color       = ?v(<<"color">>, A),
     Price       = ?v(<<"fprice">>, A), 
     Discount    = ?v(<<"fdiscount">>, A),
-    FPrice      = Price * Discount / 100,
+    FPrice      = Price * Discount * 0.01,
 
     [{FirstName, _, _}|_] = Fields,
-    ?DEBUG("FirstName ~p",[FirstName]),
+    %% ?DEBUG("FirstName ~p",[FirstName]),
     Row = 
 	lists:foldr(
 	  fun({<<"brand">> = Name, _, W}, Acc) when Name =:= FirstName->
-		  phd("|") ++ ?to_s(Brand) ++ pading(W - width(chinese, Brand) -2 )
+		  phd("|") ++ ?to_s(Brand)
+		      ++ pading(W - width(chinese, Brand) -2 )
 		      ++ phd("|") ++ Acc;
-	     ({<<"style_number">> = Name, _, W}, Acc) when Name =:= FirstName->
-		  phd("|") ++ ?to_s(StyleNumber) ++ pading(W - width(latin1, StyleNumber) -2)
+	     ({<<"style_number">> = Name, _, W}, Acc) when Name=:=FirstName->
+		  phd("|") ++ ?to_s(StyleNumber)
+		      ++ pading(W - width(latin1, StyleNumber) -2)
 		      ++ phd("|") ++ Acc;
 	     ({<<"style_number">>, _, W}, Acc)->
-		  ?to_s(StyleNumber) ++ pading(W - width(latin1, StyleNumber) -1)
+		  ?to_s(StyleNumber)
+		      ++ pading(W - width(latin1, StyleNumber) -1)
 		      ++ phd("|") ++ Acc;
 	     ({<<"type">>, _, W}, Acc) ->
-		  ?to_s(Type) ++ pading(W - width(chinese, Type) -1 ) ++ phd("|") ++ Acc;
+		  ?to_s(Type) ++ pading(W - width(chinese, Type) -1 )
+		      ++ phd("|") ++ Acc;
 	     ({<<"color">>, _, W}, Acc) ->
-		  ?to_s(Color) ++ pading(W - width(chinese, Color) -1 ) ++ phd("|") ++ Acc;
+		  ?to_s(Color) ++ pading(W - width(chinese, Color) -1 )
+		      ++ phd("|") ++ Acc;
 	     ({<<"size">>, _, _}, Acc) ->
 		  FlatternNums ++ Acc;
 	     ({<<"price">>, _, W}, Acc)->
 		  CleanPrice = clean_zero(Price),
 		  {Mh, Ml} = middle(?TABLE, W, CleanPrice),
-		  pading(Mh) ++ ?to_s(CleanPrice) ++ pading(Ml) ++ phd("|") ++ Acc;
+		  pading(Mh) ++ ?to_s(CleanPrice) ++ pading(Ml)
+		      ++ phd("|") ++ Acc;
 	     ({<<"discount">>, _, W}, Acc)     ->
 		  {Mh, Ml} = middle(?TABLE, W, Discount),
-		  pading(Mh) ++ ?to_s(Discount) ++ pading(Ml) ++ phd("|") ++ Acc;
+		  pading(Mh) ++ ?to_s(Discount) ++ pading(Ml)
+		      ++ phd("|") ++ Acc;
 	     ({<<"dprice">>, _, W}, Acc)       ->
 		  CleanFPrice = clean_zero(FPrice),
 		  {Mh, Ml} = middle(?TABLE, W, CleanFPrice),
-		  pading(Mh) ++ ?to_s(CleanFPrice) ++ pading(Ml) ++ phd("|") ++ Acc;
+		  pading(Mh) ++ ?to_s(CleanFPrice) ++ pading(Ml)
+		      ++ phd("|") ++ Acc;
 	     ({<<"count">>, _, W}, Acc) ->
 		  {Mh, Ml} = middle(?TABLE, W, Total),
-		  pading(Mh) ++ ?to_s(Total) ++ pading(Ml) ++ phd("|") ++ Acc;
+		  pading(Mh) ++ ?to_s(Total) ++ pading(Ml)
+		      ++ phd("|") ++ Acc;
 	     ({<<"calc">>, _, W}, Acc) ->
-		  CleanCalc = round(FPrice * Total),
+		  CleanCalc = FPrice * Total,
 		  {Mh, Ml} = middle(?TABLE, W, CleanCalc),
-		  pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml) ++ phd("|") ++ Acc
+		  pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml)
+		      ++ phd("|") ++ Acc
 	  end, [], Fields),
-    ?DEBUG("row ~p", [Row]),
+    %% ?DEBUG("row ~p", [Row]),
     Row.
 
 
@@ -400,9 +419,10 @@ line_space(default) ->
     [27, 64].
 
 br(forward, <<"epson">>, <<"LQ55K">>) ->
-    br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
-	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
-	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
+    br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
 br(forward, Brand, _Model) ->
     br(Brand).
 
@@ -413,7 +433,7 @@ br(forward, Brand, _Model) ->
 %% decorate_data(head, jolimark, 'LQ-200KII/KIIF', PaperHeight)->
 %%     decorate_data(head, jolimark, none, PaperHeight);
 decorate_data(head, jolimark, _Brand, PaperHeight) ->
-    ?DEBUG("PaperHeight ~p", [PaperHeight]),
+    %% ?DEBUG("PaperHeight ~p", [PaperHeight]),
     RoundHeight = round(PaperHeight * 36 / 2.54), 
     Head = <<16#1b, 16#1d, 16#1e, 16#06, 16#01, 16#01, 16#1b, 16#0d, 16#1f, 16#1b,
 	     16#40, 16#1b, 16#74, 16#01, 16#1b, 16#36, 16#52, 16#00, 16#1b, 16#72,
@@ -425,7 +445,7 @@ decorate_data(head, jolimark, _Brand, PaperHeight) ->
 decorate_data(head, fujitsu, Brand, PaperHeight) ->
     decorate_data(head, epson, Brand, PaperHeight);
 decorate_data(head, epson, _Brand, PaperHeight) ->
-    ?DEBUG("PaperHeight ~p", [PaperHeight]),
+    %% ?DEBUG("PaperHeight ~p", [PaperHeight]),
     RoundHeight = round(PaperHeight * 36 / 2.54),
     %% ?DEBUG("roundHeight ~p", [RoundHeight]),
     %% ?DEBUG("roundHeight ~p", [<<RoundHeight:16/little>>]),
