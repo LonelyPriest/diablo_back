@@ -329,13 +329,16 @@
 		<p class="canvas-stastic">
 		  灰色：<span class="fg-green">总存库</span>
 		  &nbsp&nbsp&nbsp&nbsp浅蓝色：
-		  <span class="fg-red">已售出数量</span> 
+		  <span class="fg-red">已售出数量</span>
+		  &nbsp&nbsp&nbsp&nbsp第
+		  <span class="fg-darkRed"
+			x-ng-bind="tab_page.page_of_chart"></span>页
 		</p>
 	      </div>
 
 	      <div class="col-md-3 col-sm-3 col-xs-3">
 		<div class="btn-group btn-group-solid pull-right">
-		  <button class="btn green-meadow canvas-btn-next"
+		  <button class="btn yellow-crusta canvas-btn-next"
 			  x-ng-disabled="tab_page.page_of_chart===1"
 			  x-ng-click="chart_mode(tab_page.page_of_chart -1)">
 		    <i class="glyphicon glyphicon-menu-left"></i></button>
@@ -347,7 +350,8 @@
 	      </div>
 	    </div>
 	    
-	    <bar-chart chart-data="chart_data.bar"></bar-chart>
+	    <bar-chart ng-touchstart="touch_start()"
+		       chart-data="chart_data.bar"></bar-chart>
 	  </div>
 	      
 	</div> <!--END portlet body--> 

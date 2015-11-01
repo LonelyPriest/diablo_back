@@ -221,6 +221,13 @@ filter(fix_rsn_groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
 			   Merchant, CurrentPage, ItemsPerPage, Fields});
 
 %% inventory
+filter(groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant),
+    %% default use id
+    gen_server:call(
+      Name, {filter_groups, use_id, Merchant,
+	     CurrentPage, ItemsPerPage, Fields});
+
 filter({groups, Mode}, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(

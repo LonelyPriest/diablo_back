@@ -55,32 +55,36 @@ navbars(Module, Session) ->
     Merchant = ?session:get(merchant, Session),
     {ok, Titles} = ?w_user_profile:get(user_nav, Merchant, Session),
     ActiveTitles = lists:foldr(
-		     fun({P, T, M}, Acc) when M =:= Module ->
-			     [{P, T, true}|Acc];
-			({P, T, _}, Acc) ->
-			     [{P, T, false}|Acc]
+		     fun({P, T, M, H}, Acc) when M =:= Module ->
+			     [{P, T, true, H}|Acc];
+			({P, T, _, H}, Acc) ->
+			     [{P, T, false, H}|Acc]
 		     end, [], Titles),
     navbar(ActiveTitles).
 
 navbars(Module) ->
     Titles = ?MODULE:titles(),
     ActiveTitles = lists:foldr(
-		     fun({P, T, M}, Acc) when M =:= Module ->
-			     [{P, T, true}|Acc];
-			({P, T, _}, Acc) ->
-			     [{P, T, false}|Acc]
+		     fun({P, T, M, H}, Acc) when M =:= Module ->
+			     [{P, T, true, H}|Acc];
+			({P, T, _, H}, Acc) ->
+			     [{P, T, false, H}|Acc]
 		     end, [], Titles),
     navbar(ActiveTitles).
 
 navbar(Titles) ->
     lists:foldr(
-      fun({Href, Title, Active}, Acc) ->
-	      
+      fun({Href, Title, Active, Hidden}, Acc) ->
+	      ?DEBUG("href ~p hidden ~p", [Href, Hidden]), 
 	      "<li name="
 		  ++ string:strip(Href, both, $/)
-		  ++ case Active of
-			 true -> "  class=\"start active\">";
-			 false -> ">"
+		  ++ case Hidden of
+			 true -> " class=\"hidden-xs hidden-sm\">";
+			 false ->
+			     case Active of
+				 true -> "  class=\"start active\">";
+				 false -> ">"
+			     end
 		     end
 		  ++
 		  "<a href=\""++ Href ++ "\">" ++ Title

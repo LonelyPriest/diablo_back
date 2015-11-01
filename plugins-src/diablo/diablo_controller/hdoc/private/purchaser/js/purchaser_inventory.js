@@ -895,6 +895,9 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
     diabloUtilsService, diabloPromise, purchaserService, wgoodService,
     localStorageService, user, filterBrand, filterFirm, filterType,
     filterSizeGroup, filterColor, base){
+    // $scope.touch_start = function(){
+    // 	console.log("touch_start");
+    // }
     // var data = {
     // 	labels : ["January","February","March","April","May","June","July"],
     // 	datasets : [

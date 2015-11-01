@@ -34,11 +34,14 @@ action(Session, Req, {"list_w_retailer"}) ->
 
 action(Session, Req, {"list_w_province"}) ->
     ?DEBUG("list w_province with session ~p", [Session]),
-    ?utils:respond(batch, fun() -> ?w_retailer:province(list) end, Req);
+    Merchant = ?session:get(merchant, Session),
+    ?utils:respond(
+       batch, fun() -> ?w_retailer:province(list, Merchant) end, Req);
 
 action(Session, Req, {"list_w_city"}) ->
     ?DEBUG("list w_city with session ~p", [Session]),
-    ?utils:respond(batch, fun() -> ?w_retailer:city(list) end, Req);
+    Merchant = ?session:get(merchant, Session),
+    ?utils:respond(batch, fun() -> ?w_retailer:city(list, Merchant) end, Req);
 
 action(Session, Req, {"del_w_retailer", Id}) ->
     ?DEBUG("delete_w_retailer with session ~p, Id ~p", [Session, Id]),
@@ -56,24 +59,24 @@ action(Session, Req, {"del_w_retailer", Id}) ->
 %%--------------------------------------------------------------------
 action(Session, Req, {"new_w_retailer"}, Payload) ->
     ?DEBUG("new wretailer with session ~p~npaylaod ~p", [Session, Payload]),
-
+    Merchant = ?session:get(merchant, Session), 
     Province = ?v(<<"province">>, Payload),
     %% City     = ?v(<<"city">>, Payload),
 
     City =
 	case ?v(<<"city">>, Payload) of
 	    undefined -> {ok, -1};
-	    C -> ?w_retailer:city(new, C, Province)
+	    C -> ?w_retailer:city(new, Merchant, C, Province)
 	end,
     
     case City of
 	{ok, CityId} ->
 	    ?DEBUG("cityid  ~p", [CityId]),
-	    Merchant = ?session:get(merchant, Session),
 	    case ?w_retailer:retailer(
-		    new, [{<<"merchant">>, Merchant},
-			  {<<"city">>, CityId}|proplists:delete(<<"city">>, Payload)]) of
-		{ok, RId} ->
+		    new,
+		    Merchant,
+		    [{<<"city">>, CityId}
+		     |proplists:delete(<<"city">>, Payload)]) of {ok, RId} ->
 		    ?utils:respond(
 		       200, Req, ?succ(add_w_retailer, RId), {<<"id">>, RId});
 		{error, Error} ->

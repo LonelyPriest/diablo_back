@@ -48,7 +48,7 @@ get(M, Merchant) ->
 %%%===================================================================
 
 init([M]) ->
-    ?DEBUG("M ~p", [M]),
+    %% ?DEBUG("M ~p", [M]),
     %% RestartStrategy = simple_one_for_one,
     %% MaxRestarts = 1000,
     %% MaxSecondsBetweenRestarts = 3600,

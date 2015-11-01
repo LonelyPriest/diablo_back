@@ -271,9 +271,11 @@
 		    <td class="vert-align">
 		      <div x-ng-if="inv.sell && inv.fprice && inv.fdiscount"> 
 			<span x-ng-if="setting.round===1">
-			  {{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span>
+			  {{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}
+			</span>
 			<span x-ng-if="setting.round===0">
-			  {{f_mul(inv.fprice * inv.fdiscount * inv.sell, 0.01)}}</span>
+			  {{f_mul(inv.sell * inv.fdiscount, f_mul(inv.fprice, 0.01))}}
+			</span>
 		      </div>
 		    </td>
 		    

@@ -212,7 +212,7 @@ start(with_new_session, UserDetail) ->
     %% 	       0, SessionId, fun(A) -> A end, ?QZG_DY_SESSION),
 
     %% use the first navigation
-    [{Path, _, _}|_] =
+    [{Path, _Name, _Module, _Hidden}|_] =
 	case ?v(<<"type">>, UserDetail) of
 	    ?SUPER -> %% super login directly
 		?right_auth:navbar(super);

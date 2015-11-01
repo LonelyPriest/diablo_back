@@ -272,20 +272,24 @@ action(Session, Req, {"print_w_sale"}, Payload) ->
     try
 	{ok, Sale} = ?w_sale:sale(get_new, Merchant, RSN),
 	?DEBUG("sale ~p", [Sale]),
-	{ok, Details} = ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
+	{ok, Details} =
+	    ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
 	%% {ok, Details} = ?w_sale:rsn_detail(rsn, Merchant, {<<"rsn">>, RSN}),
 	?DEBUG("details ~p", [Details]),
 
-	{ok, Retailer} = ?w_user_profile:get(retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
-	{ok, Employee} = ?w_user_profile:get(employee, Merchant, ?v(<<"employ_id">>, Sale)),
+	{ok, Retailer} = ?w_user_profile:get(
+			    retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
+	{ok, Employee} = ?w_user_profile:get(
+			    employee, Merchant, ?v(<<"employ_id">>, Sale)),
 	{ok, Brands}   = ?w_user_profile:get(brand, Merchant),
 
-	GetBrand = fun(BrandId)->
-			   case ?w_user_profile:filter(Brands, <<"id">>, BrandId) of
-			       [] -> [];
-			       FindBrand -> ?v(<<"name">>, FindBrand)
-			   end
-		   end,
+	GetBrand =
+	    fun(BrandId)->
+		    case ?w_user_profile:filter(Brands, <<"id">>, BrandId) of
+			[] -> [];
+			FindBrand -> ?v(<<"name">>, FindBrand)
+		    end
+	    end,
 	    
 	SortInvs = sort_inventory(Merchant, GetBrand, Details, []),
 	%% ?DEBUG("sorts ~p", [SortInvs]),
@@ -304,8 +308,8 @@ action(Session, Req, {"print_w_sale"}, Payload) ->
 		    {<<"direct">>,     ?v(<<"type">>, Sale)}],
 
 	
-	?DEBUG("retailer ~p", [Retailer]),
-	?DEBUG("employee ~p", [Employee]),
+	%% ?DEBUG("retailer ~p", [Retailer]),
+	%% ?DEBUG("employee ~p", [Employee]),
 	PrintAttrs = [{<<"retailer">>, ?v(<<"name">>, Retailer)},
 		      {<<"retailer_id">>, ?v(<<"retailer_id">>, Sale)},
 		      {<<"employ">>, ?v(<<"name">>, Employee)}], 
@@ -318,9 +322,10 @@ action(Session, Req, {"print_w_sale"}, Payload) ->
 			{<<"pinfo">>, PInfo}])
 	    end,
 
-	print(RSN, Merchant, SortInvs, RSNAttrs, PrintAttrs, SuccessRespone),
+	print(RSN, Merchant, SortInvs, RSNAttrs, PrintAttrs, SuccessRespone)
 	
-	?utils:respond(200, Req, ?succ(print_w_sale, RSN), {<<"rsn">>, ?to_b(RSN)}) 
+	%% ?utils:respond(
+	%%    200, Req, ?succ(print_w_sale, RSN), {<<"rsn">>, ?to_b(RSN)}) 
     catch
 	_:{badmatch, {error, Error}} ->
 	    ?utils:respond(200, Req, Error)
@@ -580,7 +585,7 @@ print(RSN, Merchant, Invs, Attrs, PrintAttrs, ResponseFun) ->
 	{_Success, Failed} when is_list(Failed)->
 	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
 		     || {DeviceId, ECode} <- Failed],
-	    ResponseFun(2, PInfo); 
+	    ResponseFun(2, PInfo);
 	{error, {ECode, _EInfo}} ->
 	    ResponseFun(ECode, [])
     catch

@@ -320,11 +320,11 @@ ul.page-sidebar-menu > li.active > a {
     overflow: visible;
 }
 
-@media only screen and (max-width: 767px) {
-    .hidden-phone{
-	display: none;
-    }
-}
+/* @media only screen and (max-width: 767px) { */
+/*     .hidden-phone{ */
+/* 	display: none; */
+/*     } */
+/* } */
 
 .canvas {
   width: 100%;
@@ -336,9 +336,9 @@ ul.page-sidebar-menu > li.active > a {
 }
 
 .canvas-btn-pre {
-    padding:0px 10 0px 10px !important;
+    padding:0px 15 0px 15px !important;
 }
 
 .canvas-btn-next {
-    padding:0px 10px 0px 10px !important;
+    padding:0px 15px 0px 15px !important;
 }

@@ -187,7 +187,17 @@ handle_call({navbar, UserId}, _From, #func_tree{tree=Tree} = State) ->
     Navs = 
 	lists:foldr(
 	  fun({Root}, Acc) ->
-		  [gb_trees:get(?value(<<"id">>, Root), Tree)|Acc]
+		  %% [gb_trees:get(?value(<<"id">>, Root), Tree)|Acc] 
+		  RId = ?v(<<"id">>, Root),
+		  {Href, Name, Module} = gb_trees:get(RId, Tree),
+
+		  %% mobile hidden when xs, sm
+		  case RId =:= ?right_shop
+		      orelse RId =:= ?right_employe
+		      orelse RId =:= ?right_right of
+		      true ->  [{Href, Name, Module, true}|Acc];
+		      false ->[{Href, Name, Module, false}|Acc]
+		  end 
 	  end,[], OrderRights),
     ?DEBUG("navs ~p", [Navs]),
     

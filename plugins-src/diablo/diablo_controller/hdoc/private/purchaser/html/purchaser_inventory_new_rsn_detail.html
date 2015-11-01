@@ -11,15 +11,19 @@
 	  <div class="btn-group btn-group-solid">
 	    <button type="button" class="btn red purple-stripe"
 		    x-ng-click="go_back()">返回
-	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i>
+	    </button>
 
-	    <button type="button" class="btn blue purple-stripe"
+	    <button type="button"
+		    class="btn blue purple-stripe hidden-xs hidden-sm"
 		    x-ng-click="export_to()">导出
-	      <i class="glyphicon glyphicon-export"></i></button> 
+	      <i class="glyphicon glyphicon-export"></i>
+	    </button> 
 	    
 	    <button type="button" class="btn yellow purple-stripe reload"
 		    x-ng-click="do_search(default_page)">刷新
-	      <i class="icon icon-spinner fg-white"></i></button>
+	      <i class="icon icon-spinner fg-white"></i>
+	    </button>
 	  </div>
 	</div> 
       </div>
@@ -29,13 +33,13 @@
 	<div class="table-toolbar util-btn-margin-bottom-5">
 	  
 	  <div class="row">
-            <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>

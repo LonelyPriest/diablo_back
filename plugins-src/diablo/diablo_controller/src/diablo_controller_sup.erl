@@ -109,10 +109,10 @@ init([]) ->
     %% 	 {diablo_purchaser, start_link, []},
     %% 	 Restart, Shutdown, Type, [diablo_purchaser]},
 
-    WRetailer =
-	{diablo_w_retailer,
-	 {diablo_w_retailer, start_link, []},
-	 Restart, Shutdown, Type, [diablo_w_retailer]},
+    %% WRetailer =
+    %% 	{diablo_w_retailer,
+    %% 	 {diablo_w_retailer, start_link, []},
+    %% 	 Restart, Shutdown, Type, [diablo_w_retailer]},
 
     %% WSale =
     %% 	{diablo_w_sale,
@@ -160,7 +160,18 @@ init([]) ->
     %% WholeSale = [WInventory, WRetailer, WSale, WSaleDraft,
     %% 		 WPrint, WBase, WProfile, HttpPrint, WReport],
 
-    WholeSale = [WRetailer, WPrint, WBase, WProfile, HttpPrint, WReport],
+    WholeSale = [WPrint, WBase, WProfile, HttpPrint, WReport],
+
+    WRetailerSup = ?to_a(lists:concat([?w_retailer, "_sup"])),
+    WRetailerPoolSup = {
+      WRetailerSup,
+      {diablo_work_pool_sup, start_link, [?w_retailer]},
+      Restart, Shutdown, supervisor, [WRetailerSup]},
+    
+    %% WRetailer =
+    %% 	{diablo_w_retailer,
+    %% 	 {diablo_w_retailer, start_link, []},
+    %% 	 Restart, Shutdown, Type, [diablo_w_retailer]},
 
     WInvSup = ?to_a(?to_s(?w_inventory) ++ "_sup"),
     WInvPoolSup = {WInvSup,
@@ -171,9 +182,9 @@ init([]) ->
     WSaleSup = ?to_a(?to_s(?w_sale) ++ "_sup"), 
     WSalePoolSup = {WSaleSup,
 		    {diablo_work_pool_sup, start_link, [?w_sale]},
-		    Restart, Shutdown, supervisor, [WSaleSup]},
-
-    PoolSup = [WInvPoolSup, WSalePoolSup],
+		    Restart, Shutdown, supervisor, [WSaleSup]}, 
+    
+    PoolSup = [WRetailerPoolSup, WInvPoolSup, WSalePoolSup],
 
     {ok, {SupFlags, [IConv, Mysql, Employ, Merchant,
     		     Shop, Right, Supplier,

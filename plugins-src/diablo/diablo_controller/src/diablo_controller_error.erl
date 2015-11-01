@@ -336,7 +336,7 @@ error(long_content, PrintSN) ->
 error(invalid_params, PrintSN) ->
     {2414, "invalid parameter of print " ++ ?to_s(PrintSN)};
 error(print_timeout, RSN) ->
-    {2415, "timeout of order " ++ ?to_s(RSN)};
+    {2415, "timeout of rsn " ++ ?to_s(RSN)};
 error(print_unkown_error, RSN) ->
     {2416, "unkown error of print " ++ ?to_s(RSN)};
 error(print_http_failed, Reason) ->

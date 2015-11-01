@@ -1,6 +1,14 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2015-11-02",
+	 content: [
+	     "库存销售统计分布增加前进后退功能",
+	     "优化打印处理",
+	     "优化手机，平板横屏，竖屏内容显示"
+	 ]
+	},
+	
 	{date: "2015-10-30",
 	 content: [
 	     "增加库存销售统计分布示意图",

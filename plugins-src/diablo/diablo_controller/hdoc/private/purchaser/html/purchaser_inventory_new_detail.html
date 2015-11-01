@@ -9,11 +9,13 @@
 	
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <button type="button" class="btn green purple-stripe"
+	    <button type="button"
+		    class="btn green purple-stripe hidden-xs hidden-sm"
 	  	    x-ng-click="add()">入库
 	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
-	    <button type="button" class="btn red purple-stripe"
+	    <button type="button"
+		    class="btn red purple-stripe hidden-xs hidden-sm"
 	  	    x-ng-click="reject()">退货
 	      <i class="glyphicon glyphicon-minus"></i></button>
 
@@ -21,7 +23,8 @@
 	  	    x-ng-click="inventory_detail()">库存
 	      <i class="glyphicon glyphicon-book"></i></button>
 
-	    <button type="button" class="btn blue purple-stripe"
+	    <button type="button"
+		    class="btn blue purple-stripe hidden-xs hidden-sm"
 		  x-ng-click="export_to()">导出
 	    <i class="glyphicon glyphicon-export"></i></button> 
 	    
@@ -38,13 +41,13 @@
 	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
 	  <div class="row">
-            <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
                  time="time.start_time" ok="do_search(default_page)"></time-search>
             </div>
 
-            <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
                  time="time.end_time" ok="do_search(default_page)"></time-search>

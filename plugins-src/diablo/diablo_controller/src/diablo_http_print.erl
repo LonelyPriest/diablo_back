@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([print/4, print/5]).
+-export([print/4, print/5, call/2]).
 
 -export([server/1,
 	 title/4, head/7, head/8,  body_head/6,
@@ -53,8 +53,20 @@ print(test, Merchant, Shop, PId) ->
     gen_server:call(?SERVER, {print_test, Merchant, Shop, PId}).
 
 print(RSn, Merchant, Inventories, Attrs, Print) ->
-    call({print, RSn, Merchant, Inventories, Attrs, Print}).
-    %% gen_server:call(?SERVER, {print, RSn, Merchant, Inventories, Attrs, Print}).
+    %% call({print, RSn, Merchant, Inventories, Attrs, Print}).
+    %% gen_server:call(
+    %% ?SERVER, {print, RSn, Merchant, Inventories, Attrs, Print}).
+    
+    Self = self(),
+    spawn(?MODULE, call,
+	  [Self, {print, RSn, Merchant, Inventories, Attrs, Print}]),
+
+    receive
+	{Self, Any} -> Any
+    after 3000 ->
+	    {error, ?err(print_timeout, RSn)}
+    end.
+    
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -71,167 +83,6 @@ handle_call({print_test, Merchant, Shop, PId}, _Form, State) ->
     Reply = diablo_http_print_test:print(Merchant, Shop, PId),
     {reply, Reply, State};
     
-%% handle_call({print, RSN, Merchant, Invs, Attrs, Print}, _Form, State) ->
-%%     ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p, Print  ~p",
-%% 	   [RSN, Merchant, Invs, Attrs, Print]),
-
-%%     ShopId = ?v(<<"shop">>, Attrs), 
-    
-%%     {Printers, ShopInfo} =
-%% 	case ?w_user_profile:get(shop, Merchant, ShopId) of
-%% 	    {ok, []} -> {[], []};
-%% 	    {ok, [{Shop}]} ->
-%% 		case ?v(<<"repo">>, Shop) of
-%% 		    -1 ->
-%% 			case ?w_user_profile:get(print, Merchant, ShopId) of
-%% 			    {ok, []} -> {[], []};
-%% 			    {ok, [{P1}]} ->
-%% 				{[[{<<"pshop">>, ShopId}|P1]], Shop}
-%% 			end;
-%% 		    RepoId ->
-%% 			{[case ?w_user_profile:get(print, Merchant, ShopId) of
-%% 			    {ok, []} -> [];
-%% 			    {ok, [{P1}]} ->
-%% 				 [{<<"pshop">>, ShopId}|P1]
-%% 			end,
-%% 			  case ?w_user_profile:get(print, Merchant, RepoId) of
-%% 			      {ok, []} -> [];
-%% 			      {ok, [{P2}]} -> [{<<"pshop">>, RepoId}|P2]
-%% 			  end], Shop}
-%% 		end
-%% 	end,
-
-%%     %% ?DEBUG("printers ~p", [Printers]),
-%%     VPrinters = [P || P <- Printers, length(P) =/= 0 ],
-%%     ?DEBUG("printers ~p", [VPrinters]),
-%%     case VPrinters of
-%% 	[] ->
-%% 	    {reply, {error, ?err(shop_not_printer, ShopId)}, State};
-%% 	_  ->
-%% 	    %% content info
-%% 	    %% Retailer     = ?v(<<"retailer">>, Print),
-%% 	    RetailerId   = ?v(<<"retailer_id">>, Print),
-%% 	    {ok, Retailer} = ?w_user_profile:get(retailer, Merchant, RetailerId),
-%% 	    %% ?DEBUG("retailer  ~p", [Retailer]),
-%% 	    Employee     = ?v(<<"employ">>, Print), 
-%% 	    DateTime     = ?v(<<"datetime">>, Attrs),
-%% 	    Total        = ?v(<<"total">>, Attrs, 0),
-%% 	    Direct       = ?v(<<"direct">>, Attrs, 0),
-%% 	    [Date, _]    = string:tokens(?to_s(DateTime), " "),
-
-%% 	    %% shop info
-%% 	    ShopName = case ?w_sale:direct(Direct) of
-%% 			   wreject ->
-%% 			       ?to_s(?v(<<"name">>, ShopInfo)) ++ "（退货单）";
-%% 			   _       ->
-%% 			       ?v(<<"name">>, ShopInfo)
-%% 		       end,
-	    
-%% 	    ShopAddr = ?v(<<"address">>, ShopInfo),
-
-%% 	    %% profile
-%% 	    {ok, MerchantInfo} = detail(merchant, Merchant), 
-%% 	    {ok, Banks}        = detail(bank, Merchant),
-%% 	    %% {ok, Setting}      = detail(base_setting, Merchant, ShopId),
-%% 	    %% PrintRetailer      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
-%% 	    %% PrintTable         = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
-%% 	    %% IsRound            = ?to_i(?v(<<"pround">>, Setting, ?NO)),
-%% 	    Mobile             = ?v(<<"mobile">>, MerchantInfo),
-	    
-%% 	    %% ?DEBUG("PrintRetailer ~p, PrintTable ~p", [PrintRetailer, PrintTable]), 
-
-%% 	    try
-%% 		lists:foldr(
-%% 		  fun(P, Acc) ->
-%% 			  SN     = ?v(<<"sn">>, P),
-%% 			  Key    = ?v(<<"code">>, P),
-%% 			  Path   = ?v(<<"server_path">>, P),
-
-%% 			  Brand  = ?v(<<"brand">>, P),
-%% 			  Model  = ?v(<<"model">>, P),
-
-%% 			  Column = ?v(<<"pcolumn">>, P),
-%% 			  Height = ?v(<<"pheight">>, P),
-%% 			  PShop  = ?v(<<"pshop">>, P),
-			  
-%% 			  ?DEBUG("P ~p", [P]),
-%% 			  Server = server(?v(<<"server_id">>, P)),
-
-%% 			  {ok, Setting}      = detail(base_setting, Merchant, PShop),
-%% 			  PrintRetailer      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
-%% 			  PrintTable         = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
-%% 			  IsRound            = ?to_i(?v(<<"pround">>, Setting, ?NO)),
-
-%% 			  %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
-%% 			  %% [PrintRetailer, PrintTable]), 
-%% 			  %% ?DEBUG("column ~p", [Column]),
-			  
-%% 			  Head = title(Brand, Model, Column, ShopName)
-%% 			      ++ address(Brand, Model, Column, ShopAddr)
-%% 			      ++ head(Brand, Model, Column, RSN,
-%% 				      PrintRetailer, Retailer, Employee, Date)
-			      
-%% 			      ++ left_pading(Brand, Model)
-			      
-%% 			      ++ case PrintTable of
-%% 				     ?TABLE  ->
-%% 					 line_space('1/8');
-%% 				     %% ++ line(minus, Column) ++ br(Brand);
-%% 				     ?STRING ->
-%% 					 line(equal, Column) ++ br(Brand)
-%% 				 end,
-
-%% 			  Body = print_content(
-%% 				   PShop, Brand, Model, Column,
-%% 				   Merchant, Setting, Invs, Total,
-%% 				   ?v(<<"should_pay">>, Attrs, 0))
-%% 			      ++ case PrintTable of
-%% 				     ?TABLE  ->
-%% 					 %% line_space(default);
-%% 					 line_space('1/6');
-%% 				     ?STRING ->
-%% 					 []
-%% 				 end,
-%% 			  %% ?DEBUG("body ~ts", [?to_b(Body)]),
-
-%% 			  Stastic = body_stastic(IsRound, Brand, Model, Column, Attrs),
-%% 			  Foot = body_foot(Brand, Model, Column, Banks, Mobile, Setting),
-
-%% 			  Content = Head ++ Body ++ Stastic ++ Foot,
-
-%% 			  DBody = 
-%% 			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1037", "1031"]) of
-%% 				  true -> 
-%% 				      %% no page
-%% 				      %% ?DEBUG("no page with sn ~p", [SN]),
-%% 				      ?f_print:pagination(just, Height * 10, Content);
-%% 				  false ->
-%% 				      %% auto page
-%% 				      %% ?DEBUG("auto page with sn ~p", [SN]),
-%% 				      ?f_print:pagination(auto, Height * 10, Content)
-%% 			      end,
-
-%% 			  %% page by height
-%% 			  %% DBody = ?f_print:pagination(Height * 10, Content),
-
-%% 			  ?DEBUG("server ~p", [Server]),
-%% 			  [{SN, fun() when Server =:= rcloud ->
-%% 					start_print(
-%% 					  rcloud, Brand, Model, Height,
-%% 					  SN, Key, Path, DBody);
-%% 				   () when Server =:= fcloud ->
-%% 					start_print(fcloud, SN, Key, Path, Content) 
-%% 				end}|Acc] 
-%% 		  end, [], VPrinters) of
-%% 		PrintInfo -> 
-%% 		    Reply = multi_print(PrintInfo),
-%% 		    {reply, Reply, State} 
-%% 	    catch
-%% 		size_not_include ->
-%% 		    {reply, {error, ?err(print_size_not_include, ShopId)}, State} 
-%% 	    end
-%%     end;
-
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
@@ -252,9 +103,9 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 
-call({print, RSN, Merchant, Invs, Attrs, Print}) ->
-    ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p, Print  ~p",
-	   [RSN, Merchant, Invs, Attrs, Print]),
+call(Parent, {print, RSN, Merchant, Invs, Attrs, Print}) ->
+    ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p"
+	   ", Print  ~p", [RSN, Merchant, Invs, Attrs, Print]),
 
     ShopId = ?v(<<"shop">>, Attrs), 
 
@@ -287,12 +138,13 @@ call({print, RSN, Merchant, Invs, Attrs, Print}) ->
     ?DEBUG("printers ~p", [VPrinters]),
     case VPrinters of
 	[] ->
-	    {error, ?err(shop_not_printer, ShopId)};
+	    Parent ! {Parent, {error, ?err(shop_not_printer, ShopId)}};
 	_  ->
 	    %% content info
 	    %% Retailer     = ?v(<<"retailer">>, Print),
-	    RetailerId   = ?v(<<"retailer_id">>, Print),
-	    {ok, Retailer} = ?w_user_profile:get(retailer, Merchant, RetailerId),
+	    RetailerId = ?v(<<"retailer_id">>, Print),
+	    {ok, Retailer}
+		= ?w_user_profile:get(retailer, Merchant, RetailerId),
 	    %% ?DEBUG("retailer  ~p", [Retailer]),
 	    Employee     = ?v(<<"employ">>, Print), 
 	    DateTime     = ?v(<<"datetime">>, Attrs),
@@ -303,7 +155,8 @@ call({print, RSN, Merchant, Invs, Attrs, Print}) ->
 	    %% shop info
 	    ShopName = case ?w_sale:direct(Direct) of
 			   wreject ->
-			       ?to_s(?v(<<"name">>, ShopInfo)) ++ "（退货单）";
+			       ?to_s(?v(<<"name">>, ShopInfo))
+				   ++ "（退货单）";
 			   _       ->
 			       ?v(<<"name">>, ShopInfo)
 		       end,
@@ -338,10 +191,14 @@ call({print, RSN, Merchant, Invs, Attrs, Print}) ->
 			  ?DEBUG("P ~p", [P]),
 			  Server = server(?v(<<"server_id">>, P)),
 
-			  {ok, Setting}      = detail(base_setting, Merchant, PShop),
-			  PrintRetailer      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
-			  PrintTable         = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
-			  IsRound            = ?to_i(?v(<<"pround">>, Setting, ?NO)),
+			  {ok, Setting}
+			      = detail(base_setting, Merchant, PShop),
+			  PrintRetailer
+			      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
+			  PrintTable
+			      = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
+			  IsRound
+			      = ?to_i(?v(<<"pround">>, Setting, ?NO)),
 
 			  %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
 			  %% [PrintRetailer, PrintTable]), 
@@ -375,41 +232,47 @@ call({print, RSN, Merchant, Invs, Attrs, Print}) ->
 				 end,
 			  %% ?DEBUG("body ~ts", [?to_b(Body)]),
 
-			  Stastic = body_stastic(IsRound, Brand, Model, Column, Attrs),
-			  Foot = body_foot(Brand, Model, Column, Banks, Mobile, Setting),
-
+			  Stastic = body_stastic(
+				      IsRound, Brand, Model, Column, Attrs),
+			  Foot = body_foot(
+				   Brand, Model, Column, Banks, Mobile, Setting), 
 			  Content = Head ++ Body ++ Stastic ++ Foot,
 
+			  UpgradeDevices =
+			      ["1006", "1008", "1024", "1037", "1031"],
 			  DBody = 
-			      case lists:member(?to_s(SN), ["1006", "1008", "1024", "1037", "1031"]) of
+			      case lists:member(?to_s(SN), UpgradeDevices) of
 				  true -> 
 				      %% no page
 				      %% ?DEBUG("no page with sn ~p", [SN]),
-				      ?f_print:pagination(just, Height * 10, Content);
+				      ?f_print:pagination(
+					 just, Height * 10, Content);
 				  false ->
 				      %% auto page
 				      %% ?DEBUG("auto page with sn ~p", [SN]),
-				      ?f_print:pagination(auto, Height * 10, Content)
+				      ?f_print:pagination(
+					 auto, Height * 10, Content)
 			      end,
 
 			  %% page by height
-			  %% DBody = ?f_print:pagination(Height * 10, Content),
-
+			  %% DBody = ?f_print:pagination(Height * 10, Content), 
 			  ?DEBUG("server ~p", [Server]),
 			  [{SN, fun() when Server =:= rcloud ->
 					start_print(
 					  rcloud, Brand, Model, Height,
 					  SN, Key, Path, DBody);
 				   () when Server =:= fcloud ->
-					start_print(fcloud, SN, Key, Path, Content) 
+					start_print(
+					  fcloud, SN, Key, Path, Content) 
 				end}|Acc] 
 		  end, [], VPrinters) of
 		PrintInfo -> 
 		    Reply = multi_print(PrintInfo),
-		    Reply 
+		    Parent ! {Parent, Reply}
 	    catch
 		size_not_include ->
-		   {error, ?err(print_size_not_include, ShopId)}
+		   Parent ! {Parent,
+			     {error, ?err(print_size_not_include, ShopId)}}
 	    end
     end.
 

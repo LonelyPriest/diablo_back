@@ -14,14 +14,14 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
 -export([retailer/2, retailer/3, retailer/4]).
--export([province/1, city/1, city/3]).
+-export([province/2, city/2, city/4]).
 
 -define(SERVER, ?MODULE). 
 
@@ -32,29 +32,38 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
-retailer(new, Attrs) ->
-    gen_server:call(?SERVER, {new_retailer, Attrs}); 
-retailer(list, Merchant) ->
-    gen_server:call(?SERVER, {list_retailer, Merchant}).
 
+retailer(list, Merchant) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {list_retailer, Merchant}).
+
+retailer(new, Merchant, Attrs) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {new_retailer, Merchant, Attrs});
 retailer(delete, Merchant, RetailerId) ->
-    gen_server:call(?SERVER, {delete_retailer, Merchant, RetailerId});
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {delete_retailer, Merchant, RetailerId});
 retailer(get, Merchant, RetailerId) ->
-    gen_server:call(?SERVER, {get_retailer, Merchant, RetailerId}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {get_retailer, Merchant, RetailerId}).
     
 retailer(update, Merchant, RetailerId, Attrs) ->
-    gen_server:call(?SERVER, {update_retailer, Merchant, RetailerId, Attrs}).
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {update_retailer, Merchant, RetailerId, Attrs}).
 
-city(new, City, Province) ->
-    gen_server:call(?SERVER, {new_city, City, Province}).
-city(list) ->
-    gen_server:call(?SERVER, list_city).
-province(list) ->
-    gen_server:call(?SERVER, list_province).
+city(new, Merchant, City, Province) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {new_city, City, Province}).
+city(list, Merchant) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, list_city).
+province(list, Merchant) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, list_province).
    
 
-start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+start_link(Name) ->
+    gen_server:start_link({local, Name}, ?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -63,13 +72,13 @@ start_link() ->
 init([]) ->
     {ok, #state{}}.
 
-handle_call({new_retailer, Attrs}, _From, State) ->
+handle_call({new_retailer, Merchant, Attrs}, _From, State) ->
     ?DEBUG("new_retailer with attrs ~p", [Attrs]),
     Name     = ?v(<<"name">>, Attrs),
     Balance  = ?v(<<"balance">>, Attrs, 0),
     Mobile   = ?v(<<"mobile">>, Attrs, []),
     Address  = ?v(<<"address">>, Attrs, []),
-    Merchant = ?v(<<"merchant">>, Attrs),
+    %% Merchant = ?v(<<"merchant">>, Attrs),
     Province = ?v(<<"province">>, Attrs, -1),
     City     = ?v(<<"city">>, Attrs, -1),
 
