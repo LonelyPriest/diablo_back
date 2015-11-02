@@ -639,7 +639,7 @@ create table w_sale(
     deleted        INTEGER default 0, -- 0: no;  1: yes
     unique  key rsn (rsn),
     key index_smer  (shop, merchant, employ, retailer),
-    primary key     (id),
+    primary key     (id)
     
 )default charset=utf8;
 
