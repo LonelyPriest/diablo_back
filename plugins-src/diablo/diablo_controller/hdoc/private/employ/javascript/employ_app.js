@@ -28,7 +28,7 @@ employApp.config(['$routeProvider', function($routeProvider){
 employApp.service("employService", function($resource, dateFilter){
     // error information
     this.error = {
-	1401: "员工创建失败，已存在同样的员工手机号码"};
+	1401: "员工创建失败，员工姓名重复！！"};
 
     // =========================================================================    
     var employ = $resource("/employ/:operation/:id",

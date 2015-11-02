@@ -136,11 +136,12 @@ handle_call({update_employee, Merchant, EmployeeId, Attrs}, _From, State) ->
 		    " where name=" ++ "\'" ++ ?to_s(Name) ++ "\'"
 		    ++ " and merchant=" ++ ?to_s(Merchant)
 		    ++ " and deleted=" ++ ?to_s(?NO),
-		case ?mysql:fetch(read, Sql) of
-		    {ok, R} -> {ok, R};
-		    {error, {_, Err}} ->
-			{error, ?err(db_error, Err)}
-		end
+		?sql_utils:execute(s_read, Sql)
+		%% case ?mysql:fetch(read, Sql) of
+		%%     {ok, R} -> {ok, R};
+		%%     {error, {_, Err}} ->
+		%% 	{error, ?err(db_error, Err)}
+		%% end
 	end,
 
     case NameExist of
@@ -155,11 +156,16 @@ handle_call({update_employee, Merchant, EmployeeId, Attrs}, _From, State) ->
 		++ " where id=" ++ ?to_s(EmployeeId)
 		++ " and merchant=" ++ ?to_s(Merchant),
 
-	    case ?mysql:fetch(write, Sql1) of
-		{ok, _} -> {reply, {ok, EmployeeId}, State};
-		{error, {_, Error}} ->
-		    {reply, {error, ?err(db_error, Error)}, State}
-	    end;
+	    Reply = ?sql_utils:execute(write, Sql1, EmployeeId),
+	    ?w_user_profile:update(employee, Merchant),
+	    {reply, Reply, State};
+	    %% case ?mysql:fetch(write, Sql1) of
+	    %% 	{ok, _} -> {reply, {ok, EmployeeId}, State};
+	    %% 	{error, {_, Error}} ->
+	    %% 	    {reply, {error, ?err(db_error, Error)}, State}
+	    %% end;
+	{ok, _} ->
+	    {reply, {error, ?err(employ_exist, EmployeeId)}, State}; 
 	{error, Error} ->
 	    {reply, {error, Error}, State}
     end;

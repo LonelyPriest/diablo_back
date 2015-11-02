@@ -138,8 +138,10 @@ handle_call({navbar, super}, _From, #func_tree{tree=Tree} = State) ->
     RootKeys = [?right_merchant, ?right_right, ?right_w_print],
     Navs = 
 	lists:foldr(
-	  fun(Root, Acc) ->
-		  [gb_trees:get(Root, Tree)|Acc]
+	  fun(RId, Acc) ->
+		  {Href, Name, Module} = gb_trees:get(RId, Tree),
+		  [{Href, Name, Module, false}|Acc]
+		  %% [gb_trees:get(Root, Tree)|Acc]
 	  end,[], RootKeys),
     ?DEBUG("navs ~p", [Navs]),
     {reply, Navs, State};

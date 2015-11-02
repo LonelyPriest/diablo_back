@@ -235,6 +235,8 @@ error(repo_exist, Name) ->
 %% employ
 error(employ_exist, Name) ->
     {1401, "employ " ++ ?to_s(Name) ++ " has been exist."};
+error(employ_not_exist, Name) ->
+    {1402, "employ " ++ ?to_s(Name) ++ " does not exist."};
 
 
 %% right
