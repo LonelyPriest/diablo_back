@@ -294,7 +294,8 @@
 		   x-ng-model="params.retailer.city"
 		   typeahead-editable="false"
 		   typeahead="c as c.name for c in
-			      params.cities|filter:$viewValue|limitTo:8"></input>
+			      params.get_city(params.retailer.province.id)
+			      |filter:$viewValue|limitTo:8" />
 	  </div> 
 	  <div ng-show="!rForm.city.$pristine && !params.check_city(params.retailer.city)">
 	    <span class="fg-red">所在城市只能从列表选择</span>

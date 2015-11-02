@@ -109,7 +109,7 @@ action(Session, Req, {"update_w_retailer", Id}, Payload) ->
     	[]   ->
     	    UpdateFun(Payload, -1);
     	City ->
-    	    case ?w_retailer:city(new, City, Province) of
+    	    case ?w_retailer:city(new, Merchant, City, Province) of
 		{ok, CityId} -> 
 		    NewPayload = [{<<"city">>, CityId}
 				  |proplists:delete(<<"city">>, Payload)],

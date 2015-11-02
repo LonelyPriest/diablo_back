@@ -535,27 +535,35 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    }
 	    
 	    update_retailer.id = params.retailer.id;
-	    if (angular.isDefined(update_retailer.city) && update_retailer.city
-		&& angular.isUndefined(update_retailer.province) && !update_retailer.province){
+	    if (angular.isDefined(update_retailer.city)
+		&& update_retailer.city
+		&& angular.isUndefined(update_retailer.province)
+		&& !update_retailer.province){
 		update_retailer.province = params.retailer.province;
 	    }
 	    
-	    console.log(update_retailer);
+	    // console.log(update_retailer);
 
-	    wretailerService.update_retailer(update_retailer).then(function(result){
+	    wretailerService.update_retailer(update_retailer).then(function(
+		result
+	    ){
     		console.log(result);
     		if (result.ecode == 0){
 		    dialog.response_with_callback(
 			true, "零售商编辑",
-			"恭喜你，零售商 [" + old_retailer.name + "] 信息修改成功！！",
+			"恭喜你，零售商 ["
+			    + old_retailer.name + "] 信息修改成功！！",
 			$scope, function(){
 			    if (typeof(update_retailer.city) !== 'object'
 				&& update_retailer.city){
-				if (angular.isUndefined(diablo_get_object(result.cid, $scope.cities))){
+				if (angular.isUndefined(
+				    diablo_get_object(
+					result.cid, $scope.cities))){
 				    $scope.cities.push({
 					id:   result.cid,
 					name: update_retailer.city,
-					py:   diablo_pinyin(update_retailer.city)})
+					py:   diablo_pinyin(
+					    update_retailer.city)})
 				} 
 			    }
 			    console.log($scope.cities);
@@ -564,7 +572,8 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     		} else{
 		    dialog.response(
 			false, "零售商编辑",
-			"零售商编辑失败：" + wretailerService.error[result.ecode]);
+			"零售商编辑失败："
+			    + wretailerService.error[result.ecode]);
     		}
     	    }) 
 	};
@@ -594,13 +603,21 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    }
 	    
 	};
+
+	var city_of_province = function(pid){
+	    // console.log(pid);
+	    return $scope.cities.filter(function(c){
+		return c.pid === pid;
+	    })
+	};
 	
 	dialog.edit_with_modal(
 	    "update-wretailer.html", undefined, callback, $scope,
 	    {retailer:    old_retailer,
 	     provinces:   $scope.provinces,
-	     cities:      $scope.cities,
+	     // cities:      $scope.cities,
 	     pattern:     pattern,
+	     get_city:    city_of_province,
 	     check_same:  check_same,
 	     check_exist: check_exist,
 	     check_city:  check_city})
@@ -618,13 +635,15 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     		} else{
 		    dialog.response(
 			false, "删除零售商",
-			"删除零售商失败：" + wretailerService.error[result.ecode]);
+			"删除零售商失败："
+			    + wretailerService.error[result.ecode]);
     		}
     	    })
 	};
 
 	diabloUtilsService.request(
-	    "删除零售商", "确定要删除该零售商吗？", callback, undefined, $scope);
+	    "删除零售商", "确定要删除该零售商吗？",
+	    callback, undefined, $scope);
     }
 });
 
