@@ -1,7 +1,7 @@
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
 <!--[if !IE]><!-->
-<html lang="en" class="no-js" ng-app="loginApp">
+<html manifest="diablo.manifest" lang="en" class="no-js" ng-app="loginApp">
   <!--<![endif]-->
   <!-- BEGIN HEAD -->
   <head>
@@ -9,16 +9,13 @@
     <title>钱掌柜</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta name="MobileOptimized" content="320">
+    <meta name="MobileOptimized" content="320"> 
 
-    <meta http-equiv="Expires"         CONTENT="0">
-    <meta http-equiv="Cache-Control"   CONTENT="no-cache">
-    <meta http-equiv="Pragma"          CONTENT="no-cache">
-
-    <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href="/public/assets/metronic/plugins/font-awesome/css/font-awesome.min.css"
-	  rel="stylesheet" type="text/css"/>
+    <!-- BEGIN GLOBAL MANDATORY STYLES --> 
     <link href="/public/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+
+    <link href="/public/assets/font-awesome/css/font-awesome.min.css"
+	  rel="stylesheet" type="text/css"/>
     <!-- <link href="/public/assets/metronic/plugins/uniform/css/uniform.default.css" -->
     <!-- 	  rel="stylesheet" type="text/css"/> -->
     <!-- END GLOBAL MANDATORY STYLES -->
@@ -128,7 +125,7 @@
     <!--fast js-->
     <script src="/public/assets/fastclick/fastclick.min.js" type="text/javascript"></script>
     
-    <!-- <script src="/public/assets/metronic/scripts/app.js" type="text/javascript"></script>  -->
+    <script src="/public/assets/metronic/scripts/app.js" type="text/javascript"></script>
     
     <script src="/private/utils/javascript/diablo_utils.js" type="text/javascript"></script>
     <!-- <script src="/private/utils/javascript/ng_storage.js"   type="text/javascript"></script> -->
@@ -140,7 +137,8 @@
   <script>
     jQuery(document).ready(function() {
 	FastClick.attach(document.body);
-	version_update.init();
+        version_update.init();
+        App.handleCache();
     });
 </script>
 </html>

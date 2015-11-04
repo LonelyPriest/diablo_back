@@ -93,7 +93,8 @@ loginApp.controller("loginCtrl", function($scope, $location, $resource){
 		// show error
 		$scope.show_error = true;
 		$scope.hidden_login = true;
-		$scope.login_error = error[state.ecode] ? error[state.ecode] : error[1109]; 
+		$scope.login_error = error[state.ecode]
+		    ? error[state.ecode] : error[1109]; 
 	    }
 	})
     }

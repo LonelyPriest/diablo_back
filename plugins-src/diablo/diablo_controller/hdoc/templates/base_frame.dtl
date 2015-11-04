@@ -2,7 +2,7 @@
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
 <!--[if !IE]><!-->
-<html manifest="diablo.manifest" lang="en" class="no-js" ng-app="{{ngapp}}"> 
+<html lang="en" class="no-js" ng-app="{{ngapp}}"> 
   <!--<![endif]-->
   <!-- BEGIN HEAD -->
   <head>
