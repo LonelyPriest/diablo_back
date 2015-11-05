@@ -355,8 +355,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.total_items = $scope.inventories.length; 
 	    $scope.current_page_index = $scope.get_page($scope.default_page);
 
-	    console.log($scope.old_inventories);
-	    console.log($scope.inventories);
+	    // console.log($scope.old_inventories);
+	    // console.log($scope.inventories);
 	}
 	
     });
