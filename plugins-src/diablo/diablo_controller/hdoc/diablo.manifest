@@ -1,6 +1,6 @@
 CACHE MANIFEST
 
-#version: 1.3
+#version: 2.2
 
 CACHE:
 /favicon.ico
@@ -33,17 +33,15 @@ CACHE:
 /public/assets/angular-local-storage/angular-local-storage.min.js
 /public/assets/angular-1.3.9/i18n/angular-locale_zh.js
 /public/assets/angular-1.3.9/angular-resource.min.js
-/public/assets/angular-1.3.9/angular-resource.min.js.map
 /public/assets/angular-1.3.9/angular-route.min.js
-/public/assets/angular-1.3.9/angular-route.min.js.map
 /public/assets/angular-1.3.9/angular.min.js
-/public/assets/angular-1.3.9/angular.min.js.map
-
 
 
 /private/img/logo.png
 /public/assets/metronic/img/sidebar-menu-arrow.png 
 /public/assets/metronic/img/sidebar-toggler.jpg
+/public/assets/metronic/img/ajax-loading.gif
+
 /public/assets/metronic/fonts/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
 /public/assets/metronic/fonts/DXI1ORHCpsQm3Vp6mXoaTXhCUOGz7vYGh680lGh-uXM.woff
 /public/assets/bootstrap/fonts/glyphicons-halflings-regular.woff2
@@ -55,6 +53,7 @@ CACHE:
 /public/assets/pinyin/pinyin.js
 
 /public/assets/fastclick/fastclick.min.js
+/public/assets/chart/Chart.min.js
 
 /public/assets/metronic/plugins/bootstrap-daterangepicker/daterangepicker-bs3.css
 /public/assets/metronic/css/plugins.css
@@ -64,9 +63,5 @@ CACHE:
 
 /public/assets/sticky-theader/fsm-sticky-header.js
 
-/public/assets/dynatree-1.2.6/skin/ui.dynatree.css
-/public/assets/dynatree-1.2.6/jquery.dynatree.js
-
 NETWORK:
 *
-

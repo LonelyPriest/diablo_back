@@ -74,7 +74,7 @@
   </head>
   
   <body class="page-header-fixed page-sidebar-closed">
-  <!-- <body class="page-header-fixed"> -->
+    <!-- <body class="page-header-fixed"> -->
     <!-- begin page header-->
     <!-- <div class="header navbar navbar-inverse navbar-fixed-top"> -->
     <!-- <div class="navwrapper"> -->
@@ -249,14 +249,16 @@
     
     
     <!-- <script src="/private/sys/js/sys_app.js"   type="text/javascript"></script> -->
-    <script src="/private/base/js/base_app.js"   type="text/javascript"></script>
+    <script src="/private/base/js/base_app.js"
+	    type="text/javascript"></script>
     <!--END private lib-->
     
     <!-- Every application has own Javascript-->
     {% block self_reference_js %} {% endblock %}
 
     {% block script_init %} {% endblock %}
-    
+
+    <iframe src="cache.html" style="width:0; height:0; visibility:hidden; position:absolute; border:none"></iframe>
   </body>
 </html>
 

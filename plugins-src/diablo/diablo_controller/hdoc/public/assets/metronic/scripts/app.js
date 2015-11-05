@@ -1213,47 +1213,47 @@ var App = function () {
             }
         },
 
-	handleCache: function(){
-    	    var appCache = window.applicationCache;
-    	    switch (appCache.status) {
-	    case appCache.UNCACHED: // UNCACHED == 0
-		// console.log('UNCACHED');
-		break;
-	    case appCache.IDLE: // IDLE == 1
-		// console.log('IDLE');
-		appCache.update();
-		break;
-	    case appCache.CHECKING: // CHECKING == 2
-		// console.log('CHECKING');
-		break;
-	    case appCache.DOWNLOADING: // DOWNLOADING == 3
-		// console.log('DOWNLOADING');
-		break;
-	    case appCache.UPDATEREADY:  // UPDATEREADY == 4
-		// console.log('UPDATEREADY');
-		break;
-	    case appCache.OBSOLETE: // OBSOLETE == 5
-		// console.log('OBSOLETE');
-		break;
-	    default:
-		// console.log('UKNOWN CACHE STATUS');
-		break;
-	    };
+	// handleCache: function(){
+    // 	    var appCache = window.applicationCache;
+    // 	    switch (appCache.status) {
+    // 	    case appCache.UNCACHED: // UNCACHED == 0
+    // 		// console.log('UNCACHED');
+    // 		break;
+    // 	    case appCache.IDLE: // IDLE == 1
+    // 		// console.log('IDLE');
+    // 		appCache.update();
+    // 		break;
+    // 	    case appCache.CHECKING: // CHECKING == 2
+    // 		// console.log('CHECKING');
+    // 		break;
+    // 	    case appCache.DOWNLOADING: // DOWNLOADING == 3
+    // 		// console.log('DOWNLOADING');
+    // 		break;
+    // 	    case appCache.UPDATEREADY:  // UPDATEREADY == 4
+    // 		// console.log('UPDATEREADY');
+    // 		break;
+    // 	    case appCache.OBSOLETE: // OBSOLETE == 5
+    // 		// console.log('OBSOLETE');
+    // 		break;
+    // 	    default:
+    // 		// console.log('UKNOWN CACHE STATUS');
+    // 		break;
+    // 	    };
 
-	    window.addEventListener('load', function(e) {
-		window.applicationCache.addEventListener(
-		    'updateready', function(e) {
-			if (window.applicationCache.status
-			    == window.applicationCache.UPDATEREADY) {
-			    // Browser downloaded a new app cache.
-			    window.location.reload();
-			} else {
-			// Manifest didn't changed. Nothing new to server.
-			}
-		    }, false);
+    // 	    window.addEventListener('load', function(e) {
+    // 		window.applicationCache.addEventListener(
+    // 		    'updateready', function(e) {
+    // 			if (window.applicationCache.status
+    // 			    == window.applicationCache.UPDATEREADY) {
+    // 			    // Browser downloaded a new app cache.
+    // 			    window.location.reload();
+    // 			} else {
+    // 			// Manifest didn't changed. Nothing new to server.
+    // 			}
+    // 		    }, false);
 
-	    }, false) 
-	}
+    // 	    }, false) 
+    // 	}
 
     };
 

@@ -1,7 +1,7 @@
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
 <!--[if !IE]><!-->
-<html manifest="diablo.manifest" lang="en" class="no-js" ng-app="loginApp">
+<html lang="en" class="no-js" ng-app="loginApp">
   <!--<![endif]-->
   <!-- BEGIN HEAD -->
   <head>
@@ -70,7 +70,7 @@
 	  <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
 	  <label class="control-label visible-ie8 visible-ie9">用户名</label>
 	  <div class="input-icon">
-	    <i class="fa fa-user"></i>
+	    <i class="icon icon-user"></i>
 	    <input type="text"
 		   class="form-control placeholder-no-fix"
 		   name="username"
@@ -83,7 +83,7 @@
 	<div class="form-group">
 	  <label class="control-label visible-ie8 visible-ie9">密码</label>
 	  <div class="input-icon">
-	    <i class="fa fa-lock"></i>
+	    <i class="icon icon-lock"></i>
 	    <input type="password"
 		   class="form-control placeholder-no-fix"
 		   name="password"
@@ -125,7 +125,7 @@
     <!--fast js-->
     <script src="/public/assets/fastclick/fastclick.min.js" type="text/javascript"></script>
     
-    <script src="/public/assets/metronic/scripts/app.js" type="text/javascript"></script>
+    <!-- <script src="/public/assets/metronic/scripts/app.js" type="text/javascript"></script> -->
     
     <script src="/private/utils/javascript/diablo_utils.js" type="text/javascript"></script>
     <!-- <script src="/private/utils/javascript/ng_storage.js"   type="text/javascript"></script> -->
@@ -138,7 +138,6 @@
     jQuery(document).ready(function() {
 	FastClick.attach(document.body);
         version_update.init();
-        App.handleCache();
     });
 </script>
 </html>

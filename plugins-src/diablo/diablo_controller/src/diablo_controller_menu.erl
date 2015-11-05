@@ -106,6 +106,7 @@ w_basebar(Module, Session) ->
 	"<a href='javascript:;' class='dropdown-toggle'"
 	" data-toggle='dropdown' data-hover='dropdown' data-close-others='true'>"
 	"<i class='icon icon-cogs'></i><span class='badge'>"
+	%% "<span ng-bind=\"" ++ ?to_s(User) ++  "\"></span></a>"
 	++ ?to_s(User) ++ "</span></a>"
 	"<ul class='dropdown-menu' x-ng-controller='loginOutCtrl'>"
 	%% ++ "<li id='loginOutApp' x-ng-app='loginOutApp' x-ng-controller='loginOutCtrl'>"
