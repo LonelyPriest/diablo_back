@@ -119,7 +119,8 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
     this.error = {
 	2190: "该款号库存不存在！！请确认本店是否进货该款号！！",
 	2191: "该货号已存在，请选择新的货号！！",
-	2192: "客户或营业员不存在，请建立客户或营业员资料！！", 
+	2192: "客户或营业员不存在，请建立客户或营业员资料！！",
+	2193: "款号未知，请检查后重新保存！！", 
 	2401: "店铺打印机不存在或打印处理暂停状态！！",
 	
 	2411: "打印机编号错误！！",
@@ -975,6 +976,14 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    // var batch = add.batch;
 	    // console.log(batch);
 	    var amount_info = get_sales(add.amounts);
+	    if (angular.isUndefined(add.style_number)){
+		diabloUtilsService.response(
+		    false, "销售开单", "开单失败：序号["
+			+ add.order_id.toString() + "]"
+			+ wsaleService.error[2192]);
+		return;
+	    };
+	    
 	    added.push({
 		id          : add.id,
 		style_number: add.style_number,

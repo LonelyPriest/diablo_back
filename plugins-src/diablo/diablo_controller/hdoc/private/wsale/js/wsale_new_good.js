@@ -364,7 +364,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 		 colors:[{name:color.name, id:color.id}]})
 	}
     }); 
-    console.log($scope.colors);
+    // console.log($scope.colors);
     
     // $scope.colors = [];
     // wgoodService.list_purchaser_color().then(function(colors){

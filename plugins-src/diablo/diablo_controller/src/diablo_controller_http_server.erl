@@ -177,9 +177,9 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 		%% {error, _} when Path =:= "login"->
 		%%     %% Function({Method, Req, [["login"]]});
 		%%     ?login_request:action(Req, login);
-		{error, Error} ->
-		    ?INFO("failed to check session of url ~p,"
-			  "reseaon ~p, redirect to login...", [Path, Error]),
+		{error, _Error} ->
+		    %% ?INFO("failed to check session of url ~p,"
+		    %% 	  "reseaon ~p, redirect to login...", [Path, Error]),
 		    %% {ECode, Error} = ?err(operation_invalid_session, Error),
 		    %% Req:respond({599,
 		    %% 		 [{"Content-Type", "application/json"}],

@@ -152,10 +152,15 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 	    RealyShop = realy_shop(Merchant, Shop),
 	    Sql1 = 
 		lists:foldr(
-		  fun({struct, Inv}, Acc0)-> 
-			  Amounts = ?v(<<"amounts">>, Inv), 
-			  wsale(new, SaleSn, DateTime,
-				Merchant, RealyShop, Inv, Amounts) ++ Acc0
+		  fun({struct, Inv}, Acc0)->
+			  case ?v(<<"style_number">>, Inv) of
+			      undefined -> Acc0;
+			      _ ->
+				  Amounts = ?v(<<"amounts">>, Inv), 
+				  wsale(new, SaleSn, DateTime,
+					Merchant, RealyShop, Inv, Amounts)
+				      ++ Acc0
+			  end
 		  end, [], Inventories), 
 
 	    CurrentBalance = case ?v(<<"balance">>, Account) of

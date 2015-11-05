@@ -136,7 +136,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     var rsn     = $routeParams.rsn
     var promise = diabloPromise.promise;
     wsaleService.get_w_sale_new(rsn).then(function(result){
-	console.log(result);
+	// console.log(result);
 	if (result.ecode === 0){
 	    // result[0] is the record detail
 	    // result[1] are the inventory detail that the record is included
@@ -241,8 +241,8 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    })
 	    
 	    $scope.inventories.unshift({$edit:false, $new:true}); 
-	    console.log($scope.old_inventories);
-	    console.log($scope.inventories);
+	    // console.log($scope.old_inventories);
+	    // console.log($scope.inventories);
 	}
 	
     });
