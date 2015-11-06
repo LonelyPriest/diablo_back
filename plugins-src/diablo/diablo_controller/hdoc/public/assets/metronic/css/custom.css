@@ -317,7 +317,7 @@ ul.page-sidebar-menu > li.active > a {
 
 .modal-ios {
     position: absolute;
-    overflow: visible;
+    /* overflow: visible; */
 }
 
 /* @media only screen and (max-width: 767px) { */

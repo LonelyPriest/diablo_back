@@ -718,64 +718,63 @@ diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, 
     // console.log(message); 
     
     var deviceAgent = navigator.userAgent.toLowerCase();
-    if (deviceAgent.match(/iphone|ipod|ipad/i)
-    	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
-       ) {
+    var t1, t2;
+    // if (deviceAgent.match(/iphone|ipod|ipad/i)
+    // 	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
+    //    ) 
+    {
     	$modalInstance.opened.then(function(){
     	    $('.header').hide();
             $('.footer').hide();
 	    
-    	    setTimeout(function () {
-    	    	$('.modal')
-    		    .addClass('modal-ios')
-    	    	    .height($(window).height())
-    	    	    .css({'margin-top': $(window).scrollTop() + 'px'});
-
-
-    		// $('.modal-backdrop').css({
-                //     position: 'absolute', 
-                //     top: 0, 
-                //     left: 0,
-                //     width: '100%',
-                //     height: Math.max(
-    		// 	document.body.scrollHeight,
-    		// 	document.documentElement.scrollHeight,
-			
-    		// 	document.body.offsetHeight,
-    		// 	document.documentElement.offsetHeight,
-			
-    		// 	document.body.clientHeight,
-    		// 	document.documentElement.clientHeight
-                //     ) + 'px'
-    		// });
-		
-    	    }, 0);
+    	    
 
     	    $('input').on('blur', 'input, select, textarea', function(){
-    		setTimeout(function() {
-    		    // This causes iOS to refresh, fixes problems when virtual keyboard closes
-    		    $(window).scrollLeft(0);
+    	    	t2 = setTimeout(function() {
+    	    	    // This causes iOS to refresh, fixes problems when virtual keyboard closes
+    	    	    $(window).scrollLeft(0);
 
-    		    var $focused = $(':focus');
-    		    // Needed in case user clicks directly from one input to another
-    		    if(!$focused.is('input')) {
-    			// Otherwise reset the scoll to the top of the modal
-    			$(window).scrollTop($(window).scrollTop());
-    		    }
-    		}, 0);
+    	    	    var $focused = $(':focus');
+    	    	    // Needed in case user clicks directly from one input to another
+    	    	    if(!$focused.is('input')) {
+    	    		// Otherwise reset the scoll to the top of the modal
+    	    		$(window).scrollTop($(window).scrollTop());
+    	    	    }
+    	    	}, 0);
     	    });
+
+	    t1 = setTimeout(function () {
+    	    	$('.modal')
+    	    	    .addClass('modal-ios')
+    	    	// .height($(window).height())
+    	    	    .css({'margin-top': $(window).scrollTop() + 'px'}); 
+		
+    	    }, 0);
 	    
     	});
 
+	var unbind = function(){
+	    $('.header').show();
+            $('.footer').show();
+
+	    if ($('.modal').hasClass('modal-ios')){
+		$('.modal').removeClass('modal-ios')
+	    }
+	    
+	    if (deviceAgent.match(/iphone|ipod|ipad/i)){
+	    	clearTimeout(t1);
+	    	clearTimeout(t2);
+	    	$('input').off('blur', 'input, select, textarea');
+	    }
+	}
+	
+	    
     	$modalInstance.result.then(function () {
-            $('.header').show();
-            $('.footer').show(); 
+            unbind();
     	}, function () {
-            $('.header').show();
-            $('.footer').show(); 
+            unbind();
     	}, function(){
-            $('.header').show();
-            $('.footer').show(); 
+            unbind();
     	});
     };
     
