@@ -17,7 +17,7 @@
 -export([start_link/0]).
 
 %% Supervisor callbacks
--export([init/1]).
+-export([init/1, module/1]).
 
 -define(SERVER, ?MODULE).
 
@@ -213,3 +213,6 @@ init([]) ->
 %%      },
 
 %%     supervisor:start_child(?SERVER, Spec).
+
+module(pool) ->
+    [?w_retailer, ?w_inventory, ?w_sale].

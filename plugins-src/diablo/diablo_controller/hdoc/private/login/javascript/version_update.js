@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2015-11-07",
+	 content: [
+	     "优化超大单处理",
+	     "优化打印处理"
+	 ]
+	},
+	
 	{date: "2015-11-02",
 	 content: [
 	     "库存销售统计分布增加前进后退功能",

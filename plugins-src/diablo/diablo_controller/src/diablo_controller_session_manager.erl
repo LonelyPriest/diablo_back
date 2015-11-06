@@ -27,6 +27,7 @@
 %% second
 -define(INTERVAL, 60).
 -define(TIMEOUT,  3600 * 2).
+%% -define(TIMEOUT,  10).
 %% -define(TIMEOUT,  3600 * 12).
 
 -record(state, {tref}).
@@ -225,8 +226,15 @@ handle_cast(cleanup_session, State) ->
 		  - Session#session.login_time >= ?TIMEOUT of
 		  true ->
 		      %% not acitivte, delete
-		      ?INFO("session ~p does not activited, delete it", [Session]),
+		      ?INFO("session ~p does not activited, delete it",
+			    [Session]),
 		      true = ets:delete(?SESSION, Id),
+		      %% terminate all process
+		      lists:foreach(
+			fun(Module) ->
+				diablo_work_pool_sup:terminate(
+				  Module, Session#session.merchant)
+			end, diablo_controller_sup:module(pool)),
 		      [Id|Acc];
 		  false -> Acc
 	      end

@@ -14,7 +14,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/1, get/2]).
+-export([start_link/1, get/2, terminate/2]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -41,6 +41,20 @@ get(M, Merchant) ->
 	    RModule;
 	_PId ->
 	    RModule
+    end.
+
+terminate(M, Merchant) ->
+    Module = ?to_a(?to_s(M) ++ "-" ++ ?to_s(Merchant)),
+    Sup = ?to_a(?to_s(M) ++ "_sup"),
+    case erlang:whereis(Module) of
+	undefined -> ok;
+	PId ->
+	    case supervisor:terminate_child(Sup, PId) of
+		ok -> ok;
+		{error, Error} ->
+		    ?WARN("failed to terminate child ~p, error",
+			  [Module, Error])
+	    end
     end.
 
 %%%===================================================================

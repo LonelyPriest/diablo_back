@@ -34,8 +34,9 @@
 %%% API
 %%%===================================================================
 sale(new, Merchant, Inventories, Props) ->
-    Name = ?wpool:get(?MODULE, Merchant), 
-    gen_server:call(Name, {new_sale, Merchant, Inventories, Props});
+    Name = ?wpool:get(?MODULE, Merchant),
+    gen_server:call(
+      Name, {new_sale, Merchant, Inventories, Props}, 15 * 1000);
 sale(update, Merchant, Inventories, Props) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {update_sale, Merchant, Inventories, Props});    

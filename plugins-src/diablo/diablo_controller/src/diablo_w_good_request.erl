@@ -258,7 +258,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
     OImagePath   = ?v(<<"o_path">>, Good),
     OFirm        = ?v(<<"o_firm">>, Good),
 
-    StyleNumber = ?v(<<"style_number">>, Payload),
+    StyleNumber = ?v(<<"style_number">>, Good),
     
     try
 	TypeId = case ?v(<<"type">>, Good) of
@@ -279,7 +279,8 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 		  end, 
 
 	OldPath = image(path, Merchant, OStyleNumber, OBrandId),
-	
+
+	?DEBUG("style_number ~p, BrandId ~p", [StyleNumber, BrandId]),
 	NewPath= case {StyleNumber, BrandId} of
 		     {undefined, undefined}      ->
 			 OldPath;
@@ -290,6 +291,8 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 		     {StyleNumber, BrandId}      ->
 			 image(path, Merchant, StyleNumber, BrandId)
 	    end,
+
+	?DEBUG("oldpath ~p, newpath ~p", [OldPath, NewPath]),
 	
 	ImagePath =
 	    case ?v(<<"image">>, Payload) of 
@@ -300,15 +303,23 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 			    case ?to_s(OImagePath) of
 				[] -> undefined;
 				_  ->
-				    ok = mk_image_dir(NewPath, Merchant), 
-				    {ok, _} = file:copy(OldPath, NewPath),
-				    ok = file:delete(OldPath),
-				    NewPath
+				    ok = mk_image_dir(NewPath, Merchant),
+				    case filelib:is_file(OldPath) of
+					true ->
+					    {ok, _}
+						= file:copy(OldPath, NewPath),
+					    ok = file:delete(OldPath),
+					    filename:join(
+					      ["image", ?to_s(Merchant),
+					       filename:basename(NewPath)]);
+					false -> undefined
+				    end
 			    end 
 		    end;
 		ImageData -> 
 		    case NewPath =:= OldPath of
 			true ->
+			    ok = mk_image_dir(NewPath, Merchant),
 			    ok = file:write_file(
 				   OldPath, base64:decode(ImageData));
 			false ->
@@ -319,7 +330,8 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 			    ok = file:write_file(
 				   NewPath, base64:decode(ImageData))
 		    end,
-		    filename:join(["image", file:basename(NewPath)])
+		    filename:join(
+		      ["image", ?to_s(Merchant), filename:basename(NewPath)])
 	    end,
 
 	case ?w_inventory:purchaser_good(
@@ -339,6 +351,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 	    ?utils:respond(200, Req, FError);
 	_:{badmatch, {error, FError}} ->
 	    ?WARN("failed to update good: Error ~p", [FError]),
+	    ?ERROR("failed to update good: ~p", [erlang:get_stacktrace()]),
 	    ?utils:respond(200, Req, ?err(file_op_error, FError))
     end; 
 
