@@ -457,9 +457,11 @@ get_shops(Session, Module) ->
     Shops = 
 	case ?session:get(type, Session) of
 	    ?SUPER ->
-		?shop:lookup();
+		%% ?shop:lookup();
+		[];
 	    ?MERCHANT ->
-		{ok, S0} = ?w_user_profile:get(shop, ?session:get(merchant, Session)),
+		{ok, S0} = ?w_user_profile:get(
+			      shop, ?session:get(merchant, Session)),
 		lists:foldr(
 		  fun({AShop}, Acc) ->
 			  [{[{<<"shop_id">>,  ?v(<<"id">>, AShop)},
