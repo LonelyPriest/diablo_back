@@ -38,7 +38,7 @@
     <link href="/public/assets/metro-ui/metro-color.css" rel="stylesheet" type="text/css"/>
     <!-- END THEME STYLES -->
     
-    <!-- <intercept-url pattern="/favicon.ico" access="ROLE_ANONYMOUS" /> -->
+    <intercept-url pattern="/favicon.ico" access="ROLE_ANONYMOUS" />
   </head>
 
 
@@ -132,7 +132,7 @@
     <script src="/private/login/javascript/login_app.js"    type="text/javascript"></script>
     <script src="/private/login/javascript/version_update.js"    type="text/javascript"></script>
 
-    <iframe src="cache.html" style="width:0; height:0; visibility:hidden; position:absolute; border:none"></iframe>
+    <!-- <iframe src="cache.html" style="width:0; height:0; visibility:hidden; position:absolute; border:none"></iframe> -->
   </body>   <!-- END BODY -->
 
   <script>

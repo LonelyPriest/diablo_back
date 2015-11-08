@@ -10,9 +10,9 @@
     <title>钱掌柜</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="MobileOptimized" content="480"/>
+    <meta name="MobileOptimized" content="320"/>
     <!-- <meta http-equiv="Expires"   CONTENT="0"> -->
-    <!-- <meta http-equiv="Cache-Control"  content="max-age=14400" /> -->
+    <!-- <meta http-equiv="Cache-Control"  content="no-cache" /> -->
     <!-- <meta http-equiv="Pragma"   CONTENT="no-cache"> -->
     
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
@@ -62,7 +62,7 @@
     <!-- 	  rel="stylesheet" type="text/css"/> -->
     <!-- END PAGE LEVEL PLUGIN STYLES -->
     
-    <!-- <link rel="shortcut icon" href="favicon.ico"/> -->
+    <link rel="shortcut icon" href="/favicon.ico"/>
 
     <!-- metro color -->
     <link href="/public/assets/metro-ui/metro-color.css" rel="stylesheet" type="text/css"/> 
@@ -258,7 +258,7 @@
 
     {% block script_init %} {% endblock %}
 
-    <iframe src="cache.html" style="width:0; height:0; visibility:hidden; position:absolute; border:none"></iframe>
+    <!-- <iframe src="cache.html" style="width:0; height:0; visibility:hidden; position:absolute; border:none"></iframe> -->
   </body>
 </html>
 

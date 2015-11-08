@@ -30,6 +30,23 @@ diabloUtils.directive('ngEnter', function () {
 });
 
 
+// diabloUtils.directive('autoFocus', function () {
+//     return {
+// 	restrict: 'A',
+// 	scope:{
+	
+// 	},
+// 	link: function(scope, element, attrs){
+// 	    console.log(attrs);
+// 	    var focus = scope.$eval(attrs.autoFocus);
+// 	    if (focus){
+// 		element.focus();
+// 	    }
+// 	}
+//     }
+// });
+
+
 diabloUtils.directive('ngPulsate', function () {
     return {
 	restrict: 'AE',
@@ -663,7 +680,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	})
     };
 
-    this.edit_with_modal = function(templateUrl, size, callback, scope, params){
+    this.edit_with_modal = function(
+	templateUrl, size, callback, scope, params, autoHeight){
 	return $modal.open({
 	    templateUrl: templateUrl,
 	    controller: 'diabloEditDialogCtrl',
@@ -676,7 +694,8 @@ diabloUtils.service("diabloUtilsService", function($modal){
 		message: function(){
 		    return {
 			callback:callback,
-			params: params
+			params: params,
+			autoHeight: autoHeight
 		    }
 		}
 	    }
@@ -684,10 +703,11 @@ diabloUtils.service("diabloUtilsService", function($modal){
     };
 });
 
-diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, message){
+diabloUtils.controller("diabloDialogCtrl", function(
+    $scope, $modalInstance, message){
     // console.log($scope);
-    console.log($modalInstance);
-    console.log(message);
+    // console.log($modalInstance);
+    // console.log(message);
     $scope.success = message.success;
     $scope.title = message.title;
     $scope.body  = message.body; 
@@ -700,7 +720,8 @@ diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, mess
 
     $scope.ok = function() {
 	$modalInstance.dismiss('ok');
-	if (angular.isDefined(message.callback) && typeof(message.callback) === "function"){
+	if (angular.isDefined(message.callback)
+	    && typeof(message.callback) === "function"){
 	    var callback = message.callback;
 	    if (angular.isDefined(message.params)){
 		callback(message.params)
@@ -712,16 +733,19 @@ diabloUtils.controller("diabloDialogCtrl", function($scope, $modalInstance, mess
 });
 
 
-diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, message){
+diabloUtils.controller("diabloEditDialogCtrl", function(
+    $scope, $modalInstance, message){
     // console.log($scope);
     // console.log($modalInstance);
     // console.log(message); 
+
+    var autoHeight = message.autoHeight;
     
     var deviceAgent = navigator.userAgent.toLowerCase();
     var t1, t2;
-    // if (deviceAgent.match(/iphone|ipod|ipad/i)
-    // 	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
-    //    ) 
+    if (deviceAgent.match(/iphone|ipod|ipad/i)
+    	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
+       ) 
     {
     	$modalInstance.opened.then(function(){
     	    $('.header').hide();
@@ -744,10 +768,16 @@ diabloUtils.controller("diabloEditDialogCtrl", function($scope, $modalInstance, 
     	    });
 
 	    t1 = setTimeout(function () {
-    	    	$('.modal')
-    	    	    .addClass('modal-ios')
-    	    	// .height($(window).height())
-    	    	    .css({'margin-top': $(window).scrollTop() + 'px'}); 
+		if (angular.isDefined(autoHeight) && autoHeight){
+    	    	    $('.modal')
+    	    		.addClass('modal-ios')
+    	    		.height($(window).height())
+    	    		.css({'margin-top': $(window).scrollTop() + 'px'});
+		} else {
+		    $('.modal')
+    	    		.addClass('modal-ios')
+    	    		.css({'margin-top': $(window).scrollTop() + 'px'});
+		}
 		
     	    }, 0);
 	    

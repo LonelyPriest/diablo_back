@@ -599,7 +599,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	
 	diabloUtilsService.edit_with_modal(
 	    "select-color.html", undefined,
-	    callback, $scope, {colors:$scope.colors});
+	    callback, $scope, {colors:$scope.colors}, true);
     }; 
 
     /*
@@ -705,7 +705,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	diabloUtilsService.edit_with_modal(
 	    "select-size.html", undefined,
 	    callback, $scope, {groups: $scope.groups,
-			       select_group: select_group});
+			       select_group: select_group}, true);
     };
 
     $scope.delete_image = function(){

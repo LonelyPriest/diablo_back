@@ -87,6 +87,7 @@ dispatch(Req, DocRoot) ->
 				case filelib:is_file(
 				       filename:join([DocRoot, Path])) of
 				    true ->
+					?DEBUG("Req ~p", [Req]),
 					Req:serve_file(Path, DocRoot);
 				    false->
 					Req:not_found()

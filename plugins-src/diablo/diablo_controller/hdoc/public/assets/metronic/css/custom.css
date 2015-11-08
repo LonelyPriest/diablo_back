@@ -317,7 +317,7 @@ ul.page-sidebar-menu > li.active > a {
 
 .modal-ios {
     position: absolute;
-    /* overflow: visible; */
+    overflow: visible;
 }
 
 /* @media only screen and (max-width: 767px) { */
@@ -342,3 +342,24 @@ ul.page-sidebar-menu > li.active > a {
 .canvas-btn-next {
     padding:0px 15px 0px 15px !important;
 }
+
+
+/* .modal {  */
+/*     position: fixed;  */
+/*     top: 3%;  */
+/*     right: 3%;  */
+/*     left: 3%;  */
+/*     width: auto;  */
+/*     margin: 0;  */
+/* } */
+
+/* .modal-body {  */
+/*     height: 60%;  */
+/* } */
+
+/* .modal-body {  */
+/*     max-height: 350px;  */
+/*     padding: 15px;  */
+/*     overflow-y: auto;  */
+/*     -webkit-overflow-scrolling: touch;  */
+/*  } */

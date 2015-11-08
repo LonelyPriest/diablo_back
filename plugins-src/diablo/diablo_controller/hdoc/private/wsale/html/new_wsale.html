@@ -80,9 +80,7 @@
 	      </div>
 	    </div>
 
-	    <div class="col-xs-3 col-md-3
-			
-			">
+	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
 		<!-- <span class="input-group-addon"> -->
 	  	<!--   <i class="glyphicon glyphicon-user"></i>日期 -->
@@ -324,11 +322,11 @@
 			<th class="text-center">操作</th>
 		      </tr>
 		    </thead>
-		    <tbody>
-		      <tr class="text-center" ng-repeat="inv in inventories">
-			
+		    <tbody >
+		      <tr class="text-center" x-ng-repeat="inv in inventories"> 
 			<td>{{inv.order_id}}</td>
-			<td x-ng-if="!setting.q_backend" class="col-md-2 text-left vert-align">
+			<td x-ng-if="!setting.q_backend"
+			    class="col-md-2 text-left vert-align">
 			  <span ng-if="!inv.$new">{{inv.style_number}}</span>
 			  <form name="inv.form.good" ng-if="inv.$new">
 			    <div ng-class="{'has-error':inv.form.good.$invalid
@@ -587,11 +585,71 @@
 			       x-ng-disabled=" inv.form.sell.$invalid"
 			       x-ng-click="cancel_free_update(inv)">取消
 			      <i class="glyphicon glyphicon-erase"></i></a> 
-			  </span>
-			  
-			</td>
+			  </span> 
+			</td> 
 		      </tr>
+		      
+		      <!-- <tr> -->
+		      <!-- 	<td colspan="13"> -->
+		      <!-- 	  <table class="table table-bordered -->
+		      <!-- 			table-condensed table-advanced"> -->
+		      <!-- 	    <tbody> -->
+			      
+		      <!-- 	      <tr> -->
+		      <!-- 		<td></td>  -->
+		      <!-- 		<td x-ng-repeat="s in params.sizes" -->
+		      <!-- 		    x-ng-switch on="s"> -->
+		      <!-- 		  <span x-ng-switch-when="0">均码</span> -->
+		      <!-- 		  <span x-ng-switch-default>{{s}}</span> -->
+		      <!-- 		</td> -->
+		      <!-- 		<td class="col-md-1">批量</td> -->
+		      <!-- 	      </tr> -->
 
+		      <!-- 	      <tr x-ng-repeat="c in params.colors"> -->
+
+		      <!-- 		<\!-- <td colspan=1></td> -\-> -->
+		      <!-- 		<td x-ng-switch on="c.cid"> -->
+		      <!-- 		  <span x-ng-switch-when="0">均色</span> -->
+		      <!-- 		  <span x-ng-switch-default>{{c.cname}}</span> -->
+		      <!-- 		</td> -->
+				
+		      <!-- 		<td x-ng-repeat="s in params.sizes"> -->
+		      <!-- 		  <div class="col-md-12"> -->
+		      <!-- 		    <div x-ng-if="(amount=params.get_amount -->
+		      <!-- 				  (c.cid, s, params.amounts)) -->
+		      <!-- 				  ? true : false" -->
+		      <!-- 			 class="input-group"> -->
+		      <!-- 		      <span class="input-group-addon -->
+		      <!-- 				   modal-input-group-addon"> -->
+		      <!-- 			{{amount.count}} -->
+		      <!-- 		      </span>  -->
+		      <!-- 		      <form name="aform"> -->
+		      <!-- 			<div ng-class="{'has-error':aform.$invalid || !params.valid_sell(amount)}"> -->
+		      <!-- 			  <input x-ng-if="amount" -->
+		      <!-- 				 class="form-control modal-input text-center" -->
+		      <!-- 				 type="number" step="1" -->
+		      <!-- 				 x-ng-model="amount.sell_count"></input> -->
+		      <!-- 			</div> -->
+		      <!-- 		      </form>  -->
+		      <!-- 		    </div> -->
+		      <!-- 		  </div> -->
+		      <!-- 		</td> -->
+
+		      <!-- 		<\!--batch-\-> -->
+		      <!-- 		<td> -->
+		      <!-- 		  <input class="form-control modal-input text-center" -->
+		      <!-- 			 type="number" step="1" -->
+		      <!-- 			 x-ng-model="batch" -->
+		      <!-- 			 x-ng-pattern="/^[+|\-]?\d{1,3}$/" -->
+		      <!-- 			 x-ng-change="params.set_batch(c.cid, batch, params.amounts)" -->
+		      <!-- 			 x-ng-init="batch=params.get_batch(c.cid, params.amounts)"> -->
+		      <!-- 		</td> -->
+		      <!-- 	      </tr> -->
+			      
+		      <!-- 	    </tbody> -->
+		      <!-- 	  </table> -->
+		      <!-- 	</td> -->
+		      <!-- </tr> -->
 		      <tr x-ng-if="inventories.length>1" class="text-center">
 			<td x-ng-if="setting.show_discount" colspan=8></td>
 			<td x-ng-if="!setting.show_discount" colspan=7></td>
@@ -1081,13 +1139,16 @@
 	      <div x-ng-if="(amount=params.get_amount(c.cid, s, params.amounts))?true:false">
 		
 		<div class="input-group">
-		  <span class="input-group-addon modal-input-group-addon">{{amount.count}}</span>
+		  <span class="input-group-addon modal-input-group-addon">
+		    {{amount.count}}
+		  </span>
 		  <form name="aform">
-		    <div ng-class="{'has-error':aform.$invalid || !params.valid_sell(amount)}">
+		    <div ng-class="{'has-error':aform.$invalid
+				   || !params.valid_sell(amount)}">
 		      <input x-ng-if="amount"
 			     class="form-control modal-input text-center"
 			     type="number" step="1"
-			     x-ng-model="amount.sell_count"></input>
+			     x-ng-model="amount.sell_count"/>
 		    </div>
 		  </form>
 		</div>

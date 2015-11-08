@@ -245,7 +245,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	
 	diabloUtilsService.edit_with_modal(
 	    "select-color.html", undefined,
-	    callback, $scope, {colors:$scope.colors});
+	    callback, $scope, {colors:$scope.colors}, true);
     };
 
     

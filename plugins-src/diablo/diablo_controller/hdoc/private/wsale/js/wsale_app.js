@@ -1545,6 +1545,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 			valid_sell:     valid_sell,
 			valid:          valid_all_sell};
 
+		    $scope.params = angular.copy(payload);
 		    diabloUtilsService.edit_with_modal(
 			"wsale-new.html", modal_size, callback, $scope, payload); 
 		}; 
