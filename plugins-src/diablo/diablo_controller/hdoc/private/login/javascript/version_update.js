@@ -1,6 +1,12 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2015-11-09",
+	 content: [
+	     "优化服务器，请使用 120.25.212.38 直接登录！！能提高平板响应速度"
+	 ]
+	},
+	
 	{date: "2015-11-07",
 	 content: [
 	     "优化超大单处理",
