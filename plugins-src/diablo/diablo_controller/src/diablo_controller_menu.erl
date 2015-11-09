@@ -74,25 +74,14 @@ navbars(Module) ->
 
 navbar(Titles) ->
     lists:foldr(
-      fun({Href, Title, Active, Hidden}, Acc) ->
+      fun({Href, Title, Active, {SM, XS, XXS} = Hidden}, Acc) ->
 	      ?DEBUG("href ~p active ~p, hidden ~p", [Href, Active, Hidden]), 
 	      "<li name="
 		  ++ string:strip(Href, both, $/)
-		  ++ case Hidden of
-			 true ->
-			     " class=\"hidden-xs hidden-sm"
-				 ++ case Active of
-					true -> "start active\">";
-					false -> "\">"
-				    end;
-			 false ->
-			     case Active of
-				 true -> "  class=\"start active\">";
-				 false -> ">"
-			     end
-		     end
-		  ++
-		  "<a href=\""++ Href ++ "\">" ++ Title
+		  ++ " class=\""
+		  ++ hidden(sm, SM) ++ hidden(xs, XS) ++ hidden(xxs, XXS)
+		  ++ active(Active) ++ "\">" 
+		  ++ "<a href=\""++ Href ++ "\">" ++ Title
 		  ++ "<span class=\"selected\"></span>"
 		  ++ "</a>"
 		  ++ "</li>\n" ++ Acc
@@ -320,3 +309,15 @@ sidebar(level_3_menu, [], Levels)->
 sidebar(level_3_menu, [Node|T], Levels)->
     L = sidebar(level3_menu, Node),
     sidebar(level_3_menu, T, Levels ++ L).
+
+
+hidden(sm, H) when H =:= true -> " hidden-sm ";
+hidden(sm, _) -> "";
+hidden(xs, H) when H =:= true -> " hidden-xs ";
+hidden(xs, _) -> "";
+hidden(xxs, H) when H =:= true -> " hidden-xxs ";
+hidden(xxs, _) ->  "".
+
+active(true) -> " start active " ;
+active(false) -> "".
+    

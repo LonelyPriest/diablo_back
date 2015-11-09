@@ -574,11 +574,25 @@ var diablo_viewport = function () {
 };
 
 var diablo_items_per_page = function(){
+    // return 10;
     var h = diablo_viewport().height;
 
-    if (h > 767){
-	return 15;
+    if (h > 768){
+    	return 15;
     } else {
-	return 10;
+    	return 10;
     }
+};
+
+var diablo_page_size = function(){
+    var w = diablo_viewport().width;
+
+    if ( w <=480 ) return 1;
+    if ( 480 < w && w <= 768) return 5;
+    return 10; 
+}
+
+var diablo_sequence_page = function(){
+    var w = diablo_viewport().width;
+    return w < 768 ? diablo_yes : diablo_no;
 };

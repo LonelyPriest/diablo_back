@@ -39,7 +39,7 @@
       <div class="portlet-body">
 	<div class="table-toolbar util-btn-margin-bottom-5">
 	  <!--BEGIN row-->
-	  <div class="row">
+	  <div class="row hidden-xxs">
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
 		 glyphicon="glyphicon glyphicon-arrow-left fg-red"
@@ -82,7 +82,7 @@
 		  <tr>
 		    <th>序号</th>
 		    
-		    <th x-ng-click="toggle_base()" class="danger">
+		    <th x-ng-click="toggle_base()" class="danger hidden-xxs">
 		      <span x-ng-if="show.base">
 			<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
 		      <span x-ng-if="!show.base">
@@ -100,7 +100,7 @@
 		    <th x-ng-if="show.balance">汇款</th>
 		    <th x-ng-if="show.balance" class="warning">核销</th>
 		    <th x-ng-if="show.balance" class="danger">费用</th>
-		    <th x-ng-click="toggle_balance()" class="info">
+		    <th x-ng-click="toggle_balance()" class="info hidden-xxs">
 		      <span x-ng-if="show.balance">
 			<i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
 		      <span x-ng-if="!show.balance">
@@ -114,17 +114,17 @@
 		      <span x-ng-if="!show.comment">
 			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
 		    </th> 
-		    <th x-ng-if="show.comment">备注</th>
+		    <th x-ng-if="show.comment" class="hidden-xxs">备注</th>
 		    <th>开单日期</th> 
-		    <th>打印</th>
-		    <th x-ng-if="show.action">操作</th> 
+		    <th class="hidden-xxs">打印</th>
+		    <th x-ng-if="show.action" class="hidden-xxs">操作</th> 
 		  </tr>
 		</thead>
 		
 		<tbody>
 		  <tr x-ng-repeat="r in records track by r.id">
 		    <td>{{r.order_id}}</td>
-		    <td>{{r.rsn}}</td>
+		    <td class="hidden-xxs">{{r.rsn}}</td>
 		    <td x-ng-if="show.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>开单</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
@@ -144,7 +144,7 @@
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
 		    
-		    <td>{{round(r.balance)}}</td>
+		    <td class="hidden-xxs">{{round(r.balance)}}</td>
 
 		    <td x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>{{round(r.should_pay)}}</span>
@@ -168,7 +168,7 @@
 		    <!--   </span> -->
 		    <!-- </td> --> 
 		    
-		    <td x-ng-if="show.comment">
+		    <td x-ng-if="show.comment" class="hddine_xxs">
 		      <span x-ng-switch on="r.comment">
 			<span x-ng-switch-when="null">无</span>
 			<span x-ng-switch-default>{{r.comment}}</span>
@@ -176,14 +176,14 @@
 		    </td>
 		    <td>{{r.entry_date}}</td>
 
-		    <td>
+		    <td class="hidden-xxs">
 		      <button class="btn diablo-button purple-plum"
 			      x-ng-disabled="disable_print"
 		    	      x-ng-click="print(r)">
 			打印<i class="glyphicon glyphicon-print"></i></button>
 		    </td>
 		    
-		    <td x-ng-if="show.action">
+		    <td x-ng-if="show.action" class="hidden-xxs">
 		      <button class="btn diablo-button btn-primary"
 		    	      x-ng-click="rsn_detail(r)">
 			明细<i class="glyphicon glyphicon-map-marker"></i>
@@ -207,10 +207,10 @@
 		  </tr>
 
 		  <!--Total info-->
-		  <tr x-ng-if="total_items!==0"> 
-		    <td x-ng-if="show.base" colspan="6"></td>
+		  <tr x-ng-if="total_items!==0" class="hidden-xxs"> 
+		    <td x-ng-if="show.base" colspan="6"</td>
 		    <td x-ng-if="!show.base" colspan="3"></td>
-		    
+
 		    <td class="danger">{{total_amounts}}</td>
 		    <!-- <td colspan="1"></td> -->
 		    <td x-ng-if="show.balance">{{total_cash}}</td>
@@ -238,7 +238,18 @@
 	    <div>
 	      <sapn>
 		<span>显示第 {{current_page}} / {{num_pages}} 项结果，
-		  共 {{total_items}} 项</span>
+		  共 {{total_items}} 项
+		</span>
+
+		<span>
+		  <span auto-pagesize
+			ng-model="max_page_size"></span>
+		  <!-- <span auto-pageitem -->
+		  <!-- 	ng-model="items_perpage" -->
+		  <!-- 	refresh="do_search(current_page)"> -->
+		  <!-- </span> -->
+		  
+		</span>
 		
 		<pagination x-ng-show="!sequence_pagination"
 			    class="table-pagination pagination-lg pull-right "
@@ -252,7 +263,7 @@
 	      		    x-ng-model="current_page"
 	      		    x-ng-change="page_changed()">
 		</pagination>
-
+		
 		<span x-ng-if="sequence_pagination"
 		      class="pull-right">
 		  <button class="btn red-sunglo btn-next-page"

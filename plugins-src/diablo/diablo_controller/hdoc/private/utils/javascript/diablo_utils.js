@@ -30,21 +30,44 @@ diabloUtils.directive('ngEnter', function () {
 });
 
 
-// diabloUtils.directive('autoFocus', function () {
-//     return {
-// 	restrict: 'A',
-// 	scope:{
-	
-// 	},
-// 	link: function(scope, element, attrs){
-// 	    console.log(attrs);
-// 	    var focus = scope.$eval(attrs.autoFocus);
-// 	    if (focus){
-// 		element.focus();
-// 	    }
-// 	}
-//     }
-// });
+
+
+diabloUtils.directive('autoPagesize', function () {
+    return {
+	restrict: 'A',
+	require: '?ngModel',
+	link: function(scope, element, attrs, ngModel){
+	    $(window).resize(function(){
+		var s = diablo_page_size();
+		
+		scope.$apply(function(){
+		    ngModel.$setViewValue(s);
+		})
+	    })
+	}
+    }
+});
+
+diabloUtils.directive('autoPageitem', function () {
+    return {
+	restrict: 'A',
+	require: '?ngModel',
+	scope: {
+	    refresh: '&',
+	},
+	link: function(scope, element, attrs, ngModel){
+	    console.log(scope);
+	    $(window).resize(function(){
+		var s = diablo_items_per_page();
+		console.log(s);
+		scope.$apply(function(){
+		    ngModel.$setViewValue(s);
+		})
+		scope.refresh();
+	    })
+	}
+    }
+});
 
 
 diabloUtils.directive('ngPulsate', function () {
@@ -749,37 +772,35 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
     {
     	$modalInstance.opened.then(function(){
     	    $('.header').hide();
-            $('.footer').hide();
+            $('.footer').hide(); 
+
+	    var styleEl = document.createElement('style'), styleSheet;
+	    document.head.appendChild(styleEl);
+	    styleSheet = styleEl.sheet;
+	    styleSheet.insertRule(
+		".modal { position:absolute}", 0);
 	    
-    	    
-
-    	    $('input').on('blur', 'input, select, textarea', function(){
-    	    	t2 = setTimeout(function() {
-    	    	    // This causes iOS to refresh, fixes problems when virtual keyboard closes
-    	    	    $(window).scrollLeft(0);
-
-    	    	    var $focused = $(':focus');
-    	    	    // Needed in case user clicks directly from one input to another
-    	    	    if(!$focused.is('input')) {
-    	    		// Otherwise reset the scoll to the top of the modal
-    	    		$(window).scrollTop($(window).scrollTop());
-    	    	    }
-    	    	}, 0);
-    	    });
-
-	    t1 = setTimeout(function () {
-		if (angular.isDefined(autoHeight) && autoHeight){
-    	    	    $('.modal')
-    	    		.addClass('modal-ios')
-    	    		.height($(window).height())
-    	    		.css({'margin-top': $(window).scrollTop() + 'px'});
-		} else {
-		    $('.modal')
-    	    		.addClass('modal-ios')
-    	    		.css({'margin-top': $(window).scrollTop() + 'px'});
-		}
+	    // t1 = setTimeout(function () {
+	    // 	$('.modal')
+    	    // 	    .addClass('modal-ios')
+	    // 	    .height($(window).height())
+    	    // 	    .css({'margin-top': $(window).scrollTop() + 'px'});
 		
-    	    }, 0);
+    	    // }, 0);
+
+	    // $('input').on('blur', 'input, select, textarea', function(){
+    	    // 	t2 = setTimeout(function() {
+    	    // 	    // This causes iOS to refresh, fixes problems when virtual keyboard closes
+    	    // 	    $(window).scrollLeft(0);
+
+    	    // 	    var $focused = $(':focus');
+    	    // 	    // Needed in case user clicks directly from one input to another
+    	    // 	    if(!$focused.is('input')) {
+    	    // 		// Otherwise reset the scoll to the top of the modal
+    	    // 		$(window).scrollTop($(window).scrollTop());
+    	    // 	    }
+    	    // 	}, 0);
+    	    // });
 	    
     	});
 
@@ -787,15 +808,15 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
 	    $('.header').show();
             $('.footer').show();
 
-	    if ($('.modal').hasClass('modal-ios')){
-		$('.modal').removeClass('modal-ios')
-	    }
+	    // if ($('.modal').hasClass('modal-ios')){
+	    // 	$('.modal').removeClass('modal-ios')
+	    // }
 	    
-	    if (deviceAgent.match(/iphone|ipod|ipad/i)){
-	    	clearTimeout(t1);
-	    	clearTimeout(t2);
-	    	$('input').off('blur', 'input, select, textarea');
-	    }
+	    // if (deviceAgent.match(/iphone|ipod|ipad/i)){
+	    // 	clearTimeout(t1);
+	    // 	clearTimeout(t2);
+	    // 	$('input').off('blur', 'input, select, textarea');
+	    // }
 	}
 	
 	    

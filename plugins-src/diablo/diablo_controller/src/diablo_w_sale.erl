@@ -969,7 +969,8 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 		  ++ " and style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
 		  ++ " and brand=" ++ ?to_s(Brand)];
 	    Metric -> 
-		["update w_inventory set amount=amount-" ++ ?to_s(Metric) 
+		["update w_inventory set amount=amount-" ++ ?to_s(Metric)
+		 ++ ", sell=sell+" ++ ?to_s(Metric)
 		 ++ " where "
 		 "style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
 		 ++ " and brand=" ++ ?to_s(Brand)

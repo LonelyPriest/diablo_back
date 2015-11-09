@@ -25,7 +25,11 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--define(SERVER, ?MODULE). 
+-define(SERVER, ?MODULE).
+
+-define(hidden_sm,  [?right_shop, ?right_employe, ?right_right]).
+-define(hddine_xs,  [?right_shop, ?right_employe, ?right_right]).
+-define(hddine_xxs, [?right_w_good]).
 
 
 -record(func_tree,
@@ -185,7 +189,7 @@ handle_call({navbar, UserId}, _From, #func_tree{tree=Tree} = State) ->
     OrderRights = order_root(OrderRoots, ?to_tl(Roots)),
     ?DEBUG("OrderRights ~p", [OrderRights]),
 
-    %% get root navbar
+    %% get root navbar 
     Navs = 
 	lists:foldr(
 	  fun({Root}, Acc) ->
@@ -193,13 +197,8 @@ handle_call({navbar, UserId}, _From, #func_tree{tree=Tree} = State) ->
 		  RId = ?v(<<"id">>, Root),
 		  {Href, Name, Module} = gb_trees:get(RId, Tree),
 
-		  %% mobile hidden when xs, sm
-		  case RId =:= ?right_shop
-		      orelse RId =:= ?right_employe
-		      orelse RId =:= ?right_right of
-		      true ->  [{Href, Name, Module, true}|Acc];
-		      false ->[{Href, Name, Module, false}|Acc]
-		  end 
+		  %% mobile device hidden 
+		  [{Href, Name, Module, hidden(mobile, RId)}|Acc] 
 	  end,[], OrderRights),
     ?DEBUG("navs ~p", [Navs]),
     
@@ -468,9 +467,25 @@ order_root(Orders, Currents) ->
 order_root([], _Currents, Acc) ->
     lists:reverse(Acc);
 order_root([H|T], Currents, Acc) -> 
-    case  [ {[{<<"id">>, Id}]} || {[{<<"id">>, Id}|_]} <- Currents, Id =:= H] of
+    case  [ {[{<<"id">>, Id}]} || {[{<<"id">>, Id}|_]}
+				      <- Currents, Id =:= H] of
 	[] ->
 	    order_root(T, Currents, Acc);
 	[Order] ->
 	    order_root(T, Currents, [Order|Acc])
     end.
+
+
+hidden(mobile, Nav) ->
+    {hidden(sm, Nav), hidden(xs, Nav), hidden(xxs, Nav)};
+
+hidden(sm, Nav) ->
+    lists:member(Nav, ?hidden_sm);
+hidden(xs, Nav) ->
+    lists:member(Nav, ?hddine_xs);
+hidden(xxs, Nav) ->
+    lists:member(Nav, ?hddine_xxs).
+
+
+
+

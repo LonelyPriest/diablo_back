@@ -1791,8 +1791,10 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	//     shop = $scope.shopIds[0];
 	// };
 
-	return diablo_base_setting(
-	    "se_pagination", -1, base, parseInt, diablo_no)
+	return diablo_sequence_page() === diablo_yes
+	    ? diablo_yes
+	    : diablo_base_setting(
+		"se_pagination", -1, base, parseInt, diablo_no)
     }();
 
     // console.log($scope.time);
@@ -1802,7 +1804,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
      */
     $scope.colspan = 19;
     $scope.items_perpage = diablo_items_per_page();
-    $scope.max_page_size = 10;
+    $scope.max_page_size = diablo_page_size();
 
     // console.log($routeParams);
     $scope.default_page = 1;
