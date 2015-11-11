@@ -193,10 +193,10 @@ var diablo_sidebar_goto_page = function(node, url){
 
     var path = node.split("\/");
     if (path.length === 1){
-	var active_link = sidebar.find('li#' + node);
-	active_link.addClass("active");
+    	var active_link = sidebar.find('li#' + node);
+    	active_link.addClass("active");
     } else if (path.length === 2){
-	$('li#' + path[0] + "-" + path[1]).parent().parent().addClass("active");
+    	$('li#' + path[0] + "-" + path[1]).parent().parent().addClass("active");
     } 
 };
 

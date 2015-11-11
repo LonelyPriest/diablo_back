@@ -62,6 +62,7 @@
 <script>
     jQuery(function($){
 	jQuery(document).ready(function() {
+            // FastClick.attach(document.body);
 	    App.init(); // initlayout and core plugins
 	    // $('.navwrapper').stickUp({
 	    // 	marginTop: 'auto'

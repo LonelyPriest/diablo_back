@@ -777,8 +777,7 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
 	    var styleEl = document.createElement('style'), styleSheet;
 	    document.head.appendChild(styleEl);
 	    styleSheet = styleEl.sheet;
-	    styleSheet.insertRule(
-		".modal { position:absolute}", 0);
+	    styleSheet.insertRule(".modal { position:absolute}", 0);
 	    
 	    // t1 = setTimeout(function () {
 	    // 	$('.modal')
