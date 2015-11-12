@@ -303,22 +303,29 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 				      IsRound, Brand, Model, Column, Attrs),
 			  Foot = body_foot(
 				   Brand, Model, Column, Banks, Mobile, Setting), 
-			  Content = Head ++ Body ++ Stastic ++ Foot,
+			  Content =
+			      %% ?f_print:br(backward, Brand, Model)
+			      Head ++ Body ++ Stastic ++ Foot,
+			  %% ?DEBUG("content ~p", [Content]),
+
+			  %% DBody = ?f_print:pagination(
+			  %% 	     just_page, Height * 10, Content),
 
 			  UpgradeDevices =
 			      ["1006", "1008", "1024", "1037", "1031"],
+			  
 			  DBody = 
 			      case lists:member(?to_s(SN), UpgradeDevices) of
-				  true -> 
-				      %% no page
-				      %% ?DEBUG("no page with sn ~p", [SN]),
-				      ?f_print:pagination(
-					 just, Height * 10, Content);
-				  false ->
-				      %% auto page
-				      %% ?DEBUG("auto page with sn ~p", [SN]),
-				      ?f_print:pagination(
-					 auto, Height * 10, Content)
+			  	  true -> 
+			  	      %% no page
+			  	      %% ?DEBUG("no page with sn ~p", [SN]),
+			  	      ?f_print:pagination(
+			  		 just_size, Height * 10, Content);
+			  	  false ->
+			  	      %% auto page
+			  	      %% ?DEBUG("auto page with sn ~p", [SN]),
+			  	      ?f_print:pagination(
+			  		 auto, Height * 10, Content)
 			      end,
 
 			  %% page by height
@@ -1227,10 +1234,10 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
 	     end, [], CT)
 	++ left_pading(Brand, Model)
 	++ pading(Column - 26)
-	++ "打印日期：" ++ ?utils:current_time(format_localtime) 
+	++ "打印日期：" ++ ?utils:current_time(format_localtime).
 	%% ++ br(Brand)
 	%% ++ [27, 74, 144] ++ [27, 74, 144].
-	++ ?f_print:br(forward, Brand, Model).
+	%% ++ ?f_print:br(forward, Brand, Model).
 
 	
 
@@ -1359,13 +1366,29 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
     try 
 	%% query state 
 	{ok, SN} = get_printer_state(Path, SN, Key, CureentTimeTicks), 
+
+	%% GBKBodys = 
+	%%     lists:foldr(
+	%%       fun(B, Acc) ->
+	%% 	      Utf8Data = unicode:characters_to_list(?to_s(B), utf8),
+	%% 	      GBKData  = diablo_iconv:convert("utf-8", "gbk", Utf8Data),
+	%% 	      case IsPage of
+	%% 		  true ->
+	%% 		      ?DEBUG("use page"),
+	%% 		      [base64:encode_to_string(
+	%% 			 Head ++ GBKData ++ Tail)|Acc];
+	%% 		  false ->
+	%% 		      [base64:encode_to_string(GBKData)|Acc]
+	%% 	      end 
+	%%       end,  [], Body),
 	
 	%% ok, print
 	{GBKBodys, _} = 
 	    lists:foldr(
 	      fun(B, {Acc, Lens}) ->
 		      Utf8Data = unicode:characters_to_list(?to_s(B), utf8),
-		      GBKData  = diablo_iconv:convert("utf-8", "gbk", Utf8Data),
+		      GBKData  =
+			  diablo_iconv:convert("utf-8", "gbk", Utf8Data),
 		      Base64 =
 			  case Lens + 1 =:= Len of
 			      true -> 
@@ -1374,7 +1397,10 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 					  base64:encode_to_string(
 					    Head ++ GBKData ++ Tail);
 				      false -> 
-					  base64:encode_to_string(GBKData)
+					  base64:encode_to_string(
+					    GBKData
+					    ++ ?f_print:br(
+						  forward, Brand, Model))
 				  end;
 			      false ->
 				  base64:encode_to_string(GBKData)

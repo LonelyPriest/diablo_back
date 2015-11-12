@@ -423,8 +423,12 @@ br(forward, <<"epson">>, <<"LQ55K">>) ->
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
+br(forward, <<"fujitsu">>, <<"DPK750">>) ->
+    br(<<"fujitsu">>) ++ br(<<"fujitsu">>) ++ br(<<"fujitsu">>);
 br(forward, Brand, _Model) ->
     br(Brand).
+
+
 
     
 
@@ -468,11 +472,22 @@ decorate_data(tail, fujitsu, Brand) ->
 decorate_data(tail, epson, _Brand) ->
     ?to_s(<<16#0c, 16#1b, 16#40, 16#0d>>).
 
-    
-pagination(just, PaperHeight, Body) ->
+%% 
+%% pagination by page
+%%
+pagination(just_page, _PaperHeight, Body) ->
+    Tokens = string:tokens(Body, "\r\n"),
+    ?DEBUG("tokens line ~p", [length(Tokens)]),
+    {true, do_line(38, 0, Tokens, <<>>, [])};
+
+%%
+%% pagination by size
+%%
+pagination(just_size, PaperHeight, Body) ->
     Tokens = string:tokens(Body, "\r\n"),
     ?DEBUG("tokens len ~p", [length(Tokens)]),
-    case 9 + 4.5 * length(Tokens) + 9 > PaperHeight of
+    
+    case 9 + 3.5 * length(Tokens) + 9 > PaperHeight of
 	true ->
 	    %% 15k, use 6 not 8
 	    PackageSize = 15 * 1024 * 6,
@@ -486,6 +501,9 @@ pagination(just, PaperHeight, Body) ->
 	    {true, [?to_b(Body)]}
     end;
 
+%%
+%% pagination by line
+%% 
 pagination(auto, PaperHeight, Body) ->
     Tokens = string:tokens(Body, "\r\n"),
     ?DEBUG("tokens len ~p", [length(Tokens)]),
@@ -519,12 +537,20 @@ start_pagination(Height, ContentHeight, [H|T], Page, Pages)->
     case ContentHeight + 4.5 > Height of
 	true -> 
 	    BinH = ?to_b(H),
-	    start_pagination(Height, 4.5, T,
-			     <<BinH/binary, <<"\r\n">>/binary>>, Pages ++ [Page]);
+	    start_pagination(
+	      Height,
+	      4.5,
+	      T,
+	      <<BinH/binary, <<"\r\n">>/binary>>,
+	      Pages ++ [Page]);
 	false ->
 	    BinH = ?to_b(H), 
-	    start_pagination(Height, ContentHeight + 4.5, T,
-			     <<Page/binary, BinH/binary, <<"\r\n">>/binary>>, Pages)
+	    start_pagination(
+	      Height,
+	      ContentHeight + 4.5,
+	      T,
+	      <<Page/binary, BinH/binary, <<"\r\n">>/binary>>,
+	      Pages)
     end.
 
 
@@ -542,9 +568,27 @@ do_package(PackSize, ContentSize, [H|T], Page, Pages)->
 		       <<Page/binary, BinH/binary, <<"\r\n">>/binary>>, Pages)
     end.
     
-	    
-	    
-    
+
+do_line(_PageLine, _ContentLine, [], Page, Pages)->
+    Pages ++ [Page];
+
+do_line(PageLine, ContentLine, [H|T], Page, Pages)->
+    %% ?DEBUG("CH ~p, H ~p, Page ~p, pages ~p", [ContentHeight, H, Page, Pages]),
+    BinH = ?to_b(H),
+    case ContentLine > PageLine of
+	true -> 
+	    do_line(PageLine,
+		    0,
+		    T,
+		    <<BinH/binary, <<"\r\n">>/binary>>,
+		    Pages ++ [Page]);
+	false ->
+	    do_line(PageLine,
+		    ContentLine + 1,
+		    T,
+		    <<Page/binary, BinH/binary, <<"\r\n">>/binary>>,
+		    Pages)
+    end.
 
 %% table_head(?COLUMN, Fields) ->
 %%     ?DEBUG("table_head fields ~p", [Fields]),

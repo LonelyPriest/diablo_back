@@ -252,9 +252,10 @@ good(used_detail, Merchant, StyleNumber, Brand) ->
 good_match(style_number, Merchant, StyleNumber) ->
     P = prompt_num(Merchant),
     "select distinct style_number from w_inventory_good"
-	" where merchant=" ++ ?to_s(Merchant)
+	" where style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
+	++ " and merchant=" ++ ?to_s(Merchant)
 	++ " and deleted=" ++ ?to_s(?NO) 
-	++ " and style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
+    %% ++ " and style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " limit " ++ ?to_s(P).
 
 good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
@@ -267,13 +268,13 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	", b.name as brand"
 	", c.name as type"
 	" from w_inventory_good a, brands b, inv_types c"
-	" where a.merchant=" ++ ?to_s(Merchant)
+	" where a.style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
+	" and a.merchant=" ++ ?to_s(Merchant)
 	++ " and a.firm=" ++ ?to_s(Firm)
 	++ " and a.deleted=" ++ ?to_s(?NO)
 	++ " and a.brand=b.id"
-	++ " and a.type=c.id" 
-	++ " and a.style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
-	++ " limit " ++ ?to_s(P);
+	" and a.type=c.id" 
+	" limit " ++ ?to_s(P);
 
 good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
     "select a.id, a.style_number, a.brand as brand_id"

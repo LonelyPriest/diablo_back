@@ -384,8 +384,9 @@ create table w_inventory_good
     deleted          INTEGER default 0, -- 0: no;  1: yes
 
     UNIQUE key       index_sbsm (style_number, brand, merchant),
-    key              index_sbm  (style_number, brand, firm, merchant),
-    key              merchant (merchant),
+    key              firm (firm),
+    -- key              index_sbm  (style_number, brand, firm, merchant),
+    -- key              merchant (merchant),
     
     primary key      (id)
 )default charset=utf8;
