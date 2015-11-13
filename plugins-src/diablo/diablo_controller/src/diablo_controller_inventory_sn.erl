@@ -140,7 +140,7 @@ handle_call({init, Merchant}, _From, State) ->
 
 
 handle_call(dump, _From, State) ->
-    Reply = mnesia:dump_to_textfile('unique_ids'),
+    Reply = mnesia:dump_to_textfile('unique.sn'),
     {reply, Reply, State};
 
 handle_call(_Request, _From, State) ->

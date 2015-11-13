@@ -402,7 +402,7 @@
 
 		    <td class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new && !inv.free_update">
-			{{f_mul(inv.fprice, (inv.fdiscount * 0.01))}}
+			{{f_mul(inv.fprice, f_mul(inv.fdiscount, 0.01))}}
 		      </div> 
 		      <form name="inv.form.fprice"
 			    ng-if="inv.$new && inv.free_color_size
@@ -454,7 +454,7 @@
 
 			<span x-ng-if="setting.round===0">
 			  {{f_mul(f_mul(inv.fprice, inv.sell),
-			  inv.fdiscount * 0.01)}}
+			  f_mul(inv.fdiscount, 0.01))}}
 			</span> 
 			<!-- <span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span> -->
 		      </div>

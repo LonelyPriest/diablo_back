@@ -1,6 +1,12 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2015-11-14",
+	 content: [
+	     "增加厂商退货可修改价格功能！！"
+	 ]
+	},
+	
 	{date: "2015-11-09",
 	 content: [
 	     "优化服务器，请使用 120.25.212.38 直接登录！！能提高平板响应速度"

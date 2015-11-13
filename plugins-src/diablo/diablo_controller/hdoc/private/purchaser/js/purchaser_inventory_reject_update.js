@@ -153,8 +153,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	}
 	
 	// $scope.old_select.surplus    = $scope.old_select.firm.balance;
-	$scope.old_select.shop         = $scope.get_object(base.shop_id,   $scope.shops);
-	$scope.old_select.employee     = $scope.get_object(base.employee_id, $scope.employees);
+	$scope.old_select.shop         = $scope.get_object(
+	    base.shop_id,   $scope.shops);
+	$scope.old_select.employee     = $scope.get_object(
+	    base.employee_id, $scope.employees);
 	$scope.old_select.surplus      = base.balance;
 	$scope.old_select.comment      = base.comment;
 	$scope.old_select.total        = Math.abs(base.total); 
@@ -173,10 +175,13 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	var sorts  = [];
 	for(var i = 0; i < length; i++){
 	    if(!in_sort(sorts, invs[i])) {
-		var add = {$edit:true, $new:false, sizes:[], colors:[], amounts:[]};
+		var add =
+		    {$edit:true, $new:false, sizes:[], colors:[], amounts:[]};
 		add.style_number    = invs[i].style_number;
-		add.brand           = $scope.get_object(invs[i].brand_id, $scope.brands);
-		add.type            = $scope.get_object(invs[i].type_id, $scope.types);
+		add.brand           =
+		    $scope.get_object(invs[i].brand_id, $scope.brands);
+		add.type            =
+		    $scope.get_object(invs[i].type_id, $scope.types);
 		add.sex             = invs[i].sex,
 		add.free            = invs[i].free,
 		add.season          = invs[i].season;
@@ -192,8 +197,8 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		add.reject          = Math.abs(invs[i].amount);
 		
 		add.sizes.push(invs[i].size);
-		// add.colors.push(
-		//     diablo_find_color(invs[i].color_id, filterColor));
+		add.colors.push(
+		    diablo_find_color(invs[i].color_id, filterColor));
 		
 		add.amounts.push({
 		    cid:invs[i].color_id,
@@ -637,8 +642,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	     qtype: diablo_badrepo}
 	).then(function(invs){
 	    console.log(invs);
-	    var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-	    var sort = purchaserService.sort_inventory(invs, order_sizes, filterColor);
+	    var order_sizes = wgoodService.format_size_group(
+		inv.s_group, filterSizeGroup);
+	    var sort = purchaserService.sort_inventory(
+		invs, order_sizes, filterColor);
 	    
 	    inv.total   = sort.total;
 	    inv.sizes   = sort.size;
@@ -658,8 +665,9 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		    }
 		})
 
-		return {amounts: params.amounts,
-			reject: reject};
+		return {amounts:   params.amounts,
+			reject:    reject,
+			org_price: params.org_price};
 	    };
 
 	    var after_add = function(){
@@ -675,9 +683,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	    };
 	    
 	    var callback = function(params){
-		var result = add_callback(params);
-		inv.amounts = result.amounts;
-		inv.reject  = result.reject;
+		var result    = add_callback(params);
+		inv.amounts   = result.amounts;
+		inv.reject    = result.reject;
+		inv.org_price = result.org_price;
 		after_add();
 	    };
 
@@ -690,6 +699,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		inv.free_color_size = false;
 		var payload = {sizes:        inv.sizes,
 			       colors:       inv.colors,
+			       org_price:    inv.org_price,
 			       amounts:      inv.select_amounts,
 			       get_amount:   get_amount, 
 			       valid:        valid_all};
@@ -746,12 +756,16 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	console.log(inv);
 	inv.$update = true; 
 	if (inv.free_color_size){
+	    inv.o_org_price = inv.org_price;
 	    inv.free_update = true; 
 	}
 
 	var callback = function(params){
-	    inv.amounts = params.amounts;
-	    inv.reject  = 0;
+	    inv.amounts        = params.amounts;
+	    // inv.select_amounts = params.select_amounts;
+	    inv.org_price = params.org_price; 
+	    inv.reject    = 0;
+	    
 	    angular.forEach(params.amounts, function(a){
 		if (angular.isDefined(a.reject) && a.reject){
 		    inv.reject += parseInt(a.reject);
@@ -762,7 +776,8 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 	};
 	
 	var payload = {sizes:        inv.sizes,
-		       // colors:       inv.colors, 
+		       // colors:       inv.colors,
+		       org_price:    inv.org_price,
 		       get_amount:   get_amount,
 		       valid:        valid_all};
 	
@@ -773,7 +788,8 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		payload.amounts = inv.amounts;
 		payload.colors = inv.colors;
 		dialog.edit_with_modal(
-		    "inventory-new.html", 'normal', callback, $scope, payload);
+		    "inventory-new.html",
+		    'normal', callback, $scope, payload);
 	    } 
 	} else {
 	    purchaserService.list_purchaser_inventory({
@@ -786,6 +802,7 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		
 		var s = select_amount(exists, inv.amounts);
 		inv.select_amounts = s.select_amounts;
+		inv.amounts = s.select_amounts;
 		inv.total  = s.total;
 		inv.colors = s.colors;
 
@@ -794,8 +811,10 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 		    // return;
 		} else {
 		    payload = {sizes:        inv.sizes,
-			       colors:       inv.colors, 
+			       colors:       inv.colors,
+			       org_price:    inv.org_price,
 			       amounts:      inv.select_amounts,
+			       // amounts:      inv.amounts,
 			       get_amount:   get_amount,
 			       valid:        valid_all}; 
 		    dialog.edit_with_modal(
@@ -809,8 +828,17 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
 
     $scope.save_free_update = function(inv){
 	inv.free_update = false;
-	inv.reject  = inv.amounts[0].reject;
+	// inv.org_price   = inv.o_org_price;
+	inv.reject      = inv.amounts[0].reject;
 	$scope.re_calculate(); 
+    };
+
+    $scope.cancel_free_update = function(inv){
+	// $timeout.cancel($scope.timeout_auto_save);
+	inv.free_update       = false;
+	inv.org_price         = inv.o_org_price;
+	inv.amounts[0].reject = inv.reject;
+	// $scope.re_calculate(); 
     }
 
     $scope.reset_inventory = function(inv){

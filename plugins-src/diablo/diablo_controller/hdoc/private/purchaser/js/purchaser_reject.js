@@ -405,8 +405,10 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	     qtype: diablo_badrepo}
 	).then(function(invs){
 	    console.log(invs);
-	    var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-	    var sort = purchaserService.sort_inventory(invs, order_sizes, filterColor);
+	    var order_sizes = wgoodService.format_size_group(
+		inv.s_group, filterSizeGroup);
+	    var sort = purchaserService.sort_inventory(
+		invs, order_sizes, filterColor);
 	    
 	    inv.total   = sort.total;
 	    inv.sizes   = sort.size;
@@ -424,7 +426,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 		})
 
 		return {amounts: params.amounts,
-			reject: reject_total};
+			reject:  reject_total,
+			org_price: params.org_price};
 	    };
 
 	    var after_add = function(){
@@ -440,8 +443,9 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	    
 	    var callback = function(params){
 		var result = add_callback(params);
-		inv.amounts = result.amounts;
-		inv.reject  = result.reject;
+		inv.amounts   = result.amounts;
+		inv.reject    = result.reject;
+		inv.org_price = result.org_price;
 		after_add();
 	    };
 
@@ -451,13 +455,15 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 		inv.free_color_size = false;
 		var payload = {sizes:        inv.sizes,
 			       colors:       inv.colors,
+			       org_price:    inv.org_price,
 			       amounts:      inv.amounts,
 			       get_amount:   get_amount,
 			       // valid_reject: valid_reject,
 			       valid:        valid_all};
 		
 		diabloUtilsService.edit_with_modal(
-		    "inventory-new.html", 'normal', callback, $scope, payload); 
+		    "inventory-new.html", 'normal',
+		    callback, $scope, payload); 
 	    }
 	}) 
     };
@@ -494,7 +500,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
      */
     $scope.inventory_detail = function(inv){
 	var payload = {sizes:        inv.sizes,
-		       colors:       inv.colors, 
+		       colors:       inv.colors,
+		       org_price:    inv.org_price,
 		       amounts:      inv.amounts,
 		       get_amount:   get_amount};
 	diabloUtilsService.edit_with_modal(
@@ -508,12 +515,14 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	inv.$update = true; 
 	if (inv.free_color_size){
 	    inv.free_update = true;
+	    inv.o_org_price  = inv.org_price;
 	    return;
 	}
 	
 	var callback = function(params){
-	    inv.amounts = params.amounts;
-	    inv.reject  = 0;
+	    inv.amounts   = params.amounts;
+	    inv.org_price = params.org_price;
+	    inv.reject    = 0;
 	    angular.forEach(params.amounts, function(a){
 		if (angular.isDefined(a.reject_count) && a.reject_count){
 		    inv.reject += parseInt(a.reject_count);
@@ -524,7 +533,8 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	};
 
 	var payload = {sizes:        inv.sizes,
-		       colors:       inv.colors, 
+		       colors:       inv.colors,
+		       org_price:    inv.org_price,
 		       amounts:      inv.amounts,
 		       get_amount:   get_amount,
 		       // valid_reject: valid_reject,
@@ -544,6 +554,7 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
     $scope.cancel_free_update = function(inv){
 	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
+	inv.org_price  = inv.o_org_price;
 	inv.amounts[0].reject_count = inv.reject;
     } 
     

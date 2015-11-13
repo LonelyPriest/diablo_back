@@ -13,9 +13,21 @@
 -compile(export_all).
 
 setup() ->
-    {ok, PluginDir} = application:get_env(knife, plugins_dir),
-    {ok, ExpandDir} = application:get_env(knife, plugins_expand_dir),
-    {ok, EnabledFile} = application:get_env(knife, enabled_plugins_file),
+    {ok, PluginDir}   =
+	case application:get_env(knife, plugins_dir) of
+	    undefined -> {ok, []};
+	    P -> P
+	end,
+    {ok, ExpandDir}   =
+	case application:get_env(knife, plugins_expand_dir) of
+	    undefined -> {ok, []};
+	    E -> E
+	end,
+    {ok, EnabledFile} =
+	case application:get_env(knife, enabled_plugins_file) of
+	    undefined -> {ok, []};
+	    F -> F
+	end,
 
     Plugins = prepare_plugins(EnabledFile, PluginDir, ExpandDir),
     io:format("plugins ~p will be loaded... ~n", [Plugins]),

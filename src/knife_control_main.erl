@@ -24,7 +24,7 @@
 -define(PLUGINS_COMMAND, [{controller, [list_tasks, list_jobs]},
 			  {proxy, [list_servers]}]).
 
--define(PLUGINS, [controller, proxy, agent]).
+-define(PLUGINS, [controller, proxy, agent, bxh]).
 
 start() ->
     {ok, [[NodeStr|_]|_]} = init:get_argument(nodename),
@@ -46,6 +46,7 @@ start() ->
     end,
 
     [Plugin|_] = string:tokens(NodeStr, "-"),
+    io:format("get plugin [~p]~n", [Plugin]),
     case lists:member(list_to_atom(Plugin), ?PLUGINS) of
 	false ->
 	    print_error("could not recognize plugin ~p", [Plugin]),

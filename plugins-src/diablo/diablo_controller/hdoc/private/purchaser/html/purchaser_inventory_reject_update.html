@@ -199,7 +199,7 @@
 		    <!-- <th class="text-center">性别</th> -->
 		    <!-- <th class="text-center">厂商</th> -->
 		    <th class="text-center">季节</th>
-		    <th class="text-center">进货价</th>
+		    <th class="text-center">进价</th>
 		    <!-- <th class="text-center">库存</th>  -->
 		    <!-- <th class="text-center">吊牌价</th>  -->
 		    <!-- <th class="text-center">打包价</th> -->
@@ -240,12 +240,30 @@
 		    <td class="vert-align">{{inv.type.name}}</td>
 		    <!-- <td class="vert-align">{{sexs[inv.sex]}}</td> -->
 		    <td class="vert-align">{{seasons[inv.season]}}</td>
-		    <td class="col-md-1 vert-align">{{inv.org_price}}</td>
+		    <!-- <td class="col-md-1 vert-align">{{inv.org_price}}</td> -->
 		    <!-- <td class="vert-align">{{inv.total}}</td>  -->
 
+		    <td class="col-md-1 vert-align">
+		      <div x-ng-if="!inv.$new && !inv.free_update">
+			{{inv.org_price}}
+		      </div> 
+		      <form name="inv.form.price"
+			    ng-if="inv.$new && inv.free_color_size
+				   || !inv.$new && inv.free_update">
+			<div x-ng-class="{'has-error':inv.form.price.$invalid
+					   && !inv.form.price.$pristine}"> 
+			  <input class="form-control"
+				 type="number" step="1" 
+				 required
+				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
+				 x-ng-model="inv.org_price"/>
+		      </form>
+		    </td>
 		    
 		    <td class="col-md-1 vert-align">
-		      <div x-ng-if="!inv.$new && !inv.free_update">{{inv.reject}}</div> 
+		      <div x-ng-if="!inv.$new && !inv.free_update">
+			{{inv.reject}}
+		      </div> 
 		      <form name="inv.form.reject"
 			    ng-if="inv.$new && inv.free_color_size
 				   || !inv.$new && inv.free_update">
@@ -253,7 +271,7 @@
 			  <span class="input-group-addon
 				       modal-input-group-addon">
 			    {{inv.total}}
-			    </span>
+			  </span>
 			  <div x-ng-class="{'has-error':inv.form.reject.$invalid
 					   && !inv.form.reject.$pristine
 					   || !valid_free(inv)}"> 
@@ -331,7 +349,7 @@
 			
 			<a class="btn diablo-input-button btn-danger"
 			   ng-if="inv.free_update"
-			   x-ng-click="inv.free_update=false">取消
+			   x-ng-click="cancel_free_update(inv)">取消
 			  <i class="glyphicon glyphicon-erase"></i></a> 
 		      </div>
 		      
@@ -360,8 +378,35 @@
 
 <script type="text/ng-template" id="inventory-new.html">
   <div class="modal-body">
+    
+    <div class="row diablo-form-group">
+      <div class="col-md-12 col-sm-12">
+	<div class="input-group">
+	  <!-- <span class="input-group-addon"> -->
+	  <!--   <i class="glyphicon glyphicon-yen fg-red"></i>原价</span> -->
+	  <!-- <input class="form-control text-center" -->
+	  <!-- 	 x-ng-model="params.org_price"/> -->
+	  
+	  <span class="input-group-addon">
+	    <i class="glyphicon glyphicon-jpy fg-red"></i>进价
+	  </span>
+	  <form name="fprice">
+	    <div ng-class="{'has-error':fprice.$invalid
+			   && !fprice.$pristine}"> 
+	      <input class="form-control"
+		     type="number" step="0.01" 
+		     required
+		     x-ng-pattern="/^\d+(.\d{1,2})?$/"
+		     x-ng-model="params.org_price"/>
+	    </div> 
+	  </form>
+	</div>
+      </div>
+    </div>
+    
     <div class="table-responsive">
-      <table class="table table-bordered table-striped table-condensed table-advanced">
+      <table class="table table-bordered
+		    table-striped table-condensed table-advanced">
 	<tbody>
 	  <tr>
 	    <td></td>
@@ -375,14 +420,17 @@
 	      <span x-ng-switch-when="0">均色</span>
 	      <span x-ng-switch-default>{{c.cname}}</span>
 	    </td>
-	    <td class="col-md-1" x-ng-repeat="s in params.sizes">
-	      <div x-ng-if="amount = params.get_amount(c.cid, s, params.amounts); amount">
+	    <td x-ng-repeat="s in params.sizes">
+	      <div x-ng-if="amount=params.get_amount(
+			    c.cid, s, params.amounts); amount">
 		
-		<div class="input-group">
+		<div class="input-group col-md-12">
 		  <span class="input-group-addon modal-input-group-addon">
-		    {{amount.count}}</span>
+		    {{amount.count}}
+		  </span>
 		<form name="form">
-		  <div ng-class="{'has-error':form.$invalid && !form.$pristine}">
+		  <div ng-class="{'has-error':form.$invalid
+				 && !form.$pristine}">
 		    <input x-ng-if="amount"
 			   class="form-control text-center modal-input"
 			   type="number" step="1" 
@@ -402,7 +450,8 @@
 
   <div class="modal-footer">
     <button class="btn btn-primary"
-	    x-ng-disabled="!params.valid(params.amounts)" x-ng-click="ok()">保存</button>
+	    x-ng-disabled="!params.valid(params.amounts)"
+	    x-ng-click="ok()">保存</button>
     <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
   </div>
 </script>
@@ -410,8 +459,27 @@
 
 <script type="text/ng-template" id="inventory-detail.html">
   <div class="modal-body">
+    <div class="row diablo-form-group">
+      <div class="col-md-12 col-sm-12">
+	<div class="input-group"> 
+	  <span class="input-group-addon">
+	    <i class="glyphicon glyphicon-jpy fg-red"></i>原价
+	  </span>
+	  <form name="fprice">
+	    <div ng-class="{'has-error':fprice.$invalid
+			   && !fprice.$pristine}"> 
+	      <input class="form-control"
+		     readonly
+		     x-ng-model="params.org_price"/>
+	    </div> 
+	  </form>
+	</div>
+      </div>
+    </div>
+    
     <div class="table-responsive">
-      <table class="table table-bordered table-striped table-condensed table-advanced">
+      <table class="table table-bordered
+		    table-striped table-condensed table-advanced">
 	<tbody>
 	  <tr>
 	    <td></td>

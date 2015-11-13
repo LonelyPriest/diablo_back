@@ -26,6 +26,7 @@ esac
 shift 1
 
 [ "x" = "x$KNIFE_NODENAME" ] && KNIFE_NODENAME=${SUBSYSTEM}-${NODENAME}
+## [ "x" = "x$KNIFE_NODENAME" ] && KNIFE_NODENAME=bxh@${HOSTNAME}
 [ "x" = "x$KNIFE_CTL_ERL_ARGS" ] && KNIFE_CTL_ERL_ARGS=${CTL_ERL_ARGS}
 
 ##--- End of overridden <var_name> variables

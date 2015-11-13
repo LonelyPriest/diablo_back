@@ -10,15 +10,21 @@ KNIFE_HOME=${SCRIPT_DIR}/..
 MNESIA_BASE=${KNIFE_HOME}/mnesia
 
 HOSTNAME=`env hostname`
-NODENAME=controller-knife@${HOSTNAME%%.*}
+## NODENAME=controller-knife@${HOSTNAME%%.*}
+NODENAME=bxh
 
 MNESIA_DIR=${MNESIA_BASE}/${NODENAME}
+
+SN=unique.sn
 
 BACKUP_DIR=${KNIFE_HOME}/backup_${DATE}
 [ -d ${BACKUP_DIR} ] || mkdir -p ${BACKUP_DIR}
 
 ## mnesia 
 cp -r ${MNESIA_DIR} ${BACKUP_DIR}/mnesia
+
+${SCRIPT_DIR}/knifectl controller dump
+[ $? -eq 0 ] && cp ${KNIFE_HOME}/${SN} ${BACKUP_DIR} || exit 0
 
 ## image
 IMAGE_DIR=${KNIFE_HOME}/plugins/diablo_controller-1.0.0/hdoc/image
@@ -42,10 +48,14 @@ mysqldump=$(which mysqldump)
 ${mysqldump} -hlocalhost -u${user} -p${passwd} \
     --default-character-set=utf8 ${db} > ${BACKUP_DIR}/${db}-${DATE}.sql
 
-
 ## zip
 TAR=diablo_backup-${DATE}.tar.gz
-tar -zcf ${TAR} ${BACKUP_DIR}
+
+if [ $? -eq 0 ]; then 
+    tar -zcf ${TAR} ${BACKUP_DIR}
+else
+    exit 0
+fi
 
 cp ${TAR} /home/diablo
 

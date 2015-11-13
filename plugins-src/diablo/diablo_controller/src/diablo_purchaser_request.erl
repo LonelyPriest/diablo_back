@@ -55,7 +55,7 @@ action(Session, Req, {"new_w_inventory"}, Payload) ->
     end;
 
 action(Session, Req, {"update_w_inventory"}, Payload) ->
-    ?DEBUG("update purchaser inventory with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("update purchaser inventory with session~n~p, paylaod~n~p", [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     Invs = ?v(<<"inventory">>, Payload, []),
     {struct, Base} = ?v(<<"base">>, Payload),
