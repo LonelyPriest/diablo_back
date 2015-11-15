@@ -10,8 +10,8 @@ KNIFE_HOME=${SCRIPT_DIR}/..
 MNESIA_BASE=${KNIFE_HOME}/mnesia
 
 HOSTNAME=`env hostname`
-## NODENAME=controller-knife@${HOSTNAME%%.*}
-NODENAME=bxh
+NODENAME=controller-knife@${HOSTNAME%%.*}
+## NODENAME=bxh
 
 MNESIA_DIR=${MNESIA_BASE}/${NODENAME}
 
