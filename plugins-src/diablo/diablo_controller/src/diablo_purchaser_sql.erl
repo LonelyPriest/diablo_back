@@ -1453,7 +1453,7 @@ filter_condition(inventory_new, [O|T], Acc1, Acc2) ->
     filter_condition(inventory_new, T, Acc1, [O|Acc2]).
 
 prompt_num(Merchant) ->
-    {ok, Setting}      = ?wifi_print:detail(base_setting, Merchant, -1),
+    {Setting, _}      = ?wifi_print:detail(base_setting, Merchant, -1),
     PromptNum     = ?to_i(?v(<<"prompt">>, Setting, 8)),
     ?DEBUG("prompt ~p", [PromptNum]),
     PromptNum.
