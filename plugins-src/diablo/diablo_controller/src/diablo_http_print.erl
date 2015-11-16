@@ -24,7 +24,7 @@
 
 -export([server/1,
 	 title/4, head/7, head/8,  body_head/6,
-	 row/2, body_foot/6, detail/2, detail/3,
+	 row/2, body_foot/7, detail/2, detail/3,
 	 start_print/8, start_print/5,
 	 multi_print/1, get_printer_state/4, multi_send/5]).
 
@@ -39,6 +39,13 @@
 -define(PRINT_FIELDS,
 	[brand, style_number, type, color, size_name,
 	 size, price, discount, dprice, hand, count, calc]).
+
+-define(PHONES, [<<"phone1">>,
+		 <<"phone2">>,
+		 <<"phone3">>,
+		 <<"phone4">>,
+		 <<"phone5">>,
+		 <<"phone6">>]).
 
 -record(state, {}).
 
@@ -259,7 +266,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  ?DEBUG("P ~p", [P]),
 			  Server = server(?v(<<"server_id">>, P)),
 
-			  {ok, Setting}
+			  {Setting, Phones}
 			      = detail(base_setting, Merchant, PShop),
 			  PrintRetailer
 			      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
@@ -302,7 +309,8 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  Stastic = body_stastic(
 				      IsRound, Brand, Model, Column, Attrs),
 			  Foot = body_foot(
-				   Brand, Model, Column, Banks, Mobile, Setting), 
+				   Brand, Model, Column,
+				   Banks, Mobile, Setting, Phones), 
 			  Content =
 			      %% ?f_print:br(backward, Brand, Model)
 			      Head ++ Body ++ Stastic ++ Foot,
@@ -1160,20 +1168,18 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
 	++ "上次欠款：" ++ decorate_data(block)
 	++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
 	
-	++ ?f_print:pading(2) ++ DebtName ++ decorate_data(block)
-	%% ++ ?to_s(?f_print:clean_zero(Debt)) ++ decorate_data(cancel_block)
+	++ pading(2) ++ DebtName ++ decorate_data(block)
 	++ round(IsRound, Debt) ++ decorate_data(cancel_block)
 	
-	++ ?f_print:pading(2) ++ "累计欠款：" ++ decorate_data(block)
+	++ pading(2) ++ "累计欠款：" ++ decorate_data(block)
 	++ round(IsRound, AccDet) ++ decorate_data(cancel_block)
 	
-	++ ?f_print:br(Brand) ++ ?f_print:line(minus, Column)
-	++ ?f_print:br(Brand).
+	++ br(Brand) ++ ?f_print:line(minus, Column)
+	++ br(Brand).
 
-body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
+body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
     ?DEBUG("start to build body_foot", []), 
-    Phone1 = ?v(<<"phone1">>, Setting, []),
-    Phone2 = ?v(<<"phone2">>, Setting, []), 
+
     [CH|CT] = [?v(<<"comment1">>, Setting, []),
 	       ?v(<<"comment2">>, Setting, []),
 	       ?v(<<"comment3">>, Setting, [])],
@@ -1191,7 +1197,7 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
 		  BL  =  width(chinese, B),
 		  NoL =  width(chinese, No) + 2,
 
-		  ?DEBUG("NL + BL + NoL ~p, L ~p", [NL + BL + NoL, L]),
+		  %% ?DEBUG("NL + BL + NoL ~p, L ~p", [NL + BL + NoL, L]),
 		  case NL + BL + NoL =< L of 
 		      true -> {S
 			       ++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
@@ -1207,22 +1213,36 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting) ->
 		  end
 
 	  end, {[], Column}, Banks),
+
+    %% Phone
+    {_, SPhone} = 
+	lists:foldl(
+	  fun({_, Phone, Remark}, {Len, Acc})->
+		  PhoneLen = 2 + length(?to_s(Phone))
+		      +  case Remark of
+			     []   -> 0;
+			     <<>> -> 0;
+			     _    -> 4 + width(chinese, Remark)
+			 end,
+		  case Len + PhoneLen =< Column of
+		      true ->
+			  {Len + PhoneLen,
+			   Acc ++ pading(2) ++ phone(Phone, Remark)};
+		      false->
+			  {10 + PhoneLen - 2,
+			   Acc ++ br(Brand) ++ pading(10)
+			   ++ left_pading(Brand, Mobile)
+			   ++ phone(Phone, Remark)}
+		  end
+	  end, {10 + length(?to_s(Mobile)), []}, Phones),
 	
     %mobile
     SBank ++ br(Brand)
 	++ left_pading(Brand, Model)
-	++ "电话：" ++ ?to_s(Mobile)
-	++ pading(2) ++ ?to_s(Phone1)
-	
-	++ case 6 + length(?to_s(Mobile))
-	       + 2 + length(?to_s(Phone1))
-	       + 2 + length(?to_s(Phone2)) - Column =< 0 of
-	       true  -> pading(2);
-	       false -> br(Brand) ++ left_pading(Brand, Model) ++ pading(6)
-	   end
-	++ ?to_s(Phone2) ++ br(Brand)
+	++ "联系方式：" ++ ?to_s(Mobile) ++ SPhone 
 	
     %% comment
+	++ br(Brand)
 	++ left_pading(Brand, Model)
 	++ "说明：" ++ ?to_s(CH) ++ br(Brand) 
 	++ lists:foldr(
@@ -1633,17 +1653,29 @@ detail(print_format, Merchant, Shop) ->
 
 detail(base_setting, Merchant, Shop) ->
     ?DEBUG("base_setting with merhcant ~p, Shop ~p", [Merchant, Shop]),
-    {ok, Settings} = ?w_user_profile:get(setting, Merchant, Shop), 
-    {ok, lists:foldr(
-	   fun({R}, Acc) ->
+    {ok, Settings} = ?w_user_profile:get(setting, Merchant, Shop),
+    Sort = 
+	lists:foldr(
+	   fun({R}, {Basics, Phones}=Acc) ->
+		   %% ?DEBUG("Basics ~p, Phones ~p", [Basics, Phones]),
 		   %% only use print setting
 		   case ?v(<<"type">>, R) of
-		       1 -> Acc;
-		       0 -> EName = ?v(<<"ename">>, R),
-			    Value = ?v(<<"value">>, R),
-			    [{EName, Value}|Acc]
+		       1 ->
+			   Acc;
+		       0 ->
+			   EName   = ?v(<<"ename">>, R),
+			   Value   = ?v(<<"value">>, R),
+			   Remark  = ?v(<<"remark">>, R, []), 
+			   case lists:member(EName, ?PHONES) of
+			       true ->
+				   {Basics, [{EName, Value, Remark}|Phones]};
+			       false ->
+				   {[{EName, Value}|Basics], Phones}
+			   end
 		   end
-	   end, [], Settings)}.
+	   end, {[], []}, Settings),
+    %% ?DEBUG("sort ~p", [Sort]),
+    Sort.
 
 
 field_name(<<"brand">>)        -> "品牌";
@@ -1830,3 +1862,12 @@ get_color(ColorId, [{struct, H}|T]) ->
 	false ->
 	    get_color(ColorId, T)
     end.
+
+
+phone(Phone, []) ->
+    ?to_s(Phone);
+phone(Phone, <<>>) ->
+    ?to_s(Phone);
+phone(Phone, Remark) ->
+    ?DEBUG("remark ~p", [Remark] ),
+    ?to_s(Phone) ++ "（" ++ ?to_s(Remark) ++ "）".

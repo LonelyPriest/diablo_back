@@ -71,6 +71,10 @@ baseApp.service("baseService", function($resource){
     this.option_names = [
 	{cname: "电话1", ename: "phone1"},
 	{cname: "电话2", ename: "phone2"},
+	{cname: "电话3", ename: "phone3"},
+	{cname: "电话4", ename: "phone4"},
+	{cname: "电话5", ename: "phone5"},
+	{cname: "电话6", ename: "phone6"},
 	{cname: "备注1", ename: "comment1"},
 	{cname: "备注2", ename: "comment2"},
 	{cname: "备注3", ename: "comment3"}];
@@ -139,7 +143,11 @@ baseApp.service("baseService", function($resource){
     
     this.update_setting = function(s){
 	return http.save({operation: 'update_base_setting'},
-			 {id: s.id, ename: s.ename, value: s.value, shop:s.shop}).$promise;
+			 {id:     s.id,
+			  ename:  s.ename,
+			  value:  s.value,
+			  remark: s.remark,
+			  shop:   s.shop}).$promise;
     };
 
     this.add_shop_setting = function(shop) {
@@ -271,6 +279,10 @@ baseApp.controller("printOptionCtrl", function(
 	    || name === 'qtime_length'
 	    || name === 'phone1'
 	    || name === 'phone2'
+	    || name === 'phone3'
+	    || name === 'phone4'
+	    || name === 'phone5'
+	    || name === 'phone6'
 	    || name === 'comment1'
 	    || name === 'comment2'
 	    || name === 'comment3'
@@ -329,7 +341,7 @@ baseApp.controller("printOptionCtrl", function(
 		    return {shop:s, setting:diablo_order(setting)};
 		})
 	    
-	    console.log($scope.settings); 
+	    console.log($scope.settings);
 	    $scope.select = {shop:shop,
 			     setting: $scope.shop_setting(shop)};
 	})
@@ -338,14 +350,29 @@ baseApp.controller("printOptionCtrl", function(
     $scope.refresh($scope.shops[0]);
     // console.log($scope.select.shop);
 
+    var get_set_v = function(name){
+	// console.log(name);
+	var v = {value:undefined, comment:undefined};
+	for (var i=0, l=$scope.select.setting.length; i<l; i++){
+	    if (name === $scope.select.setting[i].ename){
+		v.value = $scope.select.setting[i].value;
+		v.comment = $scope.select.setting[i].comment;
+		break;
+	    }
+	}
+	
+	return v;
+    };
+    
     $scope.add_setting = function(){
 	var callback = function(params){
 	    console.log(params.setting);
 	    var s = params.setting;
 	    baseService.add_setting({
-		cname: s.name.cname,
-		ename: s.name.ename,
-		value: s.value,
+		cname:   s.name.cname,
+		ename:   s.name.ename,
+		value:   s.value,
+		remark:  s.remark,
 		type:  baseService.print_setting,
 		shop:  $scope.select.shop.id
 	    }).then(function(result){
@@ -362,12 +389,18 @@ baseApp.controller("printOptionCtrl", function(
 	    })
 	}
 
+	// console.log(baseService.option_names[0].ename);
+	var default_set = get_set_v(baseService.option_names[0].ename);
+	console.log(default_set);
 	dialog.edit_with_modal(
 	    "add-setting.html", undefined, callback, $scope,
 	    {names:    baseService.option_names,
-	     patterns: {tel_mobile: diabloPattern.tel_mobile,
+	     patterns: {tel_mobile: diabloPattern.positive_num,
 			comment:    diabloPattern.comment},
-	     setting:  {name: baseService.option_names[0]}
+	     setting:  {name: baseService.option_names[0],
+			value: default_set.value,
+			remark: default_set.remark},
+	     get_set_v: get_set_v
 	    });
     }
     
@@ -387,9 +420,10 @@ baseApp.controller("printOptionCtrl", function(
 	    };
 	    
 	    baseService.update_setting({
-		id:    setting.id,
-		ename: setting.ename,
-		value: update,
+		id:      setting.id,
+		ename:   setting.ename,
+		value:   update,
+		remark:  setting.remark,
 		shop:  $scope.select.shop.id
 	    }).then(function(state){
 		console.log(state);
@@ -461,7 +495,7 @@ baseApp.controller("printOptionCtrl", function(
 	     init_v: v,
 	     qtime: qtime,
 	     patterns: {tel_mobile: diabloPattern.tel_mobile,
-			comment:    diabloPattern.comment}});
+			remark:    diabloPattern.comment}});
     }
 });
 

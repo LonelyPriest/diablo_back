@@ -180,6 +180,9 @@
 	    <select class="form-control" required
 		    name="name"
 		    x-ng-model="params.setting.name"
+		    x-ng-change="params.setting.value
+				 =params.get_set_v(params.setting.name.ename).value;
+				 params.setting.remark=params.get_set_v(params.setting.name.ename).comment"
 		    x-ng-options="n as n.cname for n in params.names">
 	    </select> 
 	  </div> 
@@ -194,27 +197,73 @@
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile">
-	      </input>
+		     x-ng-pattern="params.patterns.tel_mobile" />
+	      
 	      <input x-ng-switch-when="phone2"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile">
-	      </input>
+		     x-ng-pattern="params.patterns.tel_mobile" />
+
+	      <input x-ng-switch-when="phone3"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile" />
+	      
+	      <input x-ng-switch-when="phone4"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile" />
+
+	      <input x-ng-switch-when="phone5"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile" />
+	      
+	      <input x-ng-switch-when="phone6"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     x-ng-pattern="params.patterns.tel_mobile" />
+	      
 	      <input x-ng-switch-default
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.comment">
-	      </input>
+		     x-ng-pattern="params.patterns.comment"/>
+	      
 	    </span>
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>
 	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
-	    <span class="fg-red">联系方式只能是手机或座机，备注不能包含特殊字符</span>
+	    <span class="fg-red">
+	      联系方式只能是手机或座机，备注不能包含特殊字符
+	    </span>
 	  </div>
-	</div> 
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>
+	      描述
+	    </span>
+	    <input type="text"
+		   class="form-control"
+		   name="remark"
+		   x-ng-pattern="params.patterns.remark"
+		   x-ng-model="params.setting.remakr"/> 
+	  </div>
+	  <div ng-show="pForm.remark.$invalid && !pForm.remark.$pristine">
+	    <span class="fg-red"> 
+	      描述只能是中文，字母，数字，不包含特殊字符
+	    </span>
+	  </div>
+	  
+	</div>
 	
       </div>
     </form>
@@ -265,7 +314,8 @@
 		      class="form-control" required
 		      name="value"
 		      x-ng-model="params.setting.value"
-		      x-ng-options="t as t.cname for t in params.setting.ptypes"
+		      x-ng-options="t as t.cname
+				    for t in params.setting.ptypes"
 		      x-ng-init="params.setting.value=params.setting.ptypes[params.setting.value]">
 	      </select>
 
@@ -333,15 +383,41 @@
 		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
 	      </select>
 
-	      <input x-ng-switch-when="qtime_start" type="text" class="form-control"
-		     placeholder="年-月-日"
-		     datepicker-popup="yyyy/MM/dd"
-		     is-open="params.qtime.isOpened"
-		     close-text="关闭"
-		     clear-text="清除"
-		     current-text="今天"
-		     show-weeks="false"
-		     x-ng-model="params.setting.value"></input>
+	      <div x-ng-switch-when="qtime_start">
+		<div class="input-group col-md-12 col-sm-12 col-xs-12">
+		  <input type="text"
+			 class="form-control"
+			 placeholder="年-月-日"
+			 datepicker-popup="yyyy/MM/dd"
+			 is-open="params.qtime.isOpened"
+			 close-text="关闭"
+			 clear-text="清除"
+			 current-text="今天"
+			 show-weeks="false"
+			 x-ng-model="params.setting.value"/>
+		  <span class="input-group-btn">
+		    <button type="button"
+			    class="btn btn-default"
+			    x-ng-click="params.qtime.isOpened=true;
+					params.qtime.open_calendar($event)">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      
+	      <!-- <input x-ng-switch-when="qtime_start" -->
+	      <!-- 	     type="text" -->
+	      <!-- 	     class="form-control" -->
+	      <!-- 	     placeholder="年-月-日" -->
+	      <!-- 	     datepicker-popup="yyyy/MM/dd" -->
+	      <!-- 	     is-open="params.qtime.isOpened" -->
+	      <!-- 	     close-text="关闭" -->
+	      <!-- 	     clear-text="清除" -->
+	      <!-- 	     current-text="今天" -->
+	      <!-- 	     show-weeks="false" -->
+	      <!-- 	     x-ng-model="params.setting.value"/> -->
 	      
 	      
 	      <select x-ng-switch-when="qtime_length"
@@ -390,50 +466,60 @@
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="/^\d+?/">
-	      </input> 
+		     x-ng-pattern="/^\d+?/"/>
 	      
 	      <input x-ng-switch-when="phone1" type="text"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile">
-	      </input> 
+		     x-ng-pattern="params.patterns.tel_mobile"/>
+	      
 	      <input x-ng-switch-when="phone2" type="text"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile">
-	      </input>
+		     x-ng-pattern="params.patterns.tel_mobile"/> 
 	      
 	      <input x-ng-switch-default
 		     class="form-control" type="text"
 		     required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.comment">
-	      </input>
-	    </span>
-	    
-	    <span x-ng-if="params.setting.ename==='qtime_start'"
-		  <span class="input-group-btn">
-		  <button type="button"
-			  class="btn btn-default"
-			  x-ng-click="params.qtime.isOpened=true;params.qtime.open_calendar($event)">
-		    <i class="glyphicon glyphicon-calendar"></i></button> 
-	    </span>
-		  
-	    <span class="input-group-addon bg-white fg-red">*</span>
-	    
+		     x-ng-pattern="params.patterns.comment"/>
+	    </span> 
 	  </div>
+
 	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
 	    <span class="fg-red">
-	      0：打印，1：不打印； 
-	      联系方式只能是手机或座机，备注不能包含特殊字符</span>
+	      联系方式只能是手机或座机，备注不能包含特殊字符
+	    </span>
 	  </div>
+	  
+	</div>
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>
+	      描述
+	    </span>
+	    <input type="text"
+		   class="form-control"
+		   name="remark"
+		   x-ng-pattern="params.patterns.remark"
+		   x-ng-model="params.setting.remark"/> 
+	  </div>
+	  <div ng-show="pForm.remark.$invalid && !pForm.remark.$pristine">
+	    <span class="fg-red"> 
+	      描述只能是中文，字母，数字，不包含特殊字符
+	    </span>
+	  </div> 
 	</div>
 	
       </div>
+
+      
+      
     </form>
   </div>
   

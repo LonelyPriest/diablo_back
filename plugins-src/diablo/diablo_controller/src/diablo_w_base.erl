@@ -194,12 +194,14 @@ handle_call({update_base_setting, Merchant, Update}, _From, State) ->
     ?DEBUG("update_base_setting with merchant ~p, update ~p",
 	   [Merchant, Update]),
 
-    Id    = ?v(<<"id">>, Update),
-    EName = ?v(<<"ename">>, Update),
-    Value = ?v(<<"value">>, Update),
-    Shop  = ?v(<<"shop">>, Update),
+    Id     = ?v(<<"id">>, Update),
+    EName  = ?v(<<"ename">>, Update),
+    Value  = ?v(<<"value">>, Update),
+    Shop   = ?v(<<"shop">>, Update),
+    Remark = ?v(<<"remark">>, Update, []),
 
     Sql = "update w_base_setting set value=\'" ++ ?to_s(Value) ++ "\'"
+	", remark=\'" ++ ?to_s(Remark) ++ "\'"
 	++ " where id=" ++ ?to_s(Id)
 	++ " and shop=" ++ ?to_s(Shop)
 	++ " and merchant=" ++ ?to_s(Merchant),
