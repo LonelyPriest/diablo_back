@@ -31,6 +31,25 @@
 -define(hddine_xs,  [?right_shop, ?right_employe, ?right_right]).
 -define(hddine_xxs, [?right_w_good]).
 
+-define(SUPER_ROOT, [?right_merchant, ?right_right, ?right_w_print]).
+
+-define(USER_ORDRE_ROOT,
+	[?right_w_sale,
+	 ?right_w_inventory,
+	 ?right_w_good,
+	 ?right_sale,
+	 ?right_inventory,
+	 ?right_member,
+	 ?right_employe,
+	 ?right_shop,
+	 ?right_w_firm,
+	 ?right_supplier,
+	 ?right_w_retailer,
+	 ?right_w_report,
+	 ?right_right
+	 %% ?right_w_base
+	]).
+
 
 -record(func_tree,
 	{tree   :: gb_tree(),
@@ -139,14 +158,14 @@ handle_call(lookup, _From, #func_tree{tree=Tree} = State) ->
 
 handle_call({navbar, super}, _From, #func_tree{tree=Tree} = State) ->
     %% super only have merchant and right menu
-    RootKeys = [?right_merchant, ?right_right, ?right_w_print],
+    %% RootKeys = [?right_merchant, ?right_right, ?right_w_print],
     Navs = 
 	lists:foldr(
 	  fun(RId, Acc) ->
 		  {Href, Name, Module} = gb_trees:get(RId, Tree),
-		  [{Href, Name, Module, false}|Acc]
+		  [{Href, Name, Module, hidden(mobile, RId)}|Acc]
 		  %% [gb_trees:get(Root, Tree)|Acc]
-	  end,[], RootKeys),
+	  end,[], ?SUPER_ROOT),
     ?DEBUG("navs ~p", [Navs]),
     {reply, Navs, State};
 
@@ -177,17 +196,17 @@ handle_call({navbar, UserId}, _From, #func_tree{tree=Tree} = State) ->
 
 
     %% order right
-    OrderRoots = [?right_w_sale, ?right_w_inventory, ?right_w_good,
-		  ?right_sale, ?right_inventory, ?right_member,
-		  ?right_employe, ?right_shop, ?right_w_firm,
-		  ?right_supplier, ?right_w_retailer, ?right_w_report,
-		  ?right_right
-		  %% ?right_w_base
-		 ], 
-    ?DEBUG("OrderRoots ~p", [OrderRoots]),
+    %% OrderRoots = [?right_w_sale, ?right_w_inventory, ?right_w_good,
+    %% 		  ?right_sale, ?right_inventory, ?right_member,
+    %% 		  ?right_employe, ?right_shop, ?right_w_firm,
+    %% 		  ?right_supplier, ?right_w_retailer, ?right_w_report,
+    %% 		  ?right_right
+    %% 		  %% ?right_w_base
+    %% 		 ], 
+    %% ?DEBUG("OrderRoots ~p", [OrderRoots]),
 
-    OrderRights = order_root(OrderRoots, ?to_tl(Roots)),
-    ?DEBUG("OrderRights ~p", [OrderRights]),
+    OrderRights = order_root(?USER_ORDRE_ROOT, ?to_tl(Roots)),
+    %% ?DEBUG("OrderRights ~p", [OrderRights]),
 
     %% get root navbar 
     Navs = 

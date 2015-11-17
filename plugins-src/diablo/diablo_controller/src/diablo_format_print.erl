@@ -487,7 +487,7 @@ pagination(just_size, PaperHeight, Body) ->
     Tokens = string:tokens(Body, "\r\n"),
     ?DEBUG("tokens len ~p", [length(Tokens)]),
     
-    case 9 + 3.5 * length(Tokens) + 9 > PaperHeight of
+    case 9 + 4.5 * length(Tokens) + 9 > PaperHeight of
 	true ->
 	    %% 15k, use 6 not 8
 	    PackageSize = 15 * 1024 * 6,

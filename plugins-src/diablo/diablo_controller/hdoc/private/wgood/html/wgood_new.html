@@ -188,7 +188,7 @@
 			 placeholder="进货价，支持二位小数"
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
-			 x-ng-model="good.org_price"></input>
+			 x-ng-model="good.org_price"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>	      
 		<div ng-show="goodForm.org_price.$invalid && !goodForm.org_price.$pristine">
@@ -208,7 +208,7 @@
 			 placeholder="吊牌价，支持二位小数"
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
-			 x-ng-model="good.tag_price"></input>
+			 x-ng-model="good.tag_price"/>
 		  <span class="input-group-addon bg-white fg-red">*</span> 
 		</div>
 	      </div>
@@ -228,7 +228,7 @@
 			 placeholder="打包价，支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.pkg_price"></input>
+			 x-ng-model="good.pkg_price"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>
@@ -248,7 +248,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.p3"></input>
+			 x-ng-model="good.p3"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -268,7 +268,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.p4"></input>
+			 x-ng-model="good.p4"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -288,7 +288,7 @@
 			 placeholder="支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-			 x-ng-model="good.p5"></input>
+			 x-ng-model="good.p5"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>	      
@@ -309,7 +309,7 @@
 			   required
 			   placeholder="两位整数，无折扣请输入100"
 			   x-ng-pattern="/^\d{2}$|100$/"
-			   x-ng-model="good.discount"></input>
+			   x-ng-model="good.discount"/>
 		  </div>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
@@ -332,7 +332,7 @@
 			   required
 			   placeholder="请输入1到2位数字"
 			   x-ng-pattern="/^\d{1,2}$/"
-			   x-ng-model="good.alarm_day"></input>
+			   x-ng-model="good.alarm_day"/>
 		  </div>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
@@ -386,7 +386,7 @@
 		<div class="input-group">
 		  <input class="form-control" type="text"
 			 x-ng-readonly=true
-			 x-ng-model="image.file.name"></input>
+			 x-ng-model="image.file.name"/>
 		  <span class="input-group-btn"> 
 		    <image-upload image="image"></image-upload>
 		    <button class="btn btn-danger"
@@ -515,7 +515,7 @@
 		   name="balance"
 		   placeholder="默认为0，支持两位小数"
 		   x-ng-model="params.firm.balance"
-		   x-ng-pattern="/^[+|\-]?\d+(.\d{1,2})?$/"></input>
+		   x-ng-pattern="/^[+|\-]?\d+(.\d{1,2})?$/"/>
 	    <!-- <span class="input-group-addon bg-white fg-red">*</span> -->
 	    <!-- </div> -->
 	  </div>
@@ -590,7 +590,9 @@
       <span class="sr-only"></span>
     </button>
     
-    <h4 class="modal-title"><span class="label label-sm label-primary">新增颜色</span></h4>
+    <h4 class="modal-title">
+      <span class="label label-sm label-primary">新增颜色</span>
+    </h4>
   </div>
 
   <div class="modal-body">
@@ -607,7 +609,7 @@
 		   required
 		   placeholder="请输入名称"
 		   x-ng-model="params.color.name"
-		   x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]+$/"></input>
+		   x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]+$/"/>
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>
 	  <div ng-show="colorForm.name.$invalid && !colorForm.name.$pristine">
@@ -636,7 +638,7 @@
 		   type="text" 
 		   placeholder="请输入备注"
 		   x-ng-model="params.color.remark"
-		   x-ng-pattern="/^[A-Za-z0-9-\u4e00-\u9fa5]+$/"></input>
+		   x-ng-pattern="/^[A-Za-z0-9-\u4e00-\u9fa5]+$/"/>
 	  </div>
 	  <div ng-show="colorForm.remark.$invalid &&
 			! colorForm.remark.$pristine">
@@ -714,7 +716,7 @@
 		     placeholder="请输入尺码名称"
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.name"
-		     x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]+$/"</input> 
+		     x-ng-pattern="/^[A-Za-z0-9-_\u4e00-\u9fa5]+$/"/>
 		     <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -734,7 +736,7 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.si"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -758,14 +760,15 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.sii"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
 	  <div ng-show="sizeForm.sii.$invalid && !sizeForm.sii.$pristine">
 	    <span class="fg-red">请输入字母或数字</span>
 	  </div>
-	  <div ng-show="!params.check_same(params.size, 'sii', params.size.sii)">
+	  <div ng-show="!params.check_same(
+			params.size, 'sii', params.size.sii)">
 	    <span class="fg-red">尺码已存在，请重新输入</span>
 	  </div>
 	</div>
@@ -781,14 +784,15 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.siii"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
 	  <div ng-show="sizeForm.siii.$invalid && !sizeForm.siii.$pristine">
 	    <span class="fg-red">请输入字母或数字</span>
 	  </div>
-	  <div ng-show="!params.check_same(params.size, 'siii', params.size.siii)">
+	  <div ng-show="!params.check_same(
+			params.size, 'siii', params.size.siii)">
 	    <span class="fg-red">尺码已存在，请重新输入</span>
 	  </div>
 	</div>
@@ -805,7 +809,7 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.siv"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -828,7 +832,7 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.sv"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div> 
@@ -852,14 +856,15 @@
 		     capitalize
 		     x-ng-maxlength="10"
 		     x-ng-model="params.size.svi"
-		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"></input> 
+		     x-ng-pattern="/^[A-Za-z0-9\/]+$/"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
 	  <div ng-show="sizeForm.svi.$invalid && !sizeForm.svi.$pristine">
 	    <span class="fg-red">请输入字母或数字</span>
 	  </div>
-	  <div ng-show="!params.check_same(params.size, 'svi', params.size.svi)">
+	  <div ng-show="!params.check_same(
+			params.size, 'svi', params.size.svi)">
 	    <span class="fg-red">尺码已存在，请重新输入</span>
 	  </div>
 	</div> 

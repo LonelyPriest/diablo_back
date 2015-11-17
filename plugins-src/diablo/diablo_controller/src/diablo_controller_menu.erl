@@ -74,8 +74,8 @@ navbars(Module) ->
 
 navbar(Titles) ->
     lists:foldr(
-      fun({Href, Title, Active, {SM, XS, XXS} = Hidden}, Acc) ->
-	      ?DEBUG("href ~p active ~p, hidden ~p", [Href, Active, Hidden]), 
+      fun({Href, Title, Active, {SM, XS, XXS} = _Hidden}, Acc) ->
+	      %% ?DEBUG("href ~p active ~p, hidden ~p", [Href, Active, Hidden]), 
 	      "<li name="
 		  ++ string:strip(Href, both, $/)
 		  ++ " class=\""
