@@ -258,6 +258,11 @@ action(Session, Req, {"update_w_good"}, Payload) ->
     OImagePath   = ?v(<<"o_path">>, Good),
     OFirm        = ?v(<<"o_firm">>, Good),
 
+    Firm         = case ?v(<<"firm_id">>, Good) of
+		       undefined -> OFirm;
+		       _Firm     -> _Firm
+		   end,
+
     StyleNumber = ?v(<<"style_number">>, Good),
     
     try
@@ -269,11 +274,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 
 	BrandId = case ?v(<<"brand">>, Good) of
 		      undefined -> undefined;
-		      Brand ->
-			  Firm = case ?v(<<"firm">>, Payload) of
-				     undefined -> OFirm;
-				     _Firm     -> _Firm
-				 end,
+		      Brand -> 
 			  {ok, BId} = ?attr:brand(new, Merchant, Brand, Firm),
 			  BId
 		  end, 

@@ -386,7 +386,7 @@ create table w_inventory_good
     UNIQUE key       index_sbsm (style_number, brand, merchant),
     key              firm (firm),
     -- key              index_sbm  (style_number, brand, firm, merchant),
-    -- key              merchant (merchant),
+    key              merchant (merchant),
     
     primary key      (id)
 )default charset=utf8;
