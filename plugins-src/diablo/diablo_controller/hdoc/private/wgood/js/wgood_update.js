@@ -105,21 +105,6 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	$scope.image = undefined;
     };
     
-    $scope.get_firm_by_name = function(name){
-	for(var i=0, l=$scope.firms.length; i<l; i++){
-	    if (name === $scope.firms[i].name){
-		return $scope.firms[i]
-	    }
-	}
-    };
-    
-    $scope.refresh_firm = function(newFirmName){
-	diabloFilter.get_firm().then(function(firms){
-	    $scope.firms = firms;
-	    $scope.good.firm = $scope.get_firm_by_name(newFirmName);
-	})
-    };
-    
     $scope.new_firm = function(){
 	var callback = function(params){
 	    console.log(params);
@@ -130,7 +115,18 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 		    dialog.response_with_callback(
 			true, "新增厂家",
 			"恭喜你，厂家 " + params.firm.name + " 成功创建！！",
-			$scope, function(){$scope.refresh_firm(params.firm.name)});
+			$scope,
+			function(){
+			    // $scope.refresh_firm(params.firm.name)
+			    var newFirm = {
+				id:state.id,
+				name:params.firm.name,
+				py:diablo_pinyin(params.firm.name),
+				balance:params.firm.balance
+			    }; 
+			    $scope.firms.push(newFirm);
+			    $scope.good.firm = newFirm;
+			});
 		} else{
 		    dialog.response(
 	    		false, "新增厂家",
@@ -356,7 +352,10 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 		    diabloUtilsService.response_with_callback(
 			true, "修改货品", "修改货品资料成功！！", $scope,
 			function(){
-			    $location.path("/wgood_detail");
+			    diabloFilter.reset_firm();
+                            diabloFilter.reset_brand();
+                            diabloFilter.reset_type();
+			    diablo_goto_page("#/wgood_detail");
 			});
 		} else{
 		    diabloUtilsService.response(
@@ -368,6 +367,6 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     };
 
     $scope.cancel = function(){
-	$location.path("/wgood_detail");
+	diablo_goto_page("#/wgood_detail");
     }
 });

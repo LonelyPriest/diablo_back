@@ -199,13 +199,15 @@ action(Session, Req, {"new_w_good"}, Payload) ->
     
     
     try 
-	{ok, BrandId} = ?attr:brand(new, Merchant, Brand, Firm),
+	{ok, BrandId} =
+	    ?attr:brand(new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]),
 
 	case ImageData of
 	    <<>> -> ok;
 	    _ ->
 		ImageFile = filename:join(
-			      [ImageDir, ?to_s(StyleNumber) ++ "-" ++ ?to_s(BrandId) ++ ".png"]),
+			      [ImageDir,
+			       ?to_s(StyleNumber) ++ "-" ++ ?to_s(BrandId) ++ ".png"]),
 
 		case filelib:ensure_dir(ImageFile) of
 		    ok -> ok;
@@ -256,14 +258,35 @@ action(Session, Req, {"update_w_good"}, Payload) ->
     OStyleNumber = ?v(<<"o_style_number">>, Good),
     OBrandId     = ?v(<<"o_brand">>, Good),
     OImagePath   = ?v(<<"o_path">>, Good),
-    OFirm        = ?v(<<"o_firm">>, Good),
+    OFirm        = ?v(<<"o_firm">>, Good), 
+    StyleNumber = ?v(<<"style_number">>, Good),
 
     Firm         = case ?v(<<"firm_id">>, Good) of
 		       undefined -> OFirm;
 		       _Firm     -> _Firm
 		   end,
 
-    StyleNumber = ?v(<<"style_number">>, Good),
+    UpdateOrNewBrand =
+        fun(undefined) ->
+		case Firm =:= OFirm of
+		    true  ->
+			undefined;
+		    false ->
+			?attr:brand(
+			   update,
+			   Merchant,
+			   [{<<"bid">>, OBrandId}, {<<"firm">>, Firm}]),
+			undefined
+		end;
+           (NewBrand) ->
+                {ok, BId} =
+                    ?attr:brand(
+                       new,
+                       Merchant,
+                       [{<<"name">>, NewBrand}, {<<"firm">>, Firm}]),
+                BId
+        end,
+
     
     try
 	TypeId = case ?v(<<"type">>, Good) of
@@ -272,12 +295,13 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 			     TId
 		 end,
 
-	BrandId = case ?v(<<"brand">>, Good) of
-		      undefined -> undefined;
-		      Brand -> 
-			  {ok, BId} = ?attr:brand(new, Merchant, Brand, Firm),
-			  BId
-		  end, 
+	BrandId = UpdateOrNewBrand(?v(<<"brand">>, Good)),
+	%% BrandId = case ?v(<<"brand">>, Good) of
+	%% 	      undefined -> undefined;
+	%% 	      Brand -> 
+	%% 		  {ok, BId} = ?attr:brand(new, Merchant, Brand, Firm),
+	%% 		  BId
+	%% 	  end, 
 
 	OldPath = image(path, Merchant, OStyleNumber, OBrandId),
 

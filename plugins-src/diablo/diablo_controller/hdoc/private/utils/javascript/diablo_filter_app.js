@@ -223,6 +223,10 @@ function filterProvider(){
 		    })
 	    }, 
 
+	    reset_firm: function(){
+		_firms = [];
+	    },
+	    
 	    get_firm: function(){
 		if (_firms.length !== 0 ){
 		    // console.log("cache");
@@ -242,6 +246,10 @@ function filterProvider(){
 		}
 	    },
 
+	    reset_brand: function(){
+		_brands = [];
+	    },
+	    
 	    get_brand: function(){
 		if (_brands.length != 0 ){
 		    // console.log("cache brands");
@@ -261,6 +269,10 @@ function filterProvider(){
 		
 	    },
 
+	    reset_type: function(){
+		_types = [];
+	    },
+	    
 	    get_type: function(){
 		if (_types.length !== 0){
 		    return _types;

@@ -791,6 +791,10 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		dialog.response_with_callback(
 		    true, "新增货品", "新增货品资料成功！！", $scope,
 		    function(){
+			diabloFilter.reset_firm();
+                        diabloFilter.reset_brand();
+                        diabloFilter.reset_type();
+
 			// console.log("callback");
 			// reset size 
 			$scope.selectGroups = [];

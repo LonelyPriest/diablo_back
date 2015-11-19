@@ -22,7 +22,7 @@
 
 -export([color_type/1, color/2, color/3]).
 -export([size_group/2, size_group/3]).
--export([brand/2, brand/4]).
+-export([brand/2, brand/3]).
 -export([type/2, type/3]).
 
 -define(SERVER, ?MODULE). 
@@ -55,8 +55,10 @@ size_group(delete, Merchant, GId) ->
 size_group(update, Merchant, Attrs) ->
     gen_server:call(?MODULE, {update_size_group, Merchant, Attrs}).
 
-brand(new, Merchant, Brand, Firm) ->
-    gen_server:call(?MODULE, {new_brand, Merchant, Brand, Firm}).
+brand(new, Merchant, Attrs) ->
+    gen_server:call(?MODULE, {new_brand, Merchant, Attrs});
+brand(update, Merchant, Attrs) -> 
+    gen_server:call(?MODULE, {update_brand, Merchant, Attrs}).
 brand(list, Merchant) ->
     gen_server:call(?MODULE, {list_brand, Merchant}).
 
@@ -251,11 +253,12 @@ handle_call({list_size_group, Merchant}, _From, State) ->
 %% =============================================================================
 %% brand
 %% =============================================================================
-handle_call({new_brand, Merchant, Brand, Firm}, _From, State) ->
-    ?DEBUG("new_brand with merchant ~p, brand ~p, firm ~p",
-	   [Merchant, Brand, Firm]),
+handle_call({new_brand, Merchant, Attrs}, _From, State) ->
+    ?DEBUG("new_brand with merchant ~p, attrs ~p", [Merchant, Attrs]),
+    Name   = ?v(<<"name">>, Attrs),
+    Firm   = ?v(<<"firm">>, Attrs, -1),
     Sql = "select id, name, supplier from brands"
-	++ " where name=" ++ "\'" ++ ?to_s(Brand) ++ "\'"
+	++ " where name=" ++ "\'" ++ ?to_s(Name) ++ "\'"
 	++ " and supplier=" ++ ?to_s(Firm)
 	++ " and merchant =" ++ ?to_s(Merchant) ++ ";",
 
@@ -265,7 +268,7 @@ handle_call({new_brand, Merchant, Brand, Firm}, _From, State) ->
 		Sql1 = 
 		    "insert into brands"
 		    ++"(name, supplier, merchant) values("
-		    ++ "\"" ++?to_s(Brand) ++ "\","
+		    ++ "\"" ++?to_s(Name) ++ "\","
 		    ++ ?to_s(Firm) ++ ","
 		    ++ ?to_s(Merchant) ++ ");",
 		R = ?sql_utils:execute(insert, Sql1),
@@ -277,6 +280,23 @@ handle_call({new_brand, Merchant, Brand, Firm}, _From, State) ->
 		Error
 	end,
     {reply, Reply, State};
+
+handle_call({update_brand, Merchant, Attrs}, _From, State) ->
+    ?DEBUG("update_brand with merchant ~p, attrs ~p", [Merchant, Attrs]),
+    BrandId = ?v(<<"bid">>, Attrs),
+    Name    = ?v(<<"name">>, Attrs),
+    Firm    = ?v(<<"firm">>, Attrs),
+    
+    Updates = ?utils:v(name, string, Name)
+        ++ ?utils:v(supplier, integer, Firm),
+	Sql = "update brands set "
+        ++ ?utils:to_sqls(proplists, comma, Updates)
+        ++ " where id=" ++ ?to_s(BrandId)
+        ++ " and merchant=" ++ ?to_s(Merchant),
+    Reply = ?sql_utils:execute(write, Sql, BrandId),
+    ?w_user_profile:update(brand, Merchant),
+    {reply, Reply, State};
+
 
 handle_call({list_brand, Merchant}, _From, State) ->
     ?DEBUG("list_brand with merchant ~p", [Merchant]),
