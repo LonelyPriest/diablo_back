@@ -294,9 +294,10 @@ handle_call({new_good, Merchant, Attrs}, _Form, State) ->
     Reply = 
 	case ?sql_utils:execute(s_read, Sql) of
 	    {ok, []} ->
-		RealyShop = realy_shop(Merchant, Shop),
+		GetShop = fun() -> realy_shop(Merchant, Shop) end,
+		%% RealyShop = realy_shop(Merchant, Shop),
 		Sql1 = ?w_good_sql:good_new(
-			  Merchant, UseZero, RealyShop, Attrs),
+			  Merchant, UseZero, GetShop, Attrs),
 		?sql_utils:execute(transaction, Sql1, StyleNumber);
 	    {ok, _} ->
 		{error, ?err(purchaser_good_exist, StyleNumber)};

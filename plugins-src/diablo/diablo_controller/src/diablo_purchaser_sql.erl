@@ -5,7 +5,7 @@
 
 -compile(export_all).
 
-good_new(Merchant, UseZero, Shop, Attrs) ->
+good_new(Merchant, UseZero, GetShop, Attrs) ->
     StyleNumber = ?v(<<"style_number">>, Attrs),
     BrandId     = ?v(<<"brand_id">>, Attrs),
     TypeId      = ?v(<<"type_id">>, Attrs),
@@ -70,7 +70,8 @@ good_new(Merchant, UseZero, Shop, Attrs) ->
      case UseZero of
 	 ?NO ->
 	     [Sql1];
-	 ?YES -> 
+	 ?YES ->
+	     Shop = GetShop(),
 	     FSize = fun(S) when S =:= <<>> -> [];
 			(S) when S =:= [] -> [];
 			(S) -> [S]
