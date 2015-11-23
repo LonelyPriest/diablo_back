@@ -274,7 +274,8 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	++ " and a.firm=" ++ ?to_s(Firm)
 	++ " and a.deleted=" ++ ?to_s(?NO)
 	++ " and a.brand=b.id"
-	" and a.type=c.id" 
+	" and a.type=c.id"
+	" order by id desc"
 	" limit " ++ ?to_s(P);
 
 good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
@@ -297,7 +298,8 @@ good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
 	++ " and a.entry_date>=\'" ++ ?to_s(StartTime) ++ "\'"
 	++ " and a.deleted=" ++ ?to_s(?NO)
 	++ " and a.brand=b.id"
-	++ " and a.type=c.id".
+	" and a.type=c.id"
+	" order by id desc".
 
 
 inventory(abstract, Merchant, Shop, [{S1, B1}|T] = _Conditions) -> 

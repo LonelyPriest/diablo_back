@@ -91,7 +91,7 @@
 	  	<select class="form-control" type="text"
 	  		x-ng-model="select.employee"
 	  		x-ng-options="e as e.name for e in
-	  			  employees|filter:$viewValue|limitTo:8">
+	  			      employees|filter:$viewValue|limitTo:8">
 		</select> 
 	      </div>
 	    </div> 
@@ -117,14 +117,14 @@
 		<form name="select.form.cashForm">
 		  <div ng-class="{'has-error':select.form.cashForm.$invalid
 				 && !select.form.cashForm.$pristine}">
-	  	  <input class="form-control"
-			 type="number" step="0.01" 
-			 placeholder="现金"
-			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-	  		 x-ng-model="select.cash"
-			 popover-placement="top"
-			 popover-trigger="focus"
-			 popover="支持二位小数"></input>
+	  	    <input class="form-control"
+			   type="number" step="0.01" 
+			   placeholder="现金"
+			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
+	  		   x-ng-model="select.cash"
+			   popover-placement="top"
+			   popover-trigger="focus"
+			   popover="支持二位小数"></input>
 		  </div>
 		</form>
 
@@ -233,9 +233,9 @@
 	    </div>
 	    
 	    <div class="col-sm-6 col-md-6"> 
-		<div class="input-group">
-		  <span class="input-group-addon">
-		    <i class="glyphicon glyphicon-yen fg-red"></i>关联费用</span> 
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-yen fg-red"></i>关联费用</span> 
 		<form name="select.form.extraForm">
 		  <div ng-class="{'has-error':select.form.extraForm.$invalid
 				 && !select.form.extraForm.$pristine}">
@@ -262,9 +262,8 @@
 	  <div class="panel panel-default">
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
-	      <table id="t_new_update" class="table
-			    table-bordered
-			    table-striped table-hover
+	      <table id="t_new_update"
+		     class="table table-bordered table-striped table-hover
 			    table-condensed table-advanced">
 		<thead class="stick-thead"
 		       fsm-sticky-header
@@ -293,14 +292,13 @@
 		</thead>
 		<tbody>
 		  <tr class="text-center" ng-repeat="inv in inventories">
-		  <!-- <tr class="text-center" ng-repeat="inv in get_inventory(current_page_index)"> -->
 		    <td>{{inv.order_id}}</td>
 		    <td class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" ng-if="inv.$new">
 			<div ng-class="{'has-error':inv.form.good.$invalid
 				       && !inv.form.good.$pristine}">
-			<input class="form-control text-left" type="text"
+			  <input class="form-control text-left" type="text"
 				 required
 				 x-ng-model="inv.style_number"
 				 placeholder="货号"
@@ -341,7 +339,7 @@
 				 popover-placement="top"
 				 popover-trigger="focus"
 				 popover="请输入进货价"></input>
-			  <div>
+			</div>
 		      </form> 
 		    </td> 
 		    
@@ -361,7 +359,8 @@
 		    <td class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new
 				  && !inv.update_directory">
-			{{inv.total}}</div> 
+			{{inv.total}}
+		      </div> 
 		      <form name="inv.form.amount"
 			    ng-if="inv.$new
 				   && inv.free_color_size
@@ -376,8 +375,8 @@
 				 x-ng-model="inv.amounts[0].count"
 				 popover-placement="top"
 				 popover-trigger="focus"
-				 popover="均色均码直接输入数量"></input>
-			  <div>
+				 popover="均色均码直接输入数量"/>
+			</div>
 		      </form>
 		    </td>
 
@@ -396,56 +395,56 @@
 		    <td class="text-left vert-align">
 		      <div x-ng-if="inv.$new">
 			<a class="btn diablo-input-button btn-success"
-				x-ng-if="inv.free_color_size"
-				x-ng-disabled="inv.form.good.$invalid
-					       || inv.form.amount.$invalid"
-				x-ng-click="add_inventory(inv)">保存
+			   x-ng-if="inv.free_color_size"
+			   x-ng-disabled="inv.form.good.$invalid
+					  || inv.form.orgprice.$invalid
+					  || inv.form.amount.$invalid"
+			   x-ng-click="add_inventory(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a> 
 			<a class="btn diablo-input-button btn-success"
-				x-ng-if="!inv.free_color_size"
-				x-ng-disabled="inv.form.good.$invalid
-					       || inv.free_color_size
-					       || !inv.style_number
-					       || has_saved"
-				x-ng-click="add_inventory(inv)">新增
+			   x-ng-if="!inv.free_color_size"
+			   x-ng-disabled="inv.form.good.$invalid
+					  || inv.free_color_size
+					  || !inv.style_number
+					  || has_saved"
+			   x-ng-click="add_inventory(inv)">新增
 			  <i class="glyphicon glyphicon-plus"></i></a> 
 			<a class="btn diablo-input-button btn-warning"
-				x-ng-disabled="!inv.style_number"
-				x-ng-click="reset_inventory(inv)">重置
+			   x-ng-disabled="!inv.style_number"
+			   x-ng-click="reset_inventory(inv)">重置
 			  <i class="glyphicon glyphicon-pushpin"></i></a> 
 		      </div>
 
 		      <div ng-if="inv.$edit">
 			<a class="btn diablo-input-button btn-primary"
-				x-ng-if="!inv.update_directory"
-				x-ng-disabled="inv.free_color_size"
-				x-ng-click="inventory_detail(inv)">详情
+			   x-ng-if="!inv.update_directory"
+			   x-ng-disabled="inv.free_color_size"
+			   x-ng-click="inventory_detail(inv)">详情
 			  <i class="glyphicon glyphicon-eye-open"></i></a>
 			<a class="btn diablo-input-button yellow"
-				x-ng-if="!inv.update_directory"
-				x-ng-click="update_inventory(inv)">修改
+			   x-ng-if="!inv.update_directory"
+			   x-ng-click="update_inventory(inv)">修改
 			  <i class="glyphicon glyphicon-edit"></i></a>
 			<a class="btn diablo-input-button btn-danger"
-				x-ng-if="!inv.update_directory"
-				x-ng-click="delete_inventory(inv)">删除
+			   x-ng-if="!inv.update_directory"
+			   x-ng-click="delete_inventory(inv)">删除
 			  <i class="glyphicon glyphicon-erase"></i></a>
 
 			<a class="btn diablo-input-button btn-success"
-				x-ng-if="inv.update_directory"
-				x-ng-disabled="inv.form.amount.$invalid"
-				x-ng-click="save_update(inv)">保存
+			   x-ng-if="inv.update_directory"
+			   x-ng-disabled="inv.form.orgprice.$invalid
+					  || inv.form.amount.$invalid"
+			   x-ng-click="save_update(inv)">保存
 			  <i class="glyphicon glyphicon-plus"></i></a>
 			<a class="btn diablo-input-button btn-danger"
-				ng-if="inv.update_directory"
-				x-ng-disabled="inv.form.amount.$invalid"
-				x-ng-click="inv.update_directory=false;
-					    inv.$update=false">取消
+			   ng-if="inv.update_directory"
+			   x-ng-disabled="inv.form.amount.$invalid"
+			   x-ng-click="inv.update_directory=false;
+				       inv.$update=false">取消
 			  <i class="glyphicon glyphicon-erase"></i></a> 
-		      </div>
-		      
+		      </div> 
 		    </td>
 		  </tr>
-
 		  <tr x-ng-if="select.total!==0" class="text-center">
 		    <td colspan="6"></td>
 		    <td class="vert-align">{{select.total}}</td>
@@ -454,20 +453,7 @@
 		  </tr> 
 		</tbody>
 		
-		<tfoot>
-		  <!-- <tr> -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <pagination class="pull-right" -->
-		  <!-- 		  total-items="total_items" -->
-		  <!-- 		  items-per-page="items_perpage" -->
-		  <!-- 		  boundary-links="true" -->
-		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 		  x-ng-model="current_page" -->
-		  <!-- 		  x-ng-init="current_page=default_page" -->
-		  <!-- 		  x-ng-change="page_changed(current_page)"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
+		<tfoot> 
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -480,7 +466,6 @@
     </div>
   </div>
 </div>
-
 
 <script type="text/ng-template" id="inventory-new.html">
   <div class="modal-body">

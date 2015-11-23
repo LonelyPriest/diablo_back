@@ -395,7 +395,7 @@ baseApp.controller("printOptionCtrl", function(
 	dialog.edit_with_modal(
 	    "add-setting.html", undefined, callback, $scope,
 	    {names:    baseService.option_names,
-	     patterns: {tel_mobile: diabloPattern.positive_num,
+	     patterns: {tel_mobile: diabloPattern.tel_mobile,
 			comment:    diabloPattern.comment},
 	     setting:  {name: baseService.option_names[0],
 			value: default_set.value,

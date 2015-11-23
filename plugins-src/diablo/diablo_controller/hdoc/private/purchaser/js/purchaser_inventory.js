@@ -874,7 +874,8 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 
 	if (angular.isUndefined(inv.amount[0].count)
 	    || !inv.amount[0].count
-	    || parseInt(inv.amount[0].count) === 0){
+	    || parseInt(inv.amount[0].count) === 0
+	    || (!inv.org_price && inv.org_price !== 0)){
 	    return;
 	} 
 	

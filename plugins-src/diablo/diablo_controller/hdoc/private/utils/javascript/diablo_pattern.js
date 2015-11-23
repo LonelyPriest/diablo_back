@@ -3,7 +3,7 @@ angular.module("diabloPattern", []).service("diabloPattern", [function(){
     this.mobile = /^0?(13[0-9]|15[0-35-9]|18[0236-9]|14[57])[0-9]{8}$/;
 
     // telphone or mobile
-    this.tel_mobile = /^\d{3,4}\d{7,8}(-\d{3,4})?$|^0?(13[0-9]|15[0-35-9]|18[0236-9]|14[57])[0-9]{8}$/;
+    this.tel_mobile = /^\d{3,4}(-?\d{7,8})(-\d{3,4})?$|^0?(13[0-9]|15[0-35-9]|18[0236-9]|14[57])[0-9]{8}$/;
 
     // only number
     this.number = /^[0-9]*$/;
