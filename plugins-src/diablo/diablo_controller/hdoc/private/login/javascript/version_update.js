@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2015-12-06",
+	 content: [
+	     "增加管理员可查看库存结余统计",
+	     "修改打印格式，加大银行卡之间的打印距离"
+	 ]
+	},
+	
 	{date: "2015-11-14",
 	 content: [
 	     "增加厂商退货可修改价格功能！！"

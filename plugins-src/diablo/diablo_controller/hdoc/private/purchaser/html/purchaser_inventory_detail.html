@@ -113,15 +113,17 @@
 			
 			<th>折扣</th>
 			<th class="info">数量</th>
-			<th>已售出</th>
+			<th>已售</th>
 			<th>店铺</th>
+			<th x-ng-if="setting.show_orgprice">结余</th>
 			<th>上架日期</th>
 			<th>操作</th>
 		      </tr>
 		    </thead>
 		    <tbody>
 		      <tr ng-repeat="inv in inventories track by inv.id">
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.order_id}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
@@ -129,21 +131,24 @@
 			</td>
 
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.style_number}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.style_number}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.brand.name}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.brand.name}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.type.name}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
@@ -151,28 +156,32 @@
 			</td>
 			
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{sexs[inv.sex]}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{sexs[inv.sex]}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.firm.name}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.firm.name}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{seasons[inv.season]}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{seasons[inv.season]}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.year}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
@@ -180,7 +189,8 @@
 			</td>
 
 			<td x-ng-if="inv.isAlarm && setting.alarm
-				     && setting.show_orgprice" class="danger">
+				     && setting.show_orgprice"
+			    class="danger">
 			  {{inv.org_price}}
 			</td>
 			<td x-ng-if="(!setting.alarm || !inv.isAlarm)
@@ -188,7 +198,8 @@
 			  {{inv.org_price}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.tag_price}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
@@ -196,7 +207,8 @@
 			</td>
 
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.pkg_price}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
@@ -234,40 +246,51 @@
 			</td>
 
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.discount}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.discount}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.amount}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.amount}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  <span class="fg-darkBlue">{{inv.sell}}</span>
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  <span class="fg-darkBlue">{{inv.sell}}</span>
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.shop}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.shop}}
 			</td>
 
-			<td x-ng-if="inv.isAlarm && setting.alarm" class="danger">
+			<td x-ng-if="setting.show_orgprice"
+			    class="fg-magenta">
+			  {{inv.org_price * inv.amount}}
+			</td>
+			
+			<td x-ng-if="inv.isAlarm && setting.alarm"
+			    class="danger">
 			  {{inv.entry_date}}
 			</td>
 			<td x-ng-if="!setting.alarm || !inv.isAlarm">
 			  {{inv.entry_date}}
 			</td>
+
 			
 			
 			<td data-title="'操作'"> 
@@ -279,11 +302,27 @@
 			</td>
 		      </tr>
 		      <tr x-ng-if="total_items!==0" class="bg-white">
-			<td x-ng-if="!hide_column" colspan="15"></td>
-			<td x-ng-if="hide_column" colspan="12"></td>
-			<td class="danger">{{total_amount}}</td>
+			<td x-ng-if="!hide_column && setting.show_orgprice"
+			    colspan="15">
+			</td>
+			<td x-ng-if="!hide_column && !setting.show_orgprice"
+			    colspan="14">
+			</td>
+			
+			<td x-ng-if="hide_column && setting.show_orgprice"
+			    colspan="12">
+			</td>
+			<td x-ng-if="hide_column && !setting.show_orgprice"
+			    colspan="11">
+			</td>
+			
+			<td class="danger" x-ng-bind="total_amount"></td>
 			<td><span x-ng-bind="total_sell"></span></td>
-			<td colspan="3"></td>
+			<td></td>
+			<td x-ng-if="setting.show_orgprice"
+			    x-ng-bind="total_balance"
+			    class="fg-magenta"></td>
+			<td colspan="2"></td>
 		      </tr>
 		    </tbody>
 

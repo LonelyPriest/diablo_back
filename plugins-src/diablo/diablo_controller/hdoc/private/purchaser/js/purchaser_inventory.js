@@ -1106,6 +1106,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 			$scope.total_items = result.total;
 			$scope.total_amount = result.t_amount;
 			$scope.total_sell   = result.t_sell;
+			$scope.total_balance = result.t_balance;
 		    }
 		    angular.forEach(result.data, function(d){
 			if (now_date.getTime() - diablo_set_date(d.last_sell)
@@ -1160,7 +1161,8 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	console.log(inv);
 
 	var get_amount = function(cid, size){
-	    return purchaserService.get_inventory_from_sort(cid, size, inv.amounts)};
+	    return purchaserService.get_inventory_from_sort(
+		cid, size, inv.amounts)};
 	
 	if (angular.isDefined(inv.sizes)
 	    && angular.isDefined(inv.colors)
@@ -1172,7 +1174,8 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 			  };
 	    
 	    dialog.edit_with_modal(
-		"inventory-detail.html", undefined, undefined, $scope, payload);
+		"inventory-detail.html",
+		undefined, undefined, $scope, payload);
 	} else{
 	    purchaserService.list_purchaser_inventory(
 		{style_number: inv.style_number,
@@ -1182,10 +1185,14 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 		 qtype:        1}
 	    ).then(function(invs){
 		console.log(invs);
-		var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-		console.log(order_sizes);
-		var sort    = purchaserService.sort_inventory(invs, order_sizes, filterColor);
-		console.log(sort);
+		var order_sizes = wgoodService.format_size_group(
+		    inv.s_group, filterSizeGroup);
+		
+		// console.log(order_sizes);
+		var sort    = purchaserService.sort_inventory(
+		    invs, order_sizes, filterColor);
+		// console.log(sort);
+		
 		inv.sizes   = sort.size;
 		inv.colors  = sort.color;
 		inv.amounts = sort.sort;
@@ -1208,12 +1215,15 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	    add_search_condition(search); 
 	    // console.log(search);
 	    
-	    purchaserService.csv_export(purchaserService.export_type.stock, search)
+	    purchaserService.csv_export(
+		purchaserService.export_type.stock, search)
 		.then(function(result){
 	    	    console.log(result);
 		    if (result.ecode === 0){
 			dialog.response_with_callback(
-			    true, "文件导出成功", "创建文件成功，请点击确认下载！！", undefined,
+			    true,
+			    "文件导出成功",
+			    "创建文件成功，请点击确认下载！！", undefined,
 			    function(){window.location.href = result.url;}) 
 		    } else {
 			dialog.response(

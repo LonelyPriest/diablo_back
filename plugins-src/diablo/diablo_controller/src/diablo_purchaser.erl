@@ -1238,7 +1238,8 @@ handle_call({filter_goods, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, 
 handle_call({total_groups, Merchant, Fields}, _From, State) ->
     CountSql = "count(*) as total"
 	", sum(amount) as t_amount"
-	", sum(sell) as t_sell",
+	", sum(sell) as t_sell"
+	", sum(amount * org_price) as t_balance",
     Sql = ?sql_utils:count_table(
 	     w_inventory, CountSql, Merchant, realy_conditions(Merchant, Fields)), 
     Reply = ?sql_utils:execute(s_read, Sql),

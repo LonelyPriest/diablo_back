@@ -1193,26 +1193,32 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 		  No = ?v(<<"no">>, Bank),
 
 		  %% PL =  length(left_pading(Brand, Model)),
-		  NL  =  width(chinese, N) + 4,
-		  BL  =  width(chinese, B),
-		  NoL =  width(chinese, No) + 2,
+		  NL  =  width(chinese, N)  + 4,
+		  BL  =  width(chinese, B)  + 2,
+		  NoL =  width(chinese, No) + 4,
 
 		  %% ?DEBUG("NL + BL + NoL ~p, L ~p", [NL + BL + NoL, L]),
-		  case NL + BL + NoL =< L of 
-		      true -> {S
-			       ++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
-			       ++ pading(2) ++ ?to_s(No), L - NL - BL - NoL};
+		  case L + NL + BL + NoL =< Column  of 
+		      true -> {
+			S ++ case L > 0 of
+				 true -> pading(4);
+				 false -> []
+			     end 
+			++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
+			++ pading(2) ++ ?to_s(No),
+			L + NL + BL + NoL};
 		      false ->
 			  {S ++ br(Brand)
 			   ++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
-			   ++ case NoL < Column - NL - BL of
-			   	  true  -> pading(2);
-			   	  false -> br(Brand)
-			      end
-			   ++ ?to_s(No), Column - NL - BL - NoL}
+			   %% ++ case NoL < Column - NL - BL of
+			   %% 	  true  -> pading(2);
+			   %% 	  false -> br(Brand)
+			   %%    end
+			   ++ pading(2) ++ ?to_s(No),
+			   NL + BL + NoL}
 		  end
 
-	  end, {[], Column}, Banks),
+	  end, {[], 0}, Banks),
 
     %% Phone
     {_, SPhone} = 
