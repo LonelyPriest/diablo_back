@@ -936,6 +936,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     $scope.setting = {
 	show_orgprice: rightAuthen.show_orgprice(user.type),
+	export_stock:  rightAuthen.export_stock(user.type),
 	alarm:         false
     };
 

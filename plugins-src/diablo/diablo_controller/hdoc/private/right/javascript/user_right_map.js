@@ -32,5 +32,9 @@ var rightAuthen = {
 
     show_orgprice: function(userType) {
 	return userType === rightAuthen.account._master ? true:false;
+    },
+
+    export_stock: function(userType) {
+	return userType === rightAuthen.account._master ? true:false;
     }
 };

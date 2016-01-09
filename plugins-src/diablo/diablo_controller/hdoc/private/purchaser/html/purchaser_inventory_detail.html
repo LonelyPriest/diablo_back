@@ -22,8 +22,10 @@
 		    x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
 	      <i class="glyphicon glyphicon-check"></i></a>
 
-	    <a type="button" class="btn blue purple-stripe"
-		    x-ng-click="export_to()">导出
+	    <a x-ng-if="setting.export_stock"
+	       type="button"
+	       class="btn blue purple-stripe"
+	       x-ng-click="export_to()">导出
 	      <i class="glyphicon glyphicon-export"></i></a> 
 
 	    <a type="button" class="btn yellow reload purple-stripe"

@@ -1,6 +1,12 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-01-09",
+	 content: [
+	     "增加库存导出时的统计字段"
+	 ]
+	},
+	
 	{date: "2015-12-06",
 	 content: [
 	     "增加管理员可查看库存结余统计",
