@@ -378,7 +378,7 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 		    try
 			DoFun = fun(C) -> ?utils:write(Fd, C) end,
 			csv_head(ExportType, DoFun),
-			do_write(ExportType, DoFun, 1, Transes),
+			do_write(ExportType, DoFun, Transes),
 			ok = file:datasync(Fd),
 			ok = file:close(Fd)
 		    catch
@@ -531,13 +531,14 @@ csv_head(trans, Do) ->
 csv_head(trans_note, Do) ->
     Do("序号,单号,厂商,门店,店员,交易类型,款号,品牌,类型,折扣,数量,日期");
 csv_head(stock, Do) ->
-    Do("序号,款号,品牌,类别,性别,厂商,季节,年度,进货价,吊牌价,批发价,价3,价4,价5,折扣,数量,店铺,上架日期").
+    Do("序号,款号,品牌,类别,性别,厂商,季节,年度,进货价,吊牌价,批发价,折扣,数量,结余,店铺,上架日期").
 
 
-
-do_write(trans, _Do, _Count, [])->
+do_write(ExportType, Do, Transes) ->
+    do_write(ExportType, Do, 1, 0, 0, Transes).
+do_write(trans, _Do, _Count, _Amount, _Calc, [])->
     ok;
-do_write(trans, Do, Count, [H|T]) ->
+do_write(trans, Do, Count, Amount, Calc, [H|T]) ->
     Rsn       = ?v(<<"rsn">>, H),
     Firm      = ?v(<<"firm">>, H),
     Shop      = ?v(<<"shop">>, H),
@@ -581,11 +582,11 @@ do_write(trans, Do, Count, [H|T]) ->
 	++ ?to_s(Date),
     %% ++ ?to_s(Date),
     Do(L),
-    do_write(trans, Do, Count + 1, T);
+    do_write(trans, Do, Count + 1, Amount, Calc, T);
 
-do_write(trans_note, _Do, _Count, [])->
+do_write(trans_note, _Do, _Count, _Amount, _Calc, [])->
     ok;
-do_write(trans_note, Do, Count, [H|T]) ->
+do_write(trans_note, Do, Count, Amount, Calc, [H|T]) ->
     Rsn         = ?v(<<"rsn">>, H),
     Firm        = ?v(<<"firm">>, H), 
     Shop        = ?v(<<"shop">>, H),
@@ -628,11 +629,13 @@ do_write(trans_note, Do, Count, [H|T]) ->
 	++ ?to_s(Date),
     %% ++ ?to_s(Date),
     Do(L),
-    do_write(trans_note, Do, Count + 1, T);
+    do_write(trans_note, Do, Count + 1, Amount, Calc, T);
 
-do_write(stock, _Do, _Count, [])->
+do_write(stock, Do, _Count, Amount, Calc, [])->
+    L = "\r\n" ++ csv(space, "", 12) ++ ?to_s(Amount) ++ ?d ++ ?to_s(Calc),
+    Do(L),
     ok;
-do_write(stock, Do, Count, [H|T]) ->
+do_write(stock, Do, Count, Amount, Calc, [H|T]) ->
     StyleNumber = ?v(<<"style_number">>, H),
     Brand       = ?v(<<"brand">>, H), 
     Type        = ?v(<<"type">>, H),
@@ -648,9 +651,9 @@ do_write(stock, Do, Count, [H|T]) ->
     OrgPrice    = ?v(<<"org_price">>, H),
     TagPrice    = ?v(<<"tag_price">>, H),
     PkgPrice    = ?v(<<"pkg_price">>, H),
-    P3          = ?v(<<"price3">>, H),
-    P4          = ?v(<<"price4">>, H),
-    P5          = ?v(<<"price5">>, H),
+    %% P3          = ?v(<<"price3">>, H),
+    %% P4          = ?v(<<"price4">>, H),
+    %% P5          = ?v(<<"price5">>, H),
     Discount    = ?v(<<"discount">>, H), 
     Total       = ?v(<<"amount">>, H), 
 
@@ -658,7 +661,7 @@ do_write(stock, Do, Count, [H|T]) ->
 
     L = "\r\n"
 	++ ?to_s(Count) ++ ?d
-	++ " " ++ string:strip(?to_s(StyleNumber)) ++ ?d
+	++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
 	++ ?to_s(Brand) ++ ?d
 	++ ?to_s(Type) ++ ?d
     %% ++ ?to_s(Color) ++ ?d
@@ -671,16 +674,17 @@ do_write(stock, Do, Count, [H|T]) ->
 	++ ?to_s(OrgPrice) ++ ?d
 	++ ?to_s(PkgPrice) ++ ?d
 	++ ?to_s(TagPrice) ++ ?d
-	++ ?to_s(P3) ++ ?d
-	++ ?to_s(P4) ++ ?d
-	++ ?to_s(P5) ++ ?d
+    %% ++ ?to_s(P3) ++ ?d
+    %% ++ ?to_s(P4) ++ ?d
+    %% ++ ?to_s(P5) ++ ?d
 	++ ?to_s(Discount) ++ ?d
 	++ ?to_s(Total) ++ ?d
+	++ ?to_s(OrgPrice * Total) ++ ?d
 	
 	++ ?to_s(Shop) ++ ?d 
 	++ ?to_s(Date),
     Do(L),
-    do_write(stock, Do, Count + 1, T).
+    do_write(stock, Do, Count + 1, Amount + Total, Calc + Total * OrgPrice, T).
 
 export_type(0) -> trans;
 export_type(1) -> trans_note;
@@ -699,4 +703,8 @@ season(3) -> "冬".
 
 mode(0) -> use_id;
 mode(1) -> use_sell.
-    
+
+csv(space, S, 0) ->
+    S;
+csv(space, S, Num) ->
+    csv(space, "\"\"" ++ ?d ++ S, Num -1).

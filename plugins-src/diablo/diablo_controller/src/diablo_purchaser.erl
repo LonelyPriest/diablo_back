@@ -1435,8 +1435,8 @@ handle_call({stock_export, Merchant, Conditions}, _From, State) ->
 	", a.type as type_id, a.sex, a.season, a.amount"
 	", a.firm as firm_id, a.year"
 
-	", a.org_price, a.tag_price, a.pkg_price, a.price3"
-	", a.price4, a.price5, a.discount, a.shop as shop_id, a.entry_date"
+	", a.org_price, a.tag_price, a.pkg_price"
+	", a.discount, a.shop as shop_id, a.entry_date"
 
 	", b.name as shop"
 	", c.name as brand"
