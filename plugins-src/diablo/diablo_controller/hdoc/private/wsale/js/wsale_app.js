@@ -583,6 +583,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     };
 
     var draft_keys = function(){
+	// return [];
 	var keys = localStorageService.keys();
 	return keys.filter(function(k){
 	    return key_re.test(k); 
@@ -616,34 +617,42 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	
 	return false;
     };
+
+    // $scope.list_draft_test = function(){
+    // 	var callback = function(params){
+    // 	};
+    // 	diabloUtilsService.edit_with_modal("wsale-draft.html", undefined, callback, undefined, undefined);
+    // };
     
     $scope.list_draft = function(){
 	
 	var key_fix = draft_keys();
 	
-	// console.log(key); 
+	// console.log(key_fix);
+	
 	var drafts = key_fix.map(function(k){
 	    var p = k.split("-");
 	    return {sn:k,
 		    retailer:diablo_get_object(parseInt(p[1]), $scope.retailers),
 		    shop:diablo_get_object(parseInt(p[2]), $scope.shops),
-		    employee:diablo_get_object(p[3], $scope.employees),
+		    employee:diablo_get_object(p[3], $scope.employees)
 		   }
 	});
 
-	// console.log(drafts) 
+	console.log(drafts) 
 	var callback = function(params){
+	    
 	    var select_draft = params.drafts.filter(function(d){
-		return angular.isDefined(d.select) && d.select
+	    	return angular.isDefined(d.select) && d.select
 	    })[0];
 
-	    // console.log($scope.select);
+	    console.log($scope.select);
 	    $scope.select.retailer =
-		diablo_get_object(select_draft.retailer.id, $scope.retailers);
+	    	diablo_get_object(select_draft.retailer.id, $scope.retailers);
 	    $scope.select.shop =
-		diablo_get_object(select_draft.shop.id, $scope.shops);
+	    	diablo_get_object(select_draft.shop.id, $scope.shops);
 	    $scope.select.employee =
-		diablo_get_object(select_draft.employee.id, $scope.employees);
+	    	diablo_get_object(select_draft.employee.id, $scope.employees);
 	    
 	    var one = localStorageService.get(select_draft.sn);
 	    
@@ -652,33 +661,34 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	        console.log($scope.inventories); 
 	        $scope.inventories.unshift({$edit:false, $new:true});
 
-		$scope.disable_refresh = false;
+	    	$scope.disable_refresh = false;
 	        $scope.re_calculate();
 		
 	        // $scope.draft = true;
 	    } 
 	}
 
-	console.log(drafts);
+	// console.log(drafts);
 	diabloUtilsService.edit_with_modal(
-	    "wsale-draft.html", undefined, callback, $scope,
+	    "wsale-draft.html", undefined, callback, undefined,
 	    {drafts:drafts,
 	     valid: function(drafts){
-		 for (var i=0, l=drafts.length; i<l; i++){
-		     if (angular.isDefined(drafts[i].select) && drafts[i].select){
-			 return true;
-		     }
-		 } 
-		 return false;
+	    	 for (var i=0, l=drafts.length; i<l; i++){
+	    	     if (angular.isDefined(drafts[i].select) && drafts[i].select){
+	    		 return true;
+	    	     }
+	    	 } 
+	    	 return false;
 	     },
 	     select: function(drafts, d){
-		 for (var i=0, l=drafts.length; i<l; i++){
-		     if (d.sn !== drafts[i].sn){
-			 drafts[i].select = false;
-		     }
-		 }
+	    	 for (var i=0, l=drafts.length; i<l; i++){
+	    	     if (d.sn !== drafts[i].sn){
+	    		 drafts[i].select = false;
+	    	     }
+	    	 }
 	     }
-	    }); 
+	    }
+	); 
     }; 
     
     $scope.match_style_number = function(viewValue){

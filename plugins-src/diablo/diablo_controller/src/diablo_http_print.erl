@@ -66,6 +66,7 @@ print(RSn, Merchant) ->
     receive
 	{Self, Any} -> Any
     after 3000 ->
+	    ?WARN("print timeout:~n~p", [erlang:get_stacktrace()]),
 	    {error, ?err(print_timeout, RSn)}
     end.
 
@@ -320,7 +321,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  %% 	     just_page, Height * 10, Content),
 
 			  UpgradeDevices =
-			      ["1006", "1008", "1024", "1037", "1031"],
+			      ["1006", "1008", "1024", "1027", "1030", "1031", "1012"],
 			  
 			  DBody = 
 			      case lists:member(?to_s(SN), UpgradeDevices) of
@@ -561,13 +562,15 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					      find_size(G, SizeGroups) ++ Acc
 				      end, [], lists:sort(GS)),
 
-			  ?DEBUG("lenght gs ~p", [length(GS)]),
+			  ?DEBUG("lenght gs ~p, allsize ~p", [length(GS), AllSize]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
 			      	  true -> [Us || Us <- AllSize,
 						 lists:member(Us, UsedSizes)];
 			      	  false -> AllSize
 			      end,
+
+			  ?DEBUG("sizes ~p", [Sizes]),
 			  
 			  AFun =
 			      fun(Color, A) ->
@@ -593,7 +596,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 						  [AFun(Color, A)|Acc2] 
 					  end, [], Colors) ++ Acc1
 				end, [], Amounts), 
-			  %% ?DEBUG("SortAmounts ~p", [SortAmounts]),
+			  ?DEBUG("SortAmounts ~p", [SortAmounts]),
 
 			  FlatternAmounts =
 			      flattern(amount,
@@ -1418,7 +1421,7 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 		      Base64 =
 			  case Lens + 1 =:= Len of
 			      true -> 
-				  case IsPage of
+				  case IsPage andalso ?f_print:printer(Brand, Model) =:= flat of
 				      true ->
 					  base64:encode_to_string(
 					    Head ++ GBKData ++ Tail);

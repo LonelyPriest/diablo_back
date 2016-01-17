@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-01-17",
+	 content: [
+	     "修正仓库功能",
+	     "修正epson LQ55K打印机打印标准"
+	 ]
+	},
+	
 	{date: "2016-01-09",
 	 content: [
 	     "增加库存导出时的统计字段"

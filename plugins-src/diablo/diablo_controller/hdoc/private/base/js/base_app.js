@@ -704,8 +704,9 @@ baseApp.controller("tableDetailCtrl", function($scope, baseService, diabloUtilsS
 
 baseApp.controller("basePrinterConnectNewCtrl", function(
     $scope, diabloPattern, wprintService, diabloUtilsService, user){
-
+    // console.log(user);
     $scope.shops = [].concat(user.sortShops, user.sortRepoes);
+    // console.log($scope.shops);
 
     $scope.paper_columns = wprintService.paper_columns;
     $scope.paper_heights = wprintService.paper_heights;

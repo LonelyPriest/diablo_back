@@ -149,7 +149,7 @@ shopApp.controller("newShopCtrl", function(
 
     // repo
     $scope.authen_list_repo = false;
-    if (rightAuthen.authen(rightAuthen.shop_action()["list_repo"], user.right)){
+    if (rightAuthen.authen("list_repo", user.right)){
 	$scope.authen_list_repo = true; 
     };
 
@@ -227,6 +227,8 @@ shopApp.controller("shopDetailCtrl", function(
     	    $scope.repertories = repo.map(function(r){
     		return {name:r.name, id:r.id, py:diablo_pinyin(r.name)}
     	    });
+
+	    $scope.repertories.push({name:"==请选择总仓，默认不属于任何仓库==", id:-1});
 
 	    $scope.get_repo = function(id){
 		// console.log(id);
@@ -361,10 +363,13 @@ shopApp.controller("shopDetailCtrl", function(
 	    return true;
 	};
 
+	// console.log($scope.repertories);
 	dialog.edit_with_modal(
 	    "edit-shop.html", undefined, callback, $scope,
 	    {shop:angular.extend(
-		old_shop, {employee:$scope.get_employee(old_shop.shopowner_id)}),
+		old_shop,
+		{employee:$scope.get_employee(old_shop.shopowner_id),
+		 repo: old_shop.repo === undefined ? $scope.repertories[0] : old_shop.repo}),
 		// {repo:$scope.get_repo(old_shop.repo)}),
 	     employees:        $scope.employees,
 	     repertories:      $scope.repertories,

@@ -704,7 +704,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
     };
 
     this.edit_with_modal = function(
-	templateUrl, size, callback, scope, params, autoHeight){
+	templateUrl, size, callback, scope, params){
 	return $modal.open({
 	    templateUrl: templateUrl,
 	    controller: 'diabloEditDialogCtrl',
@@ -717,8 +717,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
 		message: function(){
 		    return {
 			callback:callback,
-			params: params,
-			autoHeight: autoHeight
+			params: params
 		    }
 		}
 	    }
@@ -765,16 +764,15 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
     var autoHeight = message.autoHeight;
     
     var deviceAgent = navigator.userAgent.toLowerCase();
-    var t1, t2;
-    if (deviceAgent.match(/iphone|ipod|ipad/i)
-    	// && (navigator.sayswho.match(/^Chrome\s+\d+/i).length !== 0 )
-       ) 
-    {
+    // var t1, t2;
+    if (deviceAgent.match(/iphone|ipod|ipad/i)) {
+	
     	$modalInstance.opened.then(function(){
     	    $('.header').hide();
             $('.footer').hide(); 
 
-	    var styleEl = document.createElement('style'), styleSheet;
+	    var styleEl = document.createElement('style');
+	    var styleSheet;
 	    document.head.appendChild(styleEl);
 	    styleSheet = styleEl.sheet;
 	    styleSheet.insertRule(".modal { position:absolute}", 0);
@@ -805,17 +803,7 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
 
 	var unbind = function(){
 	    $('.header').show();
-            $('.footer').show();
-
-	    // if ($('.modal').hasClass('modal-ios')){
-	    // 	$('.modal').removeClass('modal-ios')
-	    // }
-	    
-	    // if (deviceAgent.match(/iphone|ipod|ipad/i)){
-	    // 	clearTimeout(t1);
-	    // 	clearTimeout(t2);
-	    // 	$('input').off('blur', 'input, select, textarea');
-	    // }
+            $('.footer').show(); 
 	}
 	
 	    

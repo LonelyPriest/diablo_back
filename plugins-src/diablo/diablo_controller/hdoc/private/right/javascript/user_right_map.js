@@ -10,7 +10,7 @@ var rightAuthen = {
     	_shop: 40000
     },
 
-    shop_action: function(){
+    actions: function(){
 	return {
     	    new_repo     : rightAuthen.root_right._shop + 5,
     	    del_repo     : rightAuthen.root_right._shop + 6,
@@ -20,8 +20,9 @@ var rightAuthen = {
     },
     
     authen: function(authenAction, rights){
+	// console.log(rightAuthen.actions()[authenAction]);
     	for (var i = 0, l = rights.length; i < l; i++){
-    	    if (rights[i].id === authenAction){
+    	    if (rights[i].id === rightAuthen.actions()[authenAction]){
     		// console.log(rights[i].id, actions[Authenaction]);
     		return true;
     	    };

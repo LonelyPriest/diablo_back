@@ -9,7 +9,7 @@
 -export([pagination/2, pagination/3,
 	 decorate_data/1, decorate_data/3, decorate_data/4, phd/1]).
 -export([flattern/3, flattern/4, flattern/5]).
--export([field_len/4, field/2, column/3]).
+-export([field_len/4, field/2, column/3, printer/2]).
 %% -export([table_head/2, table_head/3, table_head/4]).
 
 
@@ -631,6 +631,17 @@ do_line(PageLine, ContentLine, [H|T], Page, Pages)->
 %%     HexLen = mochihex:to_int(mochihex:to_hex(Len)),
 %%     %% ?DEBUG("name ~p, HexLen ~p", [Name, HexLen]),
 %%     table_head(?ROW, T, Len, Sizes, <<THead/binary, HexLen>>).
+
+printer(<<"epson">>, <<"LQ55K">>) ->
+    scroll;
+printer(<<"jolimark">>, <<"LQ-200KII/KIIF">>) ->
+    scroll;
+printer(<<"jolimark">>, <<"LQ-200KIII">>) ->
+    scroll;
+printer(_Brand, _Model) ->
+    flat.
+
+
 
 
 

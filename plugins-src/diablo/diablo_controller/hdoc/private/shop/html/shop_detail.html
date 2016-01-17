@@ -82,8 +82,8 @@
 		    <!-- </td> -->
 		    
 		    <td>{{shop.address}}</td>
-		    <td x-ng-show="authen_list_repo" x-ng-switch on="shop.repo">
-		      <span ng-switch-when=undefined>暂无</span>
+		    <td x-ng-show="authen_list_repo" x-ng-switch on="shop.repo_id">
+		      <span ng-switch-when=-1>暂无</span>
 		      <span ng-switch-default>{{shop.repo.name}}</span>
 		      <!-- {{shop.repo}} -->
 		    </td>
