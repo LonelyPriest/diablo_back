@@ -37,7 +37,7 @@ angular.module("diabloPattern", []).service("diabloPattern", [function(){
 
     this.ch_en_num = /^[\u4e00-\u9fa5A-Za-z0-9]+$/;
     
-    this.head_ch_en_num  = /^[\u4e00-\u9fa5][\u4e00-\u9fa5A-Za-z0-9\s]+$/;
+    this.head_ch_en_num  = /^[\u4e00-\u9fa5][\u4e00-\u9fa5A-Za-z0-9-\s]+$/;
 
     this.ch_name_address = /^[\u4e00-\u9fa5][\u4e00-\u9fa5A-Za-z0-9\s]+$/;
 

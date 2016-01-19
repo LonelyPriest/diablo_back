@@ -46,7 +46,7 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	when('/wgood_new', {
 	    templateUrl: '/private/wgood/html/wgood_new.html',
             controller: 'wgoodNewCtrl',
-	    resolve: angular.extend({}, brand, firm, type, s_group)
+	    resolve: angular.extend({}, brand, firm, type, s_group, base)
 	}).
 	when('/setting/size', {
 	    templateUrl: '/private/wgood/html/wgood_size.html',
@@ -270,7 +270,7 @@ wgoodApp.service("wgoodService", function($resource, $http, dateFilter){
 
 wgoodApp.controller("wgoodNewCtrl", function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
-    wgoodService, filterBrand, filterFirm, filterType, filterSizeGroup){
+    wgoodService, filterBrand, filterFirm, filterType, filterSizeGroup, base){
     
     $scope.seasons = diablo_season2objects;
     $scope.sexs    = diablo_sex2object;
@@ -321,6 +321,17 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    }) 
 	});
     };
+
+    $scope.price_type = function(){
+	return diablo_base_setting(
+	    "price_type",
+		-1,
+	    base,
+	    parseInt,
+	    diablo_sell_style[0].id);
+    }();
+
+    console.log($scope.price_type);
 
     // $scope.new_brand = function(){
     // 	var callback = function(params){

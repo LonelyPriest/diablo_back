@@ -123,6 +123,10 @@
 			{{yes_no[s.value].cname}}
 		      </span>
 
+		      <span ng-switch-when="price_type">
+			{{price_types[s.value - 1].name}}
+		      </span>
+
 		      <!--default--> 
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
@@ -460,6 +464,14 @@
 		      x-ng-options="r as r.cname for r in params.setting.yes_no"
 		      x-ng-init="params.setting.value=params.setting.yes_no[params.setting.value]">
 	      </select>
+
+	      <select x-ng-switch-when="price_type"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="t as t.name for t in params.setting.price_types"
+		      x-ng-init="params.setting.value=params.setting.price_types[params.setting.value-1]">
+	      </select>
 	      
 
 	      <input x-ng-switch-when="pum" type="text"
@@ -478,7 +490,10 @@
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile"/> 
+		     x-ng-pattern="params.patterns.tel_mobile"/>
+
+
+	      
 	      
 	      <input x-ng-switch-default
 		     class="form-control" type="text"

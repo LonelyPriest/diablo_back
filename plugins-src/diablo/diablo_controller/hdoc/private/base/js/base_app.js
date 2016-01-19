@@ -271,6 +271,7 @@ baseApp.controller("printOptionCtrl", function(
     $scope.time_length   = baseService.time_length;
     $scope.prompt_types  = baseService.prompt_types;
     $scope.round_names   = baseService.round_names;
+    $scope.price_types   = diablo_sell_style;
     console.log($scope.print_formats);
 
     $scope.show_switch = function(name){
@@ -415,7 +416,11 @@ baseApp.controller("printOptionCtrl", function(
 	    var update;
 	    if (s.ename==="qtime_start"){
 		update = dateFilter(setting.value, "yyyy-MM-dd");
-	    } else {
+	    }
+	    if (s.ename==="price_type"){
+		update = setting.value.id;
+	    }
+	    else {
 		update = typeof(setting.value) === 'object' ? setting.value.value : setting.value;
 	    };
 	    
@@ -451,6 +456,9 @@ baseApp.controller("printOptionCtrl", function(
 	};
 	if (s.ename === 'pround'){
 	    angular.extend(s, {round_names: $scope.round_names}); 
+	};
+	if (s.ename === 'price_type'){
+	    angular.extend(s, {price_types: $scope.price_types}); 
 	};
 	
 	if (s.ename === 'ptable'
@@ -494,6 +502,7 @@ baseApp.controller("printOptionCtrl", function(
 	    {setting: s,
 	     init_v: v,
 	     qtime: qtime,
+	     to_i: diablo_set_integer,
 	     patterns: {tel_mobile: diabloPattern.tel_mobile,
 			remark:    diabloPattern.comment}});
     }

@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-01-19",
+	 content: [
+	     "增加默认价格类型选择，可自由选择吊牌价，批发价",
+	     "增加货品类型可输入横杠"
+	 ]
+	},
+	
 	{date: "2016-01-17",
 	 content: [
 	     "修正仓库功能",

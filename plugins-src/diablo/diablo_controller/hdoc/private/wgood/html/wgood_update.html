@@ -101,6 +101,7 @@
 			 required
 			 placeholder="豹纹马甲等"
 			 x-ng-enter=""
+			 x-ng-pattern="pattern.type"
 			 x-ng-model="good.type"
 			 typeahead="t as t.name for t in
 				    types|filter:$viewValue|limitTo:8"/>

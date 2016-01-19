@@ -295,6 +295,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		      trace_price   :true,
 		      round         :diablo_round_record};
 
+    $scope.sell_styles = diablo_sell_style;
+
     // all right of user
     // console.log(user); 
     // console.log(base); 
@@ -344,6 +346,17 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	return diablo_base_setting(
 	    "check_sale", shopId, base, parseInt, diablo_yes);
     };
+
+    $scope.price_type = function(shopId){
+	return diablo_base_setting(
+	    "price_type",
+		-1,
+	    base,
+	    parseInt,
+	    $scope.sell_styles[0].id);
+    }();
+
+    console.log($scope.price_type);
     
     // $scope.qtime_length = function(shopId){
     // 	return diablo_base_setting("qtime_length", shopId, base, diablo_yes);
@@ -532,6 +545,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    "qtime_start", shopId, base, function(v){return v},
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
     };
+
     // console.log($scope.qtime_start);
 
     $scope.setting.show_discount = $scope.show_discount();
@@ -695,7 +709,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	return diabloFilter.match_w_sale(viewValue, $scope.select.shop.id);
     } 
 
-    $scope.sell_styles = diablo_sell_style;
+    // $scope.sell_styles = diablo_sell_style;
 
     // console.log($scope.sell_styles);
 
@@ -733,7 +747,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	add.free         = src.free;
 	// default is pkg_price
 	// add.sell_style   = $scope.sell_styles[1];
-	add.sell_style   = $scope.sell_styles[0];
+	// add.sell_style   = $scope.sell_styles[0];
+	add.sell_style   = $scope.sell_styles[$scope.price_type - 1];
 	// add.amount       = []; 
 	// if ( (add.all_colors.length === 1 && add.all_colors[0] === "0")
 	//      && (add.all_sizes.length === 1 && add.all_sizes[0] === "0") ){
