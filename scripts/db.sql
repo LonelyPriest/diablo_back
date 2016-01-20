@@ -53,7 +53,7 @@ create table merchants
     id               INTEGER AUTO_INCREMENT,
     name             VARCHAR(64) not null,
     owner            VARCHAR(64) not null,  -- the merchant belonged to
-    mobile           VARCHAR(11) not null,
+    mobile           VARCHAR(14) not null,
     address          VARCHAR(255) not null,
     type             TINYINT default 0, -- 0:saler 1:wholesaler
     province         TINYINT default -1, -- which province
