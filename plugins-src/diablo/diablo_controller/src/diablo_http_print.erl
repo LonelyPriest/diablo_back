@@ -869,6 +869,7 @@ title(Brand, Model, Column, Title) ->
 	++ decorate_data(bwh)
 	++ ?to_s(Title)
 	++ decorate_data(cancel_bwh) 
+	++ ?f_print:br(Brand)
 	++ ?f_print:br(Brand),
     ?DEBUG("title ~ts", [?to_b(T)]),
     T.
@@ -1181,7 +1182,8 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
 	++ br(Brand).
 
 body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
-    ?DEBUG("start to build body_foot", []), 
+    ?DEBUG("start to build body_foot banks ~p~nmobile ~p~nsetting ~p~n",
+	   [Banks, Mobile, Setting]), 
 
     [CH|CT] = [?v(<<"comment1">>, Setting, []),
 	       ?v(<<"comment2">>, Setting, []),
@@ -1196,7 +1198,7 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 		  No = ?v(<<"no">>, Bank),
 
 		  %% PL =  length(left_pading(Brand, Model)),
-		  NL  =  width(chinese, N)  + 4,
+		  NL  =  width(chinese, N)  + 2,
 		  BL  =  width(chinese, B)  + 2,
 		  NoL =  width(chinese, No) + 4,
 
@@ -1204,15 +1206,15 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 		  case L + NL + BL + NoL =< Column  of 
 		      true -> {
 			S ++ case L > 0 of
-				 true -> pading(4);
+				 true -> pading(2);
 				 false -> []
 			     end 
-			++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
+			++ ?to_s(N) ++ pading(2) ++ ?to_s(B) 
 			++ pading(2) ++ ?to_s(No),
 			L + NL + BL + NoL};
 		      false ->
 			  {S ++ br(Brand)
-			   ++ ?to_s(N) ++ pading(4) ++ ?to_s(B) 
+			   ++ ?to_s(N) ++ pading(2) ++ ?to_s(B) 
 			   %% ++ case NoL < Column - NL - BL of
 			   %% 	  true  -> pading(2);
 			   %% 	  false -> br(Brand)
@@ -1663,6 +1665,7 @@ detail(print_format, Merchant, Shop) ->
 detail(base_setting, Merchant, Shop) ->
     ?DEBUG("base_setting with merhcant ~p, Shop ~p", [Merchant, Shop]),
     {ok, Settings} = ?w_user_profile:get(setting, Merchant, Shop),
+    ?DEBUG("base setting ~p", [Settings]),
     Sort = 
 	lists:foldr(
 	   fun({R}, {Basics, Phones}=Acc) ->
@@ -1683,7 +1686,7 @@ detail(base_setting, Merchant, Shop) ->
 			   end
 		   end
 	   end, {[], []}, Settings),
-    %% ?DEBUG("sort ~p", [Sort]),
+    ?DEBUG("setting sort ~p", [Sort]),
     Sort.
 
 
