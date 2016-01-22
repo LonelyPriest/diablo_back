@@ -9,7 +9,8 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 
     $scope.pattern = {style_number: diabloPattern.style_number,
 		      brand: diabloPattern.ch_en_num,
-		      type:  diabloPattern.head_ch_en_num};
+		      type:  diabloPattern.head_ch_en_num
+		     };
 
     $scope.shops  = user.sortShops;
     $scope.firms  = filterFirm;

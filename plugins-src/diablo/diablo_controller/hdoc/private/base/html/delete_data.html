@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  数据删除
+	</div>	
+      </div>
+      
+      <!--BEGIN table container-->
+      <div class="portlet-body">
+	<!--BEGIN table-toolbar-->
+	<div class="table-toolbar">
+	  <div class="alert alert-warning" role="alert">
+	    <p>
+	      <span class="fg-blue">系统将删除货品资料，入库记录，库存信息，销售记录可选择删除</span>
+	      <span class="fg-red">注意：数据删除后无法恢复，请谨慎操作！！</span>
+	    </p> 
+	  </div> 
+	  
+	  <form class="form-horizontal" name="dForm" novalidate>
+	    <div class="form-body">
+	      <div class="form-group">
+		<div class="col-md-12">
+		<label class="control-label">数据截止日期<span class="fg-red">（该日期之前的数据将被删除）</span></label>
+		<div class="input-group">
+		    <input type="text"
+			   class="form-control"
+			   required
+			   placeholder="年/月/日"
+			   datepicker-popup="yyyy/MM/dd"
+			   is-open="isOpened"
+			   close-text="关闭"
+			   clear-text="清除"
+			   current-text="今天"
+			   show-weeks="false"
+			   x-ng-model="sure.date"/>
+		    <span class="input-group-btn">
+		      <button type="button"
+			      class="btn btn-default"
+			      ng-click="open_calendar($event)">
+			<i class="glyphicon glyphicon-calendar"></i>
+		      </button>
+		    </span>
+		    <span class="input-group-addon bg-white fg-red">*</span>
+		  </div>
+		</div> 
+	      </div> 
+	    </div>
+
+	    <div class="form-body">
+	      <div class="form-group">
+		<div class="col-md-12">
+		  <label class="control-label">是否删除销售记录<span class="fg-red">（销售记录删除后无法恢复）</span></label>
+		  <div>
+		    <input type="checkbox" diablo-switch x-ng-model="sure.select"/>
+		  </div>
+		</div>
+	      </div>
+	    </div>
+
+	    <div class="form-actions fluid"> 
+	      <div class="col-md-12">
+		<span class="pull-right">
+		  <button type="submit" class="btn btn-primary"
+			  ng-disabled="dForm.$invalid"
+			  x-ng-click="sure_delete()">确定</button>
+		  <!-- <button type="button" class="btn btn-warning" -->
+		  <!-- 	  x-ng-click="cancel_new_shop()">取消</button> -->
+		</span>
+	      </div>
+	    </div> <!--END form action-->
+	    
+	  </form>
+
+	  
+	  
+	  
+	</div> <!--END table container-->
+	
+      </div>
+    </div>
+  </div>
+</div>
+

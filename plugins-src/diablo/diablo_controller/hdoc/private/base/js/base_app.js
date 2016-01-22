@@ -12,6 +12,10 @@ baseApp.config(['$routeProvider', function($routeProvider){
 	    templateUrl: '/private/base/html/reset_password.html',
             controller: 'resetPasswdCtrl'
 	}).
+	when('/del_data', {
+	    templateUrl: '/private/base/html/delete_data.html',
+            controller: 'delDataCtrl'
+	}).
 	when('/bank/new_bank_card/:cardId?', {
 	    templateUrl: '/private/base/html/bank_card_new.html',
             controller: 'bankCardNewCtrl'
@@ -63,6 +67,7 @@ baseApp.service("baseService", function($resource){
 		  8001: "该银行卡已存在！！",
 		  8002: "该设置项已存在，请选择其它设置项！！",
 		  8003: "旧密码不正确，请重新输入！！",
+		  8004: "用户权限不足！！",
 		  9001: "数据库操作失败，请联系服务人员！！"};
 
     this.print_setting = 0;
@@ -159,7 +164,12 @@ baseApp.service("baseService", function($resource){
      */
     this.reset_passwd = function(p){
 	return http.save({operation: 'update_user_passwd'},p).$promise;
-    }
+    };
+
+    this.delete_expire_data = function(expire_date, delete_sell_data){
+	return http.save({operation: 'delete_expire_data'},
+			 {expire: expire_date, sell: delete_sell_data}).$promise;
+    };
     
 });
     
@@ -416,14 +426,14 @@ baseApp.controller("printOptionCtrl", function(
 	    var update;
 	    if (s.ename==="qtime_start"){
 		update = dateFilter(setting.value, "yyyy-MM-dd");
-	    }
-	    if (s.ename==="price_type"){
+	    } else if (s.ename==="price_type"){
 		update = setting.value.id;
 	    }
 	    else {
 		update = typeof(setting.value) === 'object' ? setting.value.value : setting.value;
 	    };
-	    
+
+	    console.log(update);
 	    baseService.update_setting({
 		id:      setting.id,
 		ename:   setting.ename,
@@ -981,6 +991,51 @@ baseApp.controller("resetPasswdCtrl", function(
 	    });
 	}
     }
+});
+
+baseApp.controller("delDataCtrl", function($scope, dateFilter, diabloUtilsService, baseService){
+    
+    $scope.open_calendar = function(event){
+	event.preventDefault();
+	event.stopPropagation();
+	$scope.isOpened = true; 
+    }
+
+    $scope.today = function(){
+	return $.now();
+    };
+
+    $scope.sure = {date: $scope.today() - diablo_day_millisecond * 90, select: false};
+
+    var dialog = diabloUtilsService;
+    $scope.sure_delete = function(){
+	console.log($scope.sure);
+
+	var callback = function(){
+	    baseService.delete_expire_data(
+		dateFilter($scope.sure.date, "yyyy-MM-dd"),
+		$scope.sure.select).then(function(result){
+		    console.log(result);
+		    if (result.ecode === 0){
+			dialog.response(
+			    true, "数据删除", "数据删除成功，请注销该用户后再登录！！", undefined); 
+		    } else {
+			diablo.response(
+			    false, "数据删除", "数据删除失败："
+				+ baseService.error[result.ecode], undefined);
+		    }
+		    
+		})
+	};
+	
+	dialog.request(
+	    "数据删除",
+	    "数据删除后无法恢复，确认要删除 ["
+		+ dateFilter($scope.sure.date, "yyyy-MM-dd") + "] 之前的数据吗？",
+	    callback, undefined, undefined);
+	
+    };
+    // diablo_goto_page("#/printer/connect_detail");
 });
 
 baseApp.controller("baseCtrl", function($scope){

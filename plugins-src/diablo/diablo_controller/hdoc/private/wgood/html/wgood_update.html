@@ -101,7 +101,6 @@
 			 required
 			 placeholder="豹纹马甲等"
 			 x-ng-enter=""
-			 x-ng-pattern="pattern.type"
 			 x-ng-model="good.type"
 			 typeahead="t as t.name for t in
 				    types|filter:$viewValue|limitTo:8"/>
@@ -110,8 +109,8 @@
 	      </div>
 	      <div ng-show="goodForm.type.$invalid
 			    && !goodForm.type.$pristine">
-		<span style="color:red">
-		  请输入以中文，字母或数字，必须以中文开头
+		<span class="fg-red">
+		  请输入中文，字母或数字，必须以中文开头
 		</span>
 	      </div>
 	    </div>

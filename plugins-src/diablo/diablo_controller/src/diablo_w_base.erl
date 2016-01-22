@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([bank_card/2, bank_card/3, setting/2, setting/3]).
+-export([bank_card/2, bank_card/3, setting/2, setting/3, delete_data/3]).
 
 -define(SERVER, ?MODULE). 
 
@@ -53,6 +53,8 @@ setting(add, Merchant, Attr) ->
 setting(update, Merchant, Update) ->
     gen_server:call(?SERVER, {update_base_setting, Merchant, Update}).
 
+delete_data(expire, Expire, DeleteSell) ->
+    gen_server:call(?SERVER, {delete_expire_data, Expire, DeleteSell}).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -267,6 +269,11 @@ handle_call({add_shop_setting, Merchant, Shop}, _From, State) ->
     Reply = ?sql_utils:execute(transaction, Sql0, Shop),
     ?w_user_profile:update(setting, Merchant),
     {reply, Reply, State};
+
+handle_call({delete_expire_data, Expire, DeleteSell}, _From, State) ->
+    ?DEBUG("delete_expire_data with expire ~p, deleteSell ~p", [Expire, DeleteSell]), 
+    {reply, {ok, ok}, State};
+
 
 handle_call(_Request, _From, State) ->
     Reply = ok,

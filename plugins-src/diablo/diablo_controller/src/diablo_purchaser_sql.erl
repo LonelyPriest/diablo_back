@@ -251,16 +251,17 @@ good(used_detail, Merchant, StyleNumber, Brand) ->
 	++ " group by a.style_number, a.brand".
 
 good_match(style_number, Merchant, StyleNumber) ->
-    P = prompt_num(Merchant),
+    {P, QTimeStart} = prompt_num(Merchant),
     "select distinct style_number from w_inventory_good"
 	" where style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " and merchant=" ++ ?to_s(Merchant)
+	++ " and entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	++ " and deleted=" ++ ?to_s(?NO) 
     %% ++ " and style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " limit " ++ ?to_s(P).
 
 good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
-    P = prompt_num(Merchant), 
+    {P, QTimeStart} = prompt_num(Merchant), 
     "select a.id, a.style_number, a.brand as brand_id"
 	", a.type as type_id, a.firm as firm_id"
 	", a.sex, a.color, a.year, a.season, a.size, a.s_group, a.free"
@@ -272,6 +273,7 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	" where a.style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	" and a.merchant=" ++ ?to_s(Merchant)
 	++ " and a.firm=" ++ ?to_s(Firm)
+	++ " and entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	++ " and a.deleted=" ++ ?to_s(?NO)
 	++ " and a.brand=b.id"
 	" and a.type=c.id"
@@ -747,11 +749,12 @@ inventory(new_rsn_group_with_pagination, Merchant, Conditions, CurrentPage, Item
 %% match
 %%
 inventory_match(Merchant, StyleNumber, Shop) ->
-    P = prompt_num(Merchant),
+    {P, QTimeStart} = prompt_num(Merchant),
     "select style_number from w_inventory"
 	++ " where style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ ?sql_utils:condition(proplists, [{<<"shop">>, Shop}])
 	++ " and merchant=" ++ ?to_s(Merchant)
+	++ " and entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	++ " and deleted=" ++ ?to_s(?NO)
 	++ " group by style_number"
 	++ " limit " ++ ?to_s(P).
@@ -781,7 +784,8 @@ inventory_match(all_inventory, Merchant, Shop, Conditions) ->
 	++ " order by id";
 
 inventory_match(Merchant, StyleNumber, Shop, Firm) ->
-    P = prompt_num(Merchant),
+    {P, QTimeStart} = prompt_num(Merchant),
+    
     "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
 	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
 	", a.org_price, a.tag_price, a.pkg_price"
@@ -804,6 +808,7 @@ inventory_match(Merchant, StyleNumber, Shop, Firm) ->
 	       Firm -> " and a.firm=" ++ ?to_s(Firm)
 	   end
 	++ " and a.merchant=" ++ ?to_s(Merchant)
+	++ " and a.entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	%% ++ " and deleted=" ++ ?to_s(?NO)
 	++ " order by a.id"
 	++ " limit " ++ ?to_s(P).
@@ -1457,8 +1462,9 @@ filter_condition(inventory_new, [O|T], Acc1, Acc2) ->
 
 prompt_num(Merchant) ->
     {Setting, _}      = ?wifi_print:detail(base_setting, Merchant, -1),
-    PromptNum     = ?to_i(?v(<<"prompt">>, Setting, 8)),
-    ?DEBUG("prompt ~p", [PromptNum]),
-    PromptNum.
+    PromptNum         = ?to_i(?v(<<"prompt">>, Setting, 8)),
+    QTimeStart        = ?v(<<"qtime_start">>, Setting),
+    ?DEBUG("prompt ~p, qtime_start", [PromptNum, QTimeStart]),
+    {PromptNum, QTimeStart}.
     %% {ok, Settings} = ?w_user_profile:get(setting, Merchant, -1),
     

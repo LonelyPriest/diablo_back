@@ -825,8 +825,9 @@ pass_action(wholesaler) ->
      <<"update_user_passwd">>,
 
      %% print
-     <<"get_w_print_content">>
-
+     <<"get_w_print_content">>,
+	 
+     <<"delete_expire_data">>
      %% shop
      %% <<"list_repo">>
     ].

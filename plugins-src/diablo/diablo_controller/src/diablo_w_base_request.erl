@@ -133,6 +133,24 @@ action(Session, Req, {"update_user_passwd"}, Payload) ->
 	    ?utils:respond(200, Req, Error)
     end;
 
+action(Session, Req, {"delete_expire_data"}, Payload) ->
+    ?DEBUG("delete_expire_data with session ~p", [Session]),
+
+    Expire = ?v(<<"expire">>, Payload),
+    Sell   = ?v(<<"sell">>, Payload, false),
+    
+    case ?session:get(type, Session) of
+	?MERCHANT ->
+	    case ?w_base:delete_data(expire, Expire, Sell) of
+		{ok, _} ->
+		    ?utils:respond(200, Req, ?succ(delete_expire_data, ?MERCHANT));
+		{error, Error} ->
+		    ?utils:respond(200, Req, Error)
+	    end;
+	?USER ->
+	    ?utils:respond(200, Req,  ?err(base_invalid_right, ?USER))
+    end;
+
 %%
 %% login out
 %% 
@@ -176,8 +194,17 @@ sidebar(Session) ->
     
     Passwd = [{"passwd", "重置密码", "glyphicon glyphicon-user"}],
 
+    DeleteData = [{"del_data", "数据删除", "glyphicon glyphicon-erase"}],
+
     %% STable = [{{"table", "表格设置", "glyphicon glyphicon-scale"},
     %% 		[{"row_num", "表格行数"}]}],
 
-    
-    ?menu:sidebar(level_2_menu, SBase) ++ ?menu:sidebar(level_1_menu, Passwd).
+    case ?session:get(type, Session) of
+	?MERCHANT ->
+	    ?menu:sidebar(level_2_menu, SBase)
+		++ ?menu:sidebar(level_1_menu, Passwd)
+		++ ?menu:sidebar(level_1_menu, DeleteData);
+	?USER ->
+	    ?menu:sidebar(level_2_menu, SBase)
+		++ ?menu:sidebar(level_1_menu, Passwd)
+    end.

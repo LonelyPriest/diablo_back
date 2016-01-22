@@ -114,7 +114,7 @@
 		</div>
 	      </div>
 	      <div ng-show="goodForm.type.$invalid && !goodForm.type.$pristine">
-		<span style="color:red">请输入中文，字母或数字，必须以中文开头</span>
+		<span class="fg-red">请输入中文，字母或数字，必须以中文开头</span>
 	      </div>
 	    </div>
 	    
@@ -936,7 +936,7 @@
 	      <div class="checkbox checkbox-danger checkbox-circle">
 		<input id={{g.id}} type="checkbox"
 		       x-ng-model="g.select"
-		       x-ng-click="params.select_group(params.groups, g)"></input>
+		       x-ng-click="params.select_group(params.groups, g)"/>
 		<!-- <input id={{g.id}} type="checkbox" -->
 		<!--        x-ng-model="g.select"></input> -->
 		<label for={{g.id}}>{{g.name}}</label>

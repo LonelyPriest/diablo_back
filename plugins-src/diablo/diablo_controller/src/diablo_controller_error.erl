@@ -185,7 +185,10 @@ success(base_update_setting, Name) ->
 success(base_add_shop_setting, Shop) ->
     {0, "Success to add settings of shop " ++ ?to_s(Shop)};
 success(base_update_passwd, Account) ->
-    {0, "Success to update password of user " ++ ?to_s(Account)}. 
+    {0, "Success to update password of user " ++ ?to_s(Account)};
+success(delete_expire_data, Account) ->
+    {0, "Success to delete expire data of user " ++ ?to_s(Account)}.
+
 
 %% -----------------------------------------------------------------------------
 %% error define
@@ -363,6 +366,8 @@ error(base_setting_exist, EName) ->
     {8002, "name " ++ ?to_s(EName) ++ " of base setting has been exist"};
 error(base_invalid_update_passwd, User) ->
     {8003, "invalid password of user " ++ ?to_s(User)};
+error(base_invalid_right, User) ->
+    {8003, "invalid right of user " ++ ?to_s(User)};
 
 %% DB
 error(db_error, EInfo) ->
