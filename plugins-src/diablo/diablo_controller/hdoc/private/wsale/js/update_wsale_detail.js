@@ -57,6 +57,15 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    "check_sale", shopId, base, parseInt, diablo_yes);
     };
 
+    $scope.price_type = function(shopId){
+	return diablo_base_setting(
+	    "price_type",
+		-1,
+	    base,
+	    parseInt,
+	    $scope.sell_styles[0].id);
+    }();
+
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
     };
@@ -389,7 +398,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	
 	add.s_group      = src.s_group;
 	add.free         = src.free;
-	add.sell_style   = $scope.sell_styles[0]; 
+	// add.sell_style   = $scope.sell_styles[0];
+	add.sell_style   = $scope.sell_styles[$scope.price_type - 1];
 	// add.amount       = []; 
 	// if ( (add.all_colors.length === 1 && add.all_colors[0] === "0")
 	//      && (add.all_sizes.length === 1 && add.all_sizes[0] === "0") ){

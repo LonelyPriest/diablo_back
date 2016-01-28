@@ -1,6 +1,7 @@
 var baseApp = angular.module(
     'baseApp', ['ngRoute', 'ngResource', 'ui.bootstrap',
-		'diabloPattern', 'diabloUtils', 'diabloAuthenApp',
+		'frapontillo.bootstrap-switch', 'diabloPattern',
+		'diabloUtils', 'diabloAuthenApp',
 		'userApp', 'wprintApp'])
     .config(function($httpProvider, authenProvider){
 	$httpProvider.interceptors.push(authenProvider.interceptor); 

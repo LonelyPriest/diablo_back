@@ -256,7 +256,8 @@ good_match(style_number, Merchant, StyleNumber) ->
 	" where style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " and merchant=" ++ ?to_s(Merchant)
 	++ " and entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
-	++ " and deleted=" ++ ?to_s(?NO) 
+	++ " and deleted=" ++ ?to_s(?NO)
+	++ " order by id desc"
     %% ++ " and style_number like \'" ++ ?to_s(StyleNumber) ++ "\%'"
 	++ " limit " ++ ?to_s(P).
 
@@ -757,6 +758,7 @@ inventory_match(Merchant, StyleNumber, Shop) ->
 	++ " and entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	++ " and deleted=" ++ ?to_s(?NO)
 	++ " group by style_number"
+	++ " order by id desc"
 	++ " limit " ++ ?to_s(P).
 
 inventory_match(all_inventory, Merchant, Shop, Conditions) ->
@@ -781,7 +783,7 @@ inventory_match(all_inventory, Merchant, Shop, Conditions) ->
 	       [] -> [];
 	       TimeSql -> " and " ++ TimeSql
 	   end
-	++ " order by id";
+	++ " order by id desc";
 
 inventory_match(Merchant, StyleNumber, Shop, Firm) ->
     {P, QTimeStart} = prompt_num(Merchant),
@@ -810,7 +812,7 @@ inventory_match(Merchant, StyleNumber, Shop, Firm) ->
 	++ " and a.merchant=" ++ ?to_s(Merchant)
 	++ " and a.entry_date>=\'" ++ ?to_s(QTimeStart) ++ "\'"
 	%% ++ " and deleted=" ++ ?to_s(?NO)
-	++ " order by a.id"
+	++ " order by a.id desc"
 	++ " limit " ++ ?to_s(P).
 
 inventory_match(all_reject, Merchant, Shop, Firm, StartTime) ->
@@ -837,7 +839,7 @@ inventory_match(all_reject, Merchant, Shop, Firm, StartTime) ->
 	++ " and a.merchant=" ++ ?to_s(Merchant)
 	++ " and entry_date>=\'" ++ ?to_s(StartTime) ++ "\'"
     %% ++ " and deleted=" ++ ?to_s(?NO)
-	++ " order by a.id".
+	++ " order by a.id desc".
 	
 
 inventory(update, RSN, _Merchant, _Shop, _Firm,
@@ -1464,7 +1466,7 @@ prompt_num(Merchant) ->
     {Setting, _}      = ?wifi_print:detail(base_setting, Merchant, -1),
     PromptNum         = ?to_i(?v(<<"prompt">>, Setting, 8)),
     QTimeStart        = ?v(<<"qtime_start">>, Setting),
-    ?DEBUG("prompt ~p, qtime_start", [PromptNum, QTimeStart]),
+    ?DEBUG("prompt ~p, qtime_start ~p", [PromptNum, QTimeStart]),
     {PromptNum, QTimeStart}.
     %% {ok, Settings} = ?w_user_profile:get(setting, Merchant, -1),
     

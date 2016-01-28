@@ -271,7 +271,10 @@ init([]) ->
 	  <<"退货">>, <<"reject_w_inventory">>, ?right_w_inventory},
 	 
 	 {?fix_w_inventory,
-	  <<"库存盘点">>, <<"fix_w_inventory">>, ?right_w_inventory}
+	  <<"库存盘点">>, <<"fix_w_inventory">>, ?right_w_inventory},
+
+	 {?transfer_w_inventory,
+	  <<"库存转移">>, <<"transfer_w_inventory">>, ?right_w_inventory}
 	 
 	 %% {?filter_fix_w_inventory,
 	 %%  <<"盘点详情">>, <<"filter_fix_w_inventory">>, ?right_w_inventory}

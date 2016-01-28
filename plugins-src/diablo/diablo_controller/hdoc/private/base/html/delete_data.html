@@ -55,7 +55,11 @@
 		<div class="col-md-12">
 		  <label class="control-label">是否删除销售记录<span class="fg-red">（销售记录删除后无法恢复）</span></label>
 		  <div>
-		    <input type="checkbox" diablo-switch x-ng-model="sure.select"/>
+		    <input bs-switch
+			   type="checkbox"
+			   switch-on-text="是"
+			   switch-off-text="否"
+			   x-ng-model="sure.select"/>
 		  </div>
 		</div>
 	      </div>

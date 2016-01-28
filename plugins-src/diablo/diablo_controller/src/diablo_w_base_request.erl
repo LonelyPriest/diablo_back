@@ -134,14 +134,14 @@ action(Session, Req, {"update_user_passwd"}, Payload) ->
     end;
 
 action(Session, Req, {"delete_expire_data"}, Payload) ->
-    ?DEBUG("delete_expire_data with session ~p", [Session]),
-
+    ?DEBUG("delete_expire_data with session ~p", [Session]), 
+    Merchant = ?session:get(merchant, Session),
     Expire = ?v(<<"expire">>, Payload),
     Sell   = ?v(<<"sell">>, Payload, false),
     
     case ?session:get(type, Session) of
 	?MERCHANT ->
-	    case ?w_base:delete_data(expire, Expire, Sell) of
+	    case ?w_base:delete_data(expire, Merchant, Expire, Sell) of
 		{ok, _} ->
 		    ?utils:respond(200, Req, ?succ(delete_expire_data, ?MERCHANT));
 		{error, Error} ->

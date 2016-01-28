@@ -30,6 +30,8 @@
 %% inventory action
 -define(NEW_INVENTORY, 0).
 -define(REJECT_INVENTORY, 1).
+-define(TRANSFER_INVENTORY_FROM, 1).
+-define(TRANSFER_INVENTORY_TO, 1).
 
 %% free size
 -define(FREE_SIZE, 0).
@@ -53,6 +55,8 @@
 
 %% session
 -define(QZG_DY_SESSION, "qzg_dyty_session").
+
+-define(DEFAULT_ALARM_DAY, 7).
 
 %% right module
 -define(right_sale, 10000).
@@ -195,6 +199,7 @@
 -define(fix_w_inventory,             ?right_w_inventory + 11).
 -define(filter_fix_w_inventory,      ?right_w_inventory + 12).
 -define(check_w_inventory,           ?right_w_inventory + 13).
+-define(transfer_w_inventory,        ?right_w_inventory + 14).
 
 
 
@@ -345,6 +350,7 @@
 -define(w_good_request, diablo_w_good_request).
 -define(w_good, diablo_w_good).
 -define(w_good_sql, diablo_purchaser_sql).
+-define(w_transfer_sql, diablo_purchaser_transfer).
 
 %% report
 -define(w_report_request, diablo_w_report_request).

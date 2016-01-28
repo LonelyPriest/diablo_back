@@ -52,6 +52,14 @@ sn(w_inventory_reject_sn, Merchant) ->
     Key = ?to_atom("w-inv-reject-sn" ++ ?to_s(Merchant)),
     gen_server:call(?SERVER, {new, Key});
 
+sn(w_inventory_transfer_sn_from, Merchant) ->
+    Key = ?to_atom("w-inv-transfer-sn-f-" ++ ?to_s(Merchant)),
+    gen_server:call(?SERVER, {new, Key});
+
+sn(w_inventory_transfer_sn_to, Merchant) ->
+    Key = ?to_atom("w-inv-transfer-sn-t-" ++ ?to_s(Merchant)),
+    gen_server:call(?SERVER, {new, Key});
+
 sn(w_inventory_fix_sn, Merchant) ->
     Key = ?to_atom("w-inv-fix-sn" ++ ?to_s(Merchant)),
     gen_server:call(?SERVER, {new, Key});
@@ -118,8 +126,23 @@ init([]) ->
 %%     {reply, Id, State};
 
 handle_call({new, Key}, _From, State) ->
-    Id = mnesia:dirty_update_counter(unique_ids, Key, 1),
-    {reply, Id, State};
+    MS = [{#unique_ids{merchant='$1', id='$2'},
+	   [{'==', '$1', Key}],
+	   ['$2']}],
+    case mnesia:transaction(fun () -> mnesia:select(unique_ids, MS) end) of
+	{atomic, []} ->
+	    {atomic, ok} =
+		mnesia:transaction(
+		  fun() -> mnesia:write(#unique_ids{merchant=Key , id=0}) end),
+	    Id = mnesia:dirty_update_counter(unique_ids, Key, 1),
+	    {reply, Id, State};
+	{atomic, [_]}   ->
+	    Id = mnesia:dirty_update_counter(unique_ids, Key, 1),
+	    {reply, Id, State};
+	{aborted, Reason} ->
+	    {reply, {create_sn_failed, Reason}, State}
+    end;
+    
 
 handle_call({init, Merchant}, _From, State) ->
     M = ?to_s(Merchant),
@@ -133,7 +156,10 @@ handle_call({init, Merchant}, _From, State) ->
 		mnesia:write(#unique_ids{merchant=?to_atom("w-inv-reject-sn-" ++ M) , id=0}),
 		mnesia:write(#unique_ids{merchant=?to_atom("w-inv-fix-sn-" ++ M) , id=0}), 
 		mnesia:write(#unique_ids{merchant=?to_atom("w-sale-new-sn-" ++ M) , id=0}),
-		mnesia:write(#unique_ids{merchant=?to_atom("w-sale-reject-sn-" ++ M) , id=0})
+		mnesia:write(#unique_ids{merchant=?to_atom("w-sale-reject-sn-" ++ M) , id=0}),
+
+		mnesia:write(#unique_ids{merchant=?to_atom("w-inv-transfer-sn-f-" ++ M) , id=0}),
+		mnesia:write(#unique_ids{merchant=?to_atom("w-inv-transfer-sn-t-" ++ M) , id=0})
 	end,
     {atomic, _} = mnesia:transaction(F),
     {reply, ok, State};

@@ -80,6 +80,9 @@ purchaser_inventory(update, Merchant, Inventories, Props) ->
 purchaser_inventory(reject, Merchant, Inventories, Props) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {reject_inventory, Merchant, Inventories, Props});
+purchaser_inventory(transfer, Merchant, Inventories, Props) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {transfer_inventory, Merchant, Inventories, Props});
 purchaser_inventory(fix, Merchant, Inventories, Props) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {fix_inventory, Merchant, Inventories, Props});
@@ -1099,8 +1102,74 @@ handle_call({fix_inventory, Merchant, Inventories, Props}, _From, State) ->
 
     AllSql = Sql1 ++ [Sql2],
     Reply = ?sql_utils:execute(transaction, AllSql, RSN),
-    {reply, Reply, State}; 
+    {reply, Reply, State};
 
+handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
+    ?DEBUG("transfer_inventory with merchant ~p~n~p, props ~p",
+	   [Merchant, Inventories, Props]),
+
+    Now         = ?utils:current_time(localtime),
+    Date        = ?v(<<"date">>, Props, ?utils:current_time(localdate)),
+
+    Shop        = ?v(<<"shop">>, Props),
+    ToShop      = ?v(<<"tshop">>, Props),
+    Firm        = ?v(<<"firm">>, Props),
+    DateTime    = ?v(<<"datetime">>, Props, Now),
+    %% Cash        = ?v(<<"cash">>, Props, 0),
+    %% Card        = ?v(<<"card">>, Props, 0),
+    %% Wire        = ?v(<<"wire">>, Props, 0),
+    %% VerifyPay   = ?v(<<"verificate">>, Props, 0),
+    Employe     = ?v(<<"employee">>, Props), 
+    %% Balance     = ?v(<<"balance">>, Props),
+    %% ShouldPay   = ?v(<<"should_pay">>, Props, 0),
+    %% HasPay      = ?v(<<"has_pay">>, Props, 0), 
+    %% EPayType    = ?v(<<"e_pay_type">>, Props, -1),
+    %% EPay        = ?v(<<"e_pay">>, Props, 0), 
+
+    Total = ?v(<<"total">>, Props),
+    Comment     = ?v(<<"comment">>, Props, ""),
+
+    FromRSN = rsn(transfer_from, Merchant, Shop,
+	      ?inventory_sn:sn(w_inventroy_transfer_sn_from, Merchant)),
+
+    ToRSN = rsn(transfer_to, Merchant, ToShop,
+	      ?inventory_sn:sn(w_inventory_transfer_sn_to, Merchant)),
+    
+    Sql1 = ["insert into w_inventory_new(rsn"
+	    ", employ, firm, shop, merchant"
+	    ", total, comment, type, entry_date) values(" 
+	    ++ "\"" ++ ?to_s(FromRSN) ++ "\","
+	    ++ "\"" ++ ?to_s(Employe) ++ "\","
+	    ++ ?to_s(Firm) ++ ","
+	    ++ ?to_s(Shop) ++ ","
+	    ++ ?to_s(Merchant) ++ "," 
+	    ++ ?to_s(-Total) ++ ","
+	    ++ "\"" ++ ?to_s(Comment) ++ "\","
+	    ++ ?to_s(?TRANSFER_INVENTORY_FROM) ++ ","
+	    ++ "\"" ++ ?to_s(DateTime) ++ "\")",
+	    
+	    "insert into w_inventory_new(rsn"
+	    ", employ, firm, shop, merchant"
+	    ", total, comment, type, entry_date) values(" 
+	    ++ "\"" ++ ?to_s(ToRSN) ++ "\","
+	    ++ "\"" ++ ?to_s(Employe) ++ "\","
+	    ++ ?to_s(Firm) ++ ","
+	    ++ ?to_s(ToShop) ++ ","
+	    ++ ?to_s(Merchant) ++ "," 
+	    ++ ?to_s(Total) ++ ","
+	    ++ "\"" ++ ?to_s(Comment) ++ "\","
+	    ++ ?to_s(?TRANSFER_INVENTORY_TO) ++ ","
+	    ++ "\"" ++ ?to_s(DateTime) ++ "\")"],
+
+    Sql2 = sql(transfer_from,
+	       FromRSN, Merchant, Shop, Firm, DateTime, Inventories),
+    Sql3 = sql(transfer_to,
+	       ToRSN, Merchant, ToShop, Firm, DateTime, Inventories), 
+
+    AllSql = Sql1 ++ Sql2 ++ Sql3,
+    %% ?DEBUG("AllSql ~p", [AllSql]),
+    Reply = ?sql_utils:execute(transaction, AllSql, FromRSN),
+    {reply, Reply, State};
 
 handle_call({list_inventory, Merchant, Conditions}, _From, State) ->
     ?DEBUG("list_inventory  with merchant ~p, conditions ~p",
@@ -1488,7 +1557,11 @@ rsn(new, Merchant, Shop, Rsn) ->
 rsn(reject, Merchant, Shop, Rsn) ->
     lists:concat(["M-", ?to_i(Merchant), "-S-", ?to_i(Shop), "-R-", Rsn]);
 rsn(fix, Merchant, Shop, Rsn) ->
-    lists:concat(["M-", ?to_i(Merchant), "-S-", ?to_i(Shop), "-", Rsn]).
+    lists:concat(["M-", ?to_i(Merchant), "-S-", ?to_i(Shop), "-", Rsn]);
+rsn(transfer_from, Merchant, Shop, Rsn) ->
+    lists:concat(["M-", ?to_i(Merchant), "-S-", ?to_i(Shop), "-F-", Rsn]);
+rsn(transfer_to, Merchant, Shop, Rsn) ->
+    lists:concat(["M-", ?to_i(Merchant), "-S-", ?to_i(Shop), "-T-", Rsn]).
 
 %% @desc: geratte a sql
 sql(wnew, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
@@ -1510,7 +1583,17 @@ sql(wreject, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
 	      ?w_good_sql:amount_reject(
 		 RSN, Merchant, RealyShop,
 		 Firm, Date, DateTime, Inv, Amounts) ++ Acc0 
-      end, [], Inventories). 
+      end, [], Inventories).
+
+sql(Transfer, RSN, Merchant, Shop, Firm, Datetime, Inventories) ->
+    RealyShop = realy_shop(true, Merchant, Shop),
+    lists:foldr(
+      fun({struct, Inv}, Acc0)->
+	      %% Amounts = lists:reverse(?v(<<"amounts">>, Inv)),
+	      ?w_transfer_sql:amount_transfer(
+		 Transfer, RSN, Merchant, RealyShop,
+		 Firm, Datetime, Inv) ++ Acc0 
+      end, [], Inventories).
 
 sql(wfix, RSN, DateTime, Merchant, Shop, Inventories) ->
     %% Shop       = ?v(<<"shop">>, Props),

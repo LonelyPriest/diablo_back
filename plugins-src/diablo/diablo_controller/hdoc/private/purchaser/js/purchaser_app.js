@@ -57,7 +57,8 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
     var base = {"base": function(diabloNormalFilter){
 	return diabloNormalFilter.get_base_setting()}};
     
-    $routeProvider. 
+    $routeProvider.
+	// new
 	when('/inventory_new', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new.html',
             controller: 'purchaserInventoryNewCtrl',
@@ -68,7 +69,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
             controller: 'purchaserInventoryNewUpdateCtrl',
 	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
 	}).
-	//
+	// reject
 	when('/inventory_reject', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_reject.html',
             controller: 'purchaserInventoryRejectCtrl',
@@ -79,7 +80,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
             controller: 'purchaserInventoryRejectUpdateCtrl',
 	    resolve: angular.extend({}, user, brand, firm, type, employee, s_group, color, base)
 	}).
-	//
+	// detail
 	when('/inventory_rsn_detail/:rsn?/:ppage?', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_rsn_detail.html',
 	    controller: 'purchaserInventoryNewRsnDetailCtrl',
@@ -95,7 +96,7 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
             controller: 'purchaserInventoryDetailCtrl' ,
 	    resolve: angular.extend({}, user, brand, firm, type, s_group, color, base)
 	}).
-	// 
+	// fix
 	when('/inventory/inventory_fix', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_fix.html',
             controller: 'purchaserInventoryFixCtrl' ,
@@ -110,7 +111,13 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_fix_rsn_detail.html',
             controller: 'purchaserInventoryFixRsnDetailCtrl',
 	    resolve: angular.extend({}, user, brand, firm, s_group, color, base)
-	}). 
+	}).
+	// transfer
+	when('/inventory_transfer/:rsn?', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_transfer.html',
+            controller: 'purchaserInventoryTransferCtrl',
+	    resolve: angular.extend({}, user, firm, employee, s_group, color, base)
+	}).
 	otherwise({
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
             controller: 'purchaserInventoryNewDetailCtrl' ,
@@ -295,14 +302,16 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
     this.w_inventory_new_rsn_detail = function(inv){
 	return http.save(
 	    {operation: "w_inventory_new_rsn_detail"},
-	    {rsn:inv.rsn, style_number:inv.style_number, brand:inv.brand}).$promise;
+	    {rsn:inv.rsn, style_number:inv.style_number,
+	     brand:inv.brand}).$promise;
     }
 
     /*
      * reject
      */
     this.reject_purchaser_inventory = function(inventory){
-	return http.save({operation: "reject_w_inventory"}, inventory).$promise;
+	return http.save({operation: "reject_w_inventory"},
+			 inventory).$promise;
     }
     
     this.filter_w_inventory_reject = function(match, fields, currentPage, itemsPerpage){
@@ -357,9 +366,17 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
     this.w_invnetory_fix_rsn_detail = function(inv){
 	return http.save(
 	    {operation: "w_inventory_fix_rsn_detail"},
-	    {rsn:inv.rsn, style_number:inv.style_number, brand:inv.brand}).$promise;
+	    {rsn:inv.rsn, style_number:inv.style_number,
+	     brand:inv.brand}).$promise;
     };
 
+    // transfer
+    this.transfer_purchaser_inventory = function(inventory){
+	return http.save(
+	    {operation: "transfer_w_inventory"}, inventory).$promise;
+    };
+
+    // export
     this.csv_export = function(e_type, condition){
 	return http.save({operation: "w_inventory_export"},
 			 {condition: condition, e_type:e_type}).$promise;

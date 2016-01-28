@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([bank_card/2, bank_card/3, setting/2, setting/3, delete_data/3]).
+-export([bank_card/2, bank_card/3, setting/2, setting/3, delete_data/4]).
 
 -define(SERVER, ?MODULE). 
 
@@ -53,8 +53,9 @@ setting(add, Merchant, Attr) ->
 setting(update, Merchant, Update) ->
     gen_server:call(?SERVER, {update_base_setting, Merchant, Update}).
 
-delete_data(expire, Expire, DeleteSell) ->
-    gen_server:call(?SERVER, {delete_expire_data, Expire, DeleteSell}).
+delete_data(expire, Merchant, Expire, DeleteSell) ->
+    gen_server:call(
+      ?SERVER, {delete_expire_data, Merchant, Expire, DeleteSell}).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -270,9 +271,58 @@ handle_call({add_shop_setting, Merchant, Shop}, _From, State) ->
     ?w_user_profile:update(setting, Merchant),
     {reply, Reply, State};
 
-handle_call({delete_expire_data, Expire, DeleteSell}, _From, State) ->
-    ?DEBUG("delete_expire_data with expire ~p, deleteSell ~p", [Expire, DeleteSell]), 
-    {reply, {ok, ok}, State};
+handle_call({delete_expire_data, Merchant, Expire, DeleteSell}, _From, State) ->
+    ?DEBUG("delete_expire_data with merchant ~p, expire ~p, deleteSell ~p",
+	   [Merchant, Expire, DeleteSell]),
+
+    Condition = "merchant=" ++ ?to_s(Merchant)
+	++ " and entry_date<\'" ++ ?to_s(Expire) ++ "\'",
+
+    Sql1 = [
+	    %% delete product
+	    "delete from w_inventory_good where " ++ Condition, 
+
+	    %% delete stock
+	    "delete from w_inventory_new_detail_amount"
+	    " where rsn in "
+	    "(select rsn from w_inventory_new where " ++ Condition ++ ")", 
+
+	    "delete from w_inventory_new_detail"
+	    " where rsn in "
+	    "(select rsn from w_inventory_new where " ++ Condition ++ ")",
+
+	    "delete from w_inventory_new where " ++ Condition,
+
+	    %% delete stock fix
+	    "delete from w_inventory_fix_detail_amount"
+	    " where rsn in "
+	    "(select rsn from w_inventory_fix where " ++ Condition ++ ")", 
+
+	    "delete from w_inventory_fix_detail"
+	    " where rsn in "
+	    "(select rsn from w_inventory_fix where " ++ Condition ++ ")",
+
+	    "delete from w_inventory_fix where " ++ Condition],
+
+    Sql2 = [
+	    %% delete sell
+	    "delete from w_sale_detail_amount"
+	    " where rsn in "
+	    "(select rsn from w_sale where " ++ Condition ++ ")", 
+
+	    "delete from w_sale_detail"
+	    " where rsn in "
+	    "(select rsn from w_sale where " ++ Condition ++ ")",
+
+	    "delete from w_sale where " ++ Condition],
+
+    Sqls = case DeleteSell of
+	      true -> Sql1 ++ Sql2; 
+	      false -> Sql1
+	  end,
+
+    Reply = ?sql_utils:execute(transaction, Sqls, Merchant), 
+    {reply, Reply, State};
 
 
 handle_call(_Request, _From, State) ->
