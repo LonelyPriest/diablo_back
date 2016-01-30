@@ -20,7 +20,9 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([bank_card/2, bank_card/3, setting/2, setting/3, delete_data/4]).
+-export([bank_card/2, bank_card/3,
+	 setting/2, setting/3,
+	 delete_data/5, config/1]).
 
 -define(SERVER, ?MODULE). 
 
@@ -53,9 +55,10 @@ setting(add, Merchant, Attr) ->
 setting(update, Merchant, Update) ->
     gen_server:call(?SERVER, {update_base_setting, Merchant, Update}).
 
-delete_data(expire, Merchant, Expire, DeleteSell) ->
+delete_data(expire, Merchant, Expire, DeleteStock, DeleteSell) ->
     gen_server:call(
-      ?SERVER, {delete_expire_data, Merchant, Expire, DeleteSell}).
+      ?SERVER, {delete_expire_data,
+		Merchant, Expire, DeleteStock, DeleteSell}).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -218,32 +221,7 @@ handle_call({add_shop_setting, Merchant, Shop}, _From, State) ->
     ?DEBUG("add_shop_setting with merchant ~p, shop ~p", [Merchant, Shop]),
     Now = ?utils:current_time(localdate),
 
-    %% one month default
-    {M, S, T} = erlang:now(),
-    {{YY, MM, DD}, _} = calendar:now_to_datetime({M, S - 86400 * 30, T}),
-    DefaultDate = lists:flatten(io_lib:format("~4..0w-~2..0w-~2..0w", [YY, MM, DD])), 
-    
-    %%        ename,              cname,          value,type
-    Values = [{"pum",             "打印份数",     "1",  "0"},
-	      {"ptype",           "打印方式",     "1",  "0"}, %% 0: front; 1:backend 
-	      {"pformat",         "打印格式",     "1",  "0"},
-	      {"ptable",          "表格打印",     "0",  "0"},
-	      {"pretailer",       "打印零售商",   "0",  "0"},
-	      {"pround",          "四舍五入",     "0",  "0"},
-	      {"ptrace_price",    "价格跟踪",     "0",  "0"},
-	      {"prompt",          "提示数目",     "8",  "0"},
-	      {"pim_print",       "立即打印",     "0",  "0"},
-	      {"qtime_start",     "查询开始时间", DefaultDate,  "0"},
-	      {"qtime_length",    "查询跨度",     "30",  "0"},
-	      {"qtypeahead",      "提示方式",     "1",   "0"}, %% 0: front; 1:backend
-	      {"reject_negative", "零库存退货",   "0",   "0"},
-	      {"check_sale",      "检测库存销售", "1",   "0"},
-	      {"show_discount",   "开单显示折扣", "1",   "0"},
-	      {"se_pagination",   "顺序翻页",     "0",   "0"},
-	      {"stock_alarm",     "库存告警",     "0",   "0"},
-	      {"price_type",      "默认价格类型",  "1",  "0"}
-	     ],
-
+    Values = config(default),
     Sql0 = lists:foldr(
 	     fun({EName, CName, Value, Type}, Acc) ->
 		     Sql00 = "select id, ename, value from w_base_setting"
@@ -271,28 +249,39 @@ handle_call({add_shop_setting, Merchant, Shop}, _From, State) ->
     ?w_user_profile:update(setting, Merchant),
     {reply, Reply, State};
 
-handle_call({delete_expire_data, Merchant, Expire, DeleteSell}, _From, State) ->
-    ?DEBUG("delete_expire_data with merchant ~p, expire ~p, deleteSell ~p",
-	   [Merchant, Expire, DeleteSell]),
+handle_call({delete_expire_data, Merchant, Expire, DeleteStock, DeleteSell},
+	    _From, State) ->
+    ?DEBUG("delete_expire_data with merchant ~p"
+	   ", expire ~p, deleteStock ~p, deleteSell ~p",
+	   [Merchant, Expire, DeleteStock, DeleteSell]),
 
     Condition = "merchant=" ++ ?to_s(Merchant)
 	++ " and entry_date<\'" ++ ?to_s(Expire) ++ "\'",
 
-    Sql1 = [
+    Sqls = [
 	    %% delete product
 	    "delete from w_inventory_good where " ++ Condition, 
 
 	    %% delete stock
-	    "delete from w_inventory_new_detail_amount"
-	    " where rsn in "
-	    "(select rsn from w_inventory_new where " ++ Condition ++ ")", 
+	    %% "delete from w_inventory_new_detail_amount"
+	    %% " where rsn in "
+	    %% "(select rsn from w_inventory_new where " ++ Condition ++ ")", 
 
-	    "delete from w_inventory_new_detail"
-	    " where rsn in "
-	    "(select rsn from w_inventory_new where " ++ Condition ++ ")",
+	    %% "delete from w_inventory_new_detail"
+	    %% " where rsn in "
+	    %% "(select rsn from w_inventory_new where " ++ Condition ++ ")",
 
-	    "delete from w_inventory_new where " ++ Condition,
+	    %% "delete from w_inventory_new where " ++ Condition,
 
+	    %% delete stock
+	    "delete from w_inventory_amount where "
+	    "merchant=" ++ ?to_s(Merchant)
+	    ++ " and entry_date<\'" ++ ?to_s(Expire) ++ "\'",
+	    
+	    "delete from w_inventory where "
+	    "merchant=" ++ ?to_s(Merchant)
+	    ++ " and entry_date<\'" ++ ?to_s(Expire) ++ "\'",
+	    
 	    %% delete stock fix
 	    "delete from w_inventory_fix_detail_amount"
 	    " where rsn in "
@@ -302,24 +291,40 @@ handle_call({delete_expire_data, Merchant, Expire, DeleteSell}, _From, State) ->
 	    " where rsn in "
 	    "(select rsn from w_inventory_fix where " ++ Condition ++ ")",
 
-	    "delete from w_inventory_fix where " ++ Condition],
+	    "delete from w_inventory_fix where " ++ Condition]
+	
+	++ case DeleteStock of
+	       true -> [
+			%% delete stock record
+			"delete from w_inventory_new_detail_amount"
+			" where rsn in "
+			"(select rsn from w_inventory_new where "
+			++ Condition ++ ")", 
 
-    Sql2 = [
-	    %% delete sell
-	    "delete from w_sale_detail_amount"
-	    " where rsn in "
-	    "(select rsn from w_sale where " ++ Condition ++ ")", 
+			"delete from w_inventory_new_detail"
+			" where rsn in "
+			"(select rsn from w_inventory_new where "
+			++ Condition ++ ")",
+			
+			"delete from w_inventory_new where " ++ Condition
+		       ];
+	       false -> []
+	   end
 
-	    "delete from w_sale_detail"
-	    " where rsn in "
-	    "(select rsn from w_sale where " ++ Condition ++ ")",
+	++ case DeleteSell of
+	       true -> [
+			%% delete sell
+			"delete from w_sale_detail_amount"
+			" where rsn in "
+			"(select rsn from w_sale where " ++ Condition ++ ")", 
 
-	    "delete from w_sale where " ++ Condition],
+			"delete from w_sale_detail"
+			" where rsn in "
+			"(select rsn from w_sale where " ++ Condition ++ ")",
 
-    Sqls = case DeleteSell of
-	      true -> Sql1 ++ Sql2; 
-	      false -> Sql1
-	  end,
+			"delete from w_sale where " ++ Condition];
+	       false -> []
+	   end, 
 
     Reply = ?sql_utils:execute(transaction, Sqls, Merchant), 
     {reply, Reply, State};
@@ -344,3 +349,33 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+config(default) ->
+    %% default one month ago
+    {M, S, T} = erlang:now(), 
+    {{YY, MM, DD}, _} = calendar:now_to_datetime({M, S - 86400 * 30, T}),
+    DefaultDate = lists:flatten(
+		    io_lib:format("~4..0w-~2..0w-~2..0w", [YY, MM, DD])),
+    
+    %% ename,            cname,          value,type
+    [{"pum",             "打印份数",     "1",  "0"},
+     {"ptype",           "打印方式",     "1",  "0"}, %% 0: front; 1:backend 
+     {"pformat",         "打印格式",     "1",  "0"},
+     {"ptable",          "表格打印",     "0",  "0"},
+     {"pretailer",       "打印零售商",   "0",  "0"},
+     {"pround",          "四舍五入",     "0",  "0"},
+     {"ptrace_price",    "价格跟踪",     "0",  "0"},
+     {"prompt",          "提示数目",     "8",  "0"},
+     {"pim_print",       "立即打印",     "0",  "0"},
+     {"qtime_start",     "查询开始时间", DefaultDate,  "0"},
+     {"qtime_length",    "查询跨度",     "30",  "0"},
+     {"qtypeahead",      "提示方式",     "1",   "0"}, %% 0: front; 1:backend
+     {"reject_negative", "零库存退货",   "0",   "0"},
+     {"check_sale",      "检测库存销售", "1",   "0"},
+     {"show_discount",   "开单显示折扣", "1",   "0"},
+     {"se_pagination",   "顺序翻页",     "0",   "0"},
+     {"stock_alarm",     "库存告警",     "0",   "0"},
+     {"price_type",      "默认价格类型", "1",   "0"},
+     {"pccmix",          "打印混排",     "0",   "0"},
+     {"bdebt",           "欠款打印加粗", "0",  "0"}
+    ].

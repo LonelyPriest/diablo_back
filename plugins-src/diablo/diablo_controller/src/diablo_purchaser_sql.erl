@@ -603,7 +603,7 @@ inventory(new_rsn_groups, new, Merchant, Conditions, PageFun) ->
 	", b.discount, b.s_group, b.free, b.year, b.path, b.entry_date"
 
 	", a.shop as shop_id"
-	", a.employ as employ_id"
+	", a.employ as employee_id"
 	", a.type"
 	
     	" from w_inventory_new_detail b, w_inventory_new a" 

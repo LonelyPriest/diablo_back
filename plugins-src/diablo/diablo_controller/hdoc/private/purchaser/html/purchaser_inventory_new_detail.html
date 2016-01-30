@@ -44,24 +44,28 @@
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div> 
 
             <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
-                             filter="filter"></query-pattern>
+                             filter="filter">
+	      </query-pattern>
             </div>
 	  </div> <!--END row-->
 
 	  <query-group filters="filters" prompt="prompt"
-		       ok="do_search(default_page)"></query-group>
+		       ok="do_search(default_page)">
+	  </query-group>
 	</div> <!--END table-toolbar-->
 	
 	<!--BEGN portlet body--> 
@@ -71,15 +75,18 @@
 	    <div class="table-responsive"> 
 	      <!--EBGIN table -->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
 		    <th x-ng-click="toggle_base()">
 			<span x-ng-if="!hidden.base">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
-			<span x-ng-if="hidden.base">
-			  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			  <i class="glyphicon glyphicon-backward fg-red"></i>
+			  单号</span>
+			<span x-ng-if="hidden.base">单号
+			  <i class="glyphicon glyphicon-forward fg-red"></i>
+			</span>
 		    </th>
 		    <th x-ng-if="!hidden.base">交易</th> 
 		    <th x-ng-if="!hidden.base">店铺</th>
@@ -97,9 +104,13 @@
 		    <th class="info">
 		      <span x-ng-click="toggle_balance()">
 			<span x-ng-if="!hidden.balance">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
+			  <i class="glyphicon glyphicon-backward fg-red"></i>
+			  帐户欠款
+			</span>
 			<span x-ng-if="hidden.balance">
-			  帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			  帐户欠款
+			  <i class="glyphicon glyphicon-forward fg-red"></i>
+			</span>
 		      </span>
 		    </th>
 		    
@@ -107,9 +118,12 @@
 		    <th>实付</th>
 		    <th x-ng-click="toggle_comment()" class="danger">
 		      <span x-ng-if="!hidden.comment">
-			<i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
+			<i class="glyphicon glyphicon-backward fg-red"></i>
+			本次欠款</span>
 		      <span x-ng-if="hidden.comment">
-			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			本次欠款
+			<i class="glyphicon glyphicon-forward fg-red"></i>
+		      </span>
 		    </th>
 		    <!-- <th>总数</th> -->
 		    <th x-ng-if="!hidden.comment">备注</th>
@@ -124,6 +138,9 @@
 		    <td x-ng-if="!hidden.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>入库</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-darkOrange" x-ng-switch-when=2>
+			转出</span>
+		      <span class="fg-pink" x-ng-switch-when=3>移进</span>
 		    </td>
 		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
 		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
@@ -136,38 +153,28 @@
 		    <td x-ng-if="!hidden.balance">{{r.wire}}</td>
 		    <td x-ng-if="!hidden.balance">{{r.verificate}}</td>
 		    <td x-ng-if="!hidden.balance">
-		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">{{r.e_pay}}</span>
+		      <span x-ng-if="r.e_pay!==0" class="fg-darkBlue">
+			{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
 
 		    <td>{{r.balance}}</td>
 		    
-		    <td x-ng-switch on="r.type">
-		      <span x-ng-switch-when=0>
-			{{round(r.should_pay)}}
-		      </span>
+		    <td x-ng-switch on="r.type"> 
 		      <span class="fg-red" x-ng-switch-when=1>
-			{{round(r.should_pay)}}
+		      	{{r.should_pay}}
 		      </span>
+		      <span x-ng-switch-default>
+		      	{{r.should_pay}}
+		      </span> 
 		    </td>
 		    
 		    <td>{{r.has_pay}}</td>
-		    <!-- r.should_pay + (r.balance - r.has_pay)-->
 		    <td>
-		      {{r.balance + round(r.should_pay) + r.e_pay
+		      {{r.balance + r.should_pay + r.e_pay
 		      - r.has_pay - r.verificate}}
 		    </td>
-		    <!-- <td x-ng-switch on="r.type"> -->
-		    <!--   <span x-ng-switch-when=0> -->
-		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!--   <span x-ng-switch-when=1> -->
-		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!-- </td> -->
 		    
-		    <!-- <td>{{f_add(r.should_pay, f_sub(r.balance, r.has_pay))}}</td> -->
-		    <!-- <td>{{r.price5}}</td> -->
 		    <td x-ng-if="!hidden.comment">
 		      <span x-ng-switch on="r.comment">
 			<span x-ng-switch-when="null">无</span>
@@ -178,10 +185,13 @@
 		    <td> 
                       <button class="btn diablo-button btn-primary"
 			      x-ng-click="trans_detail(r)">明细
-			<i class="glyphicon glyphicon-map-marker"></i></button>
+			<i class="glyphicon glyphicon-map-marker"></i>
+		      </button>
 		      
 		      <button class="btn diablo-button yellow"
-		      	      x-ng-disabled="r.state===1"
+		      	      x-ng-disabled="r.state===1
+					     || r.type===2
+					     || r.type===3"
 		      	      x-ng-click="update_detail(r)">修改
 		      	<i class="glyphicon glyphicon-edit"></i></button>
 		      

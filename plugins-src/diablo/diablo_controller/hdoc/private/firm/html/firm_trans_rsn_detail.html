@@ -100,6 +100,9 @@
 		    <td x-ng-if="!hidden.base" x-ng-switch on="inv.type">
 		      <span x-ng-switch-when=0>入库</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-darkOrange" x-ng-switch-when=2>
+			转出</span>
+		      <span class="fg-pink" x-ng-switch-when=3>移进</span>
 		    </td>
 
 		    <td x-ng-if="!hidden.base">{{inv.shop.name}}</td>
@@ -114,10 +117,10 @@
 		    <td>{{inv.discount}}</td>
 
 		    <td x-ng-switch on="inv.type">
-		      <span x-ng-switch-when=0>{{inv.amount}}</span>
 		      <span class="fg-red" x-ng-switch-when=1>
 			{{inv.amount}}
 		      </span>
+		      <span x-ng-switch-default>{{inv.amount}}</span>
 		    </td>
 		    
 		    <td>{{inv.entry_date}}</td>
@@ -127,10 +130,7 @@
 			      x-ng-disabled="inv.free==0"
 		    	      x-ng-click="rsn_detail(inv)">
 			详情<i class="glyphicon glyphicon-map-marker"></i>
-		      </button>
-		      <!-- <button class="btn btn-warning red-stripe btn-xs" -->
-		      <!-- 	      x-ng-click="edit_rsn_detail(inv)"> -->
-		      <!-- 	修改<i class="glyphicon glyphicon-edit"></i></button> -->
+		      </button> 
 		    </td>
 		  </tr>
 		  <tr x-ng-if="total_items!==0" class="bg-white">
@@ -141,26 +141,7 @@
 		  </tr>
 		</tbody>
 
-		<tfoot>
-		  <!-- <tr> -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <span class="pagination"> -->
-		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		  <!-- 	  共 {{total_items}} 项</span> -->
-		  <!--     </span> -->
-		  <!--     <pagination class="pull-right" -->
-		  <!-- 		  total-items="total_items" -->
-		  <!-- 		  items-per-page="items_perpage" -->
-		  <!-- 		  num-pages="num_pages" -->
-		  <!-- 		  max-size="max_page_size" -->
-		  <!-- 		  boundary-links="true" -->
-		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 		  x-ng-model="current_page" -->
-		  <!-- 		  x-ng-init="current_page=default_page" -->
-		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
+		<tfoot> 
 		</tfoot>
 		
 	      </table> <!--END supplier table-->

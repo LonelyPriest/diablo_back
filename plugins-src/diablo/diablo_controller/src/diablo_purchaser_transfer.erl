@@ -17,7 +17,7 @@ amount_transfer(Transfer, RSN, Merchant, Shop, Firm, Datetime, Inv) ->
     ?DEBUG("transfer inventory with transfer ~p, rsn ~p~nInv ~p",
 	   [Transfer, RSN, Inv]),
 
-    Amounts     = ?v(<<"amouts">>, Inv),
+    Amounts     = ?v(<<"amounts">>, Inv),
     StyleNumber = ?v(<<"style_number">>, Inv),
     Brand       = ?v(<<"brand">>, Inv),
     Type        = ?v(<<"type">>, Inv),
@@ -41,7 +41,7 @@ amount_transfer(Transfer, RSN, Merchant, Shop, Firm, Datetime, Inv) ->
     
     Total       = ?v(<<"total">>, Inv),
     
-    Discount    = ?v(<<"fdiscount">>, Inv),
+    Discount    = ?v(<<"discount">>, Inv),
     Path        = ?v(<<"path">>, Inv, []),
     AlarmDay    = ?v(<<"alarm_day">>, Inv, ?DEFAULT_ALARM_DAY),
 
@@ -191,32 +191,31 @@ amount_transfer(Transfer, RSN, Merchant, Shop, Firm, Datetime, Inv) ->
 				     ++ ?to_s(Merchant) ++ ","
 				     ++ ?to_s(Count) ++ "," 
 				     ++ "\"" ++ ?to_s(Datetime) ++ "\")"; 
-			    {ok, R1} ->
+			     {ok, R1} ->
 				 "update w_inventory_amount set"
 				     " total=total+" ++ ?to_s(Count) 
 				     ++ ", entry_date="
 				     ++ "\"" ++ ?to_s(Datetime) ++ "\""
 				     ++ " where id="
 				     ++ ?to_s(?v(<<"id">>, R1));
-			    {error, E00} ->
+			     {error, E00} ->
 				 throw({db_error, E00})
-			 end,
-			 
-			 "insert into w_inventory_new_detail_amount(rsn"
-			 ", style_number, brand, color, size"
-			 ", total, entry_date)"
-			 " values("
-			 ++ "\"" ++ ?to_s(RSN) ++ "\","
-			 ++ "\"" ++ ?to_s(StyleNumber) ++ "\","
-			 ++ ?to_s(Brand) ++ ","
-			 ++ ?to_s(Color) ++ ","
-			 ++ "\'" ++ ?to_s(Size)  ++ "\',"
-			 ++ case Transfer of
-				transfer_from -> ?to_s(-Count) ++ ",";
-				transfer_to -> ?to_s(Count) ++ ","
-			    end 
-			 ++ "\"" ++ ?to_s(Datetime) ++ "\")"|Acc] 
-		end
+			 end]
+		end ++
+		    ["insert into w_inventory_new_detail_amount(rsn"
+		     ", style_number, brand, color, size"
+		     ", total, entry_date)"
+		     " values("
+		     ++ "\"" ++ ?to_s(RSN) ++ "\","
+		     ++ "\"" ++ ?to_s(StyleNumber) ++ "\","
+		     ++ ?to_s(Brand) ++ ","
+		     ++ ?to_s(Color) ++ ","
+		     ++ "\'" ++ ?to_s(Size)  ++ "\',"
+		     ++ case Transfer of
+			    transfer_from -> ?to_s(-Count) ++ ",";
+			    transfer_to -> ?to_s(Count) ++ ","
+			end 
+		     ++ "\"" ++ ?to_s(Datetime) ++ "\")"] ++ Acc
 	end,
 
     Sql3 = lists:foldr(NewFun, [], Amounts),

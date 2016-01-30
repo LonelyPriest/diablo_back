@@ -23,12 +23,16 @@
 	<div class="table-toolbar">
 	  <div class="alert alert-warning" role="alert">
 	    <p>
-	      <span class="fg-blue">打印宽度之和不能超过真实打印宽度。</span>
-	      <span class="fg-red">注意：打印机设置横打时，尺码长度为尺码宽度 * 尺码个数</span>
+	      <span class="fg-blue">
+		打印宽度之和不能超过真实打印宽度。
+	      </span>
+	      <span class="fg-red">
+		注意：打印机设置横打时，尺码长度为尺码宽度 * 尺码个数
+	      </span>
 	    </p>
 	    <p>
 	      <span class="fg-red">
-		特别注意：手与尺码选项不能同时选；尺码组名称与尺码不能同时选！！</span>
+		特别注意：手与尺码选项不能同时选；尺码组名称与尺码不能同时选择！！</span>
 	    </p>
 	  </div>
 
@@ -62,6 +66,7 @@
 		    <th>名称</th>
 		    <th>是否打印</th>
 		    <th>打印宽度</th>
+		    <th>打印位置</th>
 		    <th>日期</th>
 		    <th>操作</th>
 		  </tr>
@@ -77,12 +82,19 @@
 		      </span>
 		    </td>
 		    <td>{{f.width}}</td>
+		    <td>
+		      <span x-ng-switch on="f.seq">
+			  <span ng-switch-when=0>默认</span>
+			  <span ng-switch-default>{{f.seq}}</span>
+		      </span>
+		    </td>
 		    <td>{{f.entry_date}}</td>
 
 		    <td class="col-md-2"> 
                       <button class="btn diablo-button btn-warning"
-			 x-ng-click="update_printer_format(f)">修改
-			<i class="glyphicon glyphicon-edit"></i></button> 
+			      x-ng-click="update_printer_format(f)">修改
+			<i class="glyphicon glyphicon-edit"></i>
+		      </button> 
 		    </td>
 		    
 		  </tr>
@@ -122,7 +134,7 @@
 	    <input type="text" readonly
 		   class="form-control"
 		   required
-		   x-ng-model="params.fields[params.pformat.name]"></input> 
+		   x-ng-model="params.fields[params.pformat.name]"/>
 	  </div> 
 	</div>
 
@@ -134,7 +146,8 @@
 		    type="text"
 		    x-ng-model="params.pformat.print"
 		    x-ng-change="params.change_format(params.pformat)"
-		    x-ng-options="a as a.name for a in params.actions"></select>
+		    x-ng-options="a as a.name for a in params.actions">
+	    </select>
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div> 
 	</div>
@@ -142,10 +155,10 @@
 	<div class="form-group">
 	  <div class="input-group">
 	    <span class="input-group-addon">
-	      <i class="glyphicon glyphicon-hand-right fg-red"></i>宽度</span>
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>
+	      宽度</span>
 	    <input class="form-control"
-		   type="text"
-		   name="width"
+		   type="text" name="width"
 		   x-ng-model="params.pformat.width"
 		   x-ng-pattern="/^\d{1,2}$/">
 	    <span class="input-group-addon bg-white fg-red">*</span>
@@ -154,7 +167,36 @@
 	    <span class="fg-red">请输入1-2位数字</span>
 	  </div>
 	</div>
-	
+
+	<div class="form-group">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="glyphicon glyphicon-hand-right fg-red"></i>
+	      位置</span>
+	    <input x-ng-if="params.pformat.name === 'brand'
+			    || params.pformat.name === 'calc'
+			    || params.pformat.name === 'comment'"
+		   class="form-control"
+		   type="number" step="1"
+		   readonly
+		   x-ng-model="params.pformat.seq"/>
+	    
+	    <input x-ng-if="params.pformat.name !== 'brand'
+			    && params.pformat.name !== 'calc'
+			    && params.pformat.name !== 'comment'"
+		   class="form-control"
+		   type="text"
+		   name="seq"
+		   x-ng-model="params.pformat.seq"
+		   x-ng-pattern="/^\d{1,2}$/">
+	    
+	    <span class="input-group-addon bg-white fg-red">*</span>
+	  </div>
+	  <div ng-show="fForm.seq.$invalid && !fForm.seq.$pristine">
+	    <span class="fg-red">请输入1-2位数字</span>
+	  </div>
+	</div>
+
       </div>
     </form>
   </div>

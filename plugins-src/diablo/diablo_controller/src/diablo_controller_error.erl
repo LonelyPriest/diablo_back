@@ -123,7 +123,10 @@ success(check_w_inventory, RSN) ->
 success(reject_w_inventory, Total) ->
     {0, "Success to reject purchaser inventory of total amount " ++ ?to_s(Total)};
 success(fix_w_inventory, Rsn) ->
-    {0, "Success to fix inventory with record no  " ++ ?to_s(Rsn)};
+    {0, "Success to fix inventory with rsn  " ++ ?to_s(Rsn)};
+success(transfer_w_inventory, Rsn) ->
+    {0, "Success to transfer inventory with rsn  " ++ ?to_s(Rsn)};
+
 
 %% retailer
 success(add_w_retailer, Retailer) ->

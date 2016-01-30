@@ -10,7 +10,7 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <a type="button" class="btn green red-stripe"
+	    <a type="button" class="btn green"
 		    x-ng-click="goto_page('#/inventory_new')">入库
 	      <i class="glyphicon glyphicon-plus"></i></a>
 
@@ -18,7 +18,11 @@
 		    x-ng-click="goto_page('#/inventory_reject')">退货
 	      <i class="glyphicon glyphicon-minus"></i></a> 
 
-	    <a type="button" class="btn yellow purple-stripe"
+	    <a type="button" class="btn blue-hoki purple-stripe"
+		    x-ng-click="change_price_batch()">改价
+	      <i class="glyphicon glyphicon-check"></i></a>
+	    
+	    <a type="button" class="btn yellow-crusta purple-stripe"
 		    x-ng-click="goto_page('#/inventory/inventory_fix')">盘点
 	      <i class="glyphicon glyphicon-check"></i></a>
 

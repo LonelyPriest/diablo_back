@@ -631,36 +631,8 @@ handle_call({get_color_profile, Merchant, ColorId}, _From, State) ->
 handle_call({set_default, Merchant}, _From, State) ->
     ?DEBUG("set default value of merchant ~p", [Merchant]),
     %% base setting
-    Now = ?utils:current_time(localdate),
-    
-    %% one month default
-    {M, S, T} = erlang:now(), 
-    {{YY, MM, DD}, _} = calendar:now_to_datetime({M, S - 86400 * 30, T}),
-    DefaultDate = lists:flatten(io_lib:format("~4..0w-~2..0w-~2..0w", [YY, MM, DD])),
-    
-    %%         ename,           cname,            value,type
-    Values = [{"pum",           "打印份数",       "1",  "0"},
-	      {"ptype",         "打印方式",       "1",  "0"}, %% 0: front; 1:backend 
-	      {"pformat",       "打印格式",       "1",  "0"},
-	      {"ptable",        "表格打印",       "0",  "0"},
-	      {"pretailer",     "打印零售商",     "0",  "0"},
-	      {"pround",        "四舍五入",       "0",  "0"},
-	      {"ptrace_price",  "价格跟踪",       "0",  "0"},
-	      {"prompt",        "提示数目",       "8",  "0"},
-	      {"pim_print",     "立即打印",       "0",  "0"},
-	      
-	      {"qtime_start",   "查询开始时间",   DefaultDate,  "0"},
-	      {"qtime_length",  "查询跨度",       "30",  "0"},
-	      {"qtypeahead",    "提示方式",       "1",   "0"}, %% 0: front; 1:backend
-	      
-	      {"reject_negative", "零库存退货",    "0",  "0"},
-	      {"check_sale",      "检测库存销售",  "1",  "0"},
-	      {"show_discount",   "开单显示折扣",  "1",  "0"},
-	      {"se_pagination",   "顺序翻页",      "0",  "0"},
-	      {"stock_alarm",     "库存告警",      "0",  "0"},
-	      {"price_type",      "默认价格类型",  "1",  "0"}
-	     ],
-    
+    Now = ?utils:current_time(localdate), 
+    Values = ?w_base:config(default),
     
     Sql0 = lists:foldr(
 	    fun({EName, CName, Value, Type}, Acc) ->
@@ -687,24 +659,9 @@ handle_call({set_default, Merchant}, _From, State) ->
 
     %% print format
     %% {name, isPrint, printWidth}
-    Formats = [{"brand",           "0",  "0"},
-	       {"style_number",    "0",  "0"},
-	       {"type",            "0",  "0"},
-	       {"color",           "0",  "0"},
-	       {"size_name",       "0",  "0"}, 
-	       {"size",            "0",  "0"},
-	       {"price",           "0",  "0"},
-	       {"discount",        "0",  "0"},
-	       {"dprice",          "0",  "0"},
-	       {"hand",            "0",  "0"},
-	       {"count",           "0",  "0"},
-	       {"calc",            "0",  "0"},
-	       {"comment",         "0",  "0"}
-	      ],
-
-
+    Formats = ?w_print:format(default), 
     Sql1 = lists:foldr(
-	     fun({Name, Print, Width}, Acc) ->
+	     fun({Name, Print, Width, Seq}, Acc) ->
 		     Sql01 = "select id, name, print from w_print_format"
 			 " where name=\'" ++ Name ++ "\'"
 			 " and shop=-1"
@@ -712,11 +669,12 @@ handle_call({set_default, Merchant}, _From, State) ->
 		     case ?sql_utils:execute(s_read, Sql01) of
 			 {ok, []} ->
 			     ["insert into w_print_format("
-			      "name, print, width"
+			      "name, print, width, seq"
 			      ", merchant, entry_date) values("
 			      "\'" ++ Name ++ "\',"
 			      ++ Print ++ ","
-			      ++ Width  ++ ","
+			      ++ Width ++ ","
+			      ++ Seq ++ ","
 			      ++ ?to_s(Merchant) ++ "," 
 			      "\'" ++ Now ++ "\');"|Acc];
 			 {ok, _} ->

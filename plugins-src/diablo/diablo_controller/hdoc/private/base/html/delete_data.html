@@ -15,7 +15,7 @@
 	<div class="table-toolbar">
 	  <div class="alert alert-warning" role="alert">
 	    <p>
-	      <span class="fg-blue">系统将删除货品资料，入库记录，库存信息，销售记录可选择删除</span>
+	      <span class="fg-blue">系统将删除货品资料，库存信息。入库记录，销售记录可选择删除</span>
 	      <span class="fg-red">注意：数据删除后无法恢复，请谨慎操作！！</span>
 	    </p> 
 	  </div> 
@@ -50,6 +50,21 @@
 	      </div> 
 	    </div>
 
+	    <div class="form-body">
+	      <div class="form-group">
+		<div class="col-md-12">
+		  <label class="control-label">是否删除入库记录<span class="fg-red">（入库记录删除后无法恢复）</span></label>
+		  <div>
+		    <input bs-switch
+			   type="checkbox"
+			   switch-on-text="是"
+			   switch-off-text="否"
+			   x-ng-model="sure.select_in"/>
+		  </div>
+		</div>
+	      </div>
+	    </div>
+	    
 	    <div class="form-body">
 	      <div class="form-group">
 		<div class="col-md-12">

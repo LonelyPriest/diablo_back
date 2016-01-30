@@ -167,9 +167,13 @@ baseApp.service("baseService", function($resource){
 	return http.save({operation: 'update_user_passwd'},p).$promise;
     };
 
-    this.delete_expire_data = function(expire_date, delete_sell_data){
-	return http.save({operation: 'delete_expire_data'},
-			 {expire: expire_date, sell: delete_sell_data}).$promise;
+    this.delete_expire_data = function(
+	expire_date, delete_stock_data, delete_sell_data){
+	return http.save(
+	    {operation: 'delete_expire_data'},
+	    {expire: expire_date,
+	     stock: delete_stock_data,
+	     sell: delete_sell_data}).$promise;
     };
     
 });
@@ -233,11 +237,16 @@ baseApp.controller("bankCardDetailCtrl", function($scope, baseService, diabloUti
 		    console.log(state);
 		    if (state.ecode == 0){
 			dialog.response_with_callback(
-			    true, "银行卡编辑", "银行卡 " + card.no + " 修改成功！！",
+			    true,
+			    "银行卡编辑",
+			    "银行卡 " + card.no + " 修改成功！！",
 			    $scope, function(){$scope.refresh()});
 		    } else{
 			dialog.response(
-			    false, "银行卡编辑", "银行卡编辑失败：" + baseService.error[state.ecode]); 
+			    false,
+			    "银行卡编辑",
+			    "银行卡编辑失败："
+				+ baseService.error[state.ecode]); 
 		    }
 		})
 	    } 
@@ -254,17 +263,22 @@ baseApp.controller("bankCardDetailCtrl", function($scope, baseService, diabloUti
 		console.log(state);
 		if (state.ecode == 0){
 		    dialog.response_with_callback(
-			true, "银行卡删除", "银行卡 " + card.no + " 删除成功！！",
+			true,
+			"银行卡删除",
+			"银行卡 " + card.no + " 删除成功！！",
 			$scope, function(){$scope.refresh()});
 		} else{
 		    dialog.response(
-			false, "银行卡删除", "银行卡删除失败：" + baseService.error[state.ecode]); 
+			false,
+			"银行卡删除",
+			"银行卡删除失败：" + baseService.error[state.ecode]); 
 		}
 	    }) 
 	};
 
 	dialog.request(
-	    "删除银行卡", "确定要删除该银行卡吗？", callback, undefined, $scope);
+	    "删除银行卡",
+	    "确定要删除该银行卡吗？", callback, undefined, $scope);
 	
 	
     }
@@ -273,7 +287,8 @@ baseApp.controller("bankCardDetailCtrl", function($scope, baseService, diabloUti
 
 baseApp.controller("printOptionCtrl", function(
     $scope, dateFilter, baseService, diabloPattern, diabloUtilsService, user){
-    $scope.shops = [{id: -1, name:"== 请选择店铺或仓库，默认所有店铺配置相同 =="}]
+    $scope.shops = [
+	{id: -1, name:"== 请选择店铺或仓库，默认所有店铺配置相同 =="}]
 	.concat(user.sortShops, user.sortRepoes);
     
     $scope.print_types   = baseService.print_types;
@@ -316,7 +331,9 @@ baseApp.controller("printOptionCtrl", function(
 	    if (shop.id === s.shop.id){
 		if (s.setting.length === 0){
 		    var callback = function(){
-			baseService.add_shop_setting(shop.id).then(function(result){
+			baseService.add_shop_setting(
+			    shop.id
+			).then(function(result){
 			    if (result.ecode == 0){
 				dialog.response_with_callback(
 				    true, "新增打印选项", "店铺 " + shop.name
@@ -324,15 +341,18 @@ baseApp.controller("printOptionCtrl", function(
 				    $scope, function(){$scope.refresh(shop)});
 			    } else {
 				dialog.response(
-				    false, "新增打印选项",
-				    "店铺 " + shop.name + " 打印选项新增失败："
+				    false,
+				    "新增打印选项",
+				    "店铺 " + shop.name
+					+ " 打印选项新增失败："
 					+ baseService.error[result.ecode]); 
 			    }
 			})
 		    };
 		    
 		    dialog.request(
-			"新增打印选项", "该店铺无打印选项，确定要新增打印选项吗？",
+			"新增打印选项",
+			"该店铺无打印选项，确定要新增打印选项吗？",
 			callback, undefined, $scope);
 		}
 		// $scope.pformats[i].$new = false;
@@ -342,7 +362,9 @@ baseApp.controller("printOptionCtrl", function(
     };
     
     $scope.refresh = function(shop){
-	baseService.list_setting(baseService.print_setting).then(function(data){
+	baseService.list_setting(
+	    baseService.print_setting
+	).then(function(data){
 	    console.log(data);
 	    $scope.settings = 
 		$scope.shops.map(function(s){
@@ -391,8 +413,12 @@ baseApp.controller("printOptionCtrl", function(
 		console.log(result)
 		if (result.ecode === 0){
 		    dialog.response_with_callback(
-			true, "新增系统选项", "系统选项 " + s.name.cname + " 新增成功！！",
-			$scope, function(){$scope.refresh($scope.select.shop)});
+			true,
+			"新增系统选项",
+			"系统选项 " + s.name.cname + " 新增成功！！",
+			$scope,
+			function(){
+			    $scope.refresh($scope.select.shop)});
 		} else {
 		    dialog.response(
 			false, "新增系统选项", "新增系统选项失败："
@@ -431,7 +457,8 @@ baseApp.controller("printOptionCtrl", function(
 		update = setting.value.id;
 	    }
 	    else {
-		update = typeof(setting.value) === 'object' ? setting.value.value : setting.value;
+		update = typeof(setting.value) === 'object'
+		    ? setting.value.value : setting.value;
 	    };
 
 	    console.log(update);
@@ -445,11 +472,16 @@ baseApp.controller("printOptionCtrl", function(
 		console.log(state);
 		if (state.ecode == 0){
 		    dialog.response_with_callback(
-			true, "系统选项编辑", "系统选项 " + s.cname + " 编辑成功！！",
-			$scope, function(){$scope.refresh($scope.select.shop)});
+			true,
+			"系统选项编辑",
+			"系统选项 " + s.cname + " 编辑成功！！",
+			$scope,
+			function(){$scope.refresh($scope.select.shop)});
 		} else{
 		    dialog.response(
-			false, "系统选项编辑", "系统选项 " + s.cname + " 编辑失败："
+			false,
+			"系统选项编辑",
+			"系统选项 " + s.cname + " 编辑失败："
 			    + baseService.error[state.ecode]); 
 		}
 	    })
@@ -481,7 +513,10 @@ baseApp.controller("printOptionCtrl", function(
 	    || s.ename === 'check_sale'
 	    || s.ename === 'show_discount'
 	    || s.ename === 'se_pagination'
-	    || s.ename === 'stock_alarm'){
+	    || s.ename === 'stock_alarm'
+	    || s.ename === 'pccmix'
+	    || s.ename === 'bdebt'
+	   ){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};
 	if (s.ename === 'qtime_length'){
@@ -551,7 +586,9 @@ baseApp.controller("printFormatCtrl", function(
 	    if (shop.id === p.shop.id){
 		if (p.pformat.length === 0){
 		    var callback = function(){
-			wprintService.add_shop_format(shop.id).then(function(result){
+			wprintService.add_shop_format(
+			    shop.id
+			).then(function(result){
 			    if (result.ecode == 0){
 				dialog.response_with_callback(
 				    true, "新增打印格式", "店铺 " + shop.name
@@ -560,14 +597,16 @@ baseApp.controller("printFormatCtrl", function(
 			    } else {
 				dialog.response(
 				    false, "新增打印格式",
-				    "店铺 " + shop.name + " 打印格式新增失败："
+				    "店铺 " + shop.name
+					+ " 打印格式新增失败："
 					+ baseService.error[result.ecode]); 
 			    }
 			})
 		    };
 		    
 		    dialog.request(
-			"新增打印格式", "该店铺无打印格式，确定要新增打印格式吗？",
+			"新增打印格式",
+			"该店铺无打印格式，确定要新增打印格式吗？",
 			callback, undefined, $scope);
 		}
 		return p.pformat;
@@ -626,6 +665,7 @@ baseApp.controller("printFormatCtrl", function(
 		name:   f.name,
 		print:  params.pformat.print.value,
 		width:  params.pformat.width,
+		seq:    params.pformat.seq,
 		shop:   $scope.select.shop.id
 	    }).then(function(state){
 		console.log(state);
@@ -636,6 +676,7 @@ baseApp.controller("printFormatCtrl", function(
 			$scope, function(){
 			    f.print = params.pformat.print.value;
 			    f.width = params.pformat.width;
+			    f.seq   = params.pformat.seq;
 			});
 		} else{
 		    dialog.response(
@@ -646,7 +687,9 @@ baseApp.controller("printFormatCtrl", function(
 	}; 
 
 	var check_same = function(newValue){
-	    if (newValue.print == f.print && newValue.width == f.width){
+	    if (newValue.print == f.print
+		&& newValue.width == f.width
+		&& newValue.seq === f.seq){
 		return true;
 	    }
 	    return false;
@@ -667,19 +710,22 @@ baseApp.controller("printFormatCtrl", function(
 	dialog.edit_with_modal(
 	    "update-print-format.html", undefined, callback, $scope,
 	    {
-		pformat:    {name:f.name, print:print_action[0], width:f.width},
-		fields:     $scope.print_fields,
-		actions:    $scope.actions,
-		// shops:      $scope.shops,
-		check_same: check_same,
+		pformat:       {name:  f.name,
+				print: print_action[0],
+				width: f.width,
+				seq:   f.seq},
+		fields:        $scope.print_fields,
+		actions:       $scope.actions,
+		check_same:    check_same,
 		change_format: change_format
 	    });
     }
 });
 
 
-baseApp.controller("tableDetailCtrl", function($scope, baseService, diabloUtilsService){
-    
+baseApp.controller("tableDetailCtrl", function(
+    $scope, baseService, diabloUtilsService
+){    
     $scope.refresh = function(){
 	baseService.list_setting(baseService.table_setting).then(function(data){
 	    console.log(data);
@@ -1006,7 +1052,10 @@ baseApp.controller("delDataCtrl", function($scope, dateFilter, diabloUtilsServic
 	return $.now();
     };
 
-    $scope.sure = {date: $scope.today() - diablo_day_millisecond * 90, select: false};
+    $scope.sure = {
+	date:      $scope.today() - diablo_day_millisecond * 90,
+	select_in: false,
+	select:    false};
 
     var dialog = diabloUtilsService;
     $scope.sure_delete = function(){
@@ -1015,11 +1064,16 @@ baseApp.controller("delDataCtrl", function($scope, dateFilter, diabloUtilsServic
 	var callback = function(){
 	    baseService.delete_expire_data(
 		dateFilter($scope.sure.date, "yyyy-MM-dd"),
-		$scope.sure.select).then(function(result){
+		$scope.sure.select_in,
+		$scope.sure.select
+	    ).then(function(result){
 		    console.log(result);
 		    if (result.ecode === 0){
 			dialog.response(
-			    true, "数据删除", "数据删除成功，请注销该用户后再登录！！", undefined); 
+			    true,
+			    "数据删除",
+			    "数据删除成功，请注销该用户后再登录！！",
+			    undefined); 
 		    } else {
 			diablo.response(
 			    false, "数据删除", "数据删除失败："
@@ -1032,7 +1086,8 @@ baseApp.controller("delDataCtrl", function($scope, dateFilter, diabloUtilsServic
 	dialog.request(
 	    "数据删除",
 	    "数据删除后无法恢复，确认要删除 ["
-		+ dateFilter($scope.sure.date, "yyyy-MM-dd") + "] 之前的数据吗？",
+		+ dateFilter($scope.sure.date, "yyyy-MM-dd")
+		+ "] 之前的数据吗？",
 	    callback, undefined, undefined);
 	
     };

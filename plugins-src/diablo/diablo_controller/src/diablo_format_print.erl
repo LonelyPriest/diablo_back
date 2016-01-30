@@ -3,7 +3,8 @@
 -include("../../../../include/knife.hrl").
 -include("diablo_controller.hrl").
 
--export([br/1, br/3, line/2, line/4, line/5, width/2, middle/3, line_space/1]).
+-export([br/1, br/3, line/2, line/4, line/5,
+	 width/2, middle/3, middle/4, line_space/1]).
 -export([sort_amount/3, left_pading/2,
 	 pading/1, size_pading/3, clean_zero/1, f_round/1]).
 -export([pagination/2, pagination/3,
@@ -189,13 +190,19 @@ width(latin1, English) ->
 width(chinese, Chinese) ->
     %% ?DEBUG("Chinese ~p", [Chinese]),
     U16 = unicode:characters_to_binary(?to_b(Chinese), utf8, utf16),
-    ?DEBUG("U16 ~p", [U16]),
+    %% ?DEBUG("U16 ~p", [U16]),
     U = [ <<U>> || <<U>> <= U16, U =/= 0],
     %% ?DEBUG("lenght of chinese ~ts is ~p", [?to_b(Chinese), length(U)]),
     length(U).
 
 middle(?TABLE, TotalWidth, Number) ->
     Width = width(latin1, Number),
+    Mh = (TotalWidth - Width -1) div 2,
+    Ml = (TotalWidth - Width -1) rem 2,
+    {Mh, Mh + Ml}.
+
+middle(?TABLE, chinese, Chinese, TotalWidth) ->
+    Width = width(chinese, Chinese),
     Mh = (TotalWidth - Width -1) div 2,
     Ml = (TotalWidth - Width -1) rem 2,
     {Mh, Mh + Ml}.
@@ -392,7 +399,16 @@ decorate_data(bwh) ->
 	++ decorate_data(width) ++ decorate_data(height);
 decorate_data(cancel_bwh) ->
     decorate_data(cancel_block)
-	++ decorate_data(cancel_width) ++ decorate_data(cancel_height);
+	++ decorate_data(cancel_width)
+	++ decorate_data(cancel_height);
+
+decorate_data(bw) ->
+    decorate_data(block)
+	++ decorate_data(width);
+decorate_data(cancel_bw) ->
+	decorate_data(cancel_block)
+	++ decorate_data(cancel_width);
+
 decorate_data(block) ->
     ?to_s(<<16#1b, 16#45>>);
 decorate_data(cancel_block) ->

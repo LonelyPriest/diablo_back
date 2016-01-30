@@ -954,7 +954,6 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     $scope.match_style_number = function(viewValue){
 	return diabloFilter.match_w_inventory(viewValue, $scope.shopIds);
-	// return diabloFilter.match_w_inventory(viewValue, user.availableShopIds)
     };
 
     /*
@@ -1000,25 +999,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     // alarm, use default shop
     $scope.setting.alarm = diablo_base_setting(
-	"stock_alarm", -1, base, parseInt, diablo_no);
-
-    // console.log($scope.setting);
-    
-    // console.log($scope.time); 
-
-    // $scope.qtime_start = function(){
-    // 	var shop = -1
-    // 	if ($scope.shopIds.length === 1){
-    // 	    shop = $scope.shopIds[0];
-    // 	};
-    // 	return diablo_base_setting(
-    // 	    "qtime_start", shop, base, diablo_set_date,
-    // 	    diabloFilter.default_start_time(now));
-    // }();
-    // console.log($scope.qtime_start);
-    
-    // $scope.time   = diabloFilter.default_time($scope.qtime_start); 
-    // $scope.time   = diabloFilter.default_time(); 
+	"stock_alarm", -1, base, parseInt, diablo_no); 
 
     /*
      * pagination 
@@ -1035,8 +1016,6 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	page_of_chart: $scope.default_page
     };
     
-    // $scope.current_page = $scope.default_page;
-    
     $scope.page_changed = function(page){
 	// console.log(page);
 	$scope.tab_page.page_of_time = page;
@@ -1048,12 +1027,6 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	$scope.tab_page.page_of_chart = page;
 	$scope.do_search($scope.tab_page.page_of_chart);
     }; 
-
-    // $scope.is_alarm = function(alarm){
-    // 	// console.log(alarm);
-    // 	return alarm ? "danger" : "";
-    // }
-    
     
     // filter
     var add_search_condition = function(search){
@@ -1234,6 +1207,11 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 		}); 
 	});
     };
+
+    $scope.change_price_batch = function(){
+	dialog.response(
+	    false, "库存批量改价", "系统暂不支持些操作！！", undefined);
+    };
 });
 
 
@@ -1316,17 +1294,23 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.check_detail = function(r){
 	console.log(r);
 	var callback = function(){
-	    purchaserService.check_w_inventory_new(r.rsn).then(function(state){
+	    purchaserService.check_w_inventory_new(
+		r.rsn
+	    ).then(function(state){
 		console.log(state);
 		if (state.ecode == 0){
 		    dialog.response_with_callback(
-			true, "入库单审核", "入库单审核成功！！单号：" + state.rsn,
+			true,
+			"入库单审核",
+			"入库单审核成功！！单号：" + state.rsn,
 			$scope, function(){r.state = 1})
 	    	    return;
 		} else{
 	    	    diabloUtilsService.response(
-	    		false, "入库单审核",
-	    		"入库单审核失败：" + purchaserService.error[state.ecode]);
+	    		false,
+			"入库单审核",
+	    		"入库单审核失败："
+			    + purchaserService.error[state.ecode]);
 		}
 	    })
 	};
@@ -1337,15 +1321,15 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	
     };
 
-    $scope.delete_detail = function(r){
-	var callback = function(){
+    // $scope.delete_detail = function(r){
+    // 	var callback = function(){
 	    
-	}
+    // 	}
 	
-	dialog.request(
-	    "入库单删除", "入库单删除后，无法恢复，确认要删除吗？",
-	    callback, undefined, $scope);
-    };
+    // 	dialog.request(
+    // 	    "入库单删除", "入库单删除后，无法恢复，确认要删除吗？",
+    // 	    callback, undefined, $scope);
+    // };
 
     
     /*

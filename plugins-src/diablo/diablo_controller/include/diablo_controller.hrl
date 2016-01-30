@@ -30,8 +30,8 @@
 %% inventory action
 -define(NEW_INVENTORY, 0).
 -define(REJECT_INVENTORY, 1).
--define(TRANSFER_INVENTORY_FROM, 1).
--define(TRANSFER_INVENTORY_TO, 1).
+-define(TRANSFER_INVENTORY_FROM, 2).
+-define(TRANSFER_INVENTORY_TO, 3).
 
 %% free size
 -define(FREE_SIZE, 0).

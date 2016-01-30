@@ -29,19 +29,22 @@
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div> 
 
             <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
-                             filter="filter"></query-pattern>
+                             filter="filter">
+	      </query-pattern>
             </div>
 	  </div> <!--END row-->
 
@@ -56,15 +59,18 @@
 	    <div class="table-responsive"> 
 	      <!--EBGIN table -->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
 		    <th x-ng-click="toggle_base()">
 			<span x-ng-if="!hidden.base">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
-			<span x-ng-if="hidden.base">
-			  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			  <i class="glyphicon glyphicon-backward fg-red"></i>
+			  单号</span>
+			<span x-ng-if="hidden.base">单号
+			  <i class="glyphicon glyphicon-forward fg-red"></i>
+			</span>
 		    <th x-ng-if="!hidden.base">类型</th> 
 		    <th x-ng-if="!hidden.base">店铺</th>
 		    <th x-ng-if="!hidden.base">店员</th> 
@@ -81,9 +87,11 @@
 		    <th class="info">
 		      <span x-ng-click="toggle_balance()">
 			<span x-ng-if="!hidden.balance">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>帐户欠款</span>
-			<span x-ng-if="hidden.balance">
-			  帐户欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			  <i class="glyphicon glyphicon-backward fg-red"></i>
+			  帐户欠款</span>
+			<span x-ng-if="hidden.balance">帐户欠款
+			  <i class="glyphicon glyphicon-forward fg-red"></i>
+			</span>
 		      </span>
 		    </th> 
 		    
@@ -92,9 +100,11 @@
 
 		    <th x-ng-click="toggle_comment()" class="danger">
 		      <span x-ng-if="!hidden.comment">
-			<i class="glyphicon glyphicon-backward fg-red"></i>本次欠款</span>
-		      <span x-ng-if="hidden.comment">
-			本次欠款<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			<i class="glyphicon glyphicon-backward fg-red"></i>
+			本次欠款</span>
+		      <span x-ng-if="hidden.comment">本次欠款
+			<i class="glyphicon glyphicon-forward fg-red"></i>
+		      </span>
 		    </th>
 		    
 		    <!-- <th>总数</th> -->
@@ -111,11 +121,12 @@
 		    <td x-ng-if="!hidden.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>入库</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-darkOrange" x-ng-switch-when=2>
+			转出</span>
+		      <span class="fg-pink" x-ng-switch-when=3>移进</span>
 		    </td>
 		    <td x-ng-if="!hidden.base">{{r.shop.name}}</td>
 		    <td x-ng-if="!hidden.base">{{r.employee.name}}</td>
-		    
-		    <!-- <td>{{r.firm.name}}</td>  -->
 		    <td>{{r.total}}</td>
 
 		    <td x-ng-if="!hidden.balance">{{r.cash}}</td>
@@ -123,38 +134,28 @@
 		    <td x-ng-if="!hidden.balance">{{r.wire}}</td>
 		    <td x-ng-if="!hidden.balance">{{r.verificate}}</td>
 		    <td x-ng-if="!hidden.balance"> 
-		      <span x-ng-if="r.e_pay!==0" class="bg-blue">{{r.e_pay}}</span>
+		      <span x-ng-if="r.e_pay!==0" class="bg-blue">
+			{{r.e_pay}}</span>
 		      <span x-ng-if="r.e_pay===0">{{r.e_pay}}</span>
 		    </td>
 		    
 		    <td>{{r.balance}}</td>
 
 		    <td x-ng-switch on="r.type">
-		      <span x-ng-switch-when=0>
-			{{round(r.should_pay)}}
-		      </span>
 		      <span class="fg-red" x-ng-switch-when=1>
-			{{round(r.should_pay)}}
+		      	{{r.should_pay}}
 		      </span>
+		      <span x-ng-switch-default>
+		      	{{r.should_pay}}
+		      </span> 
 		    </td> 
 		    <!-- <td>{{r.should_pay}}</td> -->
 		    <td>{{r.has_pay}}</td>
 
 		    <td>
-		      {{r.balance + round(r.should_pay) + r.e_pay
+		      {{r.balance + r.should_pay + r.e_pay
 		      - r.has_pay - r.verificate}} 
-		    </td>
-		    
-		    <!-- r.should_pay + (r.balance - r.has_pay)-->
-		    <!-- <td x-ng-switch on="r.type"> -->
-		    <!--   <span x-ng-switch-when=0> -->
-		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!--   <span class="bg-red" x-ng-switch-when=1> -->
-		    <!-- 	{{f_sub(f_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!-- </td> -->
-		    <!-- <td>{{r.price5}}</td> -->
+		    </td> 
 		    
 		    <td x-ng-if="!hidden.comment">
 		      <span x-ng-switch on="r.comment">
@@ -166,7 +167,8 @@
 		    <td>
 		      <button class="btn diablo-button btn-primary"
 		    	 x-ng-click="trans_rsn_detail(r)">
-			明细<i class="glyphicon glyphicon-map-marker"></i></button>
+			明细<i class="glyphicon glyphicon-map-marker"></i>
+		      </button>
                       
 		      <button class="btn diablo-button btn-danger"
 			      x-ng-disabled="r.state===1"
@@ -194,25 +196,7 @@
 		  
 		</tbody>
 
-		<tfoot>
-		  <!-- <tr> -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <span class="pagination"> -->
-		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		  <!-- 	  共 {{total_items}} 项</span> -->
-		  <!--     </span> -->
-		  <!--     <pagination class="pagination-lg pull-right" -->
-		  <!-- 		  total-items="total_items" -->
-		  <!-- 		  items-per-page="items_perpage" -->
-		  <!-- 		  num-pages="num_pages" -->
-		  <!-- 		  max-size="max_page_size" -->
-		  <!-- 		  boundary-links="true" -->
-		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 		  x-ng-model="current_page" -->
-		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
+		<tfoot> 
 		</tfoot> 
 		
 	      </table> <!--END supplier table-->

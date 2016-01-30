@@ -137,11 +137,12 @@ action(Session, Req, {"delete_expire_data"}, Payload) ->
     ?DEBUG("delete_expire_data with session ~p", [Session]), 
     Merchant = ?session:get(merchant, Session),
     Expire = ?v(<<"expire">>, Payload),
+    Stock  = ?v(<<"stock">>, Payload, false),
     Sell   = ?v(<<"sell">>, Payload, false),
     
     case ?session:get(type, Session) of
 	?MERCHANT ->
-	    case ?w_base:delete_data(expire, Merchant, Expire, Sell) of
+	    case ?w_base:delete_data(expire, Merchant, Expire, Stock, Sell) of
 		{ok, _} ->
 		    ?utils:respond(200, Req, ?succ(delete_expire_data, ?MERCHANT));
 		{error, Error} ->
@@ -166,20 +167,29 @@ sidebar(Session) ->
     Card = 
 	case ?right_auth:authen(?new_w_bank_card, Session) of
 	    {ok, ?new_w_bank_card} ->
-		[{"new_bank_card", "新增银行卡", "glyphicon glyphicon-plus"},
-		 {"bank_card_detail", "银行卡详情", "glyphicon glyphicon-briefcase"}];
+		[{"new_bank_card",
+		  "新增银行卡",
+		  "glyphicon glyphicon-plus"},
+		 {"bank_card_detail",
+		  "银行卡详情",
+		  "glyphicon glyphicon-briefcase"}];
 	    _ ->
-		[{"bank_card_detail", "银行卡详情", "glyphicon glyphicon-briefcase"}]
+		[{"bank_card_detail",
+		  "银行卡详情",
+		  "glyphicon glyphicon-briefcase"}]
 	end, 
 
     Print =
 	case ?right_auth:authen(?new_w_printer_conn, Session) of
 	    {ok, ?new_w_printer_conn} ->
 		[
-		 {"connect_new",    "打印机绑定", "glyphicon glyphicon-plus"},
-		 {"connect_detail", "绑定详情", "glyphicon glyphicon-briefcase"}];
+		 {"connect_new",
+		  "打印机绑定", "glyphicon glyphicon-plus"},
+		 {"connect_detail",
+		  "绑定详情", "glyphicon glyphicon-briefcase"}];
 	    _ ->
-		[{"connect_detail", "绑定详情", "glyphicon glyphicon-leaf"}]
+		[{"connect_detail",
+		  "绑定详情", "glyphicon glyphicon-leaf"}]
 	end,
 
     SBase = [{{"bank", "银行卡设置", "glyphicon glyphicon-credit-card"}, Card},

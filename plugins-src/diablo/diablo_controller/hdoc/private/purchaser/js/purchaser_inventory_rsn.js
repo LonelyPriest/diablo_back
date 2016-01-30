@@ -317,7 +317,7 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     wgoodService, purchaserService, localStorageService,
     user, filterBrand, filterFirm, filterType,
     filterEmployee, filterSizeGroup, filterColor, base){
-    
+    // console.log(filterEmployee);
     // var permitShops      = user.shopIds;
     $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
@@ -440,14 +440,20 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
 		    
 		    $scope.inventories = angular.copy(result.data);
 		    angular.forEach($scope.inventories, function(inv){
-			inv.shop     = diablo_get_object(inv.shop_id, $scope.shops);
-			inv.employee = diablo_get_object(inv.employee_id, filterEmployee);
-			inv.firm     = diablo_get_object(inv.firm_id, filterFirm);
-			inv.brand    = diablo_get_object(inv.brand_id, filterBrand);
-			inv.itype    = diablo_get_object(inv.type_id, filterType);
+			inv.shop     =
+			    diablo_get_object(inv.shop_id, $scope.shops);
+			inv.employee =
+			    diablo_get_object(inv.employee_id, filterEmployee);
+			inv.firm     =
+			    diablo_get_object(inv.firm_id, filterFirm);
+			inv.brand    =
+			    diablo_get_object(inv.brand_id, filterBrand);
+			inv.itype    =
+			    diablo_get_object(inv.type_id, filterType);
 		    });
 		    
-		    diablo_order_page(page, $scope.items_perpage, $scope.inventories);
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.inventories);
 		})
 	}) 
     }

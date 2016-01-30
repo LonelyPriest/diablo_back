@@ -36,13 +36,15 @@
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 	    
             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -55,7 +57,8 @@
 
 	  <query-group filters="filters"
 	  	       prompt="prompt"
-	  	       ok="do_search(default_page)"></query-group>
+	  	       ok="do_search(default_page)">
+	  </query-group>
 	  
 	</div> <!--END table-toolbar-->
 	
@@ -66,15 +69,19 @@
 	    <div class="table-responsive">
 	      <!--EBGIN table supplier-->
 	      <table class="table table-bordered
-			    table-striped table-hover table-condensed table-advanced">
+			    table-striped table-hover
+			    table-condensed table-advanced">
 		<thead>
 		  <tr>
 		    <th>序号</th>
 		    <th x-ng-click="toggle_base()">
 		      <span x-ng-if="!hidden.base">
-		    	<i class="glyphicon glyphicon-backward fg-red"></i>单号</span>
+		    	<i class="glyphicon glyphicon-backward fg-red"></i>
+			单号</span>
 		    	<span x-ng-if="hidden.base">
-		    	  单号<i class="glyphicon glyphicon-forward fg-red"></i></span>
+		    	  单号
+			  <i class="glyphicon glyphicon-forward fg-red"></i>
+			</span>
 		    </th>
 		    
 		    <th x-ng-if="!hidden.base">采购</th> 
@@ -101,6 +108,9 @@
 		    <td x-ng-if="!hidden.base" x-ng-switch on="inv.type">
 		      <span x-ng-switch-when=0>入库</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-darkOrange" x-ng-switch-when=2>
+			转出</span>
+		      <span class="fg-pink" x-ng-switch-when=3>移进</span>
 		    </td>
 		    
 		    <td x-ng-if="!hidden.base">{{inv.shop.name}}</td>
@@ -116,7 +126,12 @@
 
 		    <td x-ng-switch on="inv.type">
 		      <span x-ng-switch-when=0>{{inv.amount}}</span>
-		      <span class="fg-red" x-ng-switch-when=1>{{inv.amount}}</span>
+		      <span class="fg-red" x-ng-switch-when=1>
+			{{inv.amount}}</span>
+		      <span class="fg-darkOrange" x-ng-switch-when=2>
+			{{inv.amount}}</span>
+		      <span class="fg-pink" x-ng-switch-when=3>
+			{{inv.amount}}</span>
 		    </td>
 		    
 		    <!-- <td>{{inv.amount}}</td> -->
@@ -127,10 +142,8 @@
 		      <button class="btn diablo-button btn-primary"
 			      x-ng-disabled="inv.free==0"
 		    	      x-ng-click="rsn_detail(inv)">
-			详情<i class="glyphicon glyphicon-map-marker"></i></button>
-		      <!-- <button class="btn btn-warning red-stripe btn-xs" -->
-		      <!-- 	      x-ng-click="edit_rsn_detail(inv)"> -->
-		      <!-- 	修改<i class="glyphicon glyphicon-edit"></i></button> -->
+			详情<i class="glyphicon glyphicon-map-marker"></i>
+		      </button> 
 		    </td>
 		  </tr>
 		  <tr x-ng-if="total_items!==0" class="bg-white">
@@ -142,24 +155,6 @@
 		</tbody>
 
 		<tfoot>
-		  <!-- <tr> -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <span class="pagination"> -->
-		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		  <!-- 	  共 {{total_items}} 项</span> -->
-		  <!--     </span> -->
-		  <!--     <pagination class="pagination-lg pull-right" -->
-		  <!-- 		  total-items="total_items" -->
-		  <!-- 		  items-per-page="items_perpage" -->
-		  <!-- 		  num-pages="num_pages" -->
-		  <!-- 		  max-size="max_page_size" -->
-		  <!-- 		  boundary-links="true" -->
-		  <!-- 		  previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 		  first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 		  x-ng-model="current_page" -->
-		  <!-- 		  x-ng-change="page_changed()"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
 		</tfoot>
 		
 	      </table> <!--END supplier table-->

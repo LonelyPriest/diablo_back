@@ -333,7 +333,8 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 	    }
 	    
 	    firmService.filter_w_inventory_new_rsn_group(
-		$scope.match, search, page, $scope.items_perpage).then(function(result){
+		$scope.match, search, page, $scope.items_perpage
+	    ).then(function(result){
 		    console.log(result);
 		    if (page === 1){
 			$scope.total_items = result.total;
@@ -342,14 +343,23 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 		    
 		    $scope.inventories = angular.copy(result.data);
 		    angular.forEach($scope.inventories, function(inv){
-			inv.shop     = diablo_get_object(inv.shop_id, user.sortShops);
-			inv.employee = diablo_get_object(inv.employee_id, filterEmployee);
-			inv.firm     = diablo_get_object(inv.firm_id, filterFirm);
-			inv.brand    = diablo_get_object(inv.brand_id, filterBrand);
-			inv.itype    = diablo_get_object(inv.type_id, filterType);
+			inv.shop     = diablo_get_object(
+			    inv.shop_id, user.sortShops);
+			
+			inv.employee = diablo_get_object(
+			    inv.employee_id, filterEmployee);
+			
+			inv.firm     = diablo_get_object(
+			    inv.firm_id, filterFirm);
+			
+			inv.brand    = diablo_get_object(
+			    inv.brand_id, filterBrand);
+			inv.itype    = diablo_get_object(
+			    inv.type_id, filterType);
 		    });
 		    
-		    diablo_order_page(page, $scope.items_perpage, $scope.inventories);
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.inventories);
 		    $scope.current_page = page;
 		})
 	}) 

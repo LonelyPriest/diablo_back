@@ -29,7 +29,8 @@
 	 multi_print/1, get_printer_state/4, multi_send/5]).
 
 -import(?f_print,
-	[width/2, middle/3, pading/1, left_pading/2, clean_zero/1, br/1,
+	[width/2, middle/3, middle/4,
+	 pading/1, left_pading/2, clean_zero/1, br/1,
 	 line/2, line/4, line/5, phd/1, line_space/1,
 	 sort_amount/3, flattern/3, field_len/4, field/2, f_round/1]).
 
@@ -273,8 +274,8 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
 			  PrintTable
 			      = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
-			  IsRound
-			      = ?to_i(?v(<<"pround">>, Setting, ?NO)),
+			  %% IsRound
+			  %%     = ?to_i(?v(<<"pround">>, Setting, ?NO)),
 
 			  %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
 			  %% [PrintRetailer, PrintTable]), 
@@ -308,9 +309,9 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  %% ?DEBUG("body ~ts", [?to_b(Body)]),
 
 			  Stastic = body_stastic(
-				      IsRound, Brand, Model, Column, Attrs),
+				      Brand, Model, Column, Setting, Attrs),
 			  Foot = body_foot(
-				   Brand, Model, Column,
+				   static, Brand, Model, Column,
 				   Banks, Mobile, Setting, Phones), 
 			  Content =
 			      %% ?f_print:br(backward, Brand, Model)
@@ -320,21 +321,25 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  %% DBody = ?f_print:pagination(
 			  %% 	     just_page, Height * 10, Content),
 
-			  UpgradeDevices =
-			      ["1006", "1008", "1024", "1027", "1030", "1031", "1012"],
+			  NoUpgradeDevices =
+			      ["1004", "1001", "1002", "1003", "1007",
+			       "1010", "1023"],
+			  %% ["1006", "1008", "1024", "1027",
+			  %% "1030", "1031", "1012"],
 			  
 			  DBody = 
-			      case lists:member(?to_s(SN), UpgradeDevices) of
-			  	  true -> 
-			  	      %% no page
-			  	      %% ?DEBUG("no page with sn ~p", [SN]),
-			  	      ?f_print:pagination(
-			  		 just_size, Height * 10, Content);
-			  	  false ->
-			  	      %% auto page
+			      case lists:member(
+				     ?to_s(SN), NoUpgradeDevices) of
+			  	  true ->
+				      %% auto page
 			  	      %% ?DEBUG("auto page with sn ~p", [SN]),
 			  	      ?f_print:pagination(
-			  		 auto, Height * 10, Content)
+			  		 auto, Height * 10, Content);
+			  	  false ->
+				      %% no page
+				      %% ?DEBUG("no page with sn ~p", [SN]),
+				      ?f_print:pagination(
+					 just_size, Height * 10, Content)
 			      end,
 
 			  %% page by height
@@ -430,13 +435,17 @@ print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S) ->
     Content;
     
 print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay) -> 
-    Fields     = detail(print_format, Merchant, Shop), 
+    Fields     = detail(print_format, Merchant, Shop),
     PrintModel = ?to_i(?v(<<"pformat">>, Setting, ?COLUMN)),
     PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
     ?DEBUG("PrintModel ~p, PrintTable ~p", [PrintModel, PrintTable]),
 
     Len2total = field_len(Fields, <<"count">>, PrintModel, 0),
-    ?DEBUG("Len2total ~p", [Len2total]), 
+    ?DEBUG("Len2total ~p", [Len2total]),
+
+    Len2calc = field_len(Fields, <<"cacl">>, PrintModel, 0),
+    ?DEBUG("Len2calc ~p", [Len2calc]),
+    
     {IsHand, _}      = field(hand, Fields),
     {IsSizeName, _}  = field(size_name, Fields),
     
@@ -471,15 +480,20 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 	fun(?TABLE) ->
 		
 		{Mh, Ml} = middle(?TABLE, WidthTotal, Total),
-		{Mh1, Ml1} = middle(?TABLE, WidthCalc, round(ShouldPay)),
+		{Mh1, Ml1} = middle(?TABLE, WidthCalc, clean_zero(ShouldPay)),
 		
-		left_pading(PBrand, Model) ++ "|" ++ pading(Len2total -2)
+		left_pading(PBrand, Model) ++ "|" ++ pading(Len2total - 2)
 		    ++ "|" ++ pading(Mh)
 		    ++ ?to_s(Total) ++ pading(Ml)
-		    
-		    ++ "|" ++ pading(Mh1)
-		    ++ ?to_s(round(ShouldPay)) ++ pading(Ml1)
-		    
+		    ++ "|"
+
+		    ++ case Len2calc - Len2total - WidthCalc of
+			   WidthTotal  -> [];
+			   WidthDiffer ->
+			       pading(WidthDiffer - WidthTotal - 1) ++ "|"
+		       end
+		    ++ pading(Mh1)
+		    ++ ?to_s(clean_zero(ShouldPay)) ++ pading(Ml1) 
 		    ++ "|" ++ br(PBrand)
 		    
 		    ++ line(add_minus, ?TABLE, ?COLUMN, Fields)
@@ -513,7 +527,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		?DEBUG("NewInvs ~p", [NewInvs]),
 		
 		%% BodyHead = body_head(PBrand, Model, Fields, Column),
-		BodyHead = body_head(PrintTable, PrintModel, PBrand, Model, Fields),
+		BodyHead = body_head(
+			     PrintTable, PrintModel, PBrand, Model, Fields),
 		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
 		
 		BodyContent = 
@@ -524,15 +539,16 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 			      RowFun([{<<"total">>, RT},
 				      {<<"hand">>, RH}|Inv], []) ++ Acc0 
 		      end, "", NewInvs)
-		    ++ left_pading(PBrand, Model) ++ pading(Len2total) ++ ?to_s(Total)
+		    ++ left_pading(PBrand, Model)
+		    ++ pading(Len2total) ++ ?to_s(Total)
 		    ++ br(PBrand),
 		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
 		BodyHead ++ BodyContent;
-	   (no_hand, ?COLUMN) ->
-
-		BodyHead = body_head(PrintTable, ?COLUMN, PBrand, Model, Fields),
-		
+	   (no_hand, ?COLUMN) -> 
+		BodyHead = body_head(
+			     PrintTable, ?COLUMN, PBrand, Model, Fields), 
 		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
+		
 		BodyContent = 
 		    lists:foldr(
 		      fun({struct, Inv}, Acc0)->
@@ -542,7 +558,6 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					RowFun(Inv, A) ++ Acc1 
 				end, [], Amounts) ++ Acc0
 		      end, "", Invs)
-		    %%++ left_pading(PBrand, Model) ++ pading(Len2total) ++ ?to_s(Total)
 		    ++ StasticFun(PrintTable),
 		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
 		line(add_minus, ?TABLE, ?COLUMN, Fields) ++ br(PBrand)
@@ -562,15 +577,14 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					      find_size(G, SizeGroups) ++ Acc
 				      end, [], lists:sort(GS)),
 
-			  ?DEBUG("lenght gs ~p, allsize ~p", [length(GS), AllSize]),
+			  ?DEBUG("lenght gs ~p, allsize ~p",
+				 [length(GS), AllSize]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
 			      	  true -> [Us || Us <- AllSize,
 						 lists:member(Us, UsedSizes)];
 			      	  false -> AllSize
 			      end,
-
-			  ?DEBUG("sizes ~p", [Sizes]),
 			  
 			  AFun =
 			      fun(Color, A) ->
@@ -862,6 +876,7 @@ title(_Brand, _Model, 33, Title) ->
     T;
 
 title(Brand, Model, Column, Title) ->
+    ?DEBUG("title ~ts", [?to_b(Title)]),
     Start = (Column - ?f_print:width(chinese, Title) * 2) div 2, 
     T = 
 	?f_print:left_pading(Brand, Model)
@@ -966,11 +981,16 @@ body_head(?TABLE, ?COLUMN, Brand, Model, Fields) ->
     ?f_print:left_pading(Brand, Model)
 	++ lists:foldr(
 	     fun({Name, CName, Width}, Acc) when Name =:= FName ->
-		     phd("|") ++ CName
-			 ++ pading(Width - width(chinese, CName) - 2)
+		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width - 1), 
+		     phd("|")
+			 ++ pading(Mh) ++ CName ++ pading(Ml)
+			 %% ++ CName
+			 %% ++ pading(Width - width(chinese, CName) - 2)
 			 ++ phd("|") ++ Acc;
 		({_Name, CName, Width}, Acc) ->
-		     CName ++ pading(Width - width(chinese, CName) - 1)
+		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width),
+		     pading(Mh) ++ CName ++ pading(Ml)
+		     %% CName ++ pading(Width - width(chinese, CName) - 1)
 			 ++ phd("|") ++ Acc 
 	     end, [], Fields)
 	++ br(Brand) ++
@@ -994,11 +1014,16 @@ body_head(?TABLE, ?ROW, Brand, Model, Fields, SizeString) ->
 	     fun({<<"size">>, _, _}, Acc) -> 
 		     SizeString ++ Acc;
 		({Name, CName, Width}, Acc) when Name =:= FName ->
-		     phd("|") ++ CName
-			 ++ pading(Width - width(chinese, CName) - 2)
+		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width - 1),
+		     phd("|")
+			 ++ pading(Mh) ++ CName ++ pading(Ml)
+			 %% ++ CName
+			 %% ++ pading(Width - width(chinese, CName) - 2)
 			 ++ phd("|") ++ Acc;
 		({_Name, CName, Width}, Acc) ->
-		     CName ++ pading(Width - width(chinese, CName) - 1)
+		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width),
+		     pading(Mh) ++ CName ++ pading(Ml)
+			 %% CName ++ pading(Width - width(chinese, CName) - 1)
 			 ++ phd("|") ++ Acc 
 	     end, [], Fields)
 	++ ?f_print:br(Brand);
@@ -1014,7 +1039,7 @@ body_head(?STRING, ?ROW, Brand, Model, Fields, SizeString) ->
 	++ ?f_print:br(Brand).
     
 
-body_stastic(_IsRound, Brand, Model, 33, Attrs) ->
+body_stastic(Brand, Model, 33, _Setting, Attrs) ->
     ?DEBUG("Brand ~p", [Brand]),
     LastBalance  = ?v(<<"balance">>, Attrs), 
     Cash         = ?v(<<"cash">>, Attrs, 0),
@@ -1054,7 +1079,7 @@ body_stastic(_IsRound, Brand, Model, 33, Attrs) ->
 	++ ?f_print:left_pading(Brand, Model) ++ "累计欠款：" ++ ?to_s(AccDet) 
 	++ ?f_print:br(Brand);
 
-body_stastic(IsRound, Brand, Model, 50, Attrs) ->
+body_stastic(Brand, Model, 50, Setting, Attrs) ->
     LastBalance  = ?v(<<"balance">>, Attrs, 0), 
     Cash         = ?v(<<"cash">>, Attrs, 0),
     Card         = ?v(<<"card">>, Attrs, 0),
@@ -1078,6 +1103,8 @@ body_stastic(IsRound, Brand, Model, 50, Attrs) ->
     %% ?DEBUG("Comment ~p", [Comment]),
 
     TotalSPay = ShouldPay + EPay,
+
+    IsRound = ?to_i(?v(<<"pround">>, Setting, ?NO)),
     
     left_pading(Brand, Model) ++ "总计：" ++ ?to_s(Total)
 	++ pading(2) ++ "总金额：" ++ round(IsRound, TotalSPay)
@@ -1099,17 +1126,18 @@ body_stastic(IsRound, Brand, Model, 50, Attrs) ->
     %% ++ line(minus, 50) ++ br(Brand)
 	
 	++ ?f_print:left_pading(Brand, Model)
-	++ "上次欠款：" ++ decorate_data(block)
-	++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
+	++ debt(print_format, Setting, LastBalance, DebtName, Debt, AccDet)
+	%% ++ "上次欠款：" ++ decorate_data(block)
+	%% ++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
 	
-	++ pading(2) ++ DebtName ++ decorate_data(block) 
-	++ round(IsRound, Debt) ++ decorate_data(cancel_block)
+	%% ++ pading(2) ++ DebtName ++ decorate_data(block) 
+	%% ++ round(IsRound, Debt) ++ decorate_data(cancel_block)
 	
-	++ pading(2) ++ "累计欠款：" ++ decorate_data(block) 
-	++ round(IsRound, AccDet)  ++ decorate_data(cancel_block)
+	%% ++ pading(2) ++ "累计欠款：" ++ decorate_data(block) 
+	%% ++ round(IsRound, AccDet)  ++ decorate_data(cancel_block)
 	++ br(Brand);
 
-body_stastic(IsRound, Brand, Model, Column, Attrs) ->
+body_stastic(Brand, Model, Column, Setting, Attrs) ->
     LastBalance  = ?v(<<"balance">>, Attrs, 0), 
     Cash         = ?v(<<"cash">>, Attrs, 0),
     Card         = ?v(<<"card">>, Attrs, 0),
@@ -1130,6 +1158,8 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
 
 
     TotalSPay = ShouldPay + EPay, 
+
+    IsRound = ?to_i(?v(<<"pround">>, Setting, ?NO)),
     
     left_pading(Brand, Model)
 	++ "总计：" ++ ?to_s(Total)
@@ -1169,19 +1199,20 @@ body_stastic(IsRound, Brand, Model, Column, Attrs) ->
 	%%        false -> ?f_print:br(Model) ++ ?f_print:left_pading(Brand, Model)
 	%%    end
 
-	++ "上次欠款：" ++ decorate_data(block)
-	++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
+	%% ++ "上次欠款：" ++ decorate_data(block)
+	%% ++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
 	
-	++ pading(2) ++ DebtName ++ decorate_data(block)
-	++ round(IsRound, Debt) ++ decorate_data(cancel_block)
+	%% ++ pading(2) ++ DebtName ++ decorate_data(block)
+	%% ++ round(IsRound, Debt) ++ decorate_data(cancel_block)
 	
-	++ pading(2) ++ "累计欠款：" ++ decorate_data(block)
-	++ round(IsRound, AccDet) ++ decorate_data(cancel_block)
+	%% ++ pading(2) ++ "累计欠款：" ++ decorate_data(block)
+	%% ++ round(IsRound, AccDet) ++ decorate_data(cancel_block);
+	++ debt(print_format, Setting, LastBalance, DebtName, Debt, AccDet)
 	
 	++ br(Brand) ++ ?f_print:line(minus, Column)
 	++ br(Brand).
 
-body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
+body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
     ?DEBUG("start to build body_foot banks ~p~nmobile ~p~nsetting ~p~n",
 	   [Banks, Mobile, Setting]), 
 
@@ -1189,7 +1220,31 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 	       ?v(<<"comment2">>, Setting, []),
 	       ?v(<<"comment3">>, Setting, [])],
 
-    %% ?DEBUG("commetns ~p", [Comments]),
+    case ?to_i(?v(<<"pccmix">>, Setting, 0)) of
+	0 ->
+	    body_foot(
+	      format_default, Brand, Model, Column, Banks, Mobile, Phones)
+		++ br(Brand);
+	1 ->
+	    body_foot(
+	      format_column, Brand, Model, Column, Banks,
+	      [{<<"phone">>, Mobile, []}|Phones], [])
+    end
+    %% comment
+	++ left_pading(Brand, Model)
+	++ "说明：" ++ ?to_s(CH) ++ br(Brand) 
+	++ lists:foldr(
+	     fun([], Acc) ->
+		     Acc;
+	     (M, Acc) ->
+		     left_pading(Brand, Model)
+			 ++ pading(6) ++ ?to_s(M) ++ br(Brand) ++ Acc
+	     end, [], CT)
+	++ left_pading(Brand, Model)
+	++ pading(Column - 26)
+	++ "打印日期：" ++ ?utils:current_time(format_localtime).
+
+body_foot(format_default, Brand, Model, Column, Banks, Mobile, Phones) ->
     {SBank, _} = 
 	lists:foldr(
 	  fun({Bank}, {S, L}) ->
@@ -1246,32 +1301,73 @@ body_foot(Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 			   ++ phone(Phone, Remark)}
 		  end
 	  end, {10 + length(?to_s(Mobile)), []}, Phones),
-	
-    %mobile
+
+    %% mobile
     SBank ++ br(Brand)
 	++ left_pading(Brand, Model)
-	++ "联系方式：" ++ ?to_s(Mobile) ++ SPhone 
-	
-    %% comment
-	++ br(Brand)
-	++ left_pading(Brand, Model)
-	++ "说明：" ++ ?to_s(CH) ++ br(Brand) 
-	++ lists:foldr(
-	     fun([], Acc) ->
-		     Acc;
-	     (M, Acc) ->
-		     left_pading(Brand, Model)
-			 ++ pading(6) ++ ?to_s(M) ++ br(Brand) ++ Acc
-	     end, [], CT)
-	++ left_pading(Brand, Model)
-	++ pading(Column - 26)
-	++ "打印日期：" ++ ?utils:current_time(format_localtime).
-	%% ++ br(Brand)
-	%% ++ [27, 74, 144] ++ [27, 74, 144].
-	%% ++ ?f_print:br(forward, Brand, Model).
+	++ "联系方式：" ++ ?to_s(Mobile) ++ SPhone;
 
-	
+body_foot(format_column, _Brand, _Model, _Column, [], [], Acc) ->
+    Acc;
+body_foot(format_column, Brand, Model, Column, Banks, [], Acc) ->
+    [{Bank}|TBanks] = Banks,
+    
+    Name     = ?v(<<"name">>, Bank),
+    BankName = ?v(<<"bank">>, Bank),
+    No       = ?v(<<"no">>, Bank),
+    S1 = left_pading(Brand, Model)
+	++ ?to_s(Name) ++ pading(2)
+	++ ?to_s(BankName) ++ pading(2) ++ ?to_s(No) ++ br(Brand),
+    
+    body_foot(format_column, Brand, Model, Column, TBanks, [], Acc ++ S1);
 
+body_foot(format_column, Brand, Model, Column, [], Phones, Acc) ->
+    [Phone|TPhones]   = Phones, 
+    {_, PhoneNo, PhoneRemark} = Phone,
+    %% PhoneLength = 2 + length(?to_s(PhoneNo))
+    %% 	+ case PhoneRemark of
+    %% 	      []   -> 0;
+    %% 	      <<>> -> 0;
+    %% 	      _    -> 4 + width(chinese, PhoneRemark)
+    %% 	  end,
+    
+    S1 =
+	%% pading(Column - PhoneLength)
+	left_pading(Brand, Model) ++  pading(70)
+	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
+    
+    body_foot(format_column, Brand, Model, Column, [], TPhones, Acc ++ S1);
+    
+body_foot(format_column, Brand, Model, Column, Banks, Phones, Acc) ->
+    [{Bank}|TBanks] = Banks, 
+    Name     = ?v(<<"name">>, Bank),
+    BankName = ?v(<<"bank">>, Bank),
+    No       = ?v(<<"no">>, Bank),
+
+    BankLength  =  width(chinese, Name)  + 2
+    	+ width(chinese, BankName)  + 2
+    	+ width(latin1, No),
+
+    ?DEBUG("BankLength ~p", [BankLength]),
+
+    [Phone|TPhones] = Phones, 
+    {_, PhoneNo, PhoneRemark} = Phone,
+    
+    %% PhoneLength = 4 + length(?to_s(PhoneNo))
+    %% 	+ case PhoneRemark of
+    %% 	       []   -> 0;
+    %% 	       <<>> -> 0;
+    %% 	       _    -> 4 + width(chinese, PhoneRemark)
+    %% 	   end,
+    
+    S1 = left_pading(Brand, Model)
+	++ ?to_s(Name) ++ pading(2)
+	++ ?to_s(BankName) ++ pading(2) ++ ?to_s(No)
+	%% ++ pading(Column - BankLength - PhoneLength)
+	++ pading(70 - BankLength)
+	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
+    body_foot(
+      format_column, Brand, Model, Column, TBanks, TPhones, Acc ++ S1). 
 
 row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
     [H|T] = FlatternAmounts,
@@ -1644,23 +1740,45 @@ detail(size_group, Merchant) ->
     end.
 
 detail(print_format, Merchant, Shop) ->
-    {ok, Formats} = ?w_user_profile:get(print_format, Merchant, Shop), 
-    lists:foldr(
-      fun(F, Acc) ->
-	      case
-		  lists:filter(
-		    fun({Format}) -> 
-			    ?v(<<"name">>, Format) =:= ?to_b(F)
-				andalso ?v(<<"print">>, Format) =:= 1
-				andalso ?v(<<"width">>, Format) =/= 0
-		    end, Formats) of
-		  [] -> Acc;
-		  [{S}] ->
-		      [{?v(<<"name">>, S),
-			field_name(?v(<<"name">>, S)), ?v(<<"width">>, S)}
-		       |Acc]
-	      end
-      end, [], ?PRINT_FIELDS);
+    {ok, Formats} = ?w_user_profile:get(print_format, Merchant, Shop),
+    %% ?DEBUG("print formats ~p", [Formats]),
+    case lists:filter(fun({Format}) ->
+			      ?v(<<"seq">>, Format) =/= 0
+				  andalso ?v(<<"print">>, Format) =:= 1
+				  andalso ?v(<<"width">>, Format) =/= 0
+		 end, Formats) of
+	[] ->
+	    lists:foldr(
+	      fun(F, Acc) ->
+		      case
+			  lists:filter(
+			    fun({Format}) -> 
+				    ?v(<<"name">>, Format) =:= ?to_b(F)
+					andalso ?v(<<"print">>, Format) =:= 1
+					andalso ?v(<<"width">>, Format) =/= 0
+			    end, Formats) of
+			  [] -> Acc;
+			  [{S}] ->
+			      [{?v(<<"name">>, S),
+				field_name(?v(<<"name">>, S)),
+				?v(<<"width">>, S)} |Acc]
+		      end
+	      end, [], ?PRINT_FIELDS);
+	 Filters->
+	    %% ?DEBUG("print format filters ~p", [Filters]),
+	    SortFilters =
+		lists:sort(
+		  fun({FA}, {FB}) ->
+			  ?v(<<"seq">>, FA) =< ?v(<<"seq">>, FB)
+		  end, Filters),
+	    
+	    lists:foldr(
+	      fun({Format}, Acc) ->
+		      [{?v(<<"name">>, Format),
+			field_name(?v(<<"name">>, Format)),
+			?v(<<"width">>, Format)} |Acc]
+	      end, [], SortFilters)
+    end;
 
 detail(base_setting, Merchant, Shop) ->
     ?DEBUG("base_setting with merhcant ~p, Shop ~p", [Merchant, Shop]),
@@ -1687,9 +1805,8 @@ detail(base_setting, Merchant, Shop) ->
 		   end
 	   end, {[], []}, Settings),
     ?DEBUG("setting sort ~p", [Sort]),
-    Sort.
-
-
+    Sort.    
+	    	    
 field_name(<<"brand">>)        -> "品牌";
 field_name(<<"style_number">>) -> "款号";
 field_name(<<"type">>)         -> "类型";
@@ -1701,7 +1818,8 @@ field_name(<<"discount">>)     -> "折扣";
 field_name(<<"dprice">>)       -> "折后价";
 field_name(<<"hand">>)         -> "手";
 field_name(<<"count">>)        -> "数量";
-field_name(<<"calc">>)         -> "小计".
+field_name(<<"calc">>)         -> "小计";
+field_name(<<"comment">>)      -> "备注".
 
 debt(Direct, Balance, Debt) ->
     case ?w_sale:direct(Direct) of
@@ -1710,6 +1828,39 @@ debt(Direct, Balance, Debt) ->
 	_ ->
 	    { "本次欠款：", ?to_f(Balance + Debt)}
     end.
+
+debt(print_format, Setting, LastBalance, DebtName, Debt, AccDet) ->
+    IsRound = ?to_i(?v(<<"pround">>, Setting, ?NO)),
+    Block   = ?to_i(?v(<<"bdebt">>, Setting, ?NO)),
+    case Block of
+	    ?NO ->
+	    "上次欠款：" ++ decorate_data(block)
+		++ round(IsRound, LastBalance) ++ decorate_data(cancel_block)
+
+		++ pading(2) ++ DebtName ++ decorate_data(block) 
+		++ round(IsRound, Debt) ++ decorate_data(cancel_block)
+		
+		++ pading(2) ++ "累计欠款：" ++ decorate_data(block) 
+		++ round(IsRound, AccDet)  ++ decorate_data(cancel_block);
+	    ?YES ->
+	    decorate_data(block) ++ "上次欠款："
+		++ round(IsRound, LastBalance)
+		++ decorate_data(cancel_block)
+
+		++ pading(2)
+		
+		++ decorate_data(block)
+		++ DebtName
+		++ round(IsRound, Debt)
+		++ decorate_data(cancel_block)
+
+		++ pading(2)
+		
+		++ decorate_data(block)
+		++ "累计欠款：" 
+		++ round(IsRound, AccDet)
+		++ decorate_data(cancel_block)
+	end.
 
 extra_pay(-1, _Pay) ->
     [];

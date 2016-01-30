@@ -22,7 +22,8 @@
 
 -export([server/1, server/2]).
 -export([printer/1, printer/2, printer/3, printer/4]).
--export([format/2, format/3, format/4]).
+-export([format/1, format/2, format/3, format/4]).
+-export([reset_format/2]).
 
 -define(SERVER, ?MODULE). 
 
@@ -61,7 +62,8 @@ format(add_to_shop, Merchant, Shop) ->
 format(update, Merchant, Id, Attrs) ->
     gen_server:call(?SERVER, {update_printer_format, Merchant, Id, Attrs}).
 
-
+reset_format(Merchant, Shop) ->
+    gen_server:call(?SERVER, {reset_format, Merchant, Shop}). 
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -83,7 +85,8 @@ handle_call({new_server, Attrs}, _From, State) ->
 
     case ?sql_utils:execute(s_read, Sql0) of
 	{ok, []} ->
-	    Sql1 = "insert into w_print_server(name, path, entry_date) values("
+	    Sql1 = "insert into w_print_server("
+		"name, path, entry_date) values("
 		++ "\'" ++ ?to_s(Name) ++ "\'"
 		++ ", \'" ++ ?to_s(Path) ++ "\'"
 		++ ", \'" ++ ?utils:current_time(localdate) ++ "\')",
@@ -91,7 +94,8 @@ handle_call({new_server, Attrs}, _From, State) ->
 	    {reply, Reply, State}; 
 	{ok, E} ->
 	    ?DEBUG("print server with path ~p has been exist", [Path]),
-	    {reply, {error, ?err(wprint_server_exist, ?v(<<"id">>, E))}, State};
+	    {reply,
+	     {error, ?err(wprint_server_exist, ?v(<<"id">>, E))}, State};
 	Error ->
 	    {reply, Error, State}
     end;
@@ -171,7 +175,8 @@ handle_call({new_printer_conn, Merchant, Attrs}, _From, State) ->
 	    {reply, Reply, State}; 
 	{ok, E} ->
 	    ?DEBUG("printer_conn ~p does exist", [?v(<<"id">>, E)]),
-	    {reply, {error, ?err(wprinter_conn_exist, ?v(<<"id">>, E))}, State};
+	    {reply,
+	     {error, ?err(wprinter_conn_exist, ?v(<<"id">>, E))}, State};
 	Error ->
 	    {reply, Error, State}
     end;
@@ -214,7 +219,8 @@ handle_call({update_printer_conn, Merchant, Id, Attrs}, _From, State) ->
 		++ ?utils:v(code, string, Key)
 		++ ?utils:v(shop, integer, Shop)
 		++ ?utils:v(status, integer, Status) 
-		++ ?utils:v(entry_date, string, ?utils:current_time(localtime)),
+		++ ?utils:v(entry_date, string,
+			    ?utils:current_time(localtime)),
 	    Sql1 = "update w_printer_conn set "
 		++ ?utils:to_sqls(proplists, comma, Updates)
 		++ " where id=" ++ ?to_s(Id),
@@ -256,33 +262,21 @@ handle_call({list_printer_conn, Merchant}, _From, State) ->
     {reply, Reply, State};
 
 handle_call({list_printer_format, Merchant}, _From, State) ->
-    Sql = "select id, name, print, shop, width, entry_date"
+    Sql = "select id, name, print, shop, width, seq, entry_date"
 	" from w_print_format"
 	" where merchant=" ++ ?to_s(Merchant)
-	++ " and deleted=" ++ ?to_s(?NO),
+	++ " and deleted=" ++ ?to_s(?NO)
+	++ " order by id",
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
 handle_call({add_format_to_shop, Merchant, Shop}, _From, State) ->
     ?DEBUG("add_format_to_shop with merchant ~p, shop ~p", [Merchant, Shop]),
-    Now = ?utils:current_time(localdate),
-    
-    Formats = [{"brand",           "0",  "0"},
-	       {"style_number",    "0",  "0"},
-	       {"type",            "0",  "0"},
-	       {"color",           "0",  "0"},
-	       {"size_name",       "0",  "0"}, 
-	       {"size",            "0",  "0"},
-	       {"price",           "0",  "0"},
-	       {"discount",        "0",  "0"},
-	       {"dprice",          "0",  "0"},
-	       {"hand",            "0",  "0"},
-	       {"count",           "0",  "0"},
-	       {"calc",            "0",  "0"}
-	      ], 
+    Now = ?utils:current_time(localdate), 
+    Formats = format(default),
 
     Sqls = lists:foldr(
-	     fun({Name, Print, Width}, Acc) ->
+	     fun({Name, Print, Width, Seq}, Acc) ->
 		     Sql01 = "select id, name, print from w_print_format"
 			 " where name=\'" ++ Name ++ "\'"
 			 ++ " and shop=" ++ ?to_s(Shop)
@@ -290,11 +284,12 @@ handle_call({add_format_to_shop, Merchant, Shop}, _From, State) ->
 		     case ?sql_utils:execute(s_read, Sql01) of
 			 {ok, []} ->
 			     ["insert into w_print_format("
-			      "name, print, width"
+			      "name, print, width, seq"
 			      ", shop, merchant, entry_date) values("
 			      "\'" ++ Name ++ "\',"
 			      ++ Print ++ ","
-			      ++ Width  ++ ","
+			      ++ Width ++ ","
+			      ++ Seq ++ ","
 			      ++ ?to_s(Shop) ++ "," 
 			      ++ ?to_s(Merchant) ++ "," 
 			      "\'" ++ Now ++ "\');"|Acc];
@@ -312,11 +307,13 @@ handle_call({update_printer_format, Merchant, Id, Attrs}, _From, State) ->
     Name     = ?v(<<"name">>, Attrs),
     Print    = ?v(<<"print">>, Attrs),
     Width    = ?v(<<"width">>, Attrs),
+    Seq      = ?v(<<"seq">>, Attrs),
     Shop     = ?v(<<"shop">>, Attrs),
     %% Fish     = ?v(<<"fish">>, Attrs),
 
     Updates = ?utils:v(print, integer, Print)
 	++ ?utils:v(width, integer, Width)
+	++ ?utils:v(seq, integer, Seq)
 	++ ?utils:v(entry_date, string, ?utils:current_time(localtime)), 
 
     UpdateSql = "update w_print_format set "
@@ -328,6 +325,32 @@ handle_call({update_printer_format, Merchant, Id, Attrs}, _From, State) ->
     
     Reply = ?sql_utils:execute(write, UpdateSql, Name), 
     %% refresh profiel
+    ?w_user_profile:update(print_format, Merchant),
+    {reply, Reply, State};
+
+handle_call({reset_format, Merchant, Shop}, _From, State) ->
+    ?DEBUG("reset_format with merchant ~p, shop ~p", [Merchant, Shop]),
+    Formats = format(default),
+    Sqls = lists:foldr(
+	     fun({Name, _Print, _Width, Seq}, Acc) ->
+		     Sql01 = "select id, name, print from w_print_format"
+			 " where name=\'" ++ Name ++ "\'"
+			 ++ " and shop=" ++ ?to_s(Shop)
+			 ++ " and merchant=" ++ ?to_s(Merchant),
+		     case ?sql_utils:execute(s_read, Sql01) of
+			 {ok, []} ->
+			     Acc;
+			 {ok, R} ->
+			     Id = ?v(<<"id">>, R),
+			     ["update w_print_format set seq=" ++ ?to_s(Seq)
+			      ++ " where id=" ++ ?to_s(Id)
+			      ++ " and name=\'" ++ Name ++ "\'"
+			      ++ " and shop=" ++ ?to_s(Shop)
+			      ++ " and merchant=" ++ ?to_s(Merchant)
+			      |Acc]
+		     end
+	     end, [], Formats),
+    Reply = ?sql_utils:execute(transaction, Sqls, Shop),
     ?w_user_profile:update(print_format, Merchant),
     {reply, Reply, State};
 	
@@ -350,3 +373,19 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+format(default) ->
+    [{"brand",           "0",  "0", "1"},
+     {"style_number",    "0",  "0", "2"},
+     {"type",            "0",  "0", "3"},
+     {"color",           "0",  "0", "4"},
+     {"size_name",       "0",  "0", "5"}, 
+     {"size",            "0",  "0", "6"},
+     {"price",           "0",  "0", "7"},
+     {"discount",        "0",  "0", "8"},
+     {"dprice",          "0",  "0", "9"},
+     {"hand",            "0",  "0", "10"},
+     {"count",           "0",  "0", "11"},
+     {"calc",            "0",  "0", "12"},
+     {"comment",         "0",  "0", "13"}
+    ].

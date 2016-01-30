@@ -194,6 +194,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	add.price5       = item.price5;
 	add.discount     = item.discount;
 	add.path         = item.path;
+	add.alarm_day    = item.alarm_day;
 
 	console.log(add);
 
@@ -268,7 +269,8 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 		amounts     : get_transfer_amount(add.amounts),
 		total       : seti(add.reject),
 		discount    : add.discount,
-		path        : add.path
+		path        : add.path,
+		alarm_day   : add.alarm_day
 	    })
 	}; 
 	
@@ -276,6 +278,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	
 	var base = {
 	    firm:          $scope.select.firm.id,
+	    balance:       $scope.select.firm.balance,
 	    shop:          $scope.select.shop.id,
 	    tshop:         $scope.select.to_shop.id,
 	    datetime:      dateFilter($scope.select.date, "yyyy-MM-dd HH:mm:ss"),

@@ -320,6 +320,7 @@ create table w_print_format(
    name            VARCHAR(16) not null,
    print           TINYINT default 1,  -- 1: yes, print 0; no
    width           TINYINT not null,
+   seq             TINYINT not null default 0,
    shop            INTEGER default -1, 
    merchant        INTEGER not null,
    entry_date      DATE default null,

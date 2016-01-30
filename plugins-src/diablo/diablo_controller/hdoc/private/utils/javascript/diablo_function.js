@@ -352,7 +352,8 @@ var diablo_print_field = {
     dprice:       "折后价",
     hand:         "手数",
     count:        "数量",
-    calc:         "小计"
+    calc:         "小计",
+    comment:      "备注"
 };
 
 var diablo_now_year = function(){

@@ -1109,11 +1109,11 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
 	   [Merchant, Inventories, Props]),
 
     Now         = ?utils:current_time(localtime),
-    Date        = ?v(<<"date">>, Props, ?utils:current_time(localdate)),
 
     Shop        = ?v(<<"shop">>, Props),
     ToShop      = ?v(<<"tshop">>, Props),
     Firm        = ?v(<<"firm">>, Props),
+    Balance     = ?v(<<"balance">>, Props),
     DateTime    = ?v(<<"datetime">>, Props, Now),
     %% Cash        = ?v(<<"cash">>, Props, 0),
     %% Card        = ?v(<<"card">>, Props, 0),
@@ -1130,19 +1130,20 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
     Comment     = ?v(<<"comment">>, Props, ""),
 
     FromRSN = rsn(transfer_from, Merchant, Shop,
-	      ?inventory_sn:sn(w_inventroy_transfer_sn_from, Merchant)),
+	      ?inventory_sn:sn(w_inventory_transfer_sn_from, Merchant)),
 
     ToRSN = rsn(transfer_to, Merchant, ToShop,
 	      ?inventory_sn:sn(w_inventory_transfer_sn_to, Merchant)),
     
     Sql1 = ["insert into w_inventory_new(rsn"
 	    ", employ, firm, shop, merchant"
-	    ", total, comment, type, entry_date) values(" 
+	    ", balance, total, comment, type, entry_date) values(" 
 	    ++ "\"" ++ ?to_s(FromRSN) ++ "\","
 	    ++ "\"" ++ ?to_s(Employe) ++ "\","
 	    ++ ?to_s(Firm) ++ ","
 	    ++ ?to_s(Shop) ++ ","
-	    ++ ?to_s(Merchant) ++ "," 
+	    ++ ?to_s(Merchant) ++ ","
+	    ++ ?to_s(Balance) ++ "," 
 	    ++ ?to_s(-Total) ++ ","
 	    ++ "\"" ++ ?to_s(Comment) ++ "\","
 	    ++ ?to_s(?TRANSFER_INVENTORY_FROM) ++ ","
@@ -1150,12 +1151,13 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
 	    
 	    "insert into w_inventory_new(rsn"
 	    ", employ, firm, shop, merchant"
-	    ", total, comment, type, entry_date) values(" 
+	    ", balance, total, comment, type, entry_date) values(" 
 	    ++ "\"" ++ ?to_s(ToRSN) ++ "\","
 	    ++ "\"" ++ ?to_s(Employe) ++ "\","
 	    ++ ?to_s(Firm) ++ ","
 	    ++ ?to_s(ToShop) ++ ","
-	    ++ ?to_s(Merchant) ++ "," 
+	    ++ ?to_s(Merchant) ++ ","
+	    ++ ?to_s(Balance) ++ "," 
 	    ++ ?to_s(Total) ++ ","
 	    ++ "\"" ++ ?to_s(Comment) ++ "\","
 	    ++ ?to_s(?TRANSFER_INVENTORY_TO) ++ ","
@@ -1163,8 +1165,10 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
 
     Sql2 = sql(transfer_from,
 	       FromRSN, Merchant, Shop, Firm, DateTime, Inventories),
+    ?DEBUG("Sql2 ~p", [Sql2]),
     Sql3 = sql(transfer_to,
-	       ToRSN, Merchant, ToShop, Firm, DateTime, Inventories), 
+	       ToRSN, Merchant, ToShop, Firm, DateTime, Inventories),
+    ?DEBUG("Sql3 ~p", [Sql3]),
 
     AllSql = Sql1 ++ Sql2 ++ Sql3,
     %% ?DEBUG("AllSql ~p", [AllSql]),
