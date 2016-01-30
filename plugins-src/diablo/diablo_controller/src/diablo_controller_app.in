@@ -24,6 +24,7 @@
      %% about sql
      diablo_pagination,                 diablo_sql_utils,
      diablo_purchaser_sql,              diablo_w_report_sql,
+     diablo_purchaser_transfer,
      
      %% model
      diablo_controller_member_request,    diablo_controller_member,

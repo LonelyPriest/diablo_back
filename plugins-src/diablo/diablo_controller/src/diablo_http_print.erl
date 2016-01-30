@@ -1843,23 +1843,33 @@ debt(print_format, Setting, LastBalance, DebtName, Debt, AccDet) ->
 		++ pading(2) ++ "累计欠款：" ++ decorate_data(block) 
 		++ round(IsRound, AccDet)  ++ decorate_data(cancel_block);
 	    ?YES ->
-	    decorate_data(block) ++ "上次欠款："
+	    decorate_data(bwh)
+		++ "上次欠款："
+		++ decorate_data(cancel_bwh)
+
+		++ decorate_data(bh)
 		++ round(IsRound, LastBalance)
-		++ decorate_data(cancel_block)
+		++ decorate_data(cancel_bh)
 
 		++ pading(2)
 		
-		++ decorate_data(block)
+		++ decorate_data(bwh)
 		++ DebtName
+		++ decorate_data(cancel_bwh)
+		
+		++ decorate_data(bh)
 		++ round(IsRound, Debt)
-		++ decorate_data(cancel_block)
+		++ decorate_data(cancel_bh)
 
 		++ pading(2)
 		
-		++ decorate_data(block)
-		++ "累计欠款：" 
+		++ decorate_data(bwh)
+		++ "累计欠款："
+		++ decorate_data(cancel_bwh)
+
+		++ decorate_data(bh)
 		++ round(IsRound, AccDet)
-		++ decorate_data(cancel_block)
+		++ decorate_data(cancel_bh)
 	end.
 
 extra_pay(-1, _Pay) ->

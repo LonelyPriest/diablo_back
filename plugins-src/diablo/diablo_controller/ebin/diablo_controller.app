@@ -12,6 +12,7 @@
                         diablo_iconv,diablo_http_print,diablo_http_print_test,
                         diablo_pagination,diablo_sql_utils,
                         diablo_purchaser_sql,diablo_w_report_sql,
+                        diablo_purchaser_transfer,
                         diablo_controller_member_request,
                         diablo_controller_member,
                         diablo_controller_employ_request,

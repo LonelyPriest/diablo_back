@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-01-30",
+	 content: [
+	     "增加店铺之间的库存调入调出功能",
+	     "增加删除货品资料功能"
+	 ]
+	},
+	
 	{date: "2016-01-19",
 	 content: [
 	     "增加默认价格类型选择，可自由选择吊牌价，批发价",

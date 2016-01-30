@@ -409,6 +409,13 @@ decorate_data(cancel_bw) ->
 	decorate_data(cancel_block)
 	++ decorate_data(cancel_width);
 
+decorate_data(bh) ->
+    decorate_data(block)
+	++ decorate_data(height);
+decorate_data(cancel_bh) ->
+    decorate_data(cancel_block)
+	++ decorate_data(cancel_height);
+
 decorate_data(block) ->
     ?to_s(<<16#1b, 16#45>>);
 decorate_data(cancel_block) ->
