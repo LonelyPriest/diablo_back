@@ -99,7 +99,8 @@ action(Session, Req, {"new_w_size"}, Payload) ->
     Merchant = ?session:get(merchant, Session),
     case ?attr:size_group(new, Merchant, Payload) of
 	{ok, GId} ->
-	    ?utils:respond(200, Req, ?succ(add_size_group, GId), {<<"id">>, GId});
+	    ?utils:respond(
+	       200, Req, ?succ(add_size_group, GId), {<<"id">>, GId});
 	{error, Error} ->
 	    ?utils:respond(200, Req, Error)
     end;
@@ -200,14 +201,16 @@ action(Session, Req, {"new_w_good"}, Payload) ->
     
     try 
 	{ok, BrandId} =
-	    ?attr:brand(new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]),
+	    ?attr:brand(
+	       new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]),
 
 	case ImageData of
 	    <<>> -> ok;
 	    _ ->
 		ImageFile = filename:join(
 			      [ImageDir,
-			       ?to_s(StyleNumber) ++ "-" ++ ?to_s(BrandId) ++ ".png"]),
+			       ?to_s(StyleNumber)
+			       ++ "-" ++ ?to_s(BrandId) ++ ".png"]),
 
 		case filelib:ensure_dir(ImageFile) of
 		    ok -> ok;
@@ -236,7 +239,8 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 	    {ok, DBId} -> 
 		?utils:respond(200, Req,
 			       ?succ(add_purchaser_good, DBId),
-			       [{<<"brand">>, BrandId}, {<<"type">>, TypeId}]); 
+			       [{<<"brand">>, BrandId},
+				{<<"type">>, TypeId}]); 
 	    {error, Error} ->
 		?utils:respond(200, Req, Error)
 	end 

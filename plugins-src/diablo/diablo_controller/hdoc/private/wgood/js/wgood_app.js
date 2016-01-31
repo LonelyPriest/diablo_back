@@ -1,7 +1,8 @@
 var wgoodApp = angular.module(
-    "wgoodApp", ['ngRoute', 'ngResource', 'diabloUtils', 'diabloFilterApp',
-		 'diabloNormalFilterApp', 'diabloPattern', 'diabloAuthenApp',
-		 'ui.bootstrap', 'userApp'])
+    "wgoodApp", ['ngRoute', 'ngResource',
+		 'diabloUtils', 'diabloFilterApp', 'diabloNormalFilterApp',
+		 'diabloPattern', 'diabloAuthenApp', 'ui.bootstrap',
+		 'userApp'])
 // .config(diablo_authen);
 .config(function($httpProvider, authenProvider){
 	$httpProvider.interceptors.push(authenProvider.interceptor); 
@@ -1111,42 +1112,78 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     };
 
     $scope.delete_good = function(g){
-	if (angular.isDefined(g.deleted) && !g.deleted){
-	    dialog.response(false, "删除货品", wgoodService.error[2098]);
-	} else {
-	    wgoodService.get_used_purchaser_good({
-		style_number:g.style_number, brand:g.brand_id
-	    }).then(function(result){
-		console.log(result);
-		if (angular.isDefined(result.id)){
-		    g.deleted = false;
-		    dialog.response(
-			false, "删除货品",
-			"删除货品失败：" + wgoodService.error[2098], $scope);
-		} else {
-		    var callback = function(){
-			wgoodService.delete_purchaser_good(g).then(function(result){
-			    if (result.ecode === 0){
-				dialog.response_with_callback(
-				    true, "删除货品",
-				    "货品资料 [" + g.style_number
-					+ "-" + g.brand.name + "-" + g.type.name
-					+ " ]删除成功！！",
-				    $scope, function(){$scope.do_search($scope.current_page)})
-			    } else {
-				dialog.response(
-				    false, "删除货品",
-				    "删除货品失败：" + wgoodService.error[result.ecode], $scope);
-			    }
-			})
-		    } 
-		    dialog.request(
-			"删除货品", "确定要删除该货品资料吗？", callback, undefined, $scope);
-		}
-	    })    
-	}
+    	if (angular.isDefined(g.deleted) && !g.deleted){
+    	    dialog.response(false, "删除货品", wgoodService.error[2098]);
+    	} else {
+    	    wgoodService.get_used_purchaser_good({
+    		style_number:g.style_number, brand:g.brand_id
+    	    }).then(function(result){
+    		console.log(result);
+    		if (angular.isDefined(result.id)){
+    		    g.deleted = false;
+    		    dialog.response(
+    			false,
+    			"删除货品",
+    			"删除货品失败："
+    			    + wgoodService.error[2098], $scope);
+    		} else {
+    		    var callback = function(){
+    			wgoodService.delete_purchaser_good(
+    			    g
+    			).then(function(result){
+    			    if (result.ecode === 0){
+    				dialog.response_with_callback(
+    				    true, "删除货品",
+    				    "货品资料 ["
+    					+ g.style_number
+    					+ "-" + g.brand.name
+    					+ "-" + g.type.name
+    					+ " ]删除成功！！",
+    				    $scope,
+    				    function(){
+    					$scope.do_search($scope.current_page)})
+    			    } else {
+    				dialog.response(
+    				    false,
+    				    "删除货品",
+    				    "删除货品失败："
+    					+ wgoodService.error[result.ecode],
+    				    $scope);
+    			    }
+    			})
+    		    } 
+    		    dialog.request(
+    			"删除货品",
+    			"确定要删除该货品资料吗？",
+    			callback, undefined, $scope);
+    		}
+    	    })    
+    	}
 	
     };
+
+
+    // $scope.delete_good = function(g){
+    // 	console.log(g);
+
+    // 	var sure_delete = function(){
+    // 	    var callback = function(params){
+    // 		console.log(params);
+    // 	    };
+	    
+    // 	    dialog.edit_with_modal(
+    // 		"good-delete.html",
+    // 		undefined,
+    // 		callback,
+    // 		undefined,
+    // 		{delete_stock:false, delete_sell: false})
+    // 	};
+
+    // 	dialog.request(
+    // 	    "货品删除",
+    // 	    "确定要删除该货品资料吗？",
+    // 	    sure_delete, undefined, undefined); 
+    // };
     
 });
 

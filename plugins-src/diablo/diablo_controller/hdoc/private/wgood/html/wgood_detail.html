@@ -32,25 +32,29 @@
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-left fg-red"
-                 time="time.start_time" ok="do_search(default_page)"></time-search>
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
             <div class="col-md-4 col-sm-4 col-xs-6">
               <time-search
                  glyphicon="glyphicon glyphicon-arrow-right fg-red"
-                 time="time.end_time" ok="do_search(default_page)"></time-search>
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
             </div>
 
 	    <div class="col-md-4 col-sm-4 col-xs-12">
               <query-pattern ng-model="match"
                              filters="filters"
-                             filter="filter"></query-pattern>
+                             filter="filter">
+	      </query-pattern>
             </div>
 	  </div> <!--END row-->
 
 	  <query-group filters="filters"
 		       prompt="prompt"
-		       ok="do_search(default_page)"></query-group>
+		       ok="do_search(default_page)">
+	  </query-group>
 
 	</div> <!--END table-toolbar-->
 
@@ -79,9 +83,13 @@
 		    <th>
 		      <span x-ng-click="toggle_price()">
 			<span x-ng-if="!hidden.p3_5">
-			  <i class="glyphicon glyphicon-backward fg-red"></i>批发价</span>
+			  <i class="glyphicon
+				    glyphicon-backward fg-red"></i>
+			  批发价</span>
 			<span x-ng-if="hidden.p3_5">
-			  批发价<i class="glyphicon glyphicon-forward fg-red"></i></span>
+			  批发价
+			  <i class="glyphicon glyphicon-forward
+				    fg-red"></i></span>
 		      </span>
 		    </th>
 		    <th x-ng-if="!hidden.p3_5">价3</th>
@@ -139,26 +147,7 @@
 		</tbody>
 
 		<tfoot>
-		  <!-- <tr>  -->
-		  <!--   <td x-ng-show="total_items>items_perpage" colspan={{colspan}}> -->
-		  <!--     <span class="pagination"> -->
-		  <!-- 	<span>显示第 {{current_page}} / {{num_pages}} 项结果， -->
-		  <!-- 	  共 {{total_items}} 项</span> -->
-		  <!--     </span> -->
-		  <!--     <pagination -->
-		  <!-- 	 class="pagination-lg pull-right" -->
-		  <!-- 	 total-items="total_items" -->
-		  <!-- 	 items-per-page="items_perpage" -->
-		  <!-- 	 num-pages="num_pages" -->
-		  <!-- 	 max-size="max_page_size" -->
-		  <!-- 	 boundary-links="true" -->
-		  <!-- 	 previous-text="&lsaquo;" next-text="&rsaquo;" -->
-		  <!-- 	 first-text="&laquo;" last-text="&raquo;" -->
-		  <!-- 	 x-ng-model="current_page" -->
-		  <!-- 	 x-ng-init="current_page=default_page" -->
-		  <!-- 	 x-ng-change="page_changed(current_page)"></pagination> -->
-		  <!--   </td> -->
-		  <!-- </tr> -->
+		  
 		</tfoot>
 		
 	      </table> <!--END supplier table-->
@@ -208,7 +197,8 @@
 
   <div class="modal-body">
     <div class="table-responsive">
-      <table class="table table-bordered table-striped table-condensed table-advanced">
+      <table class="table table-bordered
+		    table-striped table-condensed table-advanced">
 	<tbody>
 	  <tr>
 	    <td></td>
@@ -239,4 +229,41 @@
 </script> 
 
 
+<script type="text/ng-template" id="good-delete.html">
+  <div class="modal-header">
+    <button class="close" x-ng-click="cancel()" type="button">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only"></span>
+    </button>
+    <h4 class="modal-title">
+      <span class="label label-sm label-danger">货品删除</span></h4>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="checkbox checkbox-danger checkbox-circle">
+	<input id=0 type="checkbox"
+	       x-ng-model="params.delete_stock" />
+	<label for=0 class="control-label">&nbsp&nbsp是否删除入库记录
+	  <span class="fg-red">（！！入库记录删除后无法恢复）</span></label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="checkbox checkbox-danger checkbox-circle">
+	<input id=1 type="checkbox"
+	       x-ng-model="params.delete_sell" />
+	<label for=1 class="control-label">&nbsp&nbsp是否删除销售记录
+	  <span class="fg-red">（！！销售记录删除后无法恢复）</span></label>
+      </div>
+    </div>
+    
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>  
+</script>
 

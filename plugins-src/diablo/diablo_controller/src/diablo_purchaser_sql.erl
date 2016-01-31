@@ -39,8 +39,9 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 
     Sql1 =
 	"insert into w_inventory_good"
-	"(style_number, sex, color, year, season, type, size, s_group, free"
-	", brand, firm, org_price, tag_price, pkg_price, price3, price4, price5"
+	"(style_number, sex, color, year, season, type"
+	", size, s_group, free, brand, firm"
+	", org_price, tag_price, pkg_price, price3, price4, price5"
 	", discount, path, alarm_day, merchant, change_date, entry_date"
 	") values("
 	++ "\"" ++ ?to_s(StyleNumber) ++ "\","
@@ -92,8 +93,9 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 
 	     InventoryAmount =
 		 fun(Size, Color) ->
-			 ["insert into w_inventory_amount(rsn, style_number, brand"
-			     ", color, size, shop, merchant, entry_date) values("
+			 ["insert into w_inventory_amount("
+			  "rsn, style_number, brand, color, size"
+			  ", shop, merchant, entry_date) values("
 			  ++ "-1,"
 			  ++ "\"" ++ ?to_s(StyleNumber) ++ "\","
 			  ++ ?to_s(BrandId) ++ ","
@@ -142,8 +144,9 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 	     ] ++
 		 lists:foldr(
 		   fun(GId, Acc0) ->
-			   {ok, G} = ?w_user_profile:get(size_group, Merchant, GId),
-			   ?DEBUG("G ======= ~p", [G]),
+			   {ok, G} = ?w_user_profile:get(
+					size_group, Merchant, GId),
+			   %% ?DEBUG("G ======= ~p", [G]),
 			   lists:foldr(
 			     fun(S, Acc1) ->
 				     lists:foldr(
