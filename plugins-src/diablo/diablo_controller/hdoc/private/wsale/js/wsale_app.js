@@ -560,9 +560,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    // console.log(invs);
 	    $scope.all_w_inventory = 
 		invs.map(function(inv){
+		    var name =
+			inv.style_number + "，" + inv.brand + "，" + inv.type;
 		    return angular.extend(
-			inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
-		})
+			inv, {name:name, py: diablo_pinyin(name)});
+		});
 	});
     };
 

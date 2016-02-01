@@ -338,17 +338,19 @@
 				     typeahead-editable="false"
 				     typeahead-on-select="on_select_good($item, $model, $label)"
 				     typeahead="g as g.name for g in
-						all_w_inventory|filter:{name:$viewValue}|limitTo:20"/>
+						all_w_inventory|filter:$viewValue|limitTo:20"/>
 			    </div>
 			  </form>
 			</td>
 			
-			<td x-ng-if="setting.q_backend" class="col-md-2 text-left vert-align">
+			<td x-ng-if="setting.q_backend"
+			    class="col-md-2 text-left vert-align">
 			  <span ng-if="!inv.$new">{{inv.style_number}}</span>
 			  <form name="inv.form.good" ng-if="inv.$new">
 			    <div ng-class="{'has-error':inv.form.good.$invalid
 					   && !inv.form.good.$pristine}">
-			      <input class="form-control text-left" type="text"
+			      <input class="form-control text-left"
+				     type="text"
 				     required
 				     x-ng-model="inv.style_number"
 				     placeholder="货号"
@@ -357,7 +359,7 @@
 				     typeahead-wait-ms="500"
 				     typeahead-loading="loading"
 				     typeahead="g as g.name for g in
-						match_style_number($viewValue)|limitTo:8"></input>
+						match_style_number($viewValue)|limitTo:8"/>
 			      <span x-ng-show="loading">
 				<i class="glyphicon glyphicon-refresh"></i>
 			      </span>
