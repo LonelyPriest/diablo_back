@@ -6,7 +6,7 @@ wsaleApp.factory("wsaleGoodService", function(){
     var _sizeGroups = [];
     var _colors     = [];
 
-    var _shop = -1;
+    var _shop = -1; 
 
     /*
      * 
@@ -17,6 +17,10 @@ wsaleApp.factory("wsaleGoodService", function(){
     var _user      = {};
     // var _shops     = [];
     // var _rights    = [];
+
+    var _all_prompt_inventory = [];
+
+    var _q_typeahead = diablo_backend;
     
     var service = {};
 
@@ -180,12 +184,38 @@ wsaleApp.factory("wsaleGoodService", function(){
 	return _user;
     };
 
+    service.set_prompt_inventory = function(prompts){
+	_all_prompt_inventory = prompts;
+    };
+
+    service.get_prompt_inventory = function(){
+	return _all_prompt_inventory;
+    };
+
+    service.add_prompt_inventory = function(add){
+	_all_prompt_inventory.splice(0, 0, add);
+    };
+    // service.add_prompt_inventory = function(prompts, add){
+    // 	prompts.splice(0, 0, add);
+    // 	return prompts;
+    // };
+
+    service.set_prompt_mode = function(mode){
+	_q_typeahead = mode;
+    };
+
+    service.get_prompt_mode = function(){
+	return _q_typeahead;
+    };
+
     return service;
 });
 
 wsaleApp.controller("wsaleGoodNewCtrl", function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, wsaleGoodService){
+
+    // console.log($scope);
 
     var dialog        = diabloUtilsService;
     var set_float     = diablo_set_float;
@@ -194,6 +224,8 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
     $scope.types      = wsaleGoodService.get_type();
     $scope.firms      = wsaleGoodService.get_firm();
     $scope.groups     = wsaleGoodService.get_size_group();
+    $scope.promptInventory = wsaleGoodService.get_prompt_inventory();
+    
     // $scope.colors     = wsaleGoodService.get_colors();
     
     $scope.full_years = diablo_full_year;
@@ -201,12 +233,13 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
     $scope.seasons    = diablo_season2objects;
 
     $scope.refresh_brand = function(){
-	$scope.brands = wgoodService.list_purchaser_brand().then(function(brands){
-	    console.log(brands);
-	    return brands.map(function(b){
-		return {id: b.id, name:b.name, py:diablo_pinyin(b.name)};
-	    })
-	});
+	$scope.brands = wgoodService.list_purchaser_brand().then(
+	    function(brands){
+		console.log(brands);
+		return brands.map(function(b){
+		    return {id: b.id, name:b.name, py:diablo_pinyin(b.name)};
+		})
+	    });
 
 	wsaleGoodService.set_brand($scope.brands);
     };
@@ -456,10 +489,10 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 	good.shop           = wsaleGoodService.get_shop();
 	good.zero_inventory = diablo_yes;
 	
-	good.brand    = typeof(good.brand) === "object" ? good.brand.name: good.brand;
+	good.brand = typeof(good.brand) === "object" ? good.brand.name: good.brand;
 	// good.brand_py = diablo_pinyin(good.brand);
 	
-	good.type     = typeof(good.type) === "object" ? good.type.name: good.type;
+	good.type = typeof(good.type) === "object" ? good.type.name: good.type;
 	// good.type_py = diablo_pinyin(good.type);
 	
 	good.colors   = function(){
@@ -495,7 +528,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 	    } else{
 		return undefined;
 	    }
-	}();
+	}(); 
 	
 	console.log(good);
 	// var image  = angular.isDefined($scope.image) && $scope.image
@@ -563,7 +596,8 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 				py   :diablo_pinyin(good.brand)});
 			    
 			    wsaleGoodService.set_brand($scope.brands);
-			}; 
+			};
+			good.brand_id = state.brand;
 			// console.log($scope.brands);
 
 			// type
@@ -576,7 +610,39 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 
 			    wsaleGoodService.set_type($scope.types);
 			};
+			good.type_id = state.type;
+
 			// console.log($scope.types);
+			if (diablo_frontend
+			    === wsaleGoodService.get_prompt_mode()){
+			    good.price3  = good.p3;
+			    good.price4  = good.p4;
+			    good.price5  = good.p5;
+			    good.firm_id = $scope.good.firm.id;
+			    good.s_group = function(){
+				if (angular.isUndefined(good.sizes)) {
+				    return "0"
+				} else {
+				    var size_name = "";
+				    angular.foreach(good.sizes, function(s){
+					size_name += s.id.toString();
+				    }) 
+				    return size_name;
+				};
+			    }();
+
+			    good.free =  angular.isUndefined(good.colors)
+				&& angular.isUndefined(good.sizes) ? 0 : 1;
+			    
+			    // style number
+			    var name = good.style_number
+				+ "，" + good.brand + "，"+ good.type;
+			    var prompt = angular.extend(
+				good, {name: name, py: diablo_pinyin(name)});
+
+			    wsaleGoodService.add_prompt_inventory(prompt);
+			    $scope.$emit("change_prompt_inventory");
+			}; 
 		    });
 	    } else{
 		diabloUtilsService.response(
