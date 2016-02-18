@@ -31,27 +31,41 @@
 	<div class="table-toolbar">
 	  
 	  <div class="row diablo-form-group">
-	    <div class="col-xs-4 col-md-4">
-	      <div class="input-group">
-		<!-- <span class="input-group-addon"> <i class="icon icon-rss fg-red"></i>厂商</span>  -->
-	  	<input class="form-control" type="text"
-	  	       x-ng-model="select.firm"
-	  	       placeholder="请选择厂商"
-	  	       typeahead-editable="false"
-		       typeahead-on-select="change_firm()"
-	  	       typeahead="f as f.name for f in
-	  			  firms|filter:$viewValue|limitTo:8"/>
-		<span class="input-group-btn">
-		  <button class="btn default fg-red"
-			  x-ng-disabled="!select.firm"
-			  x-ng-click="select.firm=undefined"> 
-		    <i class="glyphicon glyphicon-pushpin"></i></button>
-	  	</span>
+	    <!-- <div class="col-xs-4 col-md-4"> -->
+	    <!--   <div class="input-group"> -->
+	    <!-- 	<\!-- <span class="input-group-addon"> <i class="icon icon-rss fg-red"></i>厂商</span>  -\-> -->
+	    <!-- 	<input class="form-control" type="text" -->
+	    <!-- 	       x-ng-model="select.firm" -->
+	    <!-- 	       placeholder="请选择厂商" -->
+	    <!-- 	       typeahead-editable="false" -->
+	    <!-- 	       typeahead-on-select="change_firm()" -->
+	    <!-- 	       typeahead="f as f.name for f in -->
+	    <!-- 			  firms|filter:$viewValue|limitTo:8"/> -->
+	    <!-- 	<span class="input-group-btn"> -->
+	    <!-- 	  <button class="btn default fg-red" -->
+	    <!-- 		  x-ng-disabled="!select.firm" -->
+	    <!-- 		  x-ng-click="select.firm=undefined">  -->
+	    <!-- 	    <i class="glyphicon glyphicon-pushpin"></i></button> -->
+	    <!-- 	</span> -->
 	  	
-	      </div>
-	    </div> 
+	    <!--   </div> -->
+	    <!-- </div>  -->
 
 	    <div class="col-xs-4 col-md-4">
+	      <div class="input-group">
+	    	<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-map-marker fg-red"></i>
+		  店铺</span>
+	    	<select class="form-control" type="text"
+	    		x-ng-model="select.shop"
+	    		x-ng-change="change_shop()"
+	    		x-ng-options="s as s.name for s in
+	    			      shops|filter:$viewValue|limitTo:8">
+	    	</select>
+	      </div>
+	    </div>
+
+	    <div class="col-xs-4 col-md-4"> 
 	      <div class="input-group">
 		<!-- <span class="input-group-addon"> -->
 	  	<!--   <i class="glyphicon glyphicon-user"></i>日期 -->
@@ -90,22 +104,8 @@
 	  </div> <!--END from-group-->
 
 	  <!--BEGIN row-->
-	  <div class="row diablo-form-group">
-
-	    <div class="col-xs-4 col-md-4">
-	      <div class="input-group">
-	    	<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-map-marker fg-red"></i>
-		  店铺</span>
-	    	<select class="form-control" type="text"
-	    		x-ng-model="select.shop"
-	    		x-ng-change="change_shop()"
-	    		x-ng-options="s as s.name for s in
-	    			      shops|filter:$viewValue|limitTo:8">
-	    	</select>
-	      </div>
-	    </div>
-
+	  <div class="row diablo-form-group"> 
+	    
 	    <div class="col-xs-4 col-md-4">
 	      <div class="input-group">
 	    	<span class="input-group-addon">
@@ -127,6 +127,17 @@
 		       type="text"
 		       placeholder="备注"
 	  	       x-ng-model="select.comment"></input> 
+	      </div>
+	    </div>
+
+	    <div class="col-xs-4 col-md-4"> 
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-plane fg-red"></i>总数</span>
+	  	<input class="form-control"
+		       type="text"
+		       readonly
+	  	       x-ng-model="select.total"></input> 
 	      </div>
 	    </div>
 	    

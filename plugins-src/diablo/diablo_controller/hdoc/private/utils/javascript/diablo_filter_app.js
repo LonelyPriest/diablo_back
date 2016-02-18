@@ -82,7 +82,15 @@ function filterProvider(){
 		} else if (name === 'has_pay'){
 		    _filter.fields.push({name:"has_pay", chinese:"实付查询"});
 		    _prompt.has_pay = promptValues;
+		} else if (name === 'fshop'){
+		    _filter.fields.push({name:"fshop", chinese:"调出店铺"});
+		    _prompt.fshop = promptValues;
+		} else if (name === 'tshop'){
+		    _filter.fields.push({name:"tshop", chinese:"调入店铺"});
+		    _prompt.tshop = promptValues;
 		}
+
+		
 
 		return _filter;
 	    },
@@ -162,13 +170,15 @@ function filterProvider(){
 	    match_w_reject_inventory: function(viewValue, shop, firm){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
-		    {prompt:viewValue, shop:shop, firm:firm, type:1}).$promise.then(function(invs){
-			console.log(invs);
-			return invs.map(function(inv){
-			    return angular.extend(
-				inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
-			})
+		    {prompt:viewValue, shop:shop, firm:firm, type:1}
+		).$promise.then(function(invs){
+		    console.log(invs);
+		    return invs.map(function(inv){
+			return angular.extend(
+			    inv, {name:inv.style_number
+				  + "，" + inv.brand + "，" + inv.type})
 		    })
+		})
 	    },
 
 	    match_all_w_reject_inventory: function(start_time, shop, firm){
@@ -184,43 +194,49 @@ function filterProvider(){
 	    match_w_inventory: function(viewValue, shop, firm){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
-		    {prompt:viewValue, shop:shop, firm:firm}).$promise.then(function(invs){
-			console.log(invs);
-			if (angular.isUndefined(firm)){
-			    return invs.map(function(inv){
-				return inv.style_number;
-			    })
-			} else{
-			    return invs.map(function(inv){
-				return angular.extend(
-				    inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
-			    })
-			}
-		    })
+		    {prompt:viewValue, shop:shop, firm:firm}
+		).$promise.then(function(invs){
+		    console.log(invs);
+		    if (angular.isUndefined(firm)){
+			return invs.map(function(inv){
+			    return inv.style_number;
+			})
+		    } else{
+			return invs.map(function(inv){
+			    return angular.extend(
+				inv, {name:inv.style_number
+				      + "，" + inv.brand + "，" + inv.type})
+			})
+		    }
+		})
 	    },
 
 	    match_w_fix: function(viewValue, shop){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
-		    {prompt:viewValue, shop:shop, firm:[]}).$promise.then(function(invs){
-			console.log(invs);
-			return invs.map(function(inv){
-			    return angular.extend(
-				inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
-			})
+		    {prompt:viewValue, shop:shop, firm:[]}
+		).$promise.then(function(invs){
+		    console.log(invs);
+		    return invs.map(function(inv){
+			return angular.extend(
+			    inv, {name:inv.style_number
+				  + "，" + inv.brand + "，" + inv.type})
 		    })
-	    },
+		})
+	    }, 
 
 	    match_w_sale: function(viewValue, shop){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
-		    {prompt:viewValue, shop:shop, firm:[]}).$promise.then(function(invs){
-			console.log(invs);
-			return invs.map(function(inv){
-			    return angular.extend(
-				inv, {name:inv.style_number + "，" + inv.brand + "，" + inv.type})
-			})
+		    {prompt:viewValue, shop:shop, firm:[]}
+		).$promise.then(function(invs){
+		    console.log(invs);
+		    return invs.map(function(inv){
+			return angular.extend(
+			    inv, {name:inv.style_number
+				  + "，" + inv.brand + "，" + inv.type})
 		    })
+		})
 	    }, 
 
 	    reset_firm: function(){
@@ -387,6 +403,7 @@ function normalFilterProvider(){
     var _retailers     = [];
     var _employees     = [];
     var _baseSettings  = [];
+    var _shops         = [];
     
     this.$get = function($resource){
 	var _employeeHttp = $resource("/employ/:operation", {operation: '@operation'});
@@ -399,6 +416,9 @@ function normalFilterProvider(){
 				      post_get: {method: 'POST', isArray: true}
 				  });
 	// var _goodHttp = $resource("/wgood/:operation/:id", {operation: '@operation', id: '@id'});
+
+	var _shopHttp = $resource("/shop/:operation/:id",
+    				  {operation: '@operation', id: '@id'});
 	
 	return{
 	    match_all_w_inventory: function(condition){
@@ -497,7 +517,30 @@ function normalFilterProvider(){
 		    })    
 		}
 		
-	    } 
+	    },
+
+	    get_shop: function(){
+		if (_shops.length !== 0){
+		    return _shops;
+		} else {
+		    return _shopHttp.query(
+			{operation: "list_shop"}
+		    ).$promise.then(function(shops){
+			// console.log(shops);
+			_shops = shops.map(function(s){
+			    return {id: s.id,
+				    name:s.name,
+				    repo: s.repo,
+				    py:diablo_pinyin(s.name)};
+			});
+
+			return _shops;
+			
+		    })
+		}
+	    }
+
+	    //
 	}
     }
 };
@@ -516,6 +559,9 @@ function shareFilterProvider(){
 	var _provinceHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _cityHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _baseHttp = $resource("/wbase/:operation", {operation: '@operation'});
+
+	var _shopHttp = $resource("/shop/:operation/:id",
+    				  {operation: '@operation', id: '@id'});
 	// var _goodHttp = $resource("/wgood/:operation/:id", {operation: '@operation', id: '@id'});
 	
 	return{

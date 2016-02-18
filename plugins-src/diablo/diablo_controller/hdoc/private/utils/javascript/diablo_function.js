@@ -11,6 +11,11 @@ var diablo_badrepo = 1;
 var diablo_round_record = 0;
 var diablo_round_row = 1;
 
+// transfer
+var diablo_in_round = 0;
+var diablo_in_stock = 1;
+var diablo_in_back  = 2;
+
 /*
  * storage key
  */

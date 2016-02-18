@@ -41,53 +41,69 @@ action(Session, _Req, Unkown) ->
 %% new
 %% =============================================================================
 action(Session, Req, {"new_w_inventory"}, Payload) ->
-    ?DEBUG("new purchaser inventory with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("new purchaser inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     Invs = ?v(<<"inventory">>, Payload, []),
     {struct, Base} = ?v(<<"base">>, Payload),
     
-    case ?w_inventory:purchaser_inventory(new, Merchant, lists:reverse(Invs), Base) of
+    case ?w_inventory:purchaser_inventory(
+	    new, Merchant, lists:reverse(Invs), Base) of
     	{ok, RSn} -> 
     	    ?utils:respond(
-	       200, Req, ?succ(add_purchaser_inventory, RSn), {<<"rsn">>, ?to_b(RSn)});
+	       200,
+	       Req,
+	       ?succ(add_purchaser_inventory, RSn),
+	       {<<"rsn">>, ?to_b(RSn)});
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
 
 action(Session, Req, {"update_w_inventory"}, Payload) ->
-    ?DEBUG("update purchaser inventory with session~n~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("update purchaser inventory with session~n~p, paylaod~n~p",
+	   [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     Invs = ?v(<<"inventory">>, Payload, []),
     {struct, Base} = ?v(<<"base">>, Payload),
 
-    case ?w_inventory:purchaser_inventory(update, Merchant, lists:reverse(Invs), Base) of
+    case ?w_inventory:purchaser_inventory(
+	    update, Merchant, lists:reverse(Invs), Base) of
     	{ok, RSn} -> 
     	    ?utils:respond(
-	       200, Req, ?succ(update_w_inventory, RSn), {<<"rsn">>, ?to_b(RSn)});
+	       200,
+	       Req,
+	       ?succ(update_w_inventory, RSn),
+	       {<<"rsn">>, ?to_b(RSn)});
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
 
 action(Session, Req, {"check_w_inventory"}, Payload) ->
-    ?DEBUG("update purchaser inventory with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("check_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     RSN = ?v(<<"rsn">>, Payload, []),
     
     case ?w_inventory:purchaser_inventory(check, Merchant, RSN) of
     	{ok, RSN} -> 
     	    ?utils:respond(
-	       200, Req, ?succ(check_w_inventory, RSN), {<<"rsn">>, ?to_b(RSN)});
+	       200,
+	       Req,
+	       ?succ(check_w_inventory, RSN),
+	       {<<"rsn">>, ?to_b(RSN)});
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
 
 action(Session, Req, {"filter_w_inventory_new"}, Payload) -> 
-    ?DEBUG("filter_w_inventory_new with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("filter_w_inventory_new with session ~p, paylaod~n~p",
+	   [Session, Payload]),
     
     Merchant = ?session:get(merchant, Session),
     ?pagination:pagination(
        fun(Match, Conditions) ->
-	       ?w_inventory:filter(total_news, ?to_a(Match), Merchant, Conditions)
+	       ?w_inventory:filter(
+		  total_news, ?to_a(Match), Merchant, Conditions)
        end,
        fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
 	       ?w_inventory:filter(
@@ -136,7 +152,8 @@ action(Session, Req, {"filter_w_inventory_new_rsn_group"}, Payload) ->
        end, Req, Payload);
 
 action(Session, Req, {"w_inventory_new_rsn_detail"}, Payload) ->
-    ?DEBUG("w_inventory_rsn_detail with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("w_inventory_rsn_detail with session ~p, paylaod~n~p",
+	   [Session, Payload]),
 
     Merchant = ?session:get(merchant, Session),
     %% RSn = ?v(<<"rsn">>, Payload),
@@ -149,11 +166,13 @@ action(Session, Req, {"w_inventory_new_rsn_detail"}, Payload) ->
     end;
 
 action(Session, Req, {"get_w_inventory_new_amount"}, Payload) ->
-    ?DEBUG("get_new_amount_detail with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("get_new_amount_detail with session ~p, paylaod~n~p",
+	   [Session, Payload]),
 
     Merchant = ?session:get(merchant, Session),
     %% RSn = ?v(<<"rsn">>, Payload),
-    case ?w_inventory:purchaser_inventory(get_new_amount, Merchant, Payload) of 
+    case ?w_inventory:purchaser_inventory(
+	    get_new_amount, Merchant, Payload) of 
     	{ok, Details} ->
 	    ?utils:respond(200, object, Req, {[{<<"ecode">>, 0},
 					       {<<"data">>, Details}]}); 
@@ -166,25 +185,19 @@ action(Session, Req, {"get_w_inventory_new_amount"}, Payload) ->
 %% reject
 %% =============================================================================
 action(Session, Req, {"reject_w_inventory"}, Payload) ->
-    ?DEBUG("reject purchasr inventory with session ~p, paylaod~n~p", [Session, Payload]),
+    ?DEBUG("reject purchasr inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
     Invs = ?v(<<"inventory">>, Payload),
     {struct, Base} = ?v(<<"base">>, Payload),
-    case ?w_inventory:purchaser_inventory(reject, Merchant, lists:reverse(Invs), Base) of 
+    case ?w_inventory:purchaser_inventory(
+	    reject, Merchant, lists:reverse(Invs), Base) of 
     	{ok, RSn} ->
-	    ?utils:respond(200, Req, ?succ(reject_w_inventory, RSn), {<<"rsn">>, ?to_b(RSn)});
-    	{error, Error} ->
-    	    ?utils:respond(200, Req, Error)
-    end;
-
-action(Session, Req, {"transfer_w_inventory"}, Payload) ->
-    ?DEBUG("transfer purchasr inventory with session~n~p, paylaod~n~p", [Session, Payload]),
-    Merchant = ?session:get(merchant, Session),
-    Invs = ?v(<<"inventory">>, Payload),
-    {struct, Base} = ?v(<<"base">>, Payload),
-    case ?w_inventory:purchaser_inventory(transfer, Merchant, lists:reverse(Invs), Base) of 
-    	{ok, RSn} ->
-	    ?utils:respond(200, Req, ?succ(transfer_w_inventory, RSn), {<<"rsn">>, ?to_b(RSn)});
+	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(reject_w_inventory, RSn),
+	       {<<"rsn">>, ?to_b(RSn)});
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
@@ -314,6 +327,87 @@ action(Session, Req, {"w_inventory_fix_rsn_detail"}, Payload) ->
 
 
 %% =============================================================================
+%% transfer
+%% =============================================================================
+action(Session, Req, {"transfer_w_inventory"}, Payload) ->
+    ?DEBUG("transfer purchasr inventory with session~n~p, paylaod~n~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    Invs = ?v(<<"inventory">>, Payload),
+    {struct, Base} = ?v(<<"base">>, Payload),
+    case ?w_inventory:purchaser_inventory(transfer, Merchant, lists:reverse(Invs), Base) of 
+    	{ok, RSn} ->
+	    ?utils:respond(200, Req, ?succ(transfer_w_inventory, RSn), {<<"rsn">>, ?to_b(RSn)});
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+
+
+action(Session, Req, {"filter_transfer_w_inventory"}, Payload) -> 
+    ?DEBUG("filter_transfer_w_inventory with session ~p, paylaod~n~p", [Session, Payload]),
+
+    Merchant = ?session:get(merchant, Session),
+    ?pagination:pagination(
+       fun(Match, Conditions) ->
+	       ?w_inventory:filter(total_transfer, ?to_a(Match), Merchant, Conditions)
+       end,
+       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+	       ?w_inventory:filter(
+		  transfer, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+       end, Req, Payload);
+
+
+action(Session, Req, {"filter_transfer_rsn_w_inventory"}, Payload) ->
+    ?DEBUG("filter_transfer_rsn_w_inventory with session ~p~n, paylaod~n~p",
+	   [Session, Payload]),
+
+    Merchant  = ?session:get(merchant, Session),
+
+    ?pagination:pagination(
+       fun(Match, Conditions) ->
+	       ?w_inventory:filter(total_transfer_rsn_groups,
+				   ?to_a(Match), Merchant, Conditions)
+       end,
+       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+	       ?w_inventory:filter(
+		  transfer_rsn_groups,
+		  Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+       end, Req, Payload);
+
+
+action(Session, Req, {"w_inventory_transfer_rsn_detail"}, Payload) ->
+    ?DEBUG("w_inventory_transfer_rsn_detail with session ~p~n, paylaod~n~p",
+	   [Session, Payload]),
+
+    Merchant = ?session:get(merchant, Session),
+    %% RSn = ?v(<<"rsn">>, Payload),
+    case ?w_inventory:rsn_detail(transfer_rsn, Merchant, Payload) of 
+    	{ok, Details} ->
+	    ?utils:respond(200, object, Req, {[{<<"ecode">>, 0},
+					       {<<"data">>, Details}]}); 
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+
+
+action(Session, Req, {"check_w_inventory_transfer"}, Payload) ->
+    ?DEBUG("check_w_inventory_transfer with session ~p, paylaod~n~p",
+	   [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    %% RSN = ?v(<<"rsn">>, Payload),
+    %% TShop = ?v(<<"tshop">>, Payload),
+
+    case ?w_inventory:purchaser_inventory(
+	    check_transfer, Merchant, Payload) of
+    	{ok, RSN} -> 
+    	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(check_w_inventory_transfer, RSN),
+	       {<<"rsn">>, ?to_b(RSN)});
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+%% =============================================================================
 %% match
 %% =============================================================================
 action(Session, Req, {"match_all_w_inventory"}, Payload) ->
@@ -348,9 +442,11 @@ action(Session, Req, {"match_w_inventory"}, Payload) ->
     QType       = ?v(<<"type">>, Payload, 0),
 
     Match = fun() when Firm =:= undefined->
-		    ?w_inventory:match(inventory, QType, Merchant, StyleNumber, Shop);
+		    ?w_inventory:match(
+		       inventory, QType, Merchant, StyleNumber, Shop);
 	       () ->
-		    ?w_inventory:match(inventory, QType, Merchant, StyleNumber, Shop, Firm)
+		    ?w_inventory:match(
+		       inventory, QType, Merchant, StyleNumber, Shop, Firm)
 	    end,
     
     batch_responed(Match, Req);
@@ -445,14 +541,7 @@ sidebar(Session) ->
 
 	    InvDetail = [{"inventory_detail",
 			  "库存详情",
-			  "glyphicon glyphicon-book"}],
-
-	    Transfer = authen_shop_action(
-		       {?transfer_w_inventory,
-			"inventory_transfer",
-			"库存转移",
-			"glyphicon glyphicon-transfer"},
-		       Shops),
+			  "glyphicon glyphicon-book"}], 
 	    
 	    %% Record =
 	    %% 	[{{"record", "采购入库", "glyphicon glyphicon-shopping-cart"},
@@ -472,6 +561,30 @@ sidebar(Session) ->
 	    %% 	      {"inventory_rsn_detail/reject",
 	    %% 	       "退货明细", "glyphicon glyphicon-map-marker"}]
 	    %%  }],
+
+	    Transfer =
+		[
+		 {{"inventory", "库存转移", "glyphicon glyphicon-transfer"},
+		  authen_shop_action(
+		    {?transfer_w_inventory,
+		     "inventory_transfer",
+		     "移仓",
+		     "glyphicon glyphicon-transfer"},
+		    Shops) 
+		  ++ [{"inventory_transfer_detail",
+		       "移仓记录",
+		       "glyphicon glyphicon-tasks"},
+		      {"inventory_rsn_detail/transfer",
+		       "移仓明细",
+		       "glyphicon glyphicon-leaf"}] 
+		 }],
+
+	    %% Transfer = authen_shop_action(
+	    %% 		 {?transfer_w_inventory,
+	    %% 		  "inventory_transfer",
+	    %% 		  "库存转移",
+	    %% 		  "glyphicon glyphicon-transfer"},
+	    %% 		 Shops),
 	    
 	    InvMgr =
 		[
@@ -496,10 +609,9 @@ sidebar(Session) ->
 			++ Reject
 			++ TransR
 			++ TransD
-			++ InvDetail
-			++ Transfer),
+			++ InvDetail),
 	    
-	    Level2 = ?menu:sidebar(level_2_menu, InvMgr),
+	    Level2 = ?menu:sidebar(level_2_menu, Transfer ++ InvMgr),
 	    Level1 ++ Level2
 	    %% ?menu:sidebar(level_2_menu, Order ++ Record ++ Reject ++ InvMgr) 
     end.

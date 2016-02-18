@@ -343,7 +343,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 			+ g.brand + "，" + g.type})
 	    });
 
-	    console.log($scope.all_w_goods);
+	    // console.log($scope.all_w_goods);
 	});
     };
     

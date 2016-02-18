@@ -174,19 +174,19 @@ init([]) ->
 	 {?update_repo,    <<"修改仓库">>, <<"update_repo">>, ?right_shop},
 	 {?list_repo,      <<"查询仓库">>, <<"list_repo">>,   ?right_shop},
 	 
-	 {?new_badrepo,    <<"新增次品仓">>, <<"new_badrepo">>,    ?right_shop},
-	 {?del_badrepo,    <<"删除次品仓">>, <<"del_badrepo">>,    ?right_shop},
-	 {?update_badrepo, <<"修改次品仓">>, <<"update_badrepo">>, ?right_shop},
-	 {?list_badrepo,   <<"查询次品仓">>, <<"list_badrepo">>,   ?right_shop}
+	 {?new_badrepo,    <<"新增次品仓">>, <<"new_badrepo">>,  ?right_shop},
+	 {?del_badrepo,    <<"删除次品仓">>, <<"del_badrepo">>,  ?right_shop},
+	 {?update_badrepo, <<"修改次品仓">>, <<"update_badrepo">>,?right_shop},
+	 {?list_badrepo,   <<"查询次品仓">>, <<"list_badrepo">>, ?right_shop}
 	],
 
     
     
     Employ = 
-	[{?new_employe,    <<"新增员工">>, <<"new_employe">>,    ?right_employe},
-	 {?del_employe,    <<"删除员工">>, <<"delete_employe">>, ?right_employe},
-	 {?update_employe, <<"修改员工">>, <<"update_employe">>, ?right_employe},
-	 {?list_employe,   <<"查询员工">>, <<"list_employe">>,   ?right_employe}
+	[{?new_employe, <<"新增员工">>, <<"new_employe">>,    ?right_employe},
+	 {?del_employe, <<"删除员工">>, <<"delete_employe">>, ?right_employe},
+	 {?update_employe,<<"修改员工">>,<<"update_employe">>,?right_employe},
+	 {?list_employe,<<"查询员工">>, <<"list_employe">>,   ?right_employe}
 	],
 
     Right =
@@ -201,8 +201,8 @@ init([]) ->
 	],
 
     Supplier = 
-	[{?new_supplier,    <<"新增供应商">>, <<"new_supplier">>,      ?right_supplier},
-	 {?del_supplier,    <<"删除供应商">>, <<"delete_supplier">>,   ?right_supplier},
+	[{?new_supplier,<<"新增供应商">>, <<"new_supplier">>, ?right_supplier},
+	 {?del_supplier,<<"删除供应商">>, <<"delete_supplier">>,?right_supplier},
 	 {?update_supplier, <<"修改供应商">>, <<"update_supplier">>,   ?right_supplier},
 	 {?list_supplier,   <<"查询供应商">>, <<"list_supplier">>,     ?right_supplier},
 	 %% {?new_brand,       <<"新增品牌">>,   <<"new_brand">>,         ?right_supplier},
@@ -225,11 +225,16 @@ init([]) ->
 
     %% sale
     WSale =
-	[{?new_w_sale,    <<"销售开单">>,     <<"new_w_sale">>,       ?right_w_sale},
-	 {?reject_w_sale, <<"销售退货">>,     <<"reject_w_sale">>,    ?right_w_sale},
-	 {?print_w_sale,  <<"销售单打印">>,   <<"print_w_sale">>,     ?right_w_sale},
-	 {?update_w_sale, <<"销售单编辑">>,   <<"update_w_sale">>,    ?right_w_sale},
-	 {?check_w_sale,  <<"销售单审核">>,   <<"check_w_sale">>,     ?right_w_sale} 
+	[{?new_w_sale,
+	  <<"销售开单">>, <<"new_w_sale">>, ?right_w_sale},
+	 {?reject_w_sale,
+	  <<"销售退货">>, <<"reject_w_sale">>, ?right_w_sale},
+	 {?print_w_sale,
+	  <<"销售单打印">>, <<"print_w_sale">>, ?right_w_sale},
+	 {?update_w_sale,
+	  <<"销售单编辑">>, <<"update_w_sale">>, ?right_w_sale},
+	 {?check_w_sale,
+	  <<"销售单审核">>, <<"check_w_sale">>, ?right_w_sale} 
 	],
     
     %% inventory
@@ -255,26 +260,24 @@ init([]) ->
 	 %% {?list_w_good,   <<"查询货品信息">>,<<"list_purchaser_good">>,   ?right_w_inventory},
 
 	 %% inventory
-	 {?new_w_inventory, <<"新增库存">>, <<"new_w_inventory">>,     ?right_w_inventory},
-	 {?del_w_inventory, <<"删除库存">>, <<"delete_w_inventoryy">>, ?right_w_inventory},
-	 {?update_w_inventory, <<"修改库存">>, <<"update_w_inventory">>,  ?right_w_inventory},
-	 %% {?list_w_inventory,
-	 %%  <<"查询库存">>, <<"list_purchaser_inventory">>,    ?right_w_inventory},
-	 
-	 %% {?update_w_inventory_price,
-	 %%  <<"修改进货价">>, <<"update_w_inventory_price">>,  ?right_w_inventory},
-	 
-	 %% {?list_new_w_inventory,
-	 %%  <<"入库详情">>, <<"list_w_inventory_new">>, ?right_w_inventory},
-	 {?check_w_inventory, <<"库存审核">>, <<"check_w_inventory">>,  ?right_w_inventory},
+	 {?new_w_inventory,
+	  <<"新增库存">>, <<"new_w_inventory">>,     ?right_w_inventory},
+	 {?del_w_inventory,
+	  <<"删除库存">>, <<"delete_w_inventoryy">>, ?right_w_inventory},
+	 {?update_w_inventory,
+	  <<"修改库存">>, <<"update_w_inventory">>,  ?right_w_inventory}, 
+	 {?check_w_inventory,
+	  <<"库存审核">>, <<"check_w_inventory">>,  ?right_w_inventory},
 	 {?reject_w_inventory,
-	  <<"退货">>, <<"reject_w_inventory">>, ?right_w_inventory},
-	 
+	  <<"退货">>, <<"reject_w_inventory">>, ?right_w_inventory}, 
 	 {?fix_w_inventory,
-	  <<"库存盘点">>, <<"fix_w_inventory">>, ?right_w_inventory},
-
+	  <<"库存盘点">>, <<"fix_w_inventory">>, ?right_w_inventory}, 
 	 {?transfer_w_inventory,
-	  <<"库存转移">>, <<"transfer_w_inventory">>, ?right_w_inventory}
+	  <<"库存调入调出">>, <<"transfer_w_inventory">>, ?right_w_inventory},
+	 {?check_w_inventory_transfer,
+	  <<"库存调入确认">>, <<"check_w_inventory_transfer">>, ?right_w_inventory},
+	 {?cancel_w_inventory_transfer,
+	  <<"库存调入取消">>, <<"cancel_w_inventory_transfer">>, ?right_w_inventory}
 	 
 	 %% {?filter_fix_w_inventory,
 	 %%  <<"盘点详情">>, <<"filter_fix_w_inventory">>, ?right_w_inventory}
@@ -282,28 +285,40 @@ init([]) ->
 
     %% firm
     WFirm =
-	[{?new_w_firm,    <<"新增厂商">>,     <<"new_firm">>,         ?right_w_firm},
-	 {?del_w_firm,    <<"删除厂商">>,     <<"delete_firm">>,      ?right_w_firm},
-	 {?update_w_firm, <<"修改厂商信息">>, <<"update_firm">>,      ?right_w_firm}
+	[{?new_w_firm,
+	  <<"新增厂商">>,     <<"new_firm">>,         ?right_w_firm},
+	 {?del_w_firm,
+	  <<"删除厂商">>,     <<"delete_firm">>,      ?right_w_firm},
+	 {?update_w_firm,
+	  <<"修改厂商信息">>, <<"update_firm">>,      ?right_w_firm}
 	 %% {?list_w_firm,   <<"查看厂商信息">>, <<"list_firm">>,        ?right_w_firm}
 	],
 
     %% sale
     WSaler =
-    	[{?new_w_retailer,    <<"新增零售商">>, <<"new_w_retailer">>,   ?right_w_retailer},
-    	 {?del_w_retailer,    <<"删除零售商">>, <<"del_w_retailer">>,   ?right_w_retailer},
-	 {?update_w_retailer, <<"修改零售商">>, <<"update_w_retailer">>,?right_w_retailer}
+    	[{?new_w_retailer,
+	  <<"新增零售商">>, <<"new_w_retailer">>,   ?right_w_retailer},
+    	 {?del_w_retailer,
+	  <<"删除零售商">>, <<"del_w_retailer">>,   ?right_w_retailer},
+	 {?update_w_retailer,
+	  <<"修改零售商">>, <<"update_w_retailer">>,?right_w_retailer}
     	],
     
     %% print
     WPrint = 
-    	[{?new_w_print_server, <<"新增服务器">>, <<"new_w_print_server">>, ?right_w_print},
-    	 {?del_w_print_server, <<"删除服务器">>, <<"del_w_print_server">>, ?right_w_print},
+    	[{?new_w_print_server,
+	  <<"新增服务器">>, <<"new_w_print_server">>, ?right_w_print},
+    	 {?del_w_print_server,
+	  <<"删除服务器">>, <<"del_w_print_server">>, ?right_w_print},
 
-	 {?new_w_printer,      <<"新增打印机">>, <<"new_w_printer">>,      ?right_w_print},
-	 {?del_w_printer,      <<"删除打印机">>, <<"del_w_printer">>,      ?right_w_print},
-	 {?update_w_printer,   <<"修改打印机">>, <<"update_w_printer">>,   ?right_w_print},
-	 {?list_w_printer,     <<"查询打印机">>, <<"list_w_printer">>,     ?right_w_print}
+	 {?new_w_printer,
+	  <<"新增打印机">>, <<"new_w_printer">>,      ?right_w_print},
+	 {?del_w_printer,
+	  <<"删除打印机">>, <<"del_w_printer">>,      ?right_w_print},
+	 {?update_w_printer,
+	  <<"修改打印机">>, <<"update_w_printer">>,   ?right_w_print},
+	 {?list_w_printer,
+	  <<"查询打印机">>, <<"list_w_printer">>,     ?right_w_print}
 
 	 %% {?new_w_printer_conn,   <<"关联打印机">>,    <<"new_w_printer_conn">>,?right_w_print},
 	 %% {?del_w_printer_conn,   <<"删除打印机关联">>,<<"del_w_printer_conn">>,?right_w_print},
@@ -312,40 +327,59 @@ init([]) ->
     	],
 
     WGood =
-	[{?new_w_good,    <<"新增货品">>,    <<"new_w_good">>,    ?right_w_good},
-	 {?del_w_good,    <<"删除货品">>,    <<"delete_w_good">>, ?right_w_good},
-	 {?update_w_good, <<"修改货品信息">>,<<"update_w_good">>, ?right_w_good}
+	[{?new_w_good,
+	  <<"新增货品">>,    <<"new_w_good">>,    ?right_w_good},
+	 {?del_w_good,
+	  <<"删除货品">>,    <<"delete_w_good">>, ?right_w_good},
+	 {?update_w_good,
+	  <<"修改货品信息">>,<<"update_w_good">>, ?right_w_good}
 	 %% {?list_w_good,   <<"查询货品信息">>,<<"list_w_good">>,   ?right_w_good}
 	 ,
 	 %% size
-	 {?new_w_size,    <<"新增尺码组">>, <<"new_w_size">>,    ?right_w_good},
-	 {?del_w_size,    <<"删除尺码组">>, <<"delete_w_size">>, ?right_w_good},
-	 {?update_w_size, <<"修改尺码组">>, <<"update_w_size">>, ?right_w_good},
+	 {?new_w_size,
+	  <<"新增尺码组">>, <<"new_w_size">>,    ?right_w_good},
+	 {?del_w_size,
+	  <<"删除尺码组">>, <<"delete_w_size">>, ?right_w_good},
+	 {?update_w_size,
+	  <<"修改尺码组">>, <<"update_w_size">>, ?right_w_good},
 
 	 %% color
-	 {?new_w_color,   <<"新增颜色">>,   <<"new_w_color">>,   ?right_w_good},
-	 {?del_w_color,   <<"删除颜色">>,   <<"delete_w_color">>,?right_w_good},
-	 {?update_w_color,<<"修改颜色">>,   <<"update_w_color">>,?right_w_good} 
+	 {?new_w_color,
+	  <<"新增颜色">>,   <<"new_w_color">>,   ?right_w_good},
+	 {?del_w_color,
+	  <<"删除颜色">>,   <<"delete_w_color">>,?right_w_good},
+	 {?update_w_color,
+	  <<"修改颜色">>,   <<"update_w_color">>,?right_w_good} 
 	],
 
     WReport =
-	[{?daily_wreport,   <<"日报表">>,   <<"daily_wreport">>, ?right_w_report},
-	 {?weekly_wreport,  <<"周报表">>,   <<"weekly_wreport">>, ?right_w_report},
-	 {?monthly_wreport, <<"月报表">>,   <<"monthly_wreport">>, ?right_w_report},
-	 {?quarter_wreport, <<"季度报表">>, <<"quarter_wreport">>, ?right_w_report},
-	 {?half_wreport,    <<"年中报表">>, <<"half_wreport">>, ?right_w_report},
-	 {?year_wreport,    <<"年中报表">>, <<"year_wreport">>, ?right_w_report} 
+	[{?daily_wreport,
+	  <<"日报表">>,   <<"daily_wreport">>, ?right_w_report},
+	 {?weekly_wreport,
+	  <<"周报表">>,   <<"weekly_wreport">>, ?right_w_report},
+	 {?monthly_wreport,
+	  <<"月报表">>,   <<"monthly_wreport">>, ?right_w_report},
+	 {?quarter_wreport,
+	  <<"季度报表">>, <<"quarter_wreport">>, ?right_w_report},
+	 {?half_wreport,
+	  <<"年中报表">>, <<"half_wreport">>, ?right_w_report},
+	 {?year_wreport,
+	  <<"年报表">>, <<"year_wreport">>, ?right_w_report} 
 	],
     
     %% rainbow
     Rainbow =
-	[{?inventory_fifo, <<"库存先进先出">>, <<"inventory_fifo">>,   ?right_rainbow}],
+	[{?inventory_fifo,
+	  <<"库存先进先出">>, <<"inventory_fifo">>,   ?right_rainbow}],
 
     %% base setting
     Base =
-    	[{?new_w_bank_card,   <<"新增银行卡">>, <<"new_w_bank_card">>,   ?right_w_base},
-	 {?del_w_bank_card,   <<"删除银行卡">>, <<"del_w_bank_card">>,   ?right_w_base},
-	 {?update_w_bank_card,<<"修改银行卡">>, <<"update_w_bank_card">>,?right_w_base},
+    	[{?new_w_bank_card,
+	  <<"新增银行卡">>, <<"new_w_bank_card">>,   ?right_w_base},
+	 {?del_w_bank_card,
+	  <<"删除银行卡">>, <<"del_w_bank_card">>,   ?right_w_base},
+	 {?update_w_bank_card,
+	  <<"修改银行卡">>, <<"update_w_bank_card">>,?right_w_base},
 	 
 	 {?new_w_printer_conn,
 	  <<"关联打印机">>,    <<"new_w_printer_conn">>,   ?right_w_base},
@@ -780,10 +814,15 @@ pass_action(wholesaler) ->
      <<"filter_w_inventory_reject_rsn_group">>,
      <<"w_inventory_reject_rsn_detail">>,
      
-     %% inventory fix
+     %% fix
      <<"filter_fix_w_inventory">>, 
      <<"filter_w_inventory_fix_rsn_group">>,
      <<"w_inventory_fix_rsn_detail">>,
+
+     %% transfer
+     <<"filter_transfer_w_inventory">>,
+     <<"filter_transfer_rsn_w_inventory">>,
+     <<"w_inventory_transfer_rsn_detail">>,
 
      %% export
      <<"w_inventory_export">>,
@@ -824,6 +863,9 @@ pass_action(wholesaler) ->
 
      %% firm
      <<"list_firm">>,
+
+     %% shop
+     <<"list_shop">>,
 
      <<"update_user_passwd">>,
 

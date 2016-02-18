@@ -446,6 +446,12 @@ br(forward, <<"epson">>, <<"LQ55K">>) ->
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
 	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
+br(forward, <<"epson">>, <<"LQ630">>) ->
+    br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>)
+	++ br(<<"epson">>) ++ br(<<"epson">>) ++ br(<<"epson">>);
 br(forward, <<"fujitsu">>, <<"DPK750">>) ->
     br(<<"fujitsu">>) ++ br(<<"fujitsu">>) ++ br(<<"fujitsu">>);
 br(forward, Brand, _Model) ->
@@ -656,6 +662,8 @@ do_line(PageLine, ContentLine, [H|T], Page, Pages)->
 %%     table_head(?ROW, T, Len, Sizes, <<THead/binary, HexLen>>).
 
 printer(<<"epson">>, <<"LQ55K">>) ->
+    scroll;
+printer(<<"epson">>, <<"LQ630">>) ->
     scroll;
 printer(<<"jolimark">>, <<"LQ-200KII/KIIF">>) ->
     scroll;

@@ -1521,9 +1521,11 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 			      true -> 
 				  case IsPage andalso ?f_print:printer(Brand, Model) =:= flat of
 				      true ->
+					  ?DEBUG("page ~p flat", [IsPage]),
 					  base64:encode_to_string(
 					    Head ++ GBKData ++ Tail);
-				      false -> 
+				      false ->
+					  ?DEBUG("page ~p scroll", [IsPage]),
 					  base64:encode_to_string(
 					    GBKData
 					    ++ ?f_print:br(
@@ -1531,6 +1533,17 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 				  end;
 			      false ->
 				  base64:encode_to_string(GBKData)
+				  %% case ?f_print:printer(Brand, Model) =:= flat of
+				  %%     true ->
+				  %% 	  ?DEBUG("page ~p flat", [IsPage]),
+				  %% 	  base64:encode_to_string(GBKData);
+				  %%     false ->
+				  %% 	  ?DEBUG("page ~p scroll", [IsPage]),
+				  %% 	  base64:encode_to_string(
+				  %% 	    GBKData
+				  %% 	    ++ ?f_print:br(
+				  %% 		  forward, Brand, Model))
+				  %% end
 			  end,
 		      {[Base64|Acc], Lens + 1}
 	      end,  {[], 0}, Body),

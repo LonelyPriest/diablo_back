@@ -56,6 +56,9 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 
     var base = {"base": function(diabloNormalFilter){
 	return diabloNormalFilter.get_base_setting()}};
+
+    var shop = {"filterShop": function(diabloNormalFilter){
+	return diabloNormalFilter.get_shop()}};
     
     $routeProvider.
 	// new
@@ -113,10 +116,21 @@ purchaserApp.config(['$routeProvider', function($routeProvider){
 	    resolve: angular.extend({}, user, brand, firm, s_group, color, base)
 	}).
 	// transfer
-	when('/inventory_transfer/:rsn?', {
+	when('/inventory/inventory_transfer', {
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_transfer.html',
             controller: 'purchaserInventoryTransferCtrl',
-	    resolve: angular.extend({}, user, firm, employee, s_group, color, base)
+	    resolve: angular.extend(
+		{}, user, shop, firm, employee, s_group, color, base)
+	}).
+	when('/inventory/inventory_transfer_detail', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_transfer_detail.html',
+            controller: 'purchaserInventoryTransferDetailCtrl' ,
+	    resolve: angular.extend({}, user, shop, employee, base) 
+	}).
+	when('/inventory/inventory_rsn_detail/transfer/:rsn?', {
+	    templateUrl: '/private/purchaser/html/purchaser_inventory_transfer_rsn_detail.html',
+            controller: 'purchaserInventoryTransferRsnDetailCtrl',
+	    resolve: angular.extend({}, user, shop, brand, type, firm, s_group, color, base)
 	}).
 	otherwise({
 	    templateUrl: '/private/purchaser/html/purchaser_inventory_new_detail.html',
@@ -198,7 +212,9 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
 	    };
 
 	    if (!in_sort(sorts, inv)){
-		sorts.push({cid:inv.color_id, size:inv.size, count:inv.amount})
+		sorts.push({cid:inv.color_id,
+			    size:inv.size,
+			    count:inv.amount})
 	    }; 
 	});
 
@@ -374,6 +390,36 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
     this.transfer_purchaser_inventory = function(inventory){
 	return http.save(
 	    {operation: "transfer_w_inventory"}, inventory).$promise;
+    };
+
+    this.filter_transfer_w_inventory = function(match, fields, currentPage, itemsPerpage){
+	return http.save(
+	    {operation: "filter_transfer_w_inventory"},
+	    {match:  angular.isDefined(match) ? match.op : undefined,
+	     fields: fields,
+	     page:   currentPage,
+	     count:  itemsPerpage}).$promise;
+    };
+
+    this.filter_transfer_rsn_w_inventory = function(match, fields, currentPage, itemsPerpage){
+	return http.save(
+	    {operation: "filter_transfer_rsn_w_inventory"},
+	    {match:  angular.isDefined(match) ? match.op : undefined,
+	     fields: fields,
+	     page:   currentPage,
+	     count:  itemsPerpage}).$promise;
+    };
+
+    this.w_invnetory_transfer_rsn_detail = function(inv){
+	return http.save(
+	    {operation: "w_inventory_transfer_rsn_detail"},
+	    {rsn:inv.rsn, style_number:inv.style_number,
+	     brand:inv.brand}).$promise;
+    };
+
+    this.check_w_inventory_transfer = function(check){
+	return http.save(
+	    {operation: "check_w_inventory_transfer"}, check).$promise;
     };
 
     // export

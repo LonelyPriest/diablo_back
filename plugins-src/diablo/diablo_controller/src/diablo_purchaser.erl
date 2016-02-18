@@ -104,9 +104,15 @@ purchaser_inventory(list, Merchant, Conditions) ->
 purchaser_inventory(check, Merchant, RSN) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {check_inventory, Merchant, RSN});
+purchaser_inventory(check_transfer, Merchant, CheckProps) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(
+      Name, {check_inventory_transfer, Merchant, CheckProps});
+
 purchaser_inventory(get_new, Merchant, RSN) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {get_new, Merchant, RSN});
+
 purchaser_inventory(get_inventory_new_rsn, Merchant, Conditions) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {get_inventory_new_rsn, Merchant, Conditions});
@@ -186,6 +192,15 @@ filter(total_fix_rsn_groups, 'and', Merchant, Fields) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {total_fix_rsn_groups, Merchant, Fields});
 
+%% transfer
+filter(total_transfer, 'and', Merchant, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {total_transfer, Merchant, Fields});
+
+filter(total_transfer_rsn_groups, 'and', Merchant, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {total_transfer_rsn_groups, Merchant, Fields});
+
 %% inventory
 filter(total_groups, 'and', Merchant, Fields) ->
     Name = ?wpool:get(?MODULE, Merchant), 
@@ -223,6 +238,17 @@ filter(fix_rsn_groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
     gen_server:call(Name, {filter_fix_rsn_groups,
 			   Merchant, CurrentPage, ItemsPerPage, Fields});
 
+%% transfer
+filter(transfer, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(
+      Name, {filter_transfer, Merchant, CurrentPage, ItemsPerPage, Fields});
+
+filter(transfer_rsn_groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {filter_transfer_rsn_groups,
+			   Merchant, CurrentPage, ItemsPerPage, Fields});
+
 %% inventory
 filter(groups, 'and', Merchant, CurrentPage, ItemsPerPage, Fields) ->
     Name = ?wpool:get(?MODULE, Merchant),
@@ -254,7 +280,11 @@ rsn_detail(reject_rsn, Merchant, Condition) ->
 
 rsn_detail(fix_rsn, Merchant, Condition) ->
     Name = ?wpool:get(?MODULE, Merchant), 
-    gen_server:call(Name, {fix_rsn_detail, Merchant, Condition}).
+    gen_server:call(Name, {fix_rsn_detail, Merchant, Condition});
+
+rsn_detail(transfer_rsn, Merchant, Condition) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {transfer_rsn_detail, Merchant, Condition}).
 
 
 %%
@@ -1112,19 +1142,8 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
 
     Shop        = ?v(<<"shop">>, Props),
     ToShop      = ?v(<<"tshop">>, Props),
-    Firm        = ?v(<<"firm">>, Props),
-    Balance     = ?v(<<"balance">>, Props),
-    DateTime    = ?v(<<"datetime">>, Props, Now),
-    %% Cash        = ?v(<<"cash">>, Props, 0),
-    %% Card        = ?v(<<"card">>, Props, 0),
-    %% Wire        = ?v(<<"wire">>, Props, 0),
-    %% VerifyPay   = ?v(<<"verificate">>, Props, 0),
+    DateTime    = ?v(<<"datetime">>, Props, Now), 
     Employe     = ?v(<<"employee">>, Props), 
-    %% Balance     = ?v(<<"balance">>, Props),
-    %% ShouldPay   = ?v(<<"should_pay">>, Props, 0),
-    %% HasPay      = ?v(<<"has_pay">>, Props, 0), 
-    %% EPayType    = ?v(<<"e_pay_type">>, Props, -1),
-    %% EPay        = ?v(<<"e_pay">>, Props, 0), 
 
     Total = ?v(<<"total">>, Props),
     Comment     = ?v(<<"comment">>, Props, ""),
@@ -1132,48 +1151,43 @@ handle_call({transfer_inventory, Merchant, Inventories, Props}, _From, State) ->
     FromRSN = rsn(transfer_from, Merchant, Shop,
 	      ?inventory_sn:sn(w_inventory_transfer_sn_from, Merchant)),
 
-    ToRSN = rsn(transfer_to, Merchant, ToShop,
-	      ?inventory_sn:sn(w_inventory_transfer_sn_to, Merchant)),
+    %% ToRSN = rsn(transfer_to, Merchant, ToShop,
+    %% 	      ?inventory_sn:sn(w_inventory_transfer_sn_to, Merchant)),
     
-    Sql1 = ["insert into w_inventory_new(rsn"
-	    ", employ, firm, shop, merchant"
-	    ", balance, total, comment, type, entry_date) values(" 
+    Sql1 = ["insert into w_inventory_transfer(rsn"
+	    ", fshop, tshop, employ, total"
+	    ", comment, merchant, state, entry_date) values(" 
 	    ++ "\"" ++ ?to_s(FromRSN) ++ "\","
-	    ++ "\"" ++ ?to_s(Employe) ++ "\","
-	    ++ ?to_s(Firm) ++ ","
 	    ++ ?to_s(Shop) ++ ","
-	    ++ ?to_s(Merchant) ++ ","
-	    ++ ?to_s(Balance) ++ "," 
-	    ++ ?to_s(-Total) ++ ","
-	    ++ "\"" ++ ?to_s(Comment) ++ "\","
-	    ++ ?to_s(?TRANSFER_INVENTORY_FROM) ++ ","
-	    ++ "\"" ++ ?to_s(DateTime) ++ "\")",
-	    
-	    "insert into w_inventory_new(rsn"
-	    ", employ, firm, shop, merchant"
-	    ", balance, total, comment, type, entry_date) values(" 
-	    ++ "\"" ++ ?to_s(ToRSN) ++ "\","
-	    ++ "\"" ++ ?to_s(Employe) ++ "\","
-	    ++ ?to_s(Firm) ++ ","
 	    ++ ?to_s(ToShop) ++ ","
-	    ++ ?to_s(Merchant) ++ ","
-	    ++ ?to_s(Balance) ++ "," 
+	    ++ "\"" ++ ?to_s(Employe) ++ "\","
 	    ++ ?to_s(Total) ++ ","
 	    ++ "\"" ++ ?to_s(Comment) ++ "\","
-	    ++ ?to_s(?TRANSFER_INVENTORY_TO) ++ ","
+	    ++ ?to_s(Merchant) ++ ","
+	    ++ ?to_s(0) ++ "," 
 	    ++ "\"" ++ ?to_s(DateTime) ++ "\")"],
 
     Sql2 = sql(transfer_from,
-	       FromRSN, Merchant, Shop, Firm, DateTime, Inventories),
+	       FromRSN, Merchant, Shop, DateTime, Inventories),
     ?DEBUG("Sql2 ~p", [Sql2]),
-    Sql3 = sql(transfer_to,
-	       ToRSN, Merchant, ToShop, Firm, DateTime, Inventories),
-    ?DEBUG("Sql3 ~p", [Sql3]),
+    %% Sql3 = sql(transfer_to,
+    %% 	       ToRSN, Merchant, ToShop, Firm, DateTime, Inventories),
+    %% ?DEBUG("Sql3 ~p", [Sql3]),
 
-    AllSql = Sql1 ++ Sql2 ++ Sql3,
+    AllSql = Sql1 ++ Sql2,
     %% ?DEBUG("AllSql ~p", [AllSql]),
     Reply = ?sql_utils:execute(transaction, AllSql, FromRSN),
     {reply, Reply, State};
+
+handle_call({check_inventory_transfer, Merchant, CheckProps}, _From, State) ->
+    ?DEBUG("check_inventory_transfer: checkprops ~p", [CheckProps]),
+    %% Now = ?utils:current_time(format_localtime),
+    RSN = ?v(<<"rsn">>, CheckProps),
+    %% TShop = ?v(<<"tshop">>, Payload),
+    Sqls = ?w_transfer_sql:check_transfer(Merchant, CheckProps),
+    Reply = ?sql_utils:execute(transaction, Sqls, RSN),
+    {reply, Reply, State};
+    
 
 handle_call({list_inventory, Merchant, Conditions}, _From, State) ->
     ?DEBUG("list_inventory  with merchant ~p, conditions ~p",
@@ -1255,21 +1269,6 @@ handle_call({filter_news, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, S
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State}; 
 
-%% reject
-%% handle_call({total_rejects, Merchant, Fields}, _From, State) ->
-%%     CountSql = count_table(w_inventory_new, reject, Merchant, Fields),
-%%     Reply = ?sql_utils:execute(s_read, CountSql),
-%%     {reply, Reply, State}; 
-
-%% handle_call({filter_rejects, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-%%     ?DEBUG("filter_rejects_with_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
-%% 	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]), 
-%%     %% {StartTime, EndTime, Conditions} = cut(fields_with_prifix, Fields),
-%%     Sql = ?w_good_sql:inventory(
-%% 	     reject_detail_with_pagination, Merchant, Fields, CurrentPage, ItemsPerPage),
-%%     Reply = ?sql_utils:execute(read, Sql),
-%%     {reply, Reply, State}; 
-
 %% fix
 handle_call({total_fix, Merchant, Fields}, _From, State) ->
     Sql = "rsn, exist, fixed, metric",
@@ -1285,10 +1284,36 @@ handle_call({total_fix, Merchant, Fields}, _From, State) ->
     {reply, Reply, State}; 
 
 handle_call({filter_fix, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-    ?DEBUG("filter_fix_with_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+    ?DEBUG("filter_fix_with_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
 	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]), 
     Sql = ?w_good_sql:inventory(
-	     fix_detail_with_pagination, Merchant, Fields, CurrentPage, ItemsPerPage),
+	     fix_detail_with_pagination,
+	     Merchant, Fields, CurrentPage, ItemsPerPage),
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+
+
+%% transfer
+handle_call({total_transfer, Merchant, Fields}, _From, State) ->
+    Sql = "rsn, total",
+    CountTable = ?sql_utils:count_table(
+		    w_inventory_transfer, Sql, Merchant, Fields),
+    CountSql = "select count(*) as total"
+    	", sum(total) as t_total" 
+    	" from ("
+	++ CountTable ++ ") a",
+    %% Sql = ?sql_utils:count_table("w_inventory_fix", Merchant, Fields),
+    Reply = ?sql_utils:execute(s_read, CountSql),
+    {reply, Reply, State}; 
+
+handle_call({filter_transfer, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
+    ?DEBUG("filter_transfer_with_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]), 
+    Sql = ?w_good_sql:inventory(
+	     transfer_detail_with_pagination,
+	     Merchant, Fields, CurrentPage, ItemsPerPage),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State}; 
 
@@ -1299,11 +1324,13 @@ handle_call({total_goods, Merchant, Fields}, _From, State) ->
     {reply, Reply, State}; 
 
 handle_call({filter_goods, Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
-    ?DEBUG("filter_goods_with_and: currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+    ?DEBUG("filter_goods_with_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
 	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]),
 
     Sql = ?w_good_sql:good(
-	     detail_with_pagination, Merchant, Fields, CurrentPage, ItemsPerPage), 
+	     detail_with_pagination,
+	     Merchant, Fields, CurrentPage, ItemsPerPage), 
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State}; 
 
@@ -1426,11 +1453,45 @@ handle_call({fix_rsn_detail, Merchant, Conditions}, _From, State) ->
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
+
+%% =============================================================================
+%% transfer
+%% =============================================================================
+handle_call({total_transfer_rsn_groups, Merchant, Fields}, _From, State) ->
+    Sql = "rsn",
+    CountTable = ?sql_utils:count_table(
+		    w_inventory_transfer, Sql, Merchant, Fields),
+    CountSql = "select count(*) as total"
+	", SUM(amount) as t_amount" 
+	" from w_inventory_transfer_detail"
+	" where rsn in(" ++ CountTable ++ ")",
+    Reply = ?sql_utils:execute(s_read, CountSql),
+    {reply, Reply, State}; 
+
+handle_call({filter_transfer_rsn_groups,
+	     Merchant, CurrentPage, ItemsPerPage, Fields}, _From, State) ->
+    ?DEBUG("filter_fix_rsn_group_and: "
+	   "currentPage ~p, ItemsPerpage ~p, Merchant ~p~n"
+	   "fields ~p", [CurrentPage, ItemsPerPage, Merchant, Fields]), 
+    Sql = ?w_good_sql:inventory(
+	     transfer_rsn_group_with_pagination,
+	     Merchant, Fields, CurrentPage, ItemsPerPage),
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State}; 
+
+handle_call({transfer_rsn_detail, Merchant, Conditions}, _From, State) ->
+    ?DEBUG("transfer_rsn_detail with merchant ~p, "
+	   "Conditions ~p", [Merchant, Conditions]), 
+    Sql = ?w_good_sql:inventory(transfer_rsn_detail, Merchant, Conditions),
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+
 %%
 %% export
 %%
 handle_call({new_trans_export, Merchant, Conditions}, _From, State)->
-    ?DEBUG("new_trans_export with merchant ~p, condition ~p", [Merchant, Conditions]),
+    ?DEBUG("new_trans_export with merchant ~p, condition ~p",
+	   [Merchant, Conditions]),
     {_, C} = ?w_good_sql:filter_condition(inventory_new, Conditions, [], []),
     SortConditions = ?w_good_sql:sort_condition(w_inventory_new, Merchant, C),
     Sql = "select a.id, a.rsn, a.employ as employee_id"
@@ -1589,15 +1650,15 @@ sql(wreject, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
 		 Firm, Date, DateTime, Inv, Amounts) ++ Acc0 
       end, [], Inventories).
 
-sql(Transfer, RSN, Merchant, Shop, Firm, Datetime, Inventories) ->
+sql(transfer_from, RSN, Merchant, Shop, Datetime, Inventories) ->
     RealyShop = realy_shop(true, Merchant, Shop),
     lists:foldr(
       fun({struct, Inv}, Acc0)->
 	      %% Amounts = lists:reverse(?v(<<"amounts">>, Inv)),
 	      ?w_transfer_sql:amount_transfer(
-		 Transfer, RSN, Merchant, RealyShop,
-		 Firm, Datetime, Inv) ++ Acc0 
-      end, [], Inventories).
+		 transfer_from, RSN, Merchant, RealyShop,
+		 Datetime, Inv) ++ Acc0 
+      end, [], Inventories);
 
 sql(wfix, RSN, DateTime, Merchant, Shop, Inventories) ->
     %% Shop       = ?v(<<"shop">>, Props),

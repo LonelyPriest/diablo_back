@@ -176,6 +176,26 @@
 		   typeahead-editable="false"
 		   typeahead="s as s.name for s in
 			      prompt.retailer|filter:$viewValue|limitTo:8"/>
+	  </span>
+
+	  <span x-ng-switch-when="fshop">
+	    <input type="text"
+		   class="form-control"
+		   placeholder="请输入调出店铺"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+		   typeahead="s as s.name for s in
+			      prompt.fshop|filter:$viewValue|limitTo:8"/>
+	  </span>
+
+	  <span x-ng-switch-when="tshop">
+	    <input type="text"
+		   class="form-control"
+		   placeholder="请输入调出店铺"
+		   x-ng-model="f.value"
+		   typeahead-editable="false"
+		   typeahead="s as s.name for s in
+			      prompt.tshop|filter:$viewValue|limitTo:8"/>
 	  </span> 
 	  
 	</div> 

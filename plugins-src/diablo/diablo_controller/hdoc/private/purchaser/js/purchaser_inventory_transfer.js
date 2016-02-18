@@ -1,9 +1,11 @@
 purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
-    diabloPromise, diabloFilter, wgoodService, purchaserService,
-    user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
+    diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,
+    purchaserService, user, filterShop, filterFirm, filterEmployee,
+    filterSizeGroup, filterColor, base){
     // console.log(user);
 
+    console.log(filterShop);
     // $scope.shops     = user.sortShops;
     $scope.shops             = user.sortBadRepoes.concat(user.sortShops);
     $scope.to_shops          = [];
@@ -37,16 +39,15 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     
     $scope.select = {
 	total: 0,
-	should_pay: 0,
 	shop: $scope.shops.length !==0 ? $scope.shops[0]: undefined,
 	// extra_pay_type: $scope.extra_pay_types[0]
     };
 
     $scope.get_transfer_sthop = function(){
 	$scope.to_shops = [];
-	for (var i=0, l=$scope.shops.length; i<l; i++){
-	    if ($scope.select.shop.id !== $scope.shops[i].id){
-		$scope.to_shops.push($scope.shops[i]);
+	for (var i=0, l=filterShop.length; i<l; i++){
+	    if ($scope.select.shop.id !== filterShop[i].id){
+		$scope.to_shops.push(filterShop[i]);
 	    }
 	};
 
@@ -59,13 +60,13 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	return !$scope.has_saved; 
     };
     
-    $scope.change_firm = function(){
-	console.log($scope.select.firm); 
+    // $scope.change_firm = function(){
+    // 	console.log($scope.select.firm); 
 
-	if ($scope.q_prompt === diablo_frontend){
-	    $scope.get_all_prompt_inventory();
-	}
-    };
+    // 	if ($scope.q_prompt === diablo_frontend){
+    // 	    $scope.get_all_prompt_inventory();
+    // 	}
+    // };
 
     $scope.change_shop = function(){
 	// console.log($scope.select.shop);
@@ -91,9 +92,9 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 
     }; 
     
-    if ($scope.firms.length !== 0){
-    	$scope.select.firm = $scope.firms[0]; 
-    }
+    // if ($scope.firms.length !== 0){
+    // 	$scope.select.firm = $scope.firms[0]; 
+    // }
     
     if ($scope.employees.length !== 0){
 	$scope.select.employee = $scope.employees[0];
@@ -130,16 +131,16 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     // console.log($scope.setting);
 
     $scope.get_all_prompt_inventory = function(){
-	diabloFilter.match_all_w_reject_inventory(
-	    $scope.qtime_start($scope.select.shop.id),
-	    $scope.select.shop.id,
-	    $scope.select.firm.id
-	).then(function(invs){
+	diabloNormalFilter.match_all_w_inventory(
+	    {start_time:$scope.qtime_start($scope.select.shop.id),
+	     shop:$scope.select.shop.id} 
+	).$promise.then(function(invs){
 	    // console.log(invs);
 	    $scope.all_prompt_inventory = invs.map(function(inv){
+		var name =
+		    inv.style_number + "，" + inv.brand + "，" + inv.type;
 		return angular.extend(
-		    inv, {name:inv.style_number +
-			  "，" + inv.brand + "，" + inv.type})
+		    inv, {name:name, py:diablo_pinyin(name)})
 	    });
 
 	    // console.log($scope.all_prompt_inventory);
@@ -152,8 +153,8 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     };
 
     $scope.match_prompt_inventory = function(viewValue){
-	return diabloFilter.match_w_reject_inventory(
-	    viewValue, $scope.select.shop.id, $scope.select.firm.id); 
+	return diabloFilter.match_w_sale(
+	    viewValue, $scope.select.shop.id); 
     }; 
 
     $scope.on_select_inventory = function(item, model, label){
@@ -181,6 +182,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	add.brand_id     = item.brand_id;
 	add.type         = item.type;
 	add.type_id      = item.type_id;
+	add.firm_id      = item.firm_id;
 	add.s_group      = item.s_group;
 	add.free         = item.free;
 	add.year         = item.year;
@@ -254,6 +256,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 		type        : add.type_id,
 		sex         : add.sex,
 		season      : add.season,
+		firm        : add.firm_id,
 		
 		org_price   : add.org_price,
 		tag_price   : add.tag_price,
@@ -277,8 +280,8 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	// var e_pay = setv($scope.select.extra_pay);
 	
 	var base = {
-	    firm:          $scope.select.firm.id,
-	    balance:       $scope.select.firm.balance,
+	    // firm:          $scope.select.firm.id,
+	    // balance:       $scope.select.firm.balance,
 	    shop:          $scope.select.shop.id,
 	    tshop:         $scope.select.to_shop.id,
 	    datetime:      dateFilter($scope.select.date, "yyyy-MM-dd HH:mm:ss"),
@@ -570,4 +573,151 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	}, 1000); 
     };
     
+});
+
+
+purchaserApp.controller("purchaserInventoryTransferDetailCtrl", function(
+    $scope, dateFilter, diabloPattern, diabloUtilsService,
+    diabloFilter, purchaserService, wgoodService,
+    user, filterShop, filterEmployee, base){
+    // console.log(user);
+
+    $scope.goto_page = diablo_goto_page;
+
+    $scope.go_transfer = function(){
+	$scope.goto_page('#/inventory/inventory_transfer');
+    };
+
+    $scope.go_transfer_rsn = function(){
+	$scope.goto_page('#/inventory/inventory_rsn_detail/transfer');
+    };
+
+    /*
+    ** filter
+    */ 
+
+    // initial
+    $scope.filters = [];
+    
+    diabloFilter.reset_field();
+    diabloFilter.add_field("rsn", []);
+    diabloFilter.add_field("fshop",     user.sortShops);
+    diabloFilter.add_field("tshop",     user.sortShops);
+    // diabloFilter.add_field("firm",     filterFirm);
+    diabloFilter.add_field("employee", filterEmployee); 
+
+    $scope.filter = diabloFilter.get_filter();
+    $scope.prompt = diabloFilter.get_prompt();
+    
+    var now = $.now();
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start",
+	    shopId, base,
+	    diablo_set_date,
+	    diabloFilter.default_start_time(now));
+    }();
+    // console.log($scope.qtime_start);
+    
+    $scope.time   = diabloFilter.default_time($scope.qtime_start); 
+    // $scope.time   = diabloFilter.default_time();
+
+    console.log($scope.filter);
+    
+    /*
+     * pagination 
+     */
+    $scope.colspan = 15;
+    $scope.items_perpage = 10;
+    $scope.default_page = 1;
+    // $scope.current_page = $scope.default_page;
+
+    $scope.do_search = function(page){
+	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
+	    if ((angular.isUndefined(search.fshopo)
+		 || !search.fshop || search.fshop.length === 0)
+		|| (angular.isUndefined(search.tshopo)
+		    || !search.tshop || search.tshop.length === 0)){
+		search.fshop = user.sortShops.length
+		    === 0 ? undefined : user.shopIds; ;
+	    }
+
+	    purchaserService.filter_transfer_w_inventory(
+		$scope.match,
+		search, page,
+		$scope.items_perpage).then(function(result){
+		    console.log(result);
+		    if (page === 1){
+			$scope.total_items = result.total
+		    }
+		    angular.forEach(result.data, function(d){
+			d.fshop = diablo_get_object(
+			    d.fshop_id, user.sortShops);
+			d.tshop = diablo_get_object(
+			    d.tshop_id, filterShop);
+			d.employee = diablo_get_object(
+			    d.employee_id, filterEmployee);
+		    })
+		    $scope.records = result.data;
+		    diablo_order_page(
+			page, $scope.items_perpage, $scope.records);
+		})
+
+	    $scope.current_page = page;
+	    
+	})
+    };
+    
+    // default the first page
+    $scope.do_search($scope.default_page);
+
+    $scope.page_changed = function(){
+	$scope.do_search($scope.current_page);
+    };
+
+
+    // details
+    $scope.rsn_detail = function(r){
+	// console.log(r);
+	diablo_goto_page(
+	    "#/inventory/inventory_rsn_detail/transfer/" + r.rsn);
+    };
+
+    // check
+    var dialog = diabloUtilsService;
+    $scope.check_transfer = function(r){
+	var callback = function(){
+	    var check_date = dateFilter($.now(), "yyyy-MM-dd HH:mm:ss");
+	    purchaserService.check_w_inventory_transfer(
+		{rsn:r.rsn, tshop:r.tshop_id, datetime:check_date}
+	    ).then(function(state){
+		console.log(state);
+		if (state.ecode == 0){
+		    dialog.response_with_callback(
+			true,
+			"移仓调入确认",
+			"确认成功，请检查店铺 ["
+			    + r.tshop.name + "] 库存！！",
+			$scope, function(){
+			    r.state=1; r.check_date=check_date;})
+	    	    return;
+		} else{
+	    	    dialog.response(
+	    		false,
+			"移仓调入确认",
+	    		"确认失败："
+			    + purchaserService.error[state.ecode]);
+		}
+	    })
+	};
+
+	dialog.request(
+	    "移仓调入确认",
+	    "移仓只能确认一次，确认后货品自动增加，请在货品到达到后确认！！",
+	    callback, undefined, $scope);
+    };
+
+    $scope.cancel_transfer = function(r){
+	dialog.response(false, "移仓取消", "系统暂不支持此操作！！", undefined);
+    };
 });

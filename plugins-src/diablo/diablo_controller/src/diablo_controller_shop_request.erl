@@ -24,14 +24,18 @@ action(Session, Req) ->
 action(Session, Req, {"list_shop"}) ->
     ?DEBUG("list_shop with session ~p", [Session]),
     Merchant = ?session:get(merchant, Session),
-    ?utils:respond(batch, fun() -> ?shop:lookup(Merchant) end, Req);
+    %% ?utils:respond(batch, fun() -> ?shop:lookup(Merchant) end, Req);
+    ?utils:respond(
+       batch, fun() -> ?w_user_profile:get(shop, Merchant) end, Req);
 %% {ok, M} = ?shop:lookup(?session:get(merchant, Session)),
 %% ?utils:respond(200, batch, Req, M);
 
 action(Session, Req, {"list_repo"}) ->
     ?DEBUG("list_repo with session ~p", [Session]),
     Merchant = ?session:get(merchant, Session),
-    ?utils:respond(batch, fun() -> ?shop:repo(list, Merchant) end, Req);
+    %% ?utils:respond(batch, fun() -> ?shop:repo(list, Merchant) end, Req);
+    ?utils:respond(
+       batch, fun() -> ?w_user_profile:get(repo, Merchant) end, Req);
 
 action(Session, Req, {"list_badrepo"}) ->
     ?DEBUG("list_badrepo with session ~p", [Session]),

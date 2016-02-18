@@ -7,6 +7,7 @@ userApp.factory("userService", function($resource, $q){
     var _shops     = [];
     var _rights    = [];
     var _loginType = undefined;
+    // var _rightShops = [];
 
     // var promise = function(callback, params){
     // 	return function(){
@@ -44,7 +45,8 @@ userApp.factory("userService", function($resource, $q){
 	var shops = _shops;
 	return {
     	    right: _rights,
-	    type: _loginType,
+	    type:  _loginType,
+	    shop:  _shops,
 
 	    // shops exclude the shop that bind to the repository,
 	    // or repository itself

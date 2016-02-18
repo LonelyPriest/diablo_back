@@ -27,6 +27,11 @@
 -define(CHECKING, 0).
 -define(CHECKED, 1).
 
+%% transfer
+-define(IN_ROAD, 0).
+-define(IN_STOCK, 1).
+-define(IN_BACK, 2).
+
 %% inventory action
 -define(NEW_INVENTORY, 0).
 -define(REJECT_INVENTORY, 1).
@@ -192,14 +197,22 @@
 -define(new_w_inventory,             ?right_w_inventory + 4).
 -define(del_w_inventory,             ?right_w_inventory + 5).
 -define(update_w_inventory,          ?right_w_inventory + 6).
--define(update_w_inventory_price,    ?right_w_inventory + 7). 
+-define(update_w_inventory_price,    ?right_w_inventory + 7).
+
 -define(list_w_inventory,            ?right_w_inventory + 8).
 -define(list_new_w_inventory,        ?right_w_inventory + 9).
 -define(reject_w_inventory,          ?right_w_inventory + 10).
+
 -define(fix_w_inventory,             ?right_w_inventory + 11).
 -define(filter_fix_w_inventory,      ?right_w_inventory + 12).
 -define(check_w_inventory,           ?right_w_inventory + 13).
+
+%% transfer
 -define(transfer_w_inventory,        ?right_w_inventory + 14).
+-define(filter_transfer_w_inventory, ?right_w_inventory + 15).
+-define(filter_transfer_rsn_w_inventory, ?right_w_inventory + 16).
+-define(check_w_inventory_transfer, ?right_w_inventory + 17).
+-define(cancel_w_inventory_transfer, ?right_w_inventory + 18).
 
 
 

@@ -569,7 +569,26 @@ inventory(fix_rsn_detail, _Merchant, Conditions) ->
 	" where " ++ ?sql_utils:condition(proplists_suffix, NewConditions)
 	++ "deleted=" ++ ?to_s(?NO) ++ ") a"
 
-	" left join colors b on a.color=b.id".
+	" left join colors b on a.color=b.id";
+
+inventory(transfer_rsn_detail, _Merchant, Conditions) ->
+    {_StartTime, _EndTime, NewConditions} =
+	?sql_utils:cut(fields_with_prifix, Conditions), 
+    "select a.rsn, a.style_number, a.brand as brand_id"
+	", a.color as color_id, a.size, a.total as amount"
+	%% ", b.name as color"
+
+	" from w_inventory_transfer_detail_amount a"
+	%% " from ("
+
+	%% "select rsn, style_number, brand, color, size, exist, fixed, metric"
+	%% " from w_inventory_fix_detail_amount"
+	%% " where " ++ ?sql_utils:condition(proplists_suffix, NewConditions)
+	%% ++ "deleted=" ++ ?to_s(?NO) ++ ") a"
+
+	%% " left join colors b on a.color=b.id"
+
+	" where " ++ ?utils:to_sqls(proplists, NewConditions).
 
 %% inventory(last_reject, Merchant, Shop, Firm, Conditions) ->
 %%     Sql = "select a.id, a.rsn, a.style_number, a.sell_style"
@@ -715,6 +734,80 @@ inventory(fix_rsn_groups, fix, Merchant, Conditions, PageFun) ->
 	"(select rsn, employ, shop from w_inventory_fix"
 	" where " ++ C11 ++ ") b on a.rsn=b.rsn";
 
+inventory(transfer_detail, transfer, Merchant, Conditions, PageFun) ->
+    {StartTime, EndTime, NewConditions} =
+	?sql_utils:cut(fields_with_prifix, Conditions),
+    "select a.id, a.rsn, a.fshop as fshop_id"
+	", a.tshop as tshop_id"
+	", a.employ as employee_id"
+	", a.total, a.comment, a.state"
+	", a.check_date, a.entry_date"
+    %% ", b.name as employee"
+    %% ", c.name as shop"
+	" from w_inventory_transfer a"
+
+	" where "
+	++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime)
+	++ ?sql_utils:condition(proplists, NewConditions) 
+	++ " and merchant=" ++ ?to_s(Merchant)
+	++ PageFun();
+
+inventory(transfer_rsn_groups, transfer, Merchant, Conditions, PageFun) ->
+    StartTime   = ?v(<<"start_time">>, Conditions),
+    EndTime     = ?v(<<"end_time">>, Conditions),
+    RSN         = ?v(<<"rsn">>, Conditions, []),
+    StyleNumber = ?v(<<"style_number">>, Conditions, []),
+    Brand       = ?v(<<"brand">>, Conditions, []),
+    Firm        = ?v(<<"firm">>, Conditions, []),
+    FShop       = ?v(<<"fshop">>, Conditions, []),
+    TShop       = ?v(<<"tshop">>, Conditions, []),
+
+    C1 = [{<<"rsn">>, RSN}, {<<"fshop">>, FShop}, {<<"tshop">>, TShop}],
+    C11 = ?utils:correct_condition(<<"a.">>, C1),
+	%% ++ ?sql_utils:condition(time_no_prfix, StartTime, EndTime)
+	%% ++ " and merchant="++ ?to_s(Merchant),
+
+
+    C2 = [{<<"style_number">>, StyleNumber},
+	  {<<"brand">>, Brand},
+	  {<<"firm">>, Firm}],
+    C21 = ?utils:correct_condition(<<"b.">>, C2),
+
+    "select b.id, b.rsn, b.style_number"
+	", b.brand as brand_id"
+	", b.type as type_id"
+	", b.sex, b.season, b.amount"
+	", b.firm as firm_id, b.s_group"
+	", b.free, b.year, b.path, b.entry_date"
+
+	", a.employ as employee_id"
+	", a.fshop as fshop_id"
+	", a.tshop as tshop_id"
+	", a.state"
+	", a.check_date as check_date"
+	" from w_inventory_transfer_detail b, w_inventory_transfer a"
+	" where "
+	++ ?sql_utils:condition(proplists_suffix, C21)
+	++ "b.rsn=a.rsn"
+
+	++ ?sql_utils:condition(proplists, C11)
+    	++ " and a.merchant=" ++ ?to_s(Merchant)
+    	++ " and " ++ ?sql_utils:condition(
+			 time_with_prfix, StartTime, EndTime)
+	++ PageFun();
+
+	%% "(select id, rsn, style_number, brand, type, sex"
+	%% ", season, amount, firm, s_group, free, year, path, entry_date"
+	%% " from w_inventory_transfer_detail"
+	%% " where rsn in(select rsn from w_inventory_fix where " ++ C11 ++ ")"
+	%% ++ C21 ++ PageFun() ++ ") a"
+
+	%% " left join "
+	%% "(select rsn, employ, shop from w_inventory_fix"
+	%% " where " ++ C11 ++ ") b on a.rsn=b.rsn";
+
+
+
 inventory({group_detail_with_pagination, Mode},
 	  Merchant, Conditions, CurrentPage, ItemsPerPage) -> 
     inventory(group_detail, Merchant, Conditions,
@@ -743,6 +836,15 @@ inventory(fix_detail_with_pagination, Merchant, Conditions, CurrentPage, ItemsPe
 inventory(fix_rsn_group_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) ->
     inventory(fix_rsn_groups, fix, Merchant, Conditions,
 	fun() -> ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage) end);
+
+%% transfer
+inventory(transfer_detail_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) ->
+    inventory(transfer_detail, transfer, Merchant, Conditions,
+	      fun() -> ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage) end);
+
+inventory(transfer_rsn_group_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) ->
+    inventory(transfer_rsn_groups, transfer, Merchant, Conditions,
+	      fun() -> ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage) end);
 
 inventory(new_rsn_group_with_pagination, Merchant, Conditions, CurrentPage, ItemsPerPage) -> 
     inventory(new_rsn_groups, new, Merchant, Conditions,

@@ -750,4 +750,4 @@ purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
 	diablo_goto_page("#/inventory/inventory_rsn_detail/fix/" + r.rsn);
     }
     
-})
+});
