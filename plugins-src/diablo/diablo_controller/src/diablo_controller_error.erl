@@ -364,6 +364,14 @@ error(printer_conn_not_found, Printer) ->
 error(print_size_not_include, Shop) ->
     {2423, "print field size must be include of shop " ++ ?to_s(Shop)};
 
+%% w_inventory
+error(stock_sn_not_exist, SN) ->
+    {2501, "SN " + ?to_s(SN) ++ "does not exist."};
+error(stock_been_checked, SN) ->
+    {2502, "stock of SN " ++ ?to_s(SN) ++ "has been checked."};
+error(stock_been_canceled, SN) ->
+    {2503, "stock of SN " ++ ?to_s(SN) ++ "has been canceled."};
+
 %% base
 error(base_card_exist, CardNo) ->
     {8001, "card:" ++ ?to_s(CardNo) ++ "has been exist"};

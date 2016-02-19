@@ -54,6 +54,15 @@ var diabloAuthenApp = angular.module('diabloAuthenApp', [], function($provide){
 			"普通用户不支持权限分配！！请用管理员用户登陆！！", undefined);
 		    return $q.reject(response);
 		}
+		else if (response.status === 596){
+		    var injector = angular.element(document).injector();
+		    var dialog = injector.get('diabloUtilsService');
+		    dialog.response(
+			false, "网络超时",
+			"系统网络超时，请检查你的网络！！", undefined);
+		    return $q.reject(response);
+		}
+		
 		else if(response.status === 500){
 		    var injector = angular.element(document).injector();
 		    var dialog = injector.get('diabloUtilsService');

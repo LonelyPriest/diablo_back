@@ -1183,11 +1183,27 @@ handle_call({check_inventory_transfer, Merchant, CheckProps}, _From, State) ->
     ?DEBUG("check_inventory_transfer: checkprops ~p", [CheckProps]),
     %% Now = ?utils:current_time(format_localtime),
     RSN = ?v(<<"rsn">>, CheckProps),
-    %% TShop = ?v(<<"tshop">>, Payload),
-    Sqls = ?w_transfer_sql:check_transfer(Merchant, CheckProps),
-    Reply = ?sql_utils:execute(transaction, Sqls, RSN),
+
+    Sql = "select rsn, state from w_inventory_transfer"
+	" where rsn=\"" ++ ?to_s(RSN) ++ "\"",
+
+    Reply = 
+	case ?sql_utils:execute(s_read, Sql) of
+	    {ok, []} ->
+		{error, ?err(stock_sn_not_exist, RSN)};
+	    {ok, R} ->
+		case ?v(<<"state">>, R) of
+		    ?IN_STOCK ->
+			{error, ?err(stock_been_checked, RSN)};
+		    ?IN_BACK ->
+			{error, ?err(stock_been_canceled, RSN)};
+		    ?IN_ROAD ->
+			Sqls = ?w_transfer_sql:check_transfer(
+				  Merchant, CheckProps),
+			?sql_utils:execute(transaction, Sqls, RSN)
+		end
+	end,
     {reply, Reply, State};
-    
 
 handle_call({list_inventory, Merchant, Conditions}, _From, State) ->
     ?DEBUG("list_inventory  with merchant ~p, conditions ~p",
@@ -1195,10 +1211,11 @@ handle_call({list_inventory, Merchant, Conditions}, _From, State) ->
     QType = ?v(<<"qtype">>, Conditions, 0), 
     NewConditions = 
 	lists:foldr(fun({<<"shop">>, Shop}, Acc) ->
-			    [{<<"shop">>, case QType of
-					      1 -> realy_shop(true, Merchant, Shop);
-					      _ -> realy_shop(Merchant, Shop)
-					  end}|Acc];
+			    [{<<"shop">>,
+			      case QType of
+				  1 -> realy_shop(true, Merchant, Shop);
+				  _ -> realy_shop(Merchant, Shop)
+			      end}|Acc];
 		       ({<<"qtype">>, _}, Acc) ->
 			    Acc;
 		       (C, Acc) ->

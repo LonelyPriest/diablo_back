@@ -239,6 +239,7 @@ check_transfer(Merchant, CheckProps) ->
     TShop = ?v(<<"tshop">>, CheckProps),
     Now = ?v(<<"datetime">>, CheckProps,
 	     ?utils:current_time(format_localtime)),
+
     
     Sql1 = "update w_inventory_transfer set"
 	" state=" ++ ?to_s(?IN_STOCK)

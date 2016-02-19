@@ -136,6 +136,15 @@ dispatch(Req, DocRoot) ->
 		end 
 	end
     catch
+	exit:{timeout, What} ->
+	    ?DEBUG("request timeout:~p", [What]),
+	    Report = ["web request timeout",
+                      {path, Path},
+                      {what, What},
+                      {trace, erlang:get_stacktrace()}],
+	    ?ERROR("Request failed, timeout: ~p", [Report]),
+	    Req:respond({596, [{"Content-Type", "text/plain"}],
+                         "request timeout, sorry\n"});
         Type:What ->
 	    ?DEBUG("request fialed: ~p:~p", [Type, What]),
             Report = ["web request failed",
