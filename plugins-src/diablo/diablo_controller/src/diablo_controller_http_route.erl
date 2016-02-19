@@ -47,6 +47,8 @@ url_match(get) ->
 	++ register_e(wreport,    ?w_report_request)
     %% base setting
 	++ register_e(wbase,      ?w_base_request)
+    %% wechat
+	++ register_e(wechat,      ?wechat_request)
 	;
 
 url_match(delete) ->

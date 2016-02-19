@@ -15,10 +15,11 @@
     <meta http-equiv="Cache-Control"   CONTENT="no-cache">
     <meta http-equiv="Pragma"          CONTENT="no-cache">
 
-    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN GLOBAL MANDATORY STYLES --> 
+    <link href="/public/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+
     <link href="/public/assets/metronic/plugins/font-awesome/css/font-awesome.min.css"
 	  rel="stylesheet" type="text/css"/>
-    <link href="/public/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <!-- <link href="/public/assets/metronic/plugins/uniform/css/uniform.default.css" -->
     <!-- 	  rel="stylesheet" type="text/css"/> -->
     <!-- END GLOBAL MANDATORY STYLES -->
@@ -30,13 +31,20 @@
 	  rel="stylesheet" type="text/css"/>
     <link href="/public/assets/metronic/css/style-responsive.css"
 	  rel="stylesheet" type="text/css"/>
-    <link href="/public/assets/metronic/css/plugins.css"
-	  rel="stylesheet" type="text/css"/>
+    <!-- <link href="/public/assets/metronic/css/plugins.css" -->
+    <!-- 	  rel="stylesheet" type="text/css"/> -->
     <link href="/public/assets/metronic/css/themes/default.css"
 	  rel="stylesheet" type="text/css" id="style_color"/>
     <link href="/public/assets/metronic/css/pages/login.css"
 	  rel="stylesheet" type="text/css"/>
-    <link href="/public/assets/metronic/css/custom.css" rel="stylesheet" type="text/css"/>
+
+    <link href="/private/init/custom.css"
+	  rel="stylesheet" type="text/css"/>
+
+    <link href="/public/assets/metro-ui/metro-color.css"
+    	  rel="stylesheet" type="text/css"/>
+    
+    <!-- <link href="/public/assets/metronic/css/custom.css" rel="stylesheet" type="text/css"/> -->
     <!-- END THEME STYLES -->
     
     <intercept-url pattern="/favicon.ico" access="ROLE_ANONYMOUS" />

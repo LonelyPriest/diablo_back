@@ -172,9 +172,11 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 
     %% ?DEBUG("Path ~p, Method ~p, Math ~p", [Path, Method, Match]),
 
-    case Match of
-	{match, [MatchList]} ->
-	    ?DEBUG("Path ~p, Method ~p, Math ~p", [Path, Method, Match]),
+    case {Match, Method, Path} of
+	{ {match, [[]]}, 'GET', "wechat" } ->
+	    ?wechat_request:action(Req);
+	{ {match, [MatchList]}, _Method, _Path } ->
+	    %% ?DEBUG("MatchList ~p", [MatchList]),
 	    case valid_session(Req) of
 		{ok, _} ->
 		    case length(MatchList) of
@@ -199,7 +201,8 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 			1 ->
 			    Req:respond(
 			      {301, [{"Location", "/"},
-			    	     {"Content-Type", "text/html; charset=UTF-8"}],
+			    	     {"Content-Type",
+				      "text/html; charset=UTF-8"}],
 			       "Redirecting /"});
 			_ ->
 			    Req:respond({599, [{"Content-Type", "text/plain"}],
@@ -211,9 +214,10 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 		    %% ?utils:respond(200, object, Req, {[{<<"ecode">>, 301}]})
 		    %% root(Req)
 	    end;
-	nomatch when Path =:= "login" ->
+	{nomatch, _Method,  "login"} ->
 	    ?login_request:action(Req, login);
-	nomatch when Path =:= "login_force" ->
+	%% nomatch when Path =:= "login_force" ->
+	{nomatch, _Method, "login_force"}->
 	    ?login_request:action(Req, login_force);
 	%% nomatch when Path =:= "login_redirect" ->
 	%%     %% Payload = Req:recv_body(),

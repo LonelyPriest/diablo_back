@@ -384,6 +384,9 @@
 %% pool
 -define(wpool, diablo_work_pool_sup).
 
+%% wechat
+-define(wechat_request, diablo_wechat_request).
+
 -define(value(Key, Proplists), diablo_controller_utils:value_from_proplists(Key, Proplists)).
 -define(value(Key, Proplists, Default), proplists:get_value(Key, Proplists, Default)).
 -define(v(K, L), ?value(K, L)).

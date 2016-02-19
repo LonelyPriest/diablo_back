@@ -43,7 +43,8 @@
      diablo_w_retailer,        diablo_w_retailer_request,
      diablo_w_sale,            diablo_w_sale_request, diablo_w_sale_draft,
      diablo_w_print,           diablo_w_print_request, diablo_format_print,
-     diablo_w_good_request, 
+     diablo_w_good_request,
+     diablo_wechat_request,
      %% report
      diablo_w_report_request, diablo_w_report,
      %% base
