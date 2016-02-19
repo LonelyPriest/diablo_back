@@ -513,6 +513,8 @@ pagination(just_page, _PaperHeight, Body) ->
 %% pagination by size
 %%
 pagination(just_size, PaperHeight, Body) ->
+    BodySize =  bit_size(?to_b(Body)),
+    ?DEBUG("body size ~p", [BodySize]),
     Tokens = string:tokens(Body, "\r\n"),
     ?DEBUG("tokens len ~p", [length(Tokens)]),
     
@@ -520,7 +522,7 @@ pagination(just_size, PaperHeight, Body) ->
 	true ->
 	    %% 15k, use 6 not 8
 	    PackageSize = 15 * 1024 * 6,
-	    case bit_size(?to_b(Body)) =< PackageSize of
+	    case BodySize =< PackageSize of
 		true ->
 		    {false, [?to_b(Body)]};
 		false ->
