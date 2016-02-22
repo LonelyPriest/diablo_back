@@ -114,7 +114,8 @@ rightUserApp.controller(
 		    // shop node
 		    if (in_shop($scope.shops, selectedKey)){
 			shopInfo.push({
-			    operation:parseInt(parentKey), shop:parseInt(selectedKey)});
+			    operation:parseInt(parentKey),
+			    shop:parseInt(selectedKey)});
 
 			// add the parent
 			if (!in_array(keyIds, parentKey)){
@@ -174,12 +175,14 @@ rightUserApp.controller(
 
 	    // add
 	    rightService.add_role(
-	    	$scope.role, rightService.roleType.user, {fun_id:keyIds, shops:shopInfo}
+	    	$scope.role, rightService.roleType.user,
+		{fun_id:keyIds, shops:shopInfo}
 	    ).$promise.then(function (state){
 	    	console.log(state);
 	    	if (state.ecode == 0){
 		    diabloUtilsService.response_with_callback(
-			true, "新增角色", "恭喜你，角色 " + $scope.role.name + " 创建成功！！",
+			true, "新增角色", "恭喜你，角色 "
+			    + $scope.role.name + " 创建成功！！",
 			$scope, function(){location.href = roleDetailPath});
 	    	} else{
 		    diabloUtilsService.response(
@@ -194,7 +197,6 @@ rightUserApp.controller(
 	}
 
     });
-
 
 rightUserApp.controller(
     "roleUserDetailCtrl",
@@ -226,7 +228,8 @@ rightUserApp.controller(
 		    tree_utils.build_unselect_tree(rightTree, data[0]);
 		    angular.forEach(data[1], function(shop){
 			tree_utils.add_child(
-			    rightTree, {name: shop.name, id: shop.shop_id}, shop.func_id)
+			    rightTree,
+			    {name: shop.name, id: shop.shop_id}, shop.func_id)
 		    });
 		};
 
@@ -286,10 +289,13 @@ rightUserApp.controller(
 			tree_utils.build_edit_tree(tree, $scope.current_right);
 			angular.forEach($scope.current_shops, function(shop){
 			    tree_utils.add_select_node(
-				tree, {name:shop.name, id:shop.shop_id}, shop.func_id)
+				tree,
+				{name:shop.name, id:shop.shop_id},
+				shop.func_id)
 			});
 
-			var fireNode = tree.getNodeByKey($scope.current_shops[0].shop_id.toString());
+			var fireNode = tree.getNodeByKey(
+			    $scope.current_shops[0].shop_id.toString());
 			$scope.onSelect.call(tree, true, fireNode);
 
 			// add other right not be selected
@@ -299,29 +305,39 @@ rightUserApp.controller(
 			var add_shops = function(nodes, shops){
 			    angular.forEach(nodes, function(n){
 				// get current shops
-				var current = tree.getNodeByKey(n.id.toString());
+				var current =
+				    tree.getNodeByKey(n.id.toString());
 				if (current !== null){
-				    var selectShops = get_children_of_tree(tree, n.id);
+				    var selectShops =
+					get_children_of_tree(tree, n.id);
 				    // console.log(selectShops);
 				    if (selectShops.length !== 0){
 					angular.forEach(shops, function(shop){
-					    if (!in_array(selectShops, shop.id)){
-						tree_utils.add_children(tree, [shop], n.id);
+					    if (!in_array(
+						selectShops, shop.id)){
+						tree_utils.add_children(
+						    tree, [shop], n.id);
 					    }
 					});
 				    } else{
-					tree_utils.add_children(tree, shops, n.id);
+					tree_utils.add_children(
+					    tree, shops, n.id);
 				    }
 				}
 			    })
 			};
 
-			add_shops($scope.children_of_inventory, $scope.all_shops);
-			add_shops($scope.children_of_sale, $scope.all_shops);
+			add_shops($scope.children_of_inventory,
+				  $scope.all_shops);
+			add_shops($scope.children_of_sale,
+				  $scope.all_shops);
 		    };
 
 		    rightService.tree_modal(
-			'role-user-edit.html', $scope, callback, $scope.do_update);
+			'role-user-edit.html',
+			$scope,
+			callback,
+			$scope.do_update);
 		})
 	};	
 
@@ -392,22 +408,27 @@ rightUserApp.controller(
 		if (!node.hasChildren()){
 		    var parentKey = node.getParent().data.key;
 		    // shop node
-		    if (node.isSelected() && in_shop($scope.all_shops, selectedKey)){
+		    if (node.isSelected() && in_shop(
+			$scope.all_shops, selectedKey)){
 			$scope.newSelectedShops.push({
-			    operation:parseInt(parentKey), shop:parseInt(selectedKey)});
+			    operation:parseInt(parentKey),
+			    shop:parseInt(selectedKey)});
 			// add the parent
-			if (!in_array($scope.addonSelect, parseInt(parentKey))){
+			if (!in_array($scope.addonSelect,
+				      parseInt(parentKey))){
 			    $scope.addonSelect.push(parseInt(parentKey));
 			}
 		    }
 		} else{
 		    // visit child, add the shop node
 		    node.visit(function(v){
-			if (v.isSelected() && in_shop($scope.all_shops, v.data.key)){
+			if (v.isSelected()
+			    && in_shop($scope.all_shops, v.data.key)){
 			    var parentKey = v.getParent().data.key;
 			    var action = {operation: parseInt(parentKey),
 					  shop: parseInt(v.data.key)};
-			    if (!in_shop_action($scope.newSelectedShops, action)){
+			    if (!in_shop_action(
+				$scope.newSelectedShops, action)){
 				$scope.newSelectedShops.push(action);
 			    }
 			}
@@ -529,16 +550,20 @@ rightUserApp.controller(
 	    if (added_nodes.length === 0 && deleted_nodes.length === 0
 		&& added_shops.length === 0 && deleted_shops.length === 0){
 		diabloUtilsService.response(
-		    false, "权限编辑", "权限编辑失败：" + rightService.error[6001], $scope);
+		    false,
+		    "权限编辑",
+		    "权限编辑失败：" + rightService.error[6001], $scope);
 		return;
 	    };
 
 	    rightService.update_user_role(
-		$scope.update_role, added_nodes, deleted_nodes, added_shops, deleted_shops)
+		$scope.update_role,
+		added_nodes, deleted_nodes, added_shops, deleted_shops)
 		.$promise.then(function(state){
 		    console.log(state);
 		    if (state.ecode == 0){
-			diabloUtilsService.response(true, "权限编辑", "权限编辑成功！！", $scope);
+			diabloUtilsService.response(
+			    true, "权限编辑", "权限编辑成功！！", $scope);
 			return;
 		    } else{
 			diabloUtilsService.response(
@@ -551,7 +576,8 @@ rightUserApp.controller(
 
 	$scope.delete_role = function(role){
 	    diabloUtilsService.response(
-		false, "权限编辑", "权限编辑失败：" + rightService.error[7001], $scope);
+		false, "权限编辑",
+		"权限编辑失败：" + rightService.error[7001], $scope);
 	    return;
 	};
 
@@ -564,6 +590,8 @@ rightUserApp.controller(
     "accountUserNewCtrl",
     function($scope, diabloUtilsService, rightService, merchantService){
 
+	$scope.account = {};
+	
 	rightService.list_role().$promise.then(function(roles){
 	    console.log(roles)
 	    // $scope.roles = roles;
@@ -578,7 +606,15 @@ rightUserApp.controller(
 	    });
 	    
 	    // diablo_order($scope.roles);
-	})
+	});
+
+	rightService.list_shop().$promise.then(function(shops){
+	    console.log(shops);
+	    $scope.login_shops = shops.map(function(s){
+		return {id:s.id, name:s.name, py:diablo_pinyin(s.name)};
+	    });
+	    $scope.account.login_shop = $scope.login_shops[0];
+	});
 
 	$scope.on_role_select = function(item, model, label){
 	    //console.log(item);
@@ -603,13 +639,17 @@ rightUserApp.controller(
 	// new user account
 	$scope.new_account = function(){
 	    console.log($scope.account);
-	    rightService.add_account($scope.account).$promise.then(function(state){
+	    rightService.add_account(
+		$scope.account
+	    ).$promise.then(function(state){
 		console.log(state);
 		if (state.ecode == 0){
 		    diabloUtilsService.response_with_callback(
-			true, "新增帐户", "帐户 [" + $scope.account.name + "] 创建成功",
+			true, "新增帐户",
+			"帐户 [" + $scope.account.name + "] 创建成功",
 			$scope, function(){
-			    diablo_goto_page("#/account_user/account_detail")}); 
+			    diablo_goto_page(
+				"#/account_user/account_detail")}); 
 
 		} else{
 		    diabloUtilsService.response(
@@ -626,140 +666,216 @@ rightUserApp.controller(
 
 
 
-rightUserApp.controller(
-    "accountUserDetailCtrl",
-    function($scope, $routeParams, $q, $modal, rightService, diabloUtilsService){
-	$scope.roleDesc = rightService.roleTypeDesc;
-	$scope.accountDesc = rightService.accountDesc;
+rightUserApp.controller("accountUserDetailCtrl", function(
+    $scope, $routeParams, $q, $modal, rightService, diabloUtilsService
+){
+    $scope.roleDesc = rightService.roleTypeDesc;
+    $scope.accountDesc = rightService.accountDesc;
 
-	// list
-	rightService.list_account().$promise.then(function(accounts){
-	    console.log(accounts);
-	    diablo_order(accounts);
-	    $scope.accounts = accounts; 
+    // list 
+    var promise = rightService.promise;
+
+    $scope.refresh = function(){
+	$q.all([
+	    promise(rightService.list_account)(),
+	    promise(rightService.list_shop)()
+	]).then(function(data){
+	    console.log(data);
+	    // $scope.accounts = data[0];
+	    $scope.shops = data[1].map(function(shop){
+		return {
+		    id: shop.id,
+		    name: shop.name,
+		    py: diablo_pinyin(shop.name)
+		};
+	    });
+	    // console.log($scope.shops);
+	    $scope.accounts = data[0].map(function(account){
+		return {
+		    id: account.id,
+		    name: account.name,
+		    owner: account.owner,
+		    type:  account.type,
+		    shop_id: account.shop_id,
+		    shop:  diablo_get_object(account.shop_id, $scope.shops),
+		    role_name: account.role_name,
+		    create_date: account.create_date
+		}
+	    });
+
+	    diablo_order($scope.accounts);
+	    // console.log($scope.accounts);
+	    
 	});
+    };
 
-	$scope.goto_page = function(path){
-	    window.location = path;
-	};
+    $scope.refresh();
+    
+    // rightService.list_account().$promise.then(function(accounts){
+    //     console.log(accounts);
+    //     diablo_order(accounts);
+    //     $scope.accounts = accounts; 
+    // });
+
+    $scope.goto_page = function(path){
+	window.location = path;
+    };
 
 
-	$scope.show_account_right = false;
-	// lookup account right
-	$scope.right_detail = function(account){
-	    console.log(account); 
-	    // get the roles of the account
-	    rightService.list_account_right(account).$promise.then(function(roles){
-		console.log(roles);
-		// get the right of the role, now, one user has only one role
-		// so, use roles[0]
-		rightService.user_role_right(roles[0].role_id).then(function(data){
-		    console.log(data);
-		    // reload right tree
-		    var callback = function(tree){
-			tree.reload();
-			tree_utils.build_unselect_tree(tree, data[0]);
-			angular.forEach(data[1], function(shop){
-			    tree_utils.add_child(
-				tree, {name: shop.name, id: shop.shop_id}, shop.func_id)
-			});
-		    };
+    $scope.show_account_right = false;
+    // lookup account right
+    $scope.right_detail = function(account){
+	console.log(account); 
+	// get the roles of the account
+	rightService.list_account_right(
+	    account
+	).$promise.then(function(roles){
+	    console.log(roles);
+	    // get the right of the role, now, one user has only one role
+	    // so, use roles[0]
+	    rightService.user_role_right(
+		roles[0].role_id
+	    ).then(function(data){
+		console.log(data);
+		// reload right tree
+		var callback = function(tree){
+		    tree.reload();
+		    tree_utils.build_unselect_tree(tree, data[0]);
+		    angular.forEach(data[1], function(shop){
+			tree_utils.add_child(
+			    tree,
+			    {name: shop.name,
+			     id: shop.shop_id},
+			    shop.func_id)
+		    });
+		};
 
-		    rightService.tree_modal(
-			'account_user_detail.html', $scope, callback, undefined);
-		})
+		rightService.tree_modal(
+		    'account_user_detail.html',
+		    $scope,
+		    callback,
+		    undefined);
+	    })
+	})
+    };
+
+    // delete
+    $scope.delete_account = function(account){
+	var do_delete = function(){
+	    console.log(account);
+	    rightService.delete_account(
+		account
+	    ).$promise.then(function(state){
+		console.log(state);
+		if (state.ecode == 0){
+		    diabloUtilsService.response_with_callback(
+			true, "删除帐户",
+			"帐户 " + account.name + " 删除成功",
+			$scope, function(){location.reload()})
+		} else{
+		    diabloUtilsService.response(
+			false, "删除帐户",
+			"帐户 " + account.name
+			    + " 删除失败："
+			    + rightService.error[state.ecode], $scope)
+		}
 	    })
 	};
+	
+	diabloUtilsService.request(
+	    "删除帐户",
+	    "确认要删除该帐户吗？", do_delete, undefined, $scope);
+    };
+    
+    // update	
+    $scope.update_account = function(account){
+	console.log(account);
+	var editAccount = angular.copy(account);
+	editAccount.desc = $scope.roleDesc[account.type];
 
-	// delete
-	$scope.delete_account = function(account){
-	    var do_delete = function(){
-		console.log(account);
-		rightService.delete_account(account).$promise.then(function(state){
+	var promise = rightService.promise;
+	$q.all([
+	    promise(rightService.list_role)(),
+	    promise(rightService.list_account_right, account)()
+	]).then(function(data){
+	    console.log(data);
+	    // data[0] are all the roles;
+	    // data[1] is the current account roles;
+	    var roles = data[0];
+	    roles = diablo_order(roles);
+	    // get the right of the role, now, one user has only one role
+	    // so, use roles[0]
+	    var current_role = data[1][0];
+	    editAccount.role =
+		function(){
+		    for(var i=0, l=roles.length; i<l; i++){
+			if (roles[i].id === current_role.role_id){
+			    return roles[i];
+			}
+		    }
+		}();
+
+	    var callback = function(new_account){
+		console.log(new_account);
+		new_account.shop_id =
+		    angular.isDefined(new_account.shop)
+		    &&  new_account.shop ? new_account.shop.id : -1;
+		if (new_account.role.id === current_role.role_id
+		    && new_account.shop_id === account.shop_id){
+		    diabloUtilsService.response(
+			false, "用户帐户修改",
+			"用户帐户修改失败：" + rightService.error[1599]);
+		    return;
+		};
+
+		var update = {id: account.id};
+		update.role_id =
+		    new_account.role.id !== current_role.role_id
+		    ? new_account.role : undefined;
+		update.shop_id =
+		    new_account.shop_id !== account.shop_id
+		    ? new_account.shop_id : undefined; 
+
+		rightService.update_user_account(
+		    update
+		).$promise.then(function(state){
 		    console.log(state);
 		    if (state.ecode == 0){
 			diabloUtilsService.response_with_callback(
-			    true, "删除帐户", "帐户 " + account.name + " 删除成功",
-			    $scope, function(){location.reload()})
+			    true, "帐户权限修改", "帐户 "
+				+ account.name
+				+ "权限修改成功！！",
+			    $scope, function(){$scope.refresh()})
 		    } else{
 			diabloUtilsService.response(
-			    false, "删除帐户", "帐户 " + account.name
-				+ " 删除失败：" + rightService.error[state.ecode], $scope)
+			    false, "帐户权限修改",
+			    "帐户 "
+				+ account.name + "权限修改失败："
+				+ rightService.error[state.ecode],
+			    $scope)
 		    }
-		})
+		});
 	    };
 	    
-	    diabloUtilsService.request(
-		"删除帐户", "确认要删除该帐户吗？", do_delete, undefined, $scope);
-	};
-	
-	// update	
-	$scope.update_account = function(account){
-	    var editAccount = angular.copy(account);
-	    editAccount.desc = $scope.roleDesc[account.type];
-
-	    var promise = rightService.promise;
-	    $q.all([
-		promise(rightService.list_role)(),
-		promise(rightService.list_account_right, account)()
-	    ]).then(function(data){
-		console.log(data);
-		// data[0] are all the roles;
-		// data[1] is the current account roles;
-		var roles = data[0];
-		roles = diablo_order(roles);
-		// get the right of the role, now, one user has only one role
-		// so, use roles[0]
-		var current_role = data[1][0];
-		editAccount.role =
-		    function(){
-			for(var i=0, l=roles.length; i<l; i++){
-			    if (roles[i].id === current_role.role_id){
-				return roles[i];
-			    }
-			}
-		    }();
-
-		var callback = function(newRole){
-		    if (newRole.id === current_role.role_id){
-			return;
-		    };
-
-		    rightService.update_account_role(account, newRole)
-			.$promise.then(function(state){
-			    console.log(state);
-			    if (state.ecode == 0){
-				diabloUtilsService.response_with_callback(
-				    true, "帐户权限修改",
-				    "帐户 " + account.name + "权限修改成功！！",
-				    $scope, function(){location.reload()})
-			    } else{
-				diabloUtilsService.response(
-				    false, "帐户权限修改",
-				    "帐户 " + account.name + "权限修改失败："
-					+ rightService.error[state.ecode], $scope)
-			    }
-			});
-		};
-		
-		$modal.open({
-		    templateUrl: 'account_user_edit.html',
-		    controller: 'accountUserModalCtrl',
-		    backdrop: 'static',
-		    scope: $scope,
-		    resolve:{
-			params: function(){
-			    return {
-				account: editAccount,
-				roles:   roles,
-				callback: callback
-			    }
+	    $modal.open({
+		templateUrl: 'account_user_edit.html',
+		controller: 'accountUserModalCtrl',
+		backdrop: 'static',
+		scope: $scope,
+		resolve:{
+		    params: function(){
+			return {
+			    account: editAccount,
+			    roles:   roles,
+			    shops:   $scope.shops,
+			    callback: callback
 			}
 		    }
-		})
+		}
 	    })
-	};
-    });
+	})
+    };
+});
 
 
 rightUserApp.controller("accountUserModalCtrl", function($scope, $modalInstance, params){
@@ -767,6 +883,7 @@ rightUserApp.controller("accountUserModalCtrl", function($scope, $modalInstance,
     console.log(params);
     $scope.account = params.account;
     $scope.roles   = params.roles;
+    $scope.shops   = params.shops;
 
     $scope.cancel = function(){
 	$modalInstance.dismiss('cancel');
@@ -776,7 +893,7 @@ rightUserApp.controller("accountUserModalCtrl", function($scope, $modalInstance,
 	$modalInstance.dismiss('ok');
 	var callback = params.callback;
 	if (angular.isDefined(callback) && typeof(callback) === "function"){
-	    callback($scope.account.role);
+	    callback($scope.account);
 	}	    
     };
 }); 

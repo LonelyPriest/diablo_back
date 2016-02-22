@@ -3,7 +3,8 @@
     <div class="portlet box purple">
 
       <div class="portlet-title">
-	<div class="caption"><i class="glyphicon glyphicon-menu-hamburger"></i>
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
 	  帐户详情
 	</div>
 	
@@ -54,6 +55,7 @@
 		    <!-- <th>所属商户</th> -->
 		    <th>所属人</th>
 		    <th>类型</th>
+		    <th>登录店铺</th>
 		    <th>权限说明</th>
 		    <th>创建时间</th>
 		    <th>操作</th>
@@ -68,6 +70,12 @@
 		    
 		    <td>{{accountDesc[account.type]}}</td> 
 		    <!-- <td>{{roleDesc[account.type]}}</td> -->
+		    <td>
+		      <div x-ng-switch on="account.shop_id">
+			<span x-ng-switch-when=-1>系统默认</span>
+			<span x-ng-switch-default>{{account.shop.name}}</span>
+		      </div>
+		    </td>
 		    <td>{{account.role_name}}</td>
 		    
 		    <td>{{account.create_date}}</td>
@@ -162,7 +170,7 @@
           <label class="col-md-3 control-label">类型</label>
           <div class="col-md-4">
 	    <input type="text" class="form-control" readonly
-                   data-ng-model="account.type"></input>
+                   data-ng-model="account.type"/>
           </div>
         </div>
 
@@ -173,6 +181,20 @@
                    data-ng-model="account.owner"></input>
           </div>
         </div>
+
+	<div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">
+	      默认登录店铺</label>
+	      <div class="col-sm-4 col-md-4">
+		<input class="form-control"
+		       type="text"
+	  	       x-ng-model="account.shop"
+	  	       placeholder="请选择用户登录店铺，默认由系统选择" 
+	  	       typeahead-editable="false"
+	  	       typeahead="s as s.name for s in
+	  			  shops|filter:$viewValue|limitTo:8"/>
+	      </div>
+	    </div>
 
 	<div class="form-group">
           <label class="col-md-3 control-label">权限</label>

@@ -75,7 +75,21 @@
 			    || accountAddForm.password.$error.maxlength">
 		<span style="color:red">密码太短，请输入6-10个字符</span>
 	      </div> 
-	    </div>	    	    
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">
+	      默认登录店铺</label>
+	      <div class="col-sm-6 col-md-6">
+		<input class="form-control"
+		       type="text"
+	  	       x-ng-model="account.login_shop"
+	  	       placeholder="请选择用户登录店铺，默认由系统选择" 
+	  	       typeahead-editable="false"
+	  	       typeahead="s as s.name for s in
+	  			  login_shops|filter:$viewValue|limitTo:8"/>
+	      </div>
+	    </div>
 
 	    <!--right-->
 	    <div class="form-group">
@@ -89,7 +103,7 @@
 			 typeahead-on-select="on_role_select($item, $model, $label)"
 			 typeahead="role as role.name for role in
 				    roles|filter:$viewValue|limitTo:8"
-			 placeholder="请选择员工权限"></input>
+			 placeholder="请选择员工权限"/>
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 		<div ng-show="init_tree">

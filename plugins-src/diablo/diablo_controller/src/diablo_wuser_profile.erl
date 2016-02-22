@@ -241,7 +241,9 @@ handle_call({get_user_right, Merchant, Session}, _From, State) ->
     ?DEBUG("get_user_right merchant ~p, session ~p", [Merchant, Session]),
     UserId = ?session:get(id, Session),
     MS = ms(Merchant, UserId, user),
-    Select = select(user, MS, fun()-> ?right_request:login_user(right, Session) end),
+    Select = select(user,
+		    MS,
+		    fun()-> ?right_request:login_user(right, Session) end),
     case is_record(Select, wuser_session_profile) of
 	true -> {reply, {ok, Select#wuser_session_profile.right}, State};
 	false -> {reply, {ok, Select}, State}
@@ -258,7 +260,10 @@ handle_call({get_user_shop, Merchant, Session}, _From, State) ->
     ?DEBUG("get_login_user_shop merchant ~p, select ~p", [Merchant, Session]),
     UserId = ?session:get(id, Session),
     MS = ms(Merchant, UserId, user),
-    Select = select(user, MS, fun()-> {ok, ?right_request:login_user(shop, Session)} end),
+    Select = select(
+	       user,
+	       MS,
+	       fun()-> {ok, ?right_request:login_user(shop, Session)} end),
     case is_record(Select, wuser_session_profile) of
 	true -> {reply, {ok, Select#wuser_session_profile.shop}, State};
 	false -> {reply, {ok, Select}, State}

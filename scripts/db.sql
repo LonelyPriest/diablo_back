@@ -171,6 +171,7 @@ create table users
     password       VARCHAR(127) not null, -- should be encrypt
     type           TINYINT default -1, -- type to user 0: supper, 1: merchant 2:user
     merchant       INTEGER default -1, -- which merchant belong to, 0: means super
+    shop           INTEGER default -1,
     max_create     INTEGER default -1, -- max users can be created of the user
     create_date    DATETIME,
     deleted        INTEGER default 0,  -- 0: no;  1: yes

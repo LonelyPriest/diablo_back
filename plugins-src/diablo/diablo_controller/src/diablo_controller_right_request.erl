@@ -58,7 +58,8 @@ action(Session, Req, {"list_right_catlog"}) ->
 	    Catlogs = ?right_auth:catlog(session, Session),
 	    %% ?DEBUG("catlogs ~p", [Catlogs]),
 	    %% filter right
-	    {ok, Rights} = ?right_init:get_children([{<<"id">>, ?right_right}]), 
+	    {ok, Rights} = ?right_init:get_children(
+			      [{<<"id">>, ?right_right}]), 
 	    NewCatlogs = Catlogs -- Rights,
 	    %% ?DEBUG("NewCatlogs ~p", [NewCatlogs]),
 	    ?utils:respond(200, batch, Req, NewCatlogs)
@@ -71,10 +72,11 @@ action(Session, Req, {"get_login_user_info"}) ->
     {ok, Catlogs} = ?w_user_profile:get(user_right, Merchant, Session),
     {ok, Shops} = ?w_user_profile:get(user_shop, Merchant, Session),
 
-    ?utils:respond(200, object, Req, {[{<<"ecode">>, 0},
-				       {<<"right">>, Catlogs},
-				       {<<"shop">>, Shops},
-				       {<<"type">>, ?session:get(type, Session)}]});
+    ?utils:respond(
+       200, object, Req, {[{<<"ecode">>, 0},
+			   {<<"right">>, Catlogs},
+			   {<<"shop">>, Shops},
+			   {<<"type">>, ?session:get(type, Session)}]});
     
 action(Session, Req, {"list_login_user_right"}) ->
     ?DEBUG("list_login_user_right with session ~p", [Session]),
@@ -189,7 +191,8 @@ action(Session, Req, {"list_account_right", AccountId}) ->
     ?DEBUG("list_account_right with session ~p, accountId ~p",
 	   [Session, AccountId]),
     %% ?utils:respond(200, Req, ?err(not_enought_right, ?utils:get_user(Session)));
-    Roles = ?right:lookup_account_right({<<"user_id">>, ?to_integer(AccountId)}),
+    Roles = ?right:lookup_account_right(
+	       {<<"user_id">>, ?to_integer(AccountId)}),
     ?utils:respond(200, batch, Req, Roles);
 
 action(Session, Req, {"list_inventory_children"}) ->
@@ -383,16 +386,32 @@ action(Session, Req, {"new_account"}, Payload) ->
     end;
 
 action(Session, Req, {"update_account"}, Payload) ->
-    ?DEBUG("update_account_role with session ~p~npayload ~p", [Session, Payload]),
+    ?DEBUG("update_account_role with session ~p~npayload ~p",
+	   [Session, Payload]),
     Account = ?value(<<"account">>, Payload),
     Role    = ?value(<<"role">>, Payload),
-    case ?right:right(update_account_role, Account, Role) of
+    %% LoginShop = ?value(<<"shop">>, Payload),
+    Type   = ?value(<<"type">>, Payload),
+
+    UpdateFun =
+	case Type of
+	    ?MERCHANT ->
+		fun() ->
+			?right:right(update_account_role, Account, Role)
+		end;
+	    ?USER ->
+		fun() ->
+			?right:right(update_account, Payload)
+		end
+	end,
+    
+    case UpdateFun() of
 	{ok, Account} ->
-	    ?utils:respond(200, Req, ?succ(update_account_role, Role));
+	    ?utils:respond(
+	       200, Req, ?succ(update_account_role, Account));
 	{error, Error} ->
 	    ?utils:respond(200, Req, Error)
     end;
-
 
 action(Session, _Req, Args, Payload) ->
     ?DEBUG("unkown action with session ~p, args ~p, payload ~p",
@@ -552,10 +571,10 @@ login_user(shop, Session) ->
 			 {<<"type">>,    ?v(<<"type">>, AShop)},
 			 {<<"func_id">>,
 			  case ?session:get(mtype, Session) of
-			      ?SALER -> ?right_inventory;
+			      ?SALER      -> ?right_inventory;
 			      ?WHOLESALER -> ?right_w_inventory
 			  end}]} | Acc]
 	      end, [], S);
 	?USER ->
 	    ?right_auth:get_user_shop(Session)
-    end.
+    end.    

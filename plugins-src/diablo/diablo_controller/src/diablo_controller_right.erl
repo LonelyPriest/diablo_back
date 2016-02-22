@@ -53,7 +53,10 @@ right(role, RoleId) ->
 
 %% account
 right(new_account, Attrs) ->
-    gen_server:call(?MODULE, {new_account, Attrs}).
+    gen_server:call(?MODULE, {new_account, Attrs});
+right(update_account, Attrs) ->
+    gen_server:call(?MODULE, {update_account, Attrs}).
+
 right(update_account_role, Account, NewRole) ->
     gen_server:call(?MODULE, {update_account_role, Account, NewRole});
 right(update_account_passwd, Account, Attrs) ->
@@ -432,6 +435,7 @@ handle_call({new_account, Attrs}, _From, State)->
     Role      = ?v(<<"role">>, Attrs),
     Merchant  = ?v(<<"merchant">>, Attrs),
     MaxCreate = ?v(<<"max_create">>, Attrs, -1),
+    LoginShop = ?v(<<"shop">>, Attrs, -1),
     
     %% name should be unique in system
     Sql = "select id, name"
@@ -444,12 +448,14 @@ handle_call({new_account, Attrs}, _From, State)->
 	{ok, []} -> 
 	    %% first to users
 	    Sql1 = "insert into users"
-		++ "(name, password, type, merchant, max_create, create_date)"
+		++ "(name, password, type, merchant"
+		", shop, max_create, create_date)"
 		++ " values ("
 		++ "\"" ++ ?to_s(Name) ++ "\","
 		++ "\"" ++ ?to_s(Password) ++ "\","
 		++ ?to_s(UserType) ++ ","
 		++ ?to_s(Merchant) ++","
+		++ ?to_s(LoginShop) ++","
 		++ ?to_s(MaxCreate) ++ ","
 		++ "\"" ++ ?utils:current_time(localtime) ++ "\");",
 		
@@ -489,8 +495,36 @@ handle_call({update_account_role, Account, NewRole}, _From, State) ->
     Reply = ?sql_utils:execute(write, Sql, Account),
     {reply, Reply, State};
 
+handle_call({update_account, Attrs}, _From, State) ->
+    ?DEBUG("update_account with attrs ~p", [Attrs]),
+    Account = ?v(<<"account">>, Attrs),
+
+    Sql1 = case ?v(<<"role">>, Attrs) of
+	      undefined -> [];
+	      Role ->
+		  ["update user_to_role set role_id=" ++ ?to_s(Role)
+		   ++ " where user_id=" ++ ?to_s(Account)]
+	  end,
+
+    
+    Sql2 = case ?v(<<"shop">>, Attrs) of
+	      undefined -> [];
+	      LoginShop ->
+		  ["update users set shop=" ++ ?to_s(LoginShop)
+		  ++ " where id=" ++ ?to_s(Account)]
+	  end,
+    AllSqls = Sql1 ++ Sql2,
+    Reply =
+	case erlang:length(AllSqls) of
+	    1 ->  ?sql_utils:execute(write, AllSqls, Account);
+	    _ ->  ?sql_utils:execute(transaction, AllSqls, Account)
+	end,
+
+    {reply, Reply, State};
+
 handle_call({update_account_passwd, Account, Attrs}, _From, State) ->
-    ?DEBUG("update_account_passwd with account ~p, attrs ~p", [Account, Attrs]), 
+    ?DEBUG("update_account_passwd with account ~p, attrs ~p",
+	   [Account, Attrs]), 
     Oldp = ?v(<<"oldp">>, Attrs),
     Newp = ?v(<<"newp">>, Attrs),
     Sql0 = "select id, name from users"
@@ -609,7 +643,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%%=================================================================== 
 account(Conditions) ->
     CorrectConditions = ?utils:correct_condition(<<"a.">>, Conditions),
-    Sql1 = "select a.id, a.name, a.type, a.merchant"
+    Sql1 = "select a.id, a.name, a.type, a.merchant, a.shop as shop_id"
 	", a.max_create, a.create_date"
 	", tc.user_id, tc.role_id, tc.role_name"
 	%% ", b.role_id as role"

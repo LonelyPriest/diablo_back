@@ -211,6 +211,7 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	1503: "该商家账户已存在！！",
 	1504: "角色创建失败，已存在同样的角色名称！！",
 	1507: "帐户超过用户购买量限制！！",
+	1599: "修改前后数据一致！！",
 	6001: "权限修改失败，权限相同，不需要修改！！",
 	7001: "系统暂不支持该操作！！",
 	9001: "数据库操作失败，请联系服务人员！！"};
@@ -364,6 +365,7 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	     password:     one.password,
 	     type:         one.type,
 	     role:         one.role.id,
+	     shop:         one.login_shop.id
 	    };
 	// a common user does not to select the special merchant
 	if (angular.isDefined(one.merchant)){
@@ -392,7 +394,18 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
     this.update_account_role = function(account, role){
 	return right.save(
 	    {operation: "update_account"},
-	    {account: account.id, role: role.id})
+	    {account: account.id,
+	     role: role.id,
+	     type: this.roleType.merchant})
+    };
+
+    this.update_user_account = function(account){
+	return right.save(
+	    {operation: "update_account"},
+	    {account: account.id,
+	     role: account.role_id,
+	     shop: account.shop_id,
+	     type: this.roleType.user})
     };
 
     // /////////////////////////////////////////////////////////////////////////////
