@@ -259,7 +259,7 @@
 	    <!-- </div><\!--END row-\-> -->
 
 	    <!--BEGIN row-->
-	    <div class="form-group">
+	    <div x-ng-if="!base_setting.hidden_p3_5" class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">价3</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">
@@ -280,7 +280,7 @@
 	      </div>
 	    </div>
 
-	    <div class="form-group">
+	    <div x-ng-if="!base_setting.hidden_p3_5" class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">价4</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">
@@ -302,7 +302,7 @@
 	    </div>
 
 	    <!-- <div class="col-sm-4 col-md-4">  -->
-	    <div class="form-group">
+	    <div x-ng-if="!base_setting.hidden_p3_5" class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">价5</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">
@@ -325,7 +325,7 @@
 	    <!-- </div><\!--END row-\-> -->
 
 	    <!--BEGIN row-->
-	    <div class="form-group">
+	    <div x-ng-if="base_setting.show_discount" class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">折扣</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">

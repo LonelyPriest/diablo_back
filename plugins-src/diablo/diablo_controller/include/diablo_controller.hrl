@@ -404,6 +404,8 @@
 	  user_name   = ""    :: string(),  %% user name
 	  user_type   = -1    :: integer(), %% user level, 0:super, 1:merchant, 2:user
 	  merchant    = -1    :: integer(), %% which merchant belong to
+	  login_shop  = -1    :: integer(), %% which shop to login
+	  login_firm  = -1    :: integer(), %% which firm to login
 	  mtype       = -1    :: integer(), %% merhcant type 0: saler, 1: wholesaler
 	  login_time          :: string()   %% start time of login
 	 }).

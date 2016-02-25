@@ -128,7 +128,10 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     $scope.current_inventories = [];
     
     if ($scope.firms.length !== 0){
-    	$scope.select.firm = $scope.firms[0];
+
+	$scope.select.firm = user.loginFirm === -1
+	    ? $scope.firms[0]:diablo_get_object(user.loginFirm, $scope.firms); 
+    	// $scope.select.firm = $scope.firms[0];
     	$scope.select.surplus = parseFloat($scope.select.firm.balance);
 	$scope.select.left_balance = $scope.select.surplus;
     }

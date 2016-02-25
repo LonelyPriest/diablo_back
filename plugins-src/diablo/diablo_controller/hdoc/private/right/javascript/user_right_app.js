@@ -7,6 +7,9 @@ userApp.factory("userService", function($resource, $q){
     var _shops     = [];
     var _rights    = [];
     var _loginType = undefined;
+    var _loginShop = -1;
+    var _loginFirm = -1;
+    
     // var _rightShops = [];
 
     // var promise = function(callback, params){
@@ -43,10 +46,13 @@ userApp.factory("userService", function($resource, $q){
     // };
     var sort = function(){
 	var shops = _shops;
+	console.log(shops);
 	return {
-    	    right: _rights,
-	    type:  _loginType,
-	    shop:  _shops,
+    	    right:     _rights,
+	    type:      _loginType,
+	    shop:      _shops,
+	    // loginShop: _loginShop,
+	    loginFirm: _loginFirm,
 
 	    // shops exclude the shop that bind to the repository,
 	    // or repository itself
@@ -55,7 +61,11 @@ userApp.factory("userService", function($resource, $q){
 		angular.forEach(shops, function(s){
 		    if ( ((s.type === 0 && s.repo_id === -1) || s.type === 1)
 			 && !in_array(ids, s.shop_id)){
-			ids.push(s.shop_id);
+			if (s.shop_id === _loginShop){
+			    ids.splice(0, 1, s.shop_id);
+			} else {
+			    ids.push(s.shop_id);
+			} 
 		    }
 		})
 		return ids;
@@ -66,7 +76,11 @@ userApp.factory("userService", function($resource, $q){
 		var ids   = []; 
 		angular.forEach(shops, function(s){
 		    if (s.type === 0 && !in_array(ids, s.shop_id)){
-			ids.push(s.shop_id);
+			if (s.shop_id === _loginShop){
+			    ids.splice(0, 1, s.shop_id);
+			} else {
+			    ids.push(s.shop_id);
+			} 
 		    }
 		})
 		return ids;
@@ -102,7 +116,11 @@ userApp.factory("userService", function($resource, $q){
 				repo:s.repo_id,
 				py:diablo_pinyin(s.name)};
 		    if (s.type === 0 && !in_array(sort, shop)){
-			sort.push(shop); 
+			if (shop.id === _loginShop){
+			    sort.splice(0, 1, shop);
+			} else {
+			    sort.push(shop); 
+			}
 		    }
 		})
 		return sort;
@@ -149,7 +167,11 @@ userApp.factory("userService", function($resource, $q){
 
 		    if ( ((s.type === 0 && s.repo_id === -1) || s.type === 1)
 			 && !in_array(sort, repo)){
-			sort.push(repo); 
+			if (s.shop_id === _loginShop){
+			    sort.splice(0, 1, repo);
+			} else {
+			    sort.push(repo); 
+			}
 		    } 
 		})
 		return sort;
@@ -189,10 +211,12 @@ userApp.factory("userService", function($resource, $q){
 	    return _user.get(
 		{operation: "get_login_user_info"}
 	    ).$promise.then(function(result){
-		// console.log(result);
+		console.log(result);
 		_shops     = result.shop;
 		_rights    = result.right;
 		_loginType = result.type;
+		_loginShop = result.login_shop;
+		_loginFirm = result.login_firm;
 		return sort();
     	    });
 	}

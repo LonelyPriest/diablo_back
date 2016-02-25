@@ -616,6 +616,15 @@ rightUserApp.controller(
 	    $scope.account.login_shop = $scope.login_shops[0];
 	});
 
+
+	rightService.list_firm().$promise.then(function(firms){
+	    console.log(firms);
+	    $scope.login_firms = firms.map(function(f){
+		return {id:f.id, name:f.name, py:diablo_pinyin(f.name)};
+	    });
+	    $scope.account.login_firm = $scope.login_firms[0];
+	});
+
 	$scope.on_role_select = function(item, model, label){
 	    //console.log(item);
 	    //console.log(model);
@@ -678,7 +687,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
     $scope.refresh = function(){
 	$q.all([
 	    promise(rightService.list_account)(),
-	    promise(rightService.list_shop)()
+	    promise(rightService.list_shop)(),
+	    promise(rightService.list_firm)()
 	]).then(function(data){
 	    console.log(data);
 	    // $scope.accounts = data[0];
@@ -689,6 +699,15 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    py: diablo_pinyin(shop.name)
 		};
 	    });
+
+	    $scope.firms = data[2].map(function(firm){
+		return {
+		    id: firm.id,
+		    name: firm.name,
+		    py: diablo_pinyin(firm.name)
+		};
+	    });
+	    
 	    // console.log($scope.shops);
 	    $scope.accounts = data[0].map(function(account){
 		return {
@@ -698,6 +717,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    type:  account.type,
 		    shop_id: account.shop_id,
 		    shop:  diablo_get_object(account.shop_id, $scope.shops),
+		    firm_id: account.firm_id,
+		    firm: diablo_get_object(account.firm_id, $scope.firms),
 		    role_name: account.role_name,
 		    create_date: account.create_date
 		}
@@ -815,26 +836,55 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    }
 		}();
 
+	    console.log(editAccount);
+
 	    var callback = function(new_account){
 		console.log(new_account);
 		new_account.shop_id =
 		    angular.isDefined(new_account.shop)
 		    &&  new_account.shop ? new_account.shop.id : -1;
-		if (new_account.role.id === current_role.role_id
-		    && new_account.shop_id === account.shop_id){
-		    diabloUtilsService.response(
-			false, "用户帐户修改",
-			"用户帐户修改失败：" + rightService.error[1599]);
-		    return;
+
+		new_account.firm_id =
+		    angular.isDefined(new_account.firm)
+		    &&  new_account.firm ? new_account.firm.id : -1;
+
+		if (new_account.type === 2 ){
+		    if (new_account.role.id === current_role.role_id
+			&& new_account.shop_id === account.shop_id
+			&& new_account.firm_id === account.firm_id){
+			diabloUtilsService.response(
+			    false, "用户帐户修改",
+			    "用户帐户修改失败：" + rightService.error[1599]);
+			return;
+		    }
+		} else {
+		    if (new_account.shop_id === account.shop_id
+			&& new_account.firm_id === account.firm_id){
+			diabloUtilsService.response(
+			    false, "用户帐户修改",
+			    "用户帐户修改失败：" + rightService.error[1599]);
+			return;
+		    }
 		};
+		
 
 		var update = {id: account.id};
-		update.role_id =
-		    new_account.role.id !== current_role.role_id
-		    ? new_account.role : undefined;
+		update.role_id = function(){
+		    if (new_account.type !== 2){
+			return undefined;
+		    } else {
+			return new_account.role.id !== current_role.role_id
+			    ? new_account.role : undefined;
+		    }
+		}();
+
 		update.shop_id =
 		    new_account.shop_id !== account.shop_id
-		    ? new_account.shop_id : undefined; 
+		    ? new_account.shop_id : undefined;
+
+		update.firm_id =
+		    new_account.firm_id !== account.firm_id
+		    ? new_account.firm_id : undefined;
 
 		rightService.update_user_account(
 		    update
@@ -867,7 +917,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 			return {
 			    account: editAccount,
 			    roles:   roles,
-			    shops:   $scope.shops,
+			    shops:   $scope.shops, 
 			    callback: callback
 			}
 		    }

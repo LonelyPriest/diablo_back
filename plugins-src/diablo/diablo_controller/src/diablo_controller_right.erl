@@ -436,6 +436,7 @@ handle_call({new_account, Attrs}, _From, State)->
     Merchant  = ?v(<<"merchant">>, Attrs),
     MaxCreate = ?v(<<"max_create">>, Attrs, -1),
     LoginShop = ?v(<<"shop">>, Attrs, -1),
+    LoginFirm = ?v(<<"firm">>, Attrs, -1),
     
     %% name should be unique in system
     Sql = "select id, name"
@@ -449,13 +450,14 @@ handle_call({new_account, Attrs}, _From, State)->
 	    %% first to users
 	    Sql1 = "insert into users"
 		++ "(name, password, type, merchant"
-		", shop, max_create, create_date)"
+		", shop, firm, max_create, create_date)"
 		++ " values ("
 		++ "\"" ++ ?to_s(Name) ++ "\","
 		++ "\"" ++ ?to_s(Password) ++ "\","
 		++ ?to_s(UserType) ++ ","
 		++ ?to_s(Merchant) ++","
 		++ ?to_s(LoginShop) ++","
+		++ ?to_s(LoginFirm) ++","
 		++ ?to_s(MaxCreate) ++ ","
 		++ "\"" ++ ?utils:current_time(localtime) ++ "\");",
 		
@@ -498,6 +500,8 @@ handle_call({update_account_role, Account, NewRole}, _From, State) ->
 handle_call({update_account, Attrs}, _From, State) ->
     ?DEBUG("update_account with attrs ~p", [Attrs]),
     Account = ?v(<<"account">>, Attrs),
+    LoginShop = ?v(<<"shop">>, Attrs),
+    LoginFirm = ?v(<<"firm">>, Attrs),
 
     Sql1 = case ?v(<<"role">>, Attrs) of
 	      undefined -> [];
@@ -506,13 +510,14 @@ handle_call({update_account, Attrs}, _From, State) ->
 		   ++ " where user_id=" ++ ?to_s(Account)]
 	  end,
 
+    Updates = ?utils:v(shop, integer, LoginShop)
+	++ ?utils:v(firm, integer, LoginFirm),
+
+    Sql2 = 
+	["update users set "
+	 ++ ?utils:to_sqls(proplists, comma, Updates)
+	 ++ " where id=" ++ ?to_s(Account)],
     
-    Sql2 = case ?v(<<"shop">>, Attrs) of
-	      undefined -> [];
-	      LoginShop ->
-		  ["update users set shop=" ++ ?to_s(LoginShop)
-		  ++ " where id=" ++ ?to_s(Account)]
-	  end,
     AllSqls = Sql1 ++ Sql2,
     Reply =
 	case erlang:length(AllSqls) of
@@ -644,7 +649,7 @@ code_change(_OldVsn, State, _Extra) ->
 account(Conditions) ->
     CorrectConditions = ?utils:correct_condition(<<"a.">>, Conditions),
     Sql1 = "select a.id, a.name, a.type, a.merchant, a.shop as shop_id"
-	", a.max_create, a.create_date"
+	", a.firm as firm_id, a.max_create, a.create_date"
 	", tc.user_id, tc.role_id, tc.role_name"
 	%% ", b.role_id as role"
 	%% ", c.name as role_name"

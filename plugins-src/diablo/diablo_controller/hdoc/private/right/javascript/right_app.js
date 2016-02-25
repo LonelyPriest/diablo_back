@@ -365,7 +365,8 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	     password:     one.password,
 	     type:         one.type,
 	     role:         one.role.id,
-	     shop:         one.login_shop.id
+	     shop:         one.login_shop.id,
+	     firm:         one.login_firm.id
 	    };
 	// a common user does not to select the special merchant
 	if (angular.isDefined(one.merchant)){
@@ -405,6 +406,7 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	    {account: account.id,
 	     role: account.role_id,
 	     shop: account.shop_id,
+	     firm: account.firm_id,
 	     type: this.roleType.user})
     };
 
@@ -429,6 +431,13 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 
     this.list_shop = function(){
 	return HttpShop.query({operation: "list_shop"})};
+
+    var httpFirm = $resource("/firm/:operation/:id",
+    			 {operation: '@operation', id: '@id'});
+    
+    this.list_firm = function(){
+	return httpFirm.query({operation: "list_firm"});
+    }
 
 });
 

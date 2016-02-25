@@ -68,14 +68,20 @@ action(Session, Req, {"list_right_catlog"}) ->
 
 action(Session, Req, {"get_login_user_info"}) ->
     ?DEBUG("get_login_user_info with session ~p", [Session]),
-    Merchant = ?session:get(merchant, Session),
+    Merchant  = ?session:get(merchant, Session),
+    LoginShop = ?session:get(login_shop, Session),
+    LoginFirm = ?session:get(login_firm, Session),
     {ok, Catlogs} = ?w_user_profile:get(user_right, Merchant, Session),
     {ok, Shops} = ?w_user_profile:get(user_shop, Merchant, Session),
+
+    ?DEBUG("shops ~p", [Shops]),
 
     ?utils:respond(
        200, object, Req, {[{<<"ecode">>, 0},
 			   {<<"right">>, Catlogs},
 			   {<<"shop">>, Shops},
+			   {<<"login_shop">>, LoginShop},
+			   {<<"login_firm">>, LoginFirm},
 			   {<<"type">>, ?session:get(type, Session)}]});
     
 action(Session, Req, {"list_login_user_right"}) ->
@@ -174,8 +180,11 @@ action(Session, Req, {"list_account"}) ->
 	    ?utils:respond(200, batch, Req, Accounts);
 	?MERCHANT ->
 	    Merchant = ?session:get(merchant, Session),
+	    %% Accounts = ?right:lookup_account(
+	    %% 		  [{<<"type">>, ?USER}, {<<"merchant">>, Merchant}]),
 	    Accounts = ?right:lookup_account(
-			  [{<<"type">>, ?USER}, {<<"merchant">>, Merchant}]),
+	    		  [{<<"type">>,[?MERCHANT, ?USER]},
+	    		   {<<"merchant">>, Merchant}]),
 	    ?utils:respond(200, batch, Req, Accounts);
 	_ ->
 	    Req:respond({598,

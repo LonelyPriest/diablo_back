@@ -42,12 +42,12 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	when('/wgood_update/:id?', {
 	    templateUrl: '/private/wgood/html/wgood_update.html',
             controller: 'wgoodUpdateCtrl',
-	    resolve: angular.extend({}, brand, firm, type, color, user)
+	    resolve: angular.extend({}, brand, firm, type, color, user, base)
 	}).
 	when('/wgood_new', {
 	    templateUrl: '/private/wgood/html/wgood_new.html',
             controller: 'wgoodNewCtrl',
-	    resolve: angular.extend({}, brand, firm, type, s_group, base)
+	    resolve: angular.extend({}, user, brand, firm, type, s_group, base)
 	}).
 	when('/setting/size', {
 	    templateUrl: '/private/wgood/html/wgood_size.html',
@@ -271,13 +271,29 @@ wgoodApp.service("wgoodService", function($resource, $http, dateFilter){
 
 wgoodApp.controller("wgoodNewCtrl", function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
-    wgoodService, filterBrand, filterFirm, filterType, filterSizeGroup, base){
+    wgoodService, user, filterBrand, filterFirm, filterType,
+    filterSizeGroup, base){
     
     $scope.seasons = diablo_season2objects;
     $scope.sexs    = diablo_sex2object;
     $scope.pattern = {style_number: diabloPattern.style_number,
 		      brand: diabloPattern.ch_en_num,
 		      type:  diabloPattern.head_ch_en_num};
+
+    $scope.base_setting = {};
+
+    $scope.base_setting.hidden_p3_5 = function(){
+	return diablo_base_setting(
+	    "h_price3_5", -1, base, parseInt, diablo_no); 
+    }();
+
+    $scope.base_setting.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", -1, base, parseInt, diablo_yes);
+    }();
+
+    console.log($scope.base_setting);
+    
     $scope.full_years = diablo_full_year;
 
     var dialog = diabloUtilsService;
@@ -740,7 +756,11 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	year      : diablo_now_year(),
 	season    : $scope.seasons[0]
     };
-    
+
+    if (user.loginFirm !== -1) {
+	$scope.good.firm = diablo_get_object(user.loginFirm, $scope.firms); 
+    };
+
     $scope.new_good = function(){
 	console.log($scope.good);
 	console.log($scope.image);
@@ -896,6 +916,10 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    p5:        $scope.good.p5,
 	    discount:  $scope.good.discount,
 	    alarm_day: $scope.good.alarm_day
+	};
+
+	if (user.loginFirm !== -1) {
+	    $scope.good.firm = diablo_get_object(user.loginFirm, $scope.firms); 
 	};
 	
 	$scope.goodForm.style_number.$pristine = true;

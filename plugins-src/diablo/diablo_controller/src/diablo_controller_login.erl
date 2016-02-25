@@ -50,7 +50,7 @@ init([]) ->
 handle_call({login, User, Passwd}, _From, State) ->
     ?DEBUG("login with User ~p", [User]),
     
-    Sql0 = "select id, name, type from users"
+    Sql0 = "select id, name from users"
 	++ " where name=" ++ "\'" ++ ?to_s(User) ++ "\'"
 	++ " and password=" ++ "\'" ++ ?to_s(Passwd) ++ "\'"
 	++ " and deleted=" ++ ?to_s(?NO),
@@ -63,6 +63,7 @@ handle_call({login, User, Passwd}, _From, State) ->
 		    {reply, {ok, [{<<"merchant">>, 0}, {<<"mtype">>, -1}|User0]}, State};
 		_ ->
 		    Sql1 = "select a.id, a.name, a.type, a.merchant"
+			", a.shop as shop_id, a.firm as firm_id"
 			", b.type as mtype from users a, merchants b"
 			++ " where a.merchant=b.id"
 			++ " and a.name=" ++ "\"" ++ ?to_s(User) ++ "\""

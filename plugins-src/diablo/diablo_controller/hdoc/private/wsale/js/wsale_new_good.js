@@ -219,6 +219,10 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 
     var dialog        = diabloUtilsService;
     var set_float     = diablo_set_float;
+
+    $scope.pattern = {style_number: diabloPattern.style_number,
+		      brand: diabloPattern.ch_en_num,
+		      type:  diabloPattern.head_ch_en_num};
     
     $scope.brands     = wsaleGoodService.get_brand();
     $scope.types      = wsaleGoodService.get_type();

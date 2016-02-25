@@ -1,7 +1,7 @@
 wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope, $location, $routeParams, $q, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
-    filterBrand, filterFirm, filterType, filterColor, user){
+    filterBrand, filterFirm, filterType, filterColor, user, base){
     // console.log(filterBrand); 
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
@@ -11,6 +11,18 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 		      brand: diabloPattern.ch_en_num,
 		      type:  diabloPattern.head_ch_en_num
 		     };
+
+    //
+    $scope.base_setting = {};
+    $scope.base_setting.hidden_p3_5 = function(){
+	return diablo_base_setting(
+	    "h_price3_5", -1, base, parseInt, diablo_no); 
+    }();
+
+    $scope.base_setting.show_discount = function(){
+	return diablo_base_setting(
+	    "show_discount", -1, base, parseInt, diablo_yes);
+    }();
 
     $scope.shops  = user.sortShops;
     $scope.firms  = filterFirm;

@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-02-25",
+	 content: [
+	     "增加用户登录时可选择默认店铺与厂商功能",
+	     "增加隐藏额外价格与折扣功能"
+	 ]
+	},
+	
 	{date: "2016-01-30",
 	 content: [
 	     "增加店铺之间的库存调入调出功能",

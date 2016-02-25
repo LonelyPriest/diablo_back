@@ -290,7 +290,7 @@ check_transfer(Merchant, CheckProps) ->
 		    "style_number=\"" ++ ?to_s(StyleNumber) ++ "\""
 		    " and brand=" ++ ?to_s(Brand)
 		    ++ " and shop=" ++ ?to_s(TShop)
-		    ++ " and merchant=" ++ ?to_s(Merchant),
+		    ++ " and merchant=" ++ ?to_s(Merchant), 
 
 		case ?sql_utils:execute(s_read, Sql21) of
 		    {ok, []} ->
@@ -328,25 +328,26 @@ check_transfer(Merchant, CheckProps) ->
 			 ++ ?to_s(Merchant) ++ ","
 			 ++ "\"" ++ ?to_s(Now) ++ "\","
 			 ++ "\"" ++ ?to_s(Now) ++ "\","
-			 ++ "\"" ++ ?to_s(Now) ++ "\")",
+			 ++ "\"" ++ ?to_s(Now) ++ "\")"
 
-			 "insert into w_inventory_amount(rsn"
-			 ", style_number, brand, color, size"
-			 ", shop, merchant, total, entry_date) select" 
-			 " -1"
-			 ", style_number"
-			 ", brand"
-			 ", color"
-			 ", size "
-			 ", " ++ ?to_s(TShop)
-			 ++ ", " ++ ?to_s(Merchant)
-			 ++ ", total"
-			 ", \"" ++ ?to_s(Now) ++ "\""
-			 " from w_inventory_transfer_detail_amount"
-			 " where rsn=\"" ++ ?to_s(RSN) ++ "\""
-			 " and style_number=\"" ++
-			     ?to_s(StyleNumber) ++ "\""
-			 " and brand=" ++ ?to_s(Brand)]; 
+			 %% "insert into w_inventory_amount(rsn"
+			 %% ", style_number, brand, color, size"
+			 %% ", shop, merchant, total, entry_date) select" 
+			 %% " -1"
+			 %% ", style_number"
+			 %% ", brand"
+			 %% ", color"
+			 %% ", size "
+			 %% ", " ++ ?to_s(TShop)
+			 %% ++ ", " ++ ?to_s(Merchant)
+			 %% ++ ", total"
+			 %% ", \"" ++ ?to_s(Now) ++ "\""
+			 %% " from w_inventory_transfer_detail_amount"
+			 %% " where rsn=\"" ++ ?to_s(RSN) ++ "\""
+			 %% " and style_number=\"" ++
+			 %%     ?to_s(StyleNumber) ++ "\""
+			 %% " and brand=" ++ ?to_s(Brand)
+			]; 
 		    {ok, R} ->
 			["update w_inventory set"
 			 " amount=amount+" ++ ?to_s(Amount)
@@ -361,32 +362,90 @@ check_transfer(Merchant, CheckProps) ->
 			 ++ "\"" ++ ?to_s(Now) ++ "\""
 			 ++ ", entry_date="
 			 ++ "\"" ++ ?to_s(Now) ++ "\""
-			 ++ " where id=" ++ ?to_s(?v(<<"id">>, R)),
+			 ++ " where id=" ++ ?to_s(?v(<<"id">>, R))
 
-			 "update w_inventory_amount a inner join("
-			 "select style_number, brand, color"
-			 ", size, total"
-			 " from w_inventory_transfer_detail_amount"
-			 " where rsn=\"" ++ ?to_s(RSN) ++ "\""
-			 " and style_number=\"" ++
-			     ?to_s(StyleNumber) ++ "\""
-			 " and brand=" ++ ?to_s(Brand) ++ ") b"
-			 " on a.style_number=b.style_number"
-			 " and a.brand=b.brand"
-			 " and a.size=b.size"
-			 " and a.color=b.color"
-			 " and a.shop=" ++ ?to_s(TShop)
-			 ++ " and a.merchant=" ++ ?to_s(Merchant)
-			 ++ " set a.total=a.total+b.total"
+			 %% "update w_inventory_amount a inner join("
+			 %% "select style_number, brand, color"
+			 %% ", size, total"
+			 %% " from w_inventory_transfer_detail_amount"
+			 %% " where rsn=\"" ++ ?to_s(RSN) ++ "\""
+			 %% " and style_number=\"" ++
+			 %%     ?to_s(StyleNumber) ++ "\""
+			 %% " and brand=" ++ ?to_s(Brand) ++ ") b"
+			 %% " on a.style_number=b.style_number"
+			 %% " and a.brand=b.brand"
+			 %% " and a.size=b.size"
+			 %% " and a.color=b.color"
+			 %% " and a.shop=" ++ ?to_s(TShop)
+			 %% ++ " and a.merchant=" ++ ?to_s(Merchant)
+			 %% ++ " set a.total=a.total+b.total"
 
-			 " where a.style_number=\"" ++
-			     ?to_s(StyleNumber) ++ "\""
-			 ++ " and a.brand=" ++ ?to_s(Brand)
-			 ++ " and a.shop=" ++ ?to_s(TShop)
-			 ++ " and a.merchant=" ++ ?to_s(Merchant)];
+			 %% " where a.style_number=\"" ++
+			 %%     ?to_s(StyleNumber) ++ "\""
+			 %% ++ " and a.brand=" ++ ?to_s(Brand)
+			 %% ++ " and a.shop=" ++ ?to_s(TShop)
+			 %% ++ " and a.merchant=" ++ ?to_s(Merchant)
+			]; 
 		    {error, Error} ->
 			throw({db_error, Error})
-		end ++ Acc
+		end ++
+		    case ?sql_utils:execute(
+			    read,
+			    "select id, style_number"
+			    ", brand, color, size, total"
+			    " from w_inventory_transfer_detail_amount"
+			    " where rsn=\"" ++ ?to_s(RSN) ++ "\""
+			    " and style_number=\"" ++ ?to_s(StyleNumber) ++ "\""
+			    " and brand=" ++ ?to_s(Brand)) of
+			{ok, []} -> [];
+			{ok, RDs}->
+			    %% Color = ?v(<<"color">>, RD),
+			    %% Size  = ?v(<<"size">>, RD),
+			    lists:foldr(
+			      fun({RD}, Acc1)->
+				      Color = ?v(<<"color">>, RD),
+				      Size  = ?v(<<"size">>, RD),
+				      Total = ?v(<<"total">>, RD),
+
+				      Sql33 =
+					  "select id, style_number, brand, shop"
+					  ", color, size, merchant"
+					  " from w_inventory_amount"
+					  " where "
+					  " style_number=\"" ++ ?to_s(StyleNumber) ++ "\""
+					  " and brand=" ++ ?to_s(Brand)
+					  ++ " and shop=" ++ ?to_s(TShop)
+					  ++ " and color=" ++ ?to_s(Color)
+					  ++ " and size=\"" ++ ?to_s(Size) ++ "\""
+					  ++ " and merchant=" ++ ?to_s(Merchant),
+				      case ?sql_utils:execute(s_read, Sql33) of
+					  {ok, []} ->
+					      ["insert into w_inventory_amount("
+					       "rsn, style_number, brand"
+					       ", color, size, shop, merchant"
+					       ", total, entry_date) values("
+					       ++ "-1,"
+					       ++ "\"" ++ ?to_s(StyleNumber) ++ "\"," 
+					       ++ ?to_s(Brand) ++ ","
+					       ++ ?to_s(Color) ++ ","
+					       ++ "\'" ++ ?to_s(Size) ++ "\',"
+					       ++ ?to_s(TShop) ++ ","
+					       ++ ?to_s(Merchant) ++ ","
+					       ++ ?to_s(Total) ++ ","
+					       ++ "\"" ++ ?to_s(Now) ++ "\")"];
+					  {ok, RR} ->
+					      ["update w_inventory_amount"
+					       " set total=total+" ++ ?to_s(Total)
+					       ++ ", entry_date=\"" ++ ?to_s(Now) ++ "\""
+					       ++ " where id="
+					       ++ ?to_s(?v(<<"id">>, RR))];
+					  {error, Error} ->
+					      throw({db_error, Error})
+				      end ++ Acc1
+			      end, [], RDs);
+			{error, Error} ->
+			    throw({db_error, Error})
+		    end ++ Acc
 	end,
 
     Sql3 = case ?sql_utils:execute(read, Sql2) of

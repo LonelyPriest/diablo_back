@@ -56,6 +56,7 @@
 		    <th>所属人</th>
 		    <th>类型</th>
 		    <th>登录店铺</th>
+		    <th>登录厂商</th>
 		    <th>权限说明</th>
 		    <th>创建时间</th>
 		    <th>操作</th>
@@ -76,6 +77,14 @@
 			<span x-ng-switch-default>{{account.shop.name}}</span>
 		      </div>
 		    </td>
+
+		    <td>
+		      <div x-ng-switch on="account.firm_id">
+			<span x-ng-switch-when=-1>系统默认</span>
+			<span x-ng-switch-default>{{account.firm.name}}</span>
+		      </div>
+		    </td>
+		    
 		    <td>{{account.role_name}}</td>
 		    
 		    <td>{{account.create_date}}</td>
@@ -183,20 +192,34 @@
         </div>
 
 	<div class="form-group">
-	      <label class="col-sm-3 col-md-3 control-label">
-	      默认登录店铺</label>
-	      <div class="col-sm-4 col-md-4">
-		<input class="form-control"
-		       type="text"
-	  	       x-ng-model="account.shop"
-	  	       placeholder="请选择用户登录店铺，默认由系统选择" 
-	  	       typeahead-editable="false"
-	  	       typeahead="s as s.name for s in
-	  			  shops|filter:$viewValue|limitTo:8"/>
-	      </div>
-	    </div>
+	  <label class="col-sm-3 col-md-3 control-label">
+	    默认登录店铺</label>
+	  <div class="col-sm-4 col-md-4">
+	    <input class="form-control"
+		   type="text"
+	  	   x-ng-model="account.shop"
+	  	   placeholder="请选择用户登录店铺，默认由系统选择" 
+	  	   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in
+	  		      shops|filter:$viewValue|limitTo:8"/>
+	  </div>
+	</div>
 
 	<div class="form-group">
+	  <label class="col-sm-3 col-md-3 control-label">
+	    默认登录厂商</label>
+	  <div class="col-sm-4 col-md-4">
+	    <input class="form-control"
+		   type="text"
+	  	   x-ng-model="account.firm"
+	  	   placeholder="请选择用户登录厂商，默认由系统选择" 
+	  	   typeahead-editable="false"
+	  	   typeahead="s as s.name for s in
+	  		      firms|filter:$viewValue|limitTo:8"/>
+	  </div>
+	</div>
+
+	<div x-ng-if="account.type===2" class="form-group">
           <label class="col-md-3 control-label">权限</label>
           <div class="col-md-4"
 	       ng-class="{'has-error':editForm.right.$invalid

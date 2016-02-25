@@ -298,7 +298,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.sell_styles = diablo_sell_style;
 
     // all right of user
-    // console.log(user); 
+    console.log(user); 
     // console.log(base); 
 
     //  var user = wsaleGoodService.get_user();

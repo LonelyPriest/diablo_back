@@ -134,6 +134,7 @@ response_with_cookie(Req, Cookie, Path, _UserName) ->
 		 "Redirecting " ++ Path}).
 
 start_force(false, new_user, UserDetail) ->
+    %% ?DEBUG("UserDetail ~p", [UserDetail]),
     case ?v(<<"type">>, UserDetail) of
 	?SUPER ->
 	    {ok, start(with_new_session, UserDetail)};
@@ -181,7 +182,7 @@ start_force(true, old_user, SessionId, _Session, UserDetail) ->
 
 
 start(with_new_session, UserDetail) ->
-    ?DEBUG("new session ~p", [?v(<<"name">>, UserDetail)]),
+    %% ?DEBUG("new session ~p", [UserDetail]),
     %% first, get login user role
     UserId = ?v(<<"id">>, UserDetail),
     Merchant = ?v(<<"merchant">>, UserDetail),

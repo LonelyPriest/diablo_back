@@ -81,7 +81,7 @@
 			 placeholder="请输入打印机序列号"
 			 x-ng-model="printer.sn"
 			 x-ng-pattern="/^[A-Za-z0-9\-]+$/"
-			 x-ng-maxlength="16"></input>
+			 x-ng-maxlength="16"/>
 		  <span class="input-group-addon bg-white fg-red">*</span> 
 		</div>
 	      </div>
@@ -100,15 +100,15 @@
 			 name="key"
 			 required
 			 placeholder="请输入打印机接入码"
-			 x-ng-pattern="/^[A-Za-z0-9]+$/"
-			 x-ng-maxlength="16"
+			 x-ng-pattern="/^[A-Za-z0-9\-]+$/"
+			 x-ng-maxlength="32"
 			 x-ng-model="printer.key"></input>
 		  <span class="input-group-addon bg-white fg-red">*</span> 
 		</div>
 	      </div>
 	      <div ng-show="printerForm.key.$error.maxlength
 			    || !printerForm.key.$pristine && printerForm.key.$invalid">
-		<span class="fg-red">字母或数字，不超过16个字符</span>
+		<span class="fg-red">字母或数字，不超过32个字符</span>
 	      </div> 
 	    </div>
 

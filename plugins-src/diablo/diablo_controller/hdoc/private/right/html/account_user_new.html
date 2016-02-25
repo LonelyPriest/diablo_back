@@ -91,6 +91,20 @@
 	      </div>
 	    </div>
 
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">
+		默认登录厂商</label>
+	      <div class="col-sm-6 col-md-6">
+		<input class="form-control"
+		       type="text"
+	  	       x-ng-model="account.login_firm"
+	  	       placeholder="请选择用户登录店铺，默认由系统选择" 
+	  	       typeahead-editable="false"
+	  	       typeahead="s as s.name for s in
+	  			  login_firms|filter:$viewValue|limitTo:8"/>
+	      </div>
+	    </div>
+
 	    <!--right-->
 	    <div class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">权限</label>

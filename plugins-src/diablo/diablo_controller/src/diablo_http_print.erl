@@ -192,8 +192,14 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 		    -1 ->
 			case ?w_user_profile:get(print, Merchant, ShopId) of
 			    {ok, []} -> {[], []};
-			    {ok, [{P1}]} ->
-				{[[{<<"pshop">>, ShopId}|P1]], Shop}
+			    {ok, [{P1}]} -> 
+				{[[{<<"pshop">>, ShopId}|P1]], Shop};
+			    {ok, Ps} ->
+				?DEBUG("printers of shop ~p", [Ps]),
+				{lists:foldr(
+				   fun({P1}, Acc)->
+					   [[{<<"pshop">>, ShopId}|P1] | Acc]
+				   end, [], Ps), Shop}
 			end;
 		    RepoId ->
 			{[case ?w_user_profile:get(print, Merchant, ShopId) of
