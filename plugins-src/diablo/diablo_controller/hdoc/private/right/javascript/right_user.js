@@ -719,6 +719,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    shop:  diablo_get_object(account.shop_id, $scope.shops),
 		    firm_id: account.firm_id,
 		    firm: diablo_get_object(account.firm_id, $scope.firms),
+		    stime: account.stime,
+		    etime: account.etime,
 		    role_name: account.role_name,
 		    create_date: account.create_date
 		}
@@ -851,7 +853,9 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		if (new_account.type === 2 ){
 		    if (new_account.role.id === current_role.role_id
 			&& new_account.shop_id === account.shop_id
-			&& new_account.firm_id === account.firm_id){
+			&& new_account.firm_id === account.firm_id
+			&& new_account.stime  === account.stime
+			&& new_account.etime === account.etime){
 			diabloUtilsService.response(
 			    false, "用户帐户修改",
 			    "用户帐户修改失败：" + rightService.error[1599]);
@@ -868,7 +872,14 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		};
 		
 
-		var update = {id: account.id};
+		var update = {
+		    id: account.id,
+		    stime: new_account.stime === account.stime
+			? undefined : new_account.stime,
+		    etime: new_account.etime === account.etime
+			? undefined : new_account.etime};
+
+		console.log(update);
 		update.role_id = function(){
 		    if (new_account.type !== 2){
 			return undefined;
@@ -877,7 +888,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 			    ? new_account.role : undefined;
 		    }
 		}();
-
+		
 		update.shop_id =
 		    new_account.shop_id !== account.shop_id
 		    ? new_account.shop_id : undefined;
@@ -915,9 +926,11 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		resolve:{
 		    params: function(){
 			return {
-			    account: editAccount,
-			    roles:   roles,
-			    shops:   $scope.shops, 
+			    account:      editAccount,
+			    roles:        roles,
+			    shops:        $scope.shops,
+			    hours:        rightService.hours,
+			    desc:         $scope.accountDesc,
 			    callback: callback
 			}
 		    }
@@ -934,6 +947,8 @@ rightUserApp.controller("accountUserModalCtrl", function($scope, $modalInstance,
     $scope.account = params.account;
     $scope.roles   = params.roles;
     $scope.shops   = params.shops;
+    $scope.desc    = params.desc;
+    $scope.hours   = params.hours;
 
     $scope.cancel = function(){
 	$modalInstance.dismiss('cancel');

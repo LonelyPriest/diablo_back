@@ -173,6 +173,8 @@ create table users
     merchant       INTEGER default -1, -- which merchant belong to, 0: means super
     shop           INTEGER default -1,
     firm           INTEGER default -1,
+    stime          INTEGER default 0,
+    etime          INTEGER default 0,
     max_create     INTEGER default -1, -- max users can be created of the user
     create_date    DATETIME,
     deleted        INTEGER default 0,  -- 0: no;  1: yes

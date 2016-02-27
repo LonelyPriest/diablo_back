@@ -292,6 +292,11 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    "show_discount", -1, base, parseInt, diablo_yes);
     }();
 
+    $scope.base_setting.multi_sgroup = function(){
+	return diablo_base_setting(
+	    "m_sgroup", -1, base, parseInt, diablo_no);
+    }();
+
     console.log($scope.base_setting);
     
     $scope.full_years = diablo_full_year;
@@ -723,12 +728,15 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	};
 
 	var select_group = function(groups, g){
-	    for(var i=0, l=groups.length; i<l; i++){
-		if (groups[i].id !== g.id){
-		    groups[i].select = false;
+	    if (!$scope.base_setting.multi_sgroup){
+		for(var i=0, l=groups.length; i<l; i++){
+
+		    if (groups[i].id !== g.id){
+			groups[i].select = false;
+		    }
 		}
-	    }
-	}
+	    } 
+	};
 
 	diabloUtilsService.edit_with_modal(
 	    "select-size.html", undefined,

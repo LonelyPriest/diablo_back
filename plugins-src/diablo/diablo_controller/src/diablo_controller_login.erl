@@ -50,7 +50,7 @@ init([]) ->
 handle_call({login, User, Passwd}, _From, State) ->
     ?DEBUG("login with User ~p", [User]),
     
-    Sql0 = "select id, name from users"
+    Sql0 = "select id, name, type from users"
 	++ " where name=" ++ "\'" ++ ?to_s(User) ++ "\'"
 	++ " and password=" ++ "\'" ++ ?to_s(Passwd) ++ "\'"
 	++ " and deleted=" ++ ?to_s(?NO),
@@ -64,16 +64,35 @@ handle_call({login, User, Passwd}, _From, State) ->
 		_ ->
 		    Sql1 = "select a.id, a.name, a.type, a.merchant"
 			", a.shop as shop_id, a.firm as firm_id"
+			", a.stime, a.etime"
 			", b.type as mtype from users a, merchants b"
 			++ " where a.merchant=b.id"
 			++ " and a.name=" ++ "\"" ++ ?to_s(User) ++ "\""
 			++ " and a.password=" ++ "\"" ++ ?to_s(Passwd) ++ "\""
 			++ " and a.deleted=" ++ ?to_string(?NO),
-		    case ?mysql:fetch(read, Sql1) of
+		    case ?sql_utils:execute(s_read, Sql1) of
 			{ok, []} ->
 			    {reply, {error, ?err(login_error, none)}, State};
-			{ok, {User1}} ->
-			    {reply, {ok, User1}, State}
+			{ok, User1} ->
+			    Stime = ?v(<<"stime">>, User1),
+			    Etime = ?v(<<"etime">>, User1),
+			    {_, {Hour, _, _}} = 
+				calendar:now_to_local_time(erlang:now()),
+			    case Stime =:= 0 andalso Etime =:= 0 of
+				true -> {reply, {ok, User1}, State};
+				false ->
+				    case (Stime =/= 0 andalso Stime > Hour)
+					orelse (Etime =/= 0 andalso Etime < Hour) of
+					true ->
+					    {reply,
+					     {error, ?err(login_out_service, User)}, State};
+					false ->
+					    {reply, {ok, User1}, State}
+				    end 
+			    end;
+			Error ->
+			    %% ?DEBUG("wrong user ~p", [User]),
+			    {reply, Error, State}
 		    end
 	    end;
 	Error ->

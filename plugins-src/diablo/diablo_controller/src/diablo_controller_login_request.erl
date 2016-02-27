@@ -21,6 +21,7 @@
 -define(LOGIN_NO_USER_FIRE, "没有用户可以踢出！！注意：管理员用户无法踢出，请确认管理员是否在线！！").
 -define(INVALID_USER, "非法用户！！").
 -define(WRONG_USER_PASSWD, "用户名或密码错误").
+-define(OUT_OF_SERVICE, "用户不在服务时间内，请选择其它用户或在服务时间内登录该用户！！").
 
 
 test_login(UserName, Passwd, Force) ->
@@ -110,11 +111,12 @@ action(Req, login, Force) ->
 				{error, {1109, _}} ->
 				    LoginResponseFun(?INVALID_USER)
 				    %% ?utils:respond(200, Req, Error)
-			    end; 
+			    end;
+			{error, {1199, _}} ->
+			    LoginResponseFun(?OUT_OF_SERVICE);
 			{error, _Error} ->
+			    ?DEBUG("login error ~p", [_Error]),
 			    LoginResponseFun(?WRONG_USER_PASSWD) 
-			    %% ?DEBUG("login error ~p", [Error]),
-			    %% ?utils:respond(200, Req, Error)
 		    end 
 	    end
     end.

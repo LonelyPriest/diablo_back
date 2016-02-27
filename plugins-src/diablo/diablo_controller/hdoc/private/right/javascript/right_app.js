@@ -216,6 +216,9 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	7001: "系统暂不支持该操作！！",
 	9001: "数据库操作失败，请联系服务人员！！"};
 
+    this.hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+		  13, 14, 15, 16, 17, 18, 19, 20, 21, 22,23, 24];
+
     this.tree_modal = function(template, scope, tree_callback, tree_update){
 	$modal.open({
             templateUrl: template,
@@ -365,8 +368,8 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	     password:     one.password,
 	     type:         one.type,
 	     role:         one.role.id,
-	     shop:         one.login_shop.id,
-	     firm:         one.login_firm.id
+	     shop:         angular.isUndefined(one.login_shop) ? undefined : one.login_shop.id,
+	     firm:         angular.isUndefined(one.login_firm) ? undefined : one.login_firm.id
 	    };
 	// a common user does not to select the special merchant
 	if (angular.isDefined(one.merchant)){
@@ -407,6 +410,8 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	     role: account.role_id,
 	     shop: account.shop_id,
 	     firm: account.firm_id,
+	     stime: account.stime,
+	     etime: account.etime,
 	     type: this.roleType.user})
     };
 

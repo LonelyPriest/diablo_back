@@ -57,6 +57,8 @@
 		    <th>类型</th>
 		    <th>登录店铺</th>
 		    <th>登录厂商</th>
+		    <th>登录开始时间</th>
+		    <th>登录结束时间</th>
 		    <th>权限说明</th>
 		    <th>创建时间</th>
 		    <th>操作</th>
@@ -82,6 +84,20 @@
 		      <div x-ng-switch on="account.firm_id">
 			<span x-ng-switch-when=-1>系统默认</span>
 			<span x-ng-switch-default>{{account.firm.name}}</span>
+		      </div>
+		    </td>
+
+		    <td>
+		      <div x-ng-switch on="account.stime">
+			<span x-ng-switch-when=0>无限制</span>
+			<span x-ng-switch-default>{{account.stime}}</span>
+		      </div>
+		    </td>
+
+		    <td>
+		      <div x-ng-switch on="account.etime">
+			<span x-ng-switch-when=0>无限制</span>
+			<span x-ng-switch-default>{{account.etime}}</span>
 		      </div>
 		    </td>
 		    
@@ -171,7 +187,7 @@
           <label class="col-md-3 control-label">帐号</label>
           <div class="col-md-4">
 	    <input type="text" class="form-control" readonly
-                   data-ng-model="account.name"></input>
+                   data-ng-model="account.name"/>
           </div>
         </div>
 
@@ -179,7 +195,7 @@
           <label class="col-md-3 control-label">类型</label>
           <div class="col-md-4">
 	    <input type="text" class="form-control" readonly
-                   data-ng-model="account.type"/>
+                   value="{{desc[account.type]}}"/>
           </div>
         </div>
 
@@ -217,6 +233,26 @@
 	  	   typeahead="s as s.name for s in
 	  		      firms|filter:$viewValue|limitTo:8"/>
 	  </div>
+	</div>
+
+	<div x-ng-if="account.type===2" class="form-group">
+	  <label class="col-md-3 control-label">登录开始时间</label>
+	  <div class="col-sm-4 col-md-4"> 
+	    <select class="form-control"
+		    x-ng-model="account.stime"
+		    x-ng-options="s for s in hours">
+	    </select>
+	  </div> 
+	</div>
+
+	<div x-ng-if="account.type===2" class="form-group">
+	  <label class="col-md-3 control-label">登录结束时间</label>
+	  <div class="col-sm-4 col-md-4"> 
+	    <select class="form-control"
+		    x-ng-model="account.etime"
+		    x-ng-options="s for s in hours">
+	    </select>
+	  </div> 
 	</div>
 
 	<div x-ng-if="account.type===2" class="form-group">

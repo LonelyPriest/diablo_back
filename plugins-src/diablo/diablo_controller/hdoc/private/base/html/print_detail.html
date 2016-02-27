@@ -1,24 +1,24 @@
 <div class="row">
   <div class="col-md-12">
     <div class="portlet box purple">
-      
+
       <div class="portlet-title">
 	<div class="caption">
 	  <i class="glyphicon glyphicon-menu-hamburger"></i>
 	  系统选项
-	</div>	
+	</div>
 
 	<div class="actions">
-	  <div class="btn-group btn-group-solid"> 
+	  <div class="btn-group btn-group-solid">
 	    <button type="button" class="btn btn-success purple-stripe"
-	  	    x-ng-click="add_setting()">新增
+		    x-ng-click="add_setting()">新增
 	      <i class="glyphicon glyphicon-plus"></i></button>
 
 	    <button type="button" class="btn blue reload purple-stripe"
 		    x-ng-click="refresh(select.shop)">刷新
 	      <i class="icon icon-spinner fg-white"></i></button>
 	  </div>
-	</div> 
+	</div>
       </div>
 
       <!--BEGIN table container-->
@@ -31,25 +31,25 @@
 	    </p>
 	  </div>
 
-	  <div class="row form-group"> 
+	  <div class="row form-group">
 	    <div class="col-sm-12 col-md-12">
 	      <select class="form-control"
 		      x-ng-model="select.shop"
 		      x-ng-change="select.setting=shop_setting(select.shop)"
 		      x-ng-options="s as s.name for s
-				    in shops|filter:$viewValue|limitTo:8"> 
-		</select> 
+				    in shops|filter:$viewValue|limitTo:8">
+		</select>
 	    </div>
-	    
+
 	</div> <!--END table-toolbar-->
-		  
-	<!--BEGN portlet body--> 
+
+	<!--BEGN portlet body-->
 	<div class="portlet-body">
 	  <!--BEGIN panel-->
 	  <div class="panel panel-default">
 	    <!--EBGIN table responsive-->
 	    <div class="table-responsive">
-	      <!--BEGIN member table--> 
+	      <!--BEGIN member table-->
 	      <table class="table table-bordered table-striped table-hover
 			    table-condensed table-advanced">
 		<thead>
@@ -64,16 +64,16 @@
 		</thead>
 		<tbody>
 		  <tr ng-repeat="s in select.setting">
-		    <td>{{s.order_id}}</td> 
+		    <td>{{s.order_id}}</td>
 		    <td>{{s.cname}}</td>
 
 		    <td x-ng-switch on="s.ename">
 		      <span ng-switch-when="ptype">
 			{{print_types[s.value].cname}}
 		      </span>
-		      
+
 		      <span ng-switch-when="ptable">
-			{{yes_no[s.value].cname}} 
+			{{yes_no[s.value].cname}}
 		      </span>
 
 		      <span ng-switch-when="pretailer">
@@ -83,14 +83,14 @@
 		      <span ng-switch-when="pround">
 			{{round_names[s.value].cname}}
 		      </span>
-		      
+
 		      <span ng-switch-when="ptrace_price">
 			{{yes_no[s.value].cname}}
 		      </span>
-		      
+
 		      <!--print format-->
 		      <span ng-switch-when="pformat">
-			<span>{{print_formats[s.value].cname}}</span> 
+			<span>{{print_formats[s.value].cname}}</span>
 		      </span>
 
 		      <span ng-switch-when="pim_print">
@@ -135,36 +135,44 @@
 			{{yes_no[s.value].cname}}
 		      </span>
 
-		      <!--default--> 
+		      <span ng-switch-when="h_price3_5">
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		       <span ng-switch-when="m_sgroup">
+			{{yes_no[s.value].cname}}
+		      </span>
+
+		      <!--default-->
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
 
 		    <td x-ng-switch on="s.remark">
 		      <span ng-switch-when="">暂无</span>
 		      <span ng-switch-default>{{s.remark}}</span>
-		    </td> 
-		    
+		    </td>
+
 		    <td>{{s.entry_date}}</td>
-		    
+
 		    <!-- <td x-ng-if="show_switch(s.ename)" class="col-md-2"> -->
 		    <!--   <input type="checkbox" x-ng-model="s.value" diablo-switch /> -->
 		    <!-- </td> -->
-		    <td class="col-md-2"> 
-                      <button class="btn diablo-button btn-warning"
+		    <td class="col-md-2">
+		      <button class="btn diablo-button btn-warning"
 			 x-ng-click="update_setting(s)">修改
-			<i class="glyphicon glyphicon-edit"></i></button> 
+			<i class="glyphicon glyphicon-edit"></i></button>
 		    </td>
-		    
+
 		  </tr>
 		</tbody>
-		
+
 	      </table> <!--END VM table-->
 	    </div> <!--END table responsive-->
 
 	  </div> <!--END panel-->
 	</div> <!--END portlet body-->
       </div> <!--END table container-->
-      
+
     </div>
   </div>
 </div>
@@ -196,21 +204,21 @@
 				 =params.get_set_v(params.setting.name.ename).value;
 				 params.setting.remark=params.get_set_v(params.setting.name.ename).comment"
 		    x-ng-options="n as n.cname for n in params.names">
-	    </select> 
-	  </div> 
+	    </select>
+	  </div>
 	</div>
 
 	<div class="form-group">
 	  <div class="input-group">
 	    <span class="input-group-addon">
 	      <i class="glyphicon glyphicon-hand-right fg-red"></i>取值</span>
-	    <span x-ng-switch on="params.setting.name.ename"> 
+	    <span x-ng-switch on="params.setting.name.ename">
 	      <input x-ng-switch-when="phone1"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.tel_mobile" />
-	      
+
 	      <input x-ng-switch-when="phone2"
 		     class="form-control" required
 		     name="value"
@@ -222,7 +230,7 @@
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.tel_mobile" />
-	      
+
 	      <input x-ng-switch-when="phone4"
 		     class="form-control" required
 		     name="value"
@@ -234,19 +242,19 @@
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.tel_mobile" />
-	      
+
 	      <input x-ng-switch-when="phone6"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.tel_mobile" />
-	      
+
 	      <input x-ng-switch-default
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.comment"/>
-	      
+
 	    </span>
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>
@@ -267,20 +275,20 @@
 		   class="form-control"
 		   name="remark"
 		   x-ng-pattern="params.patterns.remark"
-		   x-ng-model="params.setting.remakr"/> 
+		   x-ng-model="params.setting.remakr"/>
 	  </div>
 	  <div ng-show="pForm.remark.$invalid && !pForm.remark.$pristine">
-	    <span class="fg-red"> 
+	    <span class="fg-red">
 	      描述只能是中文，字母，数字，不包含特殊字符
 	    </span>
 	  </div>
-	  
+
 	</div>
-	
+
       </div>
     </form>
   </div>
-  
+
   <div class="modal-footer">
     <button class="btn btn-primary" x-ng-disabled="pForm.$invalid"
 	    x-ng-click="ok()">确认</button>
@@ -312,8 +320,8 @@
 	    <input type="text" readonly
 		   class="form-control"
 		   required
-		   x-ng-model="params.setting.cname"></input> 
-	  </div> 
+		   x-ng-model="params.setting.cname"></input>
+	  </div>
 	</div>
 
 	<div class="form-group">
@@ -321,7 +329,7 @@
 	    <span class="input-group-addon">
 	      <i class="glyphicon glyphicon-hand-right fg-red"></i>取值</span>
 	    <span x-ng-switch on="params.setting.ename">
-	      
+
 	      <select x-ng-switch-when="ptype"
 		      class="form-control" required
 		      name="value"
@@ -435,20 +443,20 @@
 		  <span class="input-group-addon bg-white fg-red">*</span>
 		</div>
 	      </div>
-	      
+
 	      <!-- <input x-ng-switch-when="qtime_start" -->
-	      <!-- 	     type="text" -->
-	      <!-- 	     class="form-control" -->
-	      <!-- 	     placeholder="年-月-日" -->
-	      <!-- 	     datepicker-popup="yyyy/MM/dd" -->
-	      <!-- 	     is-open="params.qtime.isOpened" -->
-	      <!-- 	     close-text="关闭" -->
-	      <!-- 	     clear-text="清除" -->
-	      <!-- 	     current-text="今天" -->
-	      <!-- 	     show-weeks="false" -->
-	      <!-- 	     x-ng-model="params.setting.value"/> -->
-	      
-	      
+	      <!--	     type="text" -->
+	      <!--	     class="form-control" -->
+	      <!--	     placeholder="年-月-日" -->
+	      <!--	     datepicker-popup="yyyy/MM/dd" -->
+	      <!--	     is-open="params.qtime.isOpened" -->
+	      <!--	     close-text="关闭" -->
+	      <!--	     clear-text="清除" -->
+	      <!--	     current-text="今天" -->
+	      <!--	     show-weeks="false" -->
+	      <!--	     x-ng-model="params.setting.value"/> -->
+
+
 	      <select x-ng-switch-when="qtime_length"
 		      class="form-control" required
 		      name="value"
@@ -529,18 +537,38 @@
 				 params.setting.yes_no[params.setting.value]">
 	      </select>
 
+	      <select x-ng-switch-when="h_price3_5"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="h as h.cname for
+				    h in params.setting.yes_no"
+		      x-ng-init="params.setting.value=
+				 params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="m_sgroup"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="m as m.cname for
+				    m in params.setting.yes_no"
+		      x-ng-init="params.setting.value=
+				 params.setting.yes_no[params.setting.value]">
+	      </select>
+
 	      <input x-ng-switch-when="pum" type="text"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="/^\d+?/"/>
-	      
+
 	      <input x-ng-switch-when="phone1" type="text"
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.tel_mobile"/>
-	      
+
 	      <input x-ng-switch-when="phone2" type="text"
 		     class="form-control" required
 		     name="value"
@@ -548,15 +576,15 @@
 		     x-ng-pattern="params.patterns.tel_mobile"/>
 
 
-	      
-	      
+
+
 	      <input x-ng-switch-default
 		     class="form-control" type="text"
 		     required
 		     name="value"
 		     x-ng-model="params.setting.value"
 		     x-ng-pattern="params.patterns.comment"/>
-	    </span> 
+	    </span>
 	  </div>
 
 	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
@@ -564,7 +592,7 @@
 	      联系方式只能是手机或座机，备注不能包含特殊字符
 	    </span>
 	  </div>
-	  
+
 	</div>
 
 	<div class="form-group">
@@ -577,22 +605,20 @@
 		   class="form-control"
 		   name="remark"
 		   x-ng-pattern="params.patterns.remark"
-		   x-ng-model="params.setting.remark"/> 
+		   x-ng-model="params.setting.remark"/>
 	  </div>
 	  <div ng-show="pForm.remark.$invalid && !pForm.remark.$pristine">
-	    <span class="fg-red"> 
+	    <span class="fg-red">
 	      描述只能是中文，字母，数字，不包含特殊字符
 	    </span>
-	  </div> 
+	  </div>
 	</div>
-	
-      </div>
 
-      
-      
+      </div> 
+
     </form>
   </div>
-  
+
   <div class="modal-footer">
     <button class="btn btn-primary" x-ng-disabled="pForm.$invalid"
 	    x-ng-click="ok()">确认</button>
@@ -600,16 +626,3 @@
 	    x-ng-click="cancel()">取消</button>
   </div>
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -502,6 +502,8 @@ handle_call({update_account, Attrs}, _From, State) ->
     Account = ?v(<<"account">>, Attrs),
     LoginShop = ?v(<<"shop">>, Attrs),
     LoginFirm = ?v(<<"firm">>, Attrs),
+    StartTime = ?v(<<"stime">>, Attrs),
+    EndTime   = ?v(<<"etime">>, Attrs),
 
     Sql1 = case ?v(<<"role">>, Attrs) of
 	      undefined -> [];
@@ -511,7 +513,9 @@ handle_call({update_account, Attrs}, _From, State) ->
 	  end,
 
     Updates = ?utils:v(shop, integer, LoginShop)
-	++ ?utils:v(firm, integer, LoginFirm),
+	++ ?utils:v(firm, integer, LoginFirm)
+	++ ?utils:v(stime, integer, StartTime)
+	++ ?utils:v(etime, integer, EndTime),
 
     Sql2 = 
 	["update users set "
@@ -649,7 +653,7 @@ code_change(_OldVsn, State, _Extra) ->
 account(Conditions) ->
     CorrectConditions = ?utils:correct_condition(<<"a.">>, Conditions),
     Sql1 = "select a.id, a.name, a.type, a.merchant, a.shop as shop_id"
-	", a.firm as firm_id, a.max_create, a.create_date"
+	", a.firm as firm_id, a.stime, a.etime, a.max_create, a.create_date"
 	", tc.user_id, tc.role_id, tc.role_name"
 	%% ", b.role_id as role"
 	%% ", c.name as role_name"

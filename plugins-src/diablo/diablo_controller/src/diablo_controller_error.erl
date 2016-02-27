@@ -227,6 +227,8 @@ error(login_no_user_fire, Merchant) ->
     {1107, "there is no user can be fired of merchant " ++ ?to_s(Merchant) ++ "."};
 error(login_invalid_user, User) ->
     {1108, "invalid user " ++ ?to_s(User) ++ "."};
+error(login_out_service, User) ->
+    {1199, "out service of user " ++ ?to_s(User) ++ "."};
 
 %% merchant
 error(merchant_exist, Name) ->

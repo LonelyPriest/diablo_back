@@ -358,8 +358,7 @@
 		  <input type="text" readonly
 			 class="form-control"
 			 placeholder="均色均码无需选择"
-			 x-ng-model="good.color_desc">
-		  </input>
+			 x-ng-model="good.color_desc"/> 
 		  <span class="input-group-btn">
 		    <button class="btn btn-primary"
 			    x-ng-disabled="good.free===0"
@@ -387,8 +386,15 @@
 		    <input x-ng-switch-default type="text" readonly
 			   class="form-control"
 			   x-ng-model="good.size">
-		  </div> 
-		  <span class="input-group-addon bg-white fg-red">*</span> 
+		  </div>
+		  <span class="input-group-btn">
+		    <button class="btn btn-primary"
+			    x-ng-disabled="good.free===0"
+			    x-ng-click="select_size()">
+		      <i class="glyphicon glyphicon-arrow-right"></i>
+		    </button> 
+		  </span>
+		  <!-- <span class="input-group-addon bg-white fg-red">*</span>  -->
 		</div>
 	      </div> 
 	    </div>
@@ -677,6 +683,41 @@
       </table>
     </div>
   </div> <!--END modal-body-->
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>  
+</script>
+
+
+<script type="text/ng-template" id="select-size.html"> 
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr class="text-center" x-ng-repeat="g in params.groups">
+	    <td class="vert-align">
+	      <div class="checkbox checkbox-danger checkbox-circle">
+		<input id={{g.id}} type="checkbox"
+		       x-ng-model="g.select"
+		       x-ng-click="params.select_group(params.groups, g)"/>
+		<!-- <input id={{g.id}} type="checkbox" -->
+		<!--        x-ng-model="g.select"></input> -->
+		<label for={{g.id}}>{{g.name}}</label>
+	      </div>
+	    </td>
+	    <td class="vert-align">{{g.si}}</td>
+	    <td class="vert-align">{{g.sii}}</td>
+	    <td class="vert-align">{{g.siii}}</td>
+	    <td class="vert-align">{{g.siv}}</td>
+	    <td class="vert-align">{{g.sv}}</td>
+	    <td class="vert-align">{{g.svi}}</td>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="modal-footer">
     <button class="btn btn-primary" x-ng-click="ok()">确认</button>
