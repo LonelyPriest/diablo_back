@@ -64,6 +64,7 @@ handle_call({login, User, Passwd}, _From, State) ->
 		_ ->
 		    Sql1 = "select a.id, a.name, a.type, a.merchant"
 			", a.shop as shop_id, a.firm as firm_id"
+			", a.employee as employee_id"
 			", a.stime, a.etime"
 			", b.type as mtype from users a, merchants b"
 			++ " where a.merchant=b.id"

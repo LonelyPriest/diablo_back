@@ -407,11 +407,12 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
 	return right.save(
 	    {operation: "update_account"},
 	    {account: account.id,
-	     role: account.role_id,
-	     shop: account.shop_id,
-	     firm: account.firm_id,
-	     stime: account.stime,
-	     etime: account.etime,
+	     role:     account.role_id,
+	     shop:     account.shop_id,
+	     firm:     account.firm_id,
+	     employee: account.employee_id,
+	     stime:    account.stime,
+	     etime:    account.etime,
 	     type: this.roleType.user})
     };
 
@@ -442,7 +443,12 @@ rightApp.service("rightService", function($resource, $q, $modal, dateFilter){
     
     this.list_firm = function(){
 	return httpFirm.query({operation: "list_firm"});
-    }
+    };
+
+    var httpEmploy = $resource("/employ/:operation/:id");
+    this.list_employee = function(){
+	return httpEmploy.query({operation: "list_employe"})
+    };
 
 });
 

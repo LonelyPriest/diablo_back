@@ -653,7 +653,8 @@ code_change(_OldVsn, State, _Extra) ->
 account(Conditions) ->
     CorrectConditions = ?utils:correct_condition(<<"a.">>, Conditions),
     Sql1 = "select a.id, a.name, a.type, a.merchant, a.shop as shop_id"
-	", a.firm as firm_id, a.stime, a.etime, a.max_create, a.create_date"
+	", a.firm as firm_id, employee as employee_id"
+	", a.stime, a.etime, a.max_create, a.create_date"
 	", tc.user_id, tc.role_id, tc.role_name"
 	%% ", b.role_id as role"
 	%% ", c.name as role_name"

@@ -9,6 +9,7 @@ userApp.factory("userService", function($resource, $q){
     var _loginType = undefined;
     var _loginShop = -1;
     var _loginFirm = -1;
+    var _employee  = -1;
     
     // var _rightShops = [];
 
@@ -48,11 +49,12 @@ userApp.factory("userService", function($resource, $q){
 	var shops = _shops;
 	console.log(shops);
 	return {
-    	    right:     _rights,
-	    type:      _loginType,
-	    shop:      _shops,
-	    // loginShop: _loginShop,
-	    loginFirm: _loginFirm,
+    	    right:         _rights,
+	    type:          _loginType,
+	    shop:          _shops,
+	    // loginShop:  _loginShop,
+	    loginFirm:     _loginFirm,
+	    loginEmployee: _employee,
 
 	    // shops exclude the shop that bind to the repository,
 	    // or repository itself
@@ -215,8 +217,9 @@ userApp.factory("userService", function($resource, $q){
 		_shops     = result.shop;
 		_rights    = result.right;
 		_loginType = result.type;
-		_loginShop = result.login_shop;
+		_loginShop = result.login_shop; 
 		_loginFirm = result.login_firm;
+		_employee  = result.employee_id;
 		return sort();
     	    });
 	}

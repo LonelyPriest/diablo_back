@@ -688,7 +688,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 	$q.all([
 	    promise(rightService.list_account)(),
 	    promise(rightService.list_shop)(),
-	    promise(rightService.list_firm)()
+	    promise(rightService.list_firm)(),
+	    promise(rightService.list_employee)()
 	]).then(function(data){
 	    console.log(data);
 	    // $scope.accounts = data[0];
@@ -707,21 +708,31 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    py: diablo_pinyin(firm.name)
 		};
 	    });
+
+	    $scope.employees = data[3].map(function(e){
+		return {
+		    id: e.id,
+		    name: e.name,
+		    py: diablo_pinyin(e.name)
+		};
+	    });
 	    
 	    // console.log($scope.shops);
 	    $scope.accounts = data[0].map(function(account){
 		return {
-		    id: account.id,
-		    name: account.name,
-		    owner: account.owner,
-		    type:  account.type,
-		    shop_id: account.shop_id,
-		    shop:  diablo_get_object(account.shop_id, $scope.shops),
-		    firm_id: account.firm_id,
-		    firm: diablo_get_object(account.firm_id, $scope.firms),
-		    stime: account.stime,
-		    etime: account.etime,
-		    role_name: account.role_name,
+		    id:          account.id,
+		    name:        account.name,
+		    owner:       account.owner,
+		    type:        account.type,
+		    shop_id:     account.shop_id,
+		    shop:        diablo_get_object(account.shop_id, $scope.shops),
+		    firm_id:     account.firm_id,
+		    firm:        diablo_get_object(account.firm_id, $scope.firms),
+		    employee_id: account.employee_id,
+		    employee:    diablo_get_object(account.employee_id, $scope.employees),
+		    stime:       account.stime,
+		    etime:       account.etime,
+		    role_name:   account.role_name,
 		    create_date: account.create_date
 		}
 	    });
@@ -850,10 +861,15 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    angular.isDefined(new_account.firm)
 		    &&  new_account.firm ? new_account.firm.id : -1;
 
+		new_account.employee_id = 
+		    angular.isDefined(new_account.employee)
+		    &&  new_account.employee ? new_account.employee.id : -1;
+		
 		if (new_account.type === 2 ){
 		    if (new_account.role.id === current_role.role_id
 			&& new_account.shop_id === account.shop_id
 			&& new_account.firm_id === account.firm_id
+			
 			&& new_account.stime  === account.stime
 			&& new_account.etime === account.etime){
 			diabloUtilsService.response(
@@ -897,6 +913,10 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    new_account.firm_id !== account.firm_id
 		    ? new_account.firm_id : undefined;
 
+		update.employee_id =
+		    new_account.employee_id !== account.employee_id
+		    ? new_account.employee_id : undefined;
+
 		rightService.update_user_account(
 		    update
 		).$promise.then(function(state){
@@ -929,6 +949,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 			    account:      editAccount,
 			    roles:        roles,
 			    shops:        $scope.shops,
+			    employees:    $scope.employees,
 			    hours:        rightService.hours,
 			    desc:         $scope.accountDesc,
 			    callback: callback
@@ -947,6 +968,7 @@ rightUserApp.controller("accountUserModalCtrl", function($scope, $modalInstance,
     $scope.account = params.account;
     $scope.roles   = params.roles;
     $scope.shops   = params.shops;
+    $scope.employees = params.employees;
     $scope.desc    = params.desc;
     $scope.hours   = params.hours;
 

@@ -436,8 +436,16 @@ wsaleApp.controller("wsaleNewCtrl", function(
     // employees
     $scope.employees = filterEmployee;
     if ($scope.employees.length !== 0){
-	$scope.select.employee = $scope.employees[0];
-    }
+	
+	$scope.select.employee = [];
+	angular.forEach($scope.employee, function(e){
+	    if (user.loginEmployee === e.id){
+		$scope.select.employee.splice(0, 1, e);
+	    } else {
+		$scope.select.employee.push(e);
+	    }
+	});
+    };
     
     $scope.find_employee = function(number){
 	for(var i=0, l=$scope.employees.length; i<l; i++)

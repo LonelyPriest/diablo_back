@@ -84,6 +84,7 @@ handle_call({new, User}, _From, State) ->
     Merchant     = ?v(<<"merchant">>, User),
     Shop         = ?v(<<"shop_id">>, User),
     Firm         = ?v(<<"firm_id">>, User),
+    Employee     = ?v(<<"employee_id">>, User),
     MerchantType = ?v(<<"mtype">>, User),
 
     MS = [{{'_', #session{user_name='$1', _='_'}},
@@ -106,8 +107,9 @@ handle_call({new, User}, _From, State) ->
 			      user_name   = ?to_b(UserName),
 			      user_type   = ?to_i(UserType),
 			      merchant    = ?to_i(Merchant), 
-			      login_shop  = ?to_i(Shop),
+			      login_shop  = ?to_i(Shop), 
 			      login_firm  = ?to_i(Firm),
+			      employee_id = ?to_i(Employee),
 			      mtype       = ?to_i(MerchantType),
 			      login_time  = ?utils:current_time(timestamp)}}),
     {reply, {ok, SessionId}, State};
