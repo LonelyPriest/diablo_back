@@ -3,11 +3,10 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,
     purchaserService, user, filterShop, filterFirm, filterEmployee,
     filterSizeGroup, filterColor, base){
-    // console.log(user);
-
-    console.log(filterShop);
-    // $scope.shops     = user.sortShops;
+    // console.log(user); 
+    // console.log(filterShop);
     $scope.shops             = user.sortBadRepoes.concat(user.sortShops);
+    console.log($scope.shops);
     $scope.to_shops          = [];
     
     // $scope.shops     = user.sortAvailabeShops;
@@ -27,7 +26,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     };
 
     $scope.go_back = function(){
-	diablo_goto_page("#/inventory_new_detail");
+	diablo_goto_page("#inventory/inventory_transfer_detail");
     };
 
     var now = $.now();
@@ -632,14 +631,22 @@ purchaserApp.controller("purchaserInventoryTransferDetailCtrl", function(
     $scope.default_page = 1;
     // $scope.current_page = $scope.default_page;
 
+    var toshopIds = filterShop.map(function(s){
+	return s.id;
+    });
+    
     $scope.do_search = function(page){
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    if ((angular.isUndefined(search.fshopo)
-		 || !search.fshop || search.fshop.length === 0)
-		|| (angular.isUndefined(search.tshopo)
-		    || !search.tshop || search.tshop.length === 0)){
+		 || !search.fshop || search.fshop.length === 0)){
 		search.fshop = user.sortShops.length
-		    === 0 ? undefined : user.shopIds; ;
+		    === 0 ? undefined : user.shopIds;
+	    };
+	    
+	    if ((angular.isUndefined(search.tshop)
+		 || !search.tshop || search.tshop.length === 0)){
+		search.tshop = filterShop.length
+		    === 0 ? undefined : toshopIds;
 	    }
 
 	    purchaserService.filter_transfer_w_inventory(

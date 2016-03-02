@@ -869,6 +869,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    if (new_account.role.id === current_role.role_id
 			&& new_account.shop_id === account.shop_id
 			&& new_account.firm_id === account.firm_id
+			&& new_account.employee_id === account.employee_id
 			
 			&& new_account.stime  === account.stime
 			&& new_account.etime === account.etime){

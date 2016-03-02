@@ -499,9 +499,10 @@ handle_call({update_account_role, Account, NewRole}, _From, State) ->
 
 handle_call({update_account, Attrs}, _From, State) ->
     ?DEBUG("update_account with attrs ~p", [Attrs]),
-    Account = ?v(<<"account">>, Attrs),
+    Account   = ?v(<<"account">>, Attrs),
     LoginShop = ?v(<<"shop">>, Attrs),
     LoginFirm = ?v(<<"firm">>, Attrs),
+    LoginEmployee = ?v(<<"employee">>, Attrs),
     StartTime = ?v(<<"stime">>, Attrs),
     EndTime   = ?v(<<"etime">>, Attrs),
 
@@ -514,6 +515,7 @@ handle_call({update_account, Attrs}, _From, State) ->
 
     Updates = ?utils:v(shop, integer, LoginShop)
 	++ ?utils:v(firm, integer, LoginFirm)
+	++ ?utils:v(employee, integer, LoginEmployee)
 	++ ?utils:v(stime, integer, StartTime)
 	++ ?utils:v(etime, integer, EndTime),
 

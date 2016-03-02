@@ -63,7 +63,7 @@ flattern(amount, {IsTable, Column, SizeNum, Fields}, [H|T], Flattern, MTotals, M
 		flattern(amount, {IsTable, Column, SizeNum, Fields},
 			 T,
 			 Flattern ++ [Row],
-			 Total + MTotals,
+			 abs(Total) + MTotals,
 			 FPrice * Total * FDiscount * 0.01 + MStastic)
 	end
     catch

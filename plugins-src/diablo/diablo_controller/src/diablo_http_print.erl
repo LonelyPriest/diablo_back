@@ -145,8 +145,10 @@ call(Parent, {print, RSN, Merchant}) ->
 		    end
 	    end,
 
-	SortInvs = sort_inventory(Merchant, GetBrand, Details, []),
+	{SortInvs, STotal, RTotal} = sort_inventory(
+					Merchant, GetBrand, Details, [], 0, 0),
 	%% ?DEBUG("sorts ~p", [SortInvs]),
+	?DEBUG("stotal ~p, rtotal ~p", [STotal, RTotal]),
 	RSNAttrs = [{<<"shop">>,       ?v(<<"shop_id">>, Sale)},
 		    {<<"datetime">>,   ?v(<<"entry_date">>, Sale)},
 		    {<<"balance">>,    ?v(<<"balance">>, Sale)},
@@ -155,11 +157,14 @@ call(Parent, {print, RSN, Merchant}) ->
 		    {<<"wire">>,       ?v(<<"wire">>, Sale)},
 		    {<<"verificate">>, ?v(<<"verificate">>, Sale)},
 		    {<<"should_pay">>, ?v(<<"should_pay">>, Sale)},
-		    {<<"total">>,      ?v(<<"total">>, Sale)},
+		    %% {<<"total">>,      ?v(<<"total">>, Sale)},
+		    {<<"total">>,      STotal + erlang:abs(RTotal)},
 		    {<<"comment">>,    ?v(<<"comment">>, Sale)},
 		    {<<"e_pay_type">>, ?v(<<"e_pay_type">>, Sale)},
 		    {<<"e_pay">>,      ?v(<<"e_pay">>, Sale)},
-		    {<<"direct">>,     ?v(<<"type">>, Sale)}],
+		    {<<"direct">>,     ?v(<<"type">>, Sale)},
+		    {<<"stotal">>,     STotal},
+		    {<<"rtotal">>,     RTotal}],
 
 
 	%% ?DEBUG("retailer ~p", [Retailer]),
@@ -1055,7 +1060,9 @@ body_stastic(Brand, Model, 33, _Setting, Attrs) ->
     ShouldPay    = ?v(<<"should_pay">>, Attrs, 0),
     Total        = ?v(<<"total">>, Attrs, 0),
     Comment      = ?v(<<"comment">>, Attrs, []),
-    Direct       = ?v(<<"direct">>, Attrs), 
+    Direct       = ?v(<<"direct">>, Attrs),
+    STotal       = ?v(<<"stotal">>, Attrs),
+    RTotal       = ?v(<<"rtotal">>, Attrs),
     Debt         = ShouldPay - Cash - Card - Wire - VerifyPay,
     
     {DebtName, AccDet} = debt(Direct, LastBalance, Debt),
@@ -1067,8 +1074,14 @@ body_stastic(Brand, Model, 33, _Setting, Attrs) ->
 	++ ?f_print:left_pading(Brand, Model) ++ ?f_print:line(minus, 33)
 	++ ?f_print:br(Brand)
 
-	++ ?f_print:left_pading(Brand, Model) ++ "总计：" ++ ?to_s(Total)
-	++ ?f_print:pading(1) ++ "总金额：" ++ ?to_s(ShouldPay)
+	++ ?f_print:left_pading(Brand, Model)
+	++ "总计：" ++ ?to_s(Total)
+	
+	++  "（售：" ++ ?to_s(STotal) ++ pading(1)
+	++ "退：" ++ ?to_s(erlang:abs(RTotal)) ++ "）"
+	++ br(Brand)
+	
+	++ left_pading(Brand, Model) ++ "总金额：" ++ ?to_s(ShouldPay)
 	++ ?f_print:pading(1) ++ "备注：" ++ ?to_s(Comment)
 	++ ?f_print:br(Brand)
 
@@ -1097,6 +1110,8 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
     EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     EPay         = ?v(<<"e_pay">>, Attrs, 0),
     Direct       = ?v(<<"direct">>, Attrs),
+    STotal       = ?v(<<"stotal">>, Attrs),
+    RTotal       = ?v(<<"rtotal">>, Attrs),
     %% EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     %% EPay         = ?v(<<"e_pay">>, Attrs),
 
@@ -1112,8 +1127,17 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
 
     IsRound = ?to_i(?v(<<"pround">>, Setting, ?NO)),
     
-    left_pading(Brand, Model) ++ "总计：" ++ ?to_s(Total)
-	++ pading(2) ++ "总金额：" ++ round(IsRound, TotalSPay)
+    left_pading(Brand, Model) ++ "总计：" ++ ?to_s(Total) 
+	++ case RTotal =/= 0 of
+	       true ->
+		   "（售：" ++ ?to_s(STotal) ++ pading(1)
+		       ++ "退：" ++ ?to_s(erlang:abs(RTotal)) ++ "）" 
+		       ++ br(Brand)
+		       ++ left_pading(Brand, Model); 
+	       false ->
+		   pading(2)
+	   end
+	++ "总金额：" ++ round(IsRound, TotalSPay) 
 	++ pading(2) ++ "备注：" ++ ?to_s(Comment) 
 	++ br(Brand)
 
@@ -1155,7 +1179,10 @@ body_stastic(Brand, Model, Column, Setting, Attrs) ->
     EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     EPay         = ?v(<<"e_pay">>, Attrs, 0),
     
-    Direct       = ?v(<<"direct">>, Attrs), 
+    Direct       = ?v(<<"direct">>, Attrs),
+
+    STotal       = ?v(<<"stotal">>, Attrs),
+    RTotal       = ?v(<<"rtotal">>, Attrs),
 
     %% HasPay    = Cash + Card + Wire + VerifyPay,
     HasPay    = Cash + Card + Wire, 
@@ -1169,6 +1196,15 @@ body_stastic(Brand, Model, Column, Setting, Attrs) ->
     
     left_pading(Brand, Model)
 	++ "总计：" ++ ?to_s(Total)
+
+	++ case RTotal =/= 0 of
+	       true ->
+		   "（售：" ++ ?to_s(STotal) ++ pading(1)
+		       ++ "退：" ++ ?to_s(erlang:abs(RTotal)) ++ "）" ;
+	       false ->
+		   ""
+	   end
+	
 	++ pading(2) ++ "总金额：" ++ round(IsRound, TotalSPay)
 	++ pading(2) ++ "备注：" ++ ?to_s(Comment)
 	++ br(Brand)
@@ -1930,9 +1966,10 @@ round(?NO, Money)  ->
 %%
 %% use to print
 %%
-sort_inventory(_Merchant, _GetBrand, [], Sorts)      ->
-    lists:reverse(Sorts);
-sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts) ->
+sort_inventory(_Merchant, _GetBrand, [], Sorts, STotal, RTotal) ->
+    {lists:reverse(Sorts), STotal, RTotal};
+sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
+    %% ?DEBUG("sort_inventory ~p, ~p", [Inv, Sorts]),
     case in_sort(Inv, Sorts) of
 	false  ->
 	    StyleNumber = ?v(<<"style_number">>, Inv),
@@ -1943,13 +1980,15 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts) ->
 		    {ok, []} -> [];
 		    {ok, [{Select}]} -> ?v(<<"name">>, Select)
 		end,
-	    ?DEBUG("color ~p", [Color]),
+	    %% ?DEBUG("color ~p", [Color]),
 	    Size        = ?v(<<"size">>, Inv), 
 	    Count       = ?v(<<"amount">>, Inv),
-	    Hand        =  ?v(<<"hand">>, Inv),
-
+	    %% ?DEBUG("count ~p", [Count]),
+	    Hand        = ?v(<<"hand">>, Inv),
+	    Total       = ?v(<<"total">>, Inv),
+	    
 	    Type        = find_type(Merchant, ?v(<<"type_id">>, Inv)),
-
+	    
 	    Colors  = [{struct, [{<<"cid">>, ColorId},
 				 {<<"cname">>, Color}]}],
 
@@ -1962,23 +2001,31 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts) ->
 			       {<<"brand_id">>, Brand},
 			       %% {<<"brand_name">>, ?v(<<"brand">>, Inv)},
 			       {<<"brand_name">>, GetBrand(Brand)},
-			       {<<"type_name">>,   Type},
+			       {<<"type_name">>,  Type},
 			       {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
 			       {<<"fprice">>,     ?v(<<"fprice">>, Inv)}, 
 			       {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
-			       {<<"amounts">>, Amounts},
-			       {<<"colors">>, Colors}]},
-	    sort_inventory(Merchant, GetBrand, T, [NewInv|Sorts]);
+			       {<<"total">>,      Total},
+			       {<<"amounts">>,    Amounts},
+			       {<<"colors">>,     Colors}]},
+	    %% ?DEBUG("new inv ~p", [NewInv]),
+	    {NewSTotal, NewRTotal} = 
+		case Count > 0 of
+		    true -> {STotal + Count, RTotal};
+		    false -> {STotal, RTotal + Count}
+		end,
+	    sort_inventory(Merchant, GetBrand, T, [NewInv|Sorts], NewSTotal, NewRTotal);
 	true ->
-	    NewSort = combine_inventory(Merchant, GetBrand, Inv, Sorts, []),
-	    sort_inventory(Merchant, GetBrand, T, NewSort)
+	    {NewSort, NewSTotal, NewRTotal} =
+		combine_inventory(Merchant, GetBrand, Inv, Sorts, [], STotal, RTotal),
+	    sort_inventory(Merchant, GetBrand, T, NewSort, NewSTotal, NewRTotal)
     end.
 
 in_sort(_Inv, []) ->
     false;
 in_sort(Inv, [{struct, H}|T]) ->
     StyleNumber = ?v(<<"style_number">>, H),
-    BrandId = ?v(<<"brand_id">>, H),
+    BrandId     = ?v(<<"brand_id">>, H),
     case ?v(<<"style_number">>, Inv) =:= StyleNumber
 	andalso ?v(<<"brand_id">>, Inv) =:= BrandId of
 	true ->
@@ -1987,15 +2034,18 @@ in_sort(Inv, [{struct, H}|T]) ->
 	    in_sort(Inv, T)
     end.
 
-combine_inventory(_Merchant, _GetBrand, _Inv, [], Combines) ->
-    Combines;
-combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T], Combines) ->
+combine_inventory(_Merchant, _GetBrand, _Inv, [],
+		  Combines, STotal, RTotal) ->
+    {Combines, STotal, RTotal};
+combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
+		  Combines, STotal, RTotal) ->
+    %% ?DEBUG("combine inv ~p", [Inv]),
     StyleNumber = ?v(<<"style_number">>, H),
-    BrandId = ?v(<<"brand_id">>, H),
+    BrandId     = ?v(<<"brand_id">>, H),
 
     case ?v(<<"style_number">>, Inv) =:= StyleNumber
 	andalso ?v(<<"brand_id">>, Inv) =:= BrandId of
-	true ->
+	true -> 
 	    ColorId = ?v(<<"color_id">>, Inv),
 	    %% Color   = ?v(<<"color">>, Inv),
 	    Color =
@@ -2022,6 +2072,13 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T], Combines) ->
 				    {<<"sell_count">>, Count},
 				    {<<"hand">>, Hand}]}
 			  |Amounts],
+
+	    {NewSTotal, NewRTotal} = 
+		case Count > 0 of
+		    true -> {STotal + Count, RTotal};
+		    false -> {STotal, RTotal + Count}
+		end,
+	    
 	    combine_inventory(
 	      Merchant, GetBrand, Inv, T,
 	      [{struct, [{<<"style_number">>, StyleNumber},
@@ -2032,11 +2089,13 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T], Combines) ->
 			 {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
 			 {<<"fprice">>,     ?v(<<"fprice">>, Inv)},
 			 {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
+			 {<<"total">>,      ?v(<<"total">>, Inv)},
 			 {<<"colors">>, NewColors},
-			 {<<"amounts">> ,NewAmounts}]}|Combines]);
+			 {<<"amounts">> ,NewAmounts}]}|Combines],
+	     NewSTotal, NewRTotal);
 	false ->
 	    combine_inventory(
-	      Merchant, GetBrand, Inv, T, [{struct, H}|Combines])
+	      Merchant, GetBrand, Inv, T, [{struct, H}|Combines], STotal, RTotal)
     end.
 
 find_type(Merchant, TypeId) ->

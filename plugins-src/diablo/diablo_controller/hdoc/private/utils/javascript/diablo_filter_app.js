@@ -354,8 +354,9 @@ function filterProvider(){
 			// console.log(employees);
 			_employees =  employees.map(function(e){
 			    return {name:e.name,
-				    id:e.number,
-				    py:diablo_pinyin(e.name)}
+				    id  :e.number,
+				    eid :e.id,
+				    py  :diablo_pinyin(e.name)}
 			});
 
 			return _employees;
@@ -434,8 +435,10 @@ function normalFilterProvider(){
 		    ).$promise.then(function(employees){
 			// console.log(employees);
 			_employees = employees.map(function(e){
-			    return {name:e.name,
-				    id:e.number, py:diablo_pinyin(e.name)}
+			    return {name :e.name,
+				    id   :e.number,
+				    eid  :e.id,
+				    py   :diablo_pinyin(e.name)}
 			});
 
 			return _employees;

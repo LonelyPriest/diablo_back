@@ -279,6 +279,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     user, filterFirm, filterRetailer, filterEmployee,
     filterSizeGroup, filterBrand, filterType, filterColor, base){
 
+    // console.log(filterEmployee);
     $scope.pattern  = {money: diabloPattern.decimal_2,
 		       sell:  diabloPattern.integer_except_zero};
     
@@ -382,11 +383,13 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	verificate: undefined,
 	extra_pay: undefined,
 	
-	total: 0,
-	abs_total: 0,
-	has_pay: 0.00,
-	should_pay: 0.00,
+	total:          0,
+	abs_total:      0,
+	has_pay:        0.00,
+	should_pay:     0.00,
 	extra_pay_type: $scope.extra_pay_types[0],
+	sell_total:     0,
+	reject_total:   0
 	// extra_pay: 0.00
     }; 
 
@@ -437,14 +440,22 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.employees = filterEmployee;
     if ($scope.employees.length !== 0){
 	
-	$scope.select.employee = [];
-	angular.forEach($scope.employee, function(e){
-	    if (user.loginEmployee === e.id){
-		$scope.select.employee.splice(0, 1, e);
-	    } else {
-		$scope.select.employee.push(e);
-	    }
-	});
+	// $scope.select.employee = [];
+	$scope.select.employee = $scope.employees[0];
+	for (var i=0, l=$scope.employees.length; i<l; i++){
+	    if (user.loginEmployee === $scope.employees[i].eid){
+		$scope.select.employee = $scope.employees[i]
+		break;
+	    } 
+	} 
+	
+	// angular.forEach($scope.employees, function(e){
+	//     if (user.loginEmployee === e.id){
+	// 	$scope.select.employee.splice(0, 1, e);
+	//     } else {
+	// 	$scope.select.employee.push(e);
+	//     }
+	// });
     };
     
     $scope.find_employee = function(number){
@@ -1100,7 +1111,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    e_pay:          e_pay,
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
-	    total:         seti($scope.select.total)
+	    total:         seti($scope.select.total),
+	    sell_total:    seti($scope.select.sell_total),
+	    reject_total:  seti($scope.select.reject_total)
 	};
 
 	var print = {
@@ -1292,6 +1305,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.select.total = 0;
 	$scope.select.abs_total = 0;
 	$scope.select.should_pay = 0.00;
+	$scope.select.sell_total = 0;
+	$scope.select.reject_total = 0;
 	
 	var e_pay = 0;
 	if(angular.isDefined($scope.select.extra_pay)
@@ -1302,8 +1317,15 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	console.log($scope.inventories);
 	for (var i=1, l=$scope.inventories.length; i<l; i++){
 	    var one = $scope.inventories[i];
-	    $scope.select.total      += parseInt(one.sell);
-	    $scope.select.abs_total  += Math.abs(parseInt(one.sell));
+	    var sell = parseInt(one.sell);
+	    $scope.select.total      += sell;
+	    $scope.select.abs_total  += Math.abs(sell);
+	    
+	    if (sell > 0 ){
+		$scope.sell_total += sell;
+	    } else {
+		$scope.reject_total += sell;
+	    }
 
 	    // var f1 = $scope.round(one.fprice * one.fdiscount * 0.01);
 	    if ($scope.setting.round === diablo_round_row){

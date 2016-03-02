@@ -304,6 +304,8 @@ get(login_shop, Session) ->
     Session#session.login_shop;
 get(login_firm, Session) ->
     Session#session.login_firm;
+get(login_employee, Session) ->
+    Session#session.employee_id;
 get(mtype, Session) ->
     Session#session.mtype;
 get(time, Session) ->

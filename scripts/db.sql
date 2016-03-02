@@ -174,6 +174,7 @@ create table users
     shop           INTEGER default -1,
     firm           INTEGER default -1,
     employee       INTEGER default -1,
+    retailer       INTEGER default -1,
     stime          INTEGER default 0,
     etime          INTEGER default 0,
     max_create     INTEGER default -1, -- max users can be created of the user

@@ -47,7 +47,7 @@ userApp.factory("userService", function($resource, $q){
     // };
     var sort = function(){
 	var shops = _shops;
-	console.log(shops);
+	// console.log(shops);
 	return {
     	    right:         _rights,
 	    type:          _loginType,
@@ -64,7 +64,7 @@ userApp.factory("userService", function($resource, $q){
 		    if ( ((s.type === 0 && s.repo_id === -1) || s.type === 1)
 			 && !in_array(ids, s.shop_id)){
 			if (s.shop_id === _loginShop){
-			    ids.splice(0, 1, s.shop_id);
+			    ids.splice(0, 0, s.shop_id);
 			} else {
 			    ids.push(s.shop_id);
 			} 
@@ -79,7 +79,7 @@ userApp.factory("userService", function($resource, $q){
 		angular.forEach(shops, function(s){
 		    if (s.type === 0 && !in_array(ids, s.shop_id)){
 			if (s.shop_id === _loginShop){
-			    ids.splice(0, 1, s.shop_id);
+			    ids.splice(0, 0, s.shop_id);
 			} else {
 			    ids.push(s.shop_id);
 			} 
@@ -111,7 +111,7 @@ userApp.factory("userService", function($resource, $q){
 
 	    // shops only, include the shop bind to repository
 	    sortShops: function(){
-		var sort = []; 
+		var sort = [];
 		angular.forEach(shops, function(s){
 		    var shop = {id:  s.shop_id,
 				name:s.name,
@@ -119,7 +119,7 @@ userApp.factory("userService", function($resource, $q){
 				py:diablo_pinyin(s.name)};
 		    if (s.type === 0 && !in_array(sort, shop)){
 			if (shop.id === _loginShop){
-			    sort.splice(0, 1, shop);
+			    sort.splice(0, 0, shop);
 			} else {
 			    sort.push(shop); 
 			}
@@ -170,7 +170,7 @@ userApp.factory("userService", function($resource, $q){
 		    if ( ((s.type === 0 && s.repo_id === -1) || s.type === 1)
 			 && !in_array(sort, repo)){
 			if (s.shop_id === _loginShop){
-			    sort.splice(0, 1, repo);
+			    sort.splice(0, 0, repo);
 			} else {
 			    sort.push(repo); 
 			}
@@ -219,7 +219,7 @@ userApp.factory("userService", function($resource, $q){
 		_loginType = result.type;
 		_loginShop = result.login_shop; 
 		_loginFirm = result.login_firm;
-		_employee  = result.employee_id;
+		_employee  = result.login_employee;
 		return sort();
     	    });
 	}
