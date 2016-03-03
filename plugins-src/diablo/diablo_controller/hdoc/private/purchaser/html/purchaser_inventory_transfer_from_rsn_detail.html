@@ -1,0 +1,207 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="portlet box purple">
+      
+      <div class="portlet-title">
+	<div class="caption">
+	  <i class="glyphicon glyphicon-menu-hamburger"></i>
+	  调出明细
+	</div>	
+
+	<div class="actions">
+	  <div class="btn-group btn-group-solid">
+	    <button type="button" class="btn red purple-stripe"
+		    x-ng-click="go_back()">返回
+	      <i class="glyphicon glyphicon-circle-arrow-left"></i>
+	    </button> 
+	    
+	    <button type="button" class="btn blue purple-stripe reload"
+		    x-ng-click="do_search(default_page)">刷新
+	      <i class="icon icon-spinner fg-white"></i>
+	    </button> 
+	  </div>
+	</div>
+	
+      </div>
+
+      <!--BEGIN table container-->
+      <div class="portlet-body">
+	<div class="table-toolbar util-btn-margin-bottom-5">
+	  
+	  <div class="row">
+            <div class="col-md-4">
+              <time-search
+                 glyphicon="glyphicon glyphicon-arrow-left fg-red"
+                 time="time.start_time" ok="do_search(default_page)">
+	      </time-search>
+            </div>
+
+            <div class="col-md-4">
+              <time-search
+                 glyphicon="glyphicon glyphicon-arrow-right fg-red"
+                 time="time.end_time" ok="do_search(default_page)">
+	      </time-search>
+            </div>
+	    
+            <div class="col-md-4">
+              <query-pattern ng-model="match"
+                             filters="filters"
+                             filter="filter">
+	      </query-pattern>
+            </div>
+	  </div>
+
+	  <query-group filters="filters"
+	  	       prompt="prompt"
+	  	       ok="do_search(default_page)">
+	  </query-group>
+	  
+	</div> <!--END table-toolbar-->
+	
+	<!--BEGN portlet body--> 
+	<div class="portlet-body">
+	  <!--BEGIN panel-->
+	  <div class="panel panel-default table-panel">
+	    <div class="table-responsive">
+	      <!--EBGIN table supplier-->
+	      <table class="table table-bordered
+			    table-striped table-hover
+			    table-condensed table-advanced">
+		<thead>
+		  <tr>
+		    <th>序号</th>
+		    <th class="danger">单号</th>
+		    <th>调出店铺</th>
+		    <th>调入店铺</th>
+
+		    <th>厂商</th>
+		    <th>款号</th>
+		    <th>品牌</th> 
+		    <th>类型</th>
+		    <!-- <th>季节</th> -->
+		    <th>数量</th>
+		    <th>状态</th> 
+		    <th>调出日期</th>
+		    <th>操作日期</th> 
+		    <th>操作</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr ng-repeat="inv in inventories">
+		    <td>{{inv.order_id}}</td>
+		    <td>{{inv.rsn}}</td>
+		    <td>{{inv.fshop.name}}</td>
+		    <td>{{inv.tshop.name}}</td> 
+
+		    <td>{{inv.firm.name}}</td>
+		    <td>{{inv.style_number}}</td>
+		    <td>{{inv.brand.name}}</td>
+		    <td>{{inv.type.name}}</td>
+		    <td>{{inv.amount}}</td>
+		    <td>
+		      <div x-ng-switch on="inv.state">
+			<span class="bg-red"
+			      x-ng-switch-when=0>在途中</span>
+			<span x-ng-switch-when=1>已确认</span>
+			<span class="bg-orange"
+			      x-ng-switch-when=2>已取消</span>
+		      </div>
+		    </td>
+		    
+		    <td>{{inv.entry_date}}</td>
+		    <td>
+		      <div x-ng-if="inv.check_date">
+			{{inv.check_date}}
+			<span x-ng-if="inv.state===1"
+			      class="glyphicon glyphicon-check fg-red"></span>
+			<span x-ng-if="inv.state===2"
+			      class="glyphicon
+				     glyphicon-ban-circle fg-orange"></span>
+		      </div>
+		      <div x-ng-if="!inv.check_date">无操作</div>
+		    </td>
+		    <td>
+		      <a class="btn diablo-button btn-primary"
+			 x-ng-disabled="inv.free === 0"
+		    	 x-ng-click="rsn_detail(inv)">
+			明细<i class="glyphicon glyphicon-map-marker"></i></a>
+		    </td>
+		  </tr> 
+		</tbody>
+
+		<tfoot> 
+		</tfoot>
+		
+	      </table> <!--END supplier table-->
+	    </div> <!--END table responsive-->
+	    
+	  </div> <!--END panel-->
+	</div> <!--END portlet body-->
+
+	<div x-ng-show="total_items>items_perpage" class="row">
+	  <div class="col-md-12, col-sm-12, col-xs-12">
+	    
+	    <span>显示第 {{current_page}} / {{num_pages}} 项结果，
+		  	  共 {{total_items}} 项
+	    </span>
+	
+	    <pagination class="pagination-lg table-pagination pull-right "
+		  	total-items="total_items"
+		  	items-per-page="items_perpage"
+		  	num-pages="num_pages"
+		  	max-size="max_page_size"
+		  	boundary-links="true"
+		  	previous-text="&lsaquo;" next-text="&rsaquo;"
+		  	first-text="&laquo;" last-text="&raquo;"
+		  	x-ng-model="current_page"
+		  	x-ng-init="current_page=default_page"
+		  	x-ng-change="page_changed()"></pagination>
+	  </div>
+	</div>
+		  
+      </div> <!--END table container-->
+      
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="rsn-detail.html"> 
+  <div class="modal-body">
+    
+    <div class="table-responsive">
+      <table class="table table-bordered
+		    table-striped table-condensed table-advanced">
+	<tbody>
+	  <tr>
+	    <td></td>
+	    <td x-ng-repeat="s in params.sizes" x-ng-switch on="s">
+	      <span x-ng-switch-when="0">均码</span>
+	      <span x-ng-switch-default>{{s}}</span>
+	    </td>
+	  </tr>
+	  <tr x-ng-repeat="c in params.colors">
+	    <td class="col-md-1" x-ng-switch on="c.cid">
+	      <span x-ng-switch-when=0>均色</span>
+	      <span x-ng-switch-default>{{c.cname}}</span>
+	    </td>
+	    <td class="col-md-1" x-ng-repeat="s in params.sizes">
+	      <div x-ng-if="amount=params.get_amount(
+			    c.cid, s, params.amounts); amount">
+		<span>{{amount.count}}</span> 
+	      </div>
+	    </td>
+	  </tr>
+	</tbody> 
+      </table> 
+    </div> <!--END table-responsive-->
+    <image x-ng-show="params.path"
+	   class="img-responsive img-thumbnail"
+	   ng-src="{{params.path}}"></image>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" x-ng-click="ok()">确认</button>
+    <!-- <button class="btn btn-warning" x-ng-click="cancel()">取消</button> -->
+  </div>  
+</script>

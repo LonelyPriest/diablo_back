@@ -571,12 +571,20 @@ sidebar(Session) ->
 		     "移仓",
 		     "glyphicon glyphicon-transfer"},
 		    Shops) 
-		  ++ [{"inventory_transfer_detail",
-		       "移仓记录",
-		       "glyphicon glyphicon-tasks"},
-		      {"inventory_rsn_detail/transfer",
-		       "移仓明细",
-		       "glyphicon glyphicon-leaf"}] 
+		  ++ [{"inventory_transfer_from_detail",
+		       "调出记录",
+		       "glyphicon glyphicon-circle-arrow-left"},
+		      {"inventory_transfer_to_detail",
+		       "调入记录",
+		       "glyphicon glyphicon-circle-arrow-right"},
+
+		      {"inventory_rsn_detail/transfer_from",
+		       "调出明细",
+		       "glyphicon glyphicon-superscript"},
+		      {"inventory_rsn_detail/transfer_to",
+		       "调入明细",
+		       "glyphicon glyphicon-subscript"}
+		      ] 
 		 }],
 
 	    %% Transfer = authen_shop_action(
