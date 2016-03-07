@@ -1,6 +1,12 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-03-07",
+	 content: [
+	     "增加开单时可以重复款号选项"
+	 ]
+	},
+	
 	{date: "2016-03-03",
 	 content: [
 	     "多店铺之间移仓功能完善",
