@@ -143,6 +143,10 @@
 			{{yes_no[s.value].cname}}
 		      </span>
 
+		       <span ng-switch-when="r_snumber">
+			{{yes_no[s.value].cname}}
+		      </span>
+
 		      <!--default-->
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
@@ -553,6 +557,16 @@
 		      x-ng-model="params.setting.value"
 		      x-ng-options="m as m.cname for
 				    m in params.setting.yes_no"
+		      x-ng-init="params.setting.value=
+				 params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="r_snumber"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="r as r.cname for
+				    r in params.setting.yes_no"
 		      x-ng-init="params.setting.value=
 				 params.setting.yes_no[params.setting.value]">
 	      </select>

@@ -94,7 +94,7 @@
 		       current-text="今天"
 		       show-weeks="false"
 		       x-ng-model="select.date"
-		       x-ng-init="select.date=today()"></input>
+		       x-ng-init="select.date=today()"/>
 	  	<span class="input-group-btn">
 		  <button type="button"
 			  class="btn btn-default"
@@ -112,7 +112,7 @@
 	  	<select class="form-control" type="text"
 	  		x-ng-model="select.employee"
 	  		x-ng-options="e as e.name for e in
-	  			      employees|filter:$viewValue|limitTo:8">
+	  			      employees|filter:$viewValue">
 		</select> 
 	      </div>
 	    </div> 
@@ -128,7 +128,7 @@
 	    	<input class="form-control"
 		       type="text"
 		       placeholder="备注"
-	    	       x-ng-model="select.comment"></input>
+	    	       x-ng-model="select.comment"/>
 	      </div>
 	    </div>
 	    
@@ -146,12 +146,13 @@
 			   placeholder="现金"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form>
 
 		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-credit-card fg-red"></i>刷卡</span>
+		  <i class="glyphicon glyphicon-credit-card fg-red"></i>
+		  刷卡</span>
 		<form name="select.form.cardForm">
 		  <div ng-class="{'has-error':select.form.cardForm.$invalid
 				 && !select.form.cardForm.$pristine}">
@@ -162,12 +163,13 @@
 			   placeholder="刷卡"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form>
 
 		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-piggy-bank fg-red"></i>汇款</span>
+		  <i class="glyphicon glyphicon-piggy-bank fg-red"></i>
+		  汇款</span>
 		
 		<form name="select.form.wireForm">
 		  <div ng-class="{'has-error':select.form.wireForm.$invalid
@@ -176,14 +178,14 @@
 			   type="number" step="0.01"
 			   placeholder="汇款"
 			   x-ng-pattern=pattern.money
-	  		   x-ng-model="select.wire"></input>
+	  		   x-ng-model="select.wire"/>
 		  </div> 
 		</form>
 
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>欠款</span>
 	  	<input class="form-control" readonly
-	  	       x-ng-model="select.surplus"></input> 
+	  	       x-ng-model="select.surplus"/>
 		
 		<!-- <span class="input-group-addon"><span class="fg-red">未付</span></span> -->
 	      </div>
@@ -198,7 +200,7 @@
 	    	<span class="input-group-addon">
 	    	  <i class="glyphicon glyphicon-map-marker fg-red"></i>总数</span>
 	    	<input class="form-control" type="text" readonly
-	    	       x-ng-model="select.abs_total"></input>
+	    	       x-ng-model="select.abs_total"/>
 	      </div>
 	    </div>
 	    
@@ -216,24 +218,24 @@
 			   placeholder="核销"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form>
 		
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>应付</span>
 		<input class="form-control" type="text" readonly
-		       x-ng-model="select.should_pay"></input>
+		       x-ng-model="select.should_pay"/>
 
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>实付</span>
 	  	<input class="form-control" readonly
-	  	       x-ng-model="select.has_pay"></input>
+	  	       x-ng-model="select.has_pay"/>
 
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>结余</span>
 	  	<input class="form-control" type="text" readonly
-	  	       x-ng-model="select.left_balance"></input> 
+	  	       x-ng-model="select.left_balance"/>
 		
 	      </div>
 	    </div> 
@@ -271,7 +273,7 @@
 	  		   x-ng-model="select.extra_pay"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form> 
 	      </div>
@@ -426,7 +428,7 @@
 				     x-ng-pattern="/^\d{2}$|100$/"
 				     popover-placement="top"
 				     popover-trigger="focus"
-				     popover="默认上次折扣"></input>
+				     popover="默认上次折扣"/>
 			    </div>
 			  </form>
 			</td> 
@@ -452,7 +454,7 @@
 				     x-ng-model="inv.fprice"
 				     popover-placement="top"
 				     popover-trigger="focus"
-				     popover="默认上次成交价"></input>
+				     popover="默认上次成交价"/>
 			    </div>
 			  </form>
 			</td> 
@@ -591,70 +593,8 @@
 			</td> 
 		      </tr>
 		      
-		      <!-- <tr> -->
-		      <!-- 	<td colspan="13"> -->
-		      <!-- 	  <table class="table table-bordered -->
-		      <!-- 			table-condensed table-advanced"> -->
-		      <!-- 	    <tbody> -->
-			      
-		      <!-- 	      <tr> -->
-		      <!-- 		<td></td>  -->
-		      <!-- 		<td x-ng-repeat="s in params.sizes" -->
-		      <!-- 		    x-ng-switch on="s"> -->
-		      <!-- 		  <span x-ng-switch-when="0">均码</span> -->
-		      <!-- 		  <span x-ng-switch-default>{{s}}</span> -->
-		      <!-- 		</td> -->
-		      <!-- 		<td class="col-md-1">批量</td> -->
-		      <!-- 	      </tr> -->
-
-		      <!-- 	      <tr x-ng-repeat="c in params.colors"> -->
-
-		      <!-- 		<\!-- <td colspan=1></td> -\-> -->
-		      <!-- 		<td x-ng-switch on="c.cid"> -->
-		      <!-- 		  <span x-ng-switch-when="0">均色</span> -->
-		      <!-- 		  <span x-ng-switch-default>{{c.cname}}</span> -->
-		      <!-- 		</td> -->
-				
-		      <!-- 		<td x-ng-repeat="s in params.sizes"> -->
-		      <!-- 		  <div class="col-md-12"> -->
-		      <!-- 		    <div x-ng-if="(amount=params.get_amount -->
-		      <!-- 				  (c.cid, s, params.amounts)) -->
-		      <!-- 				  ? true : false" -->
-		      <!-- 			 class="input-group"> -->
-		      <!-- 		      <span class="input-group-addon -->
-		      <!-- 				   modal-input-group-addon"> -->
-		      <!-- 			{{amount.count}} -->
-		      <!-- 		      </span>  -->
-		      <!-- 		      <form name="aform"> -->
-		      <!-- 			<div ng-class="{'has-error':aform.$invalid || !params.valid_sell(amount)}"> -->
-		      <!-- 			  <input x-ng-if="amount" -->
-		      <!-- 				 class="form-control modal-input text-center" -->
-		      <!-- 				 type="number" step="1" -->
-		      <!-- 				 x-ng-model="amount.sell_count"></input> -->
-		      <!-- 			</div> -->
-		      <!-- 		      </form>  -->
-		      <!-- 		    </div> -->
-		      <!-- 		  </div> -->
-		      <!-- 		</td> -->
-
-		      <!-- 		<\!--batch-\-> -->
-		      <!-- 		<td> -->
-		      <!-- 		  <input class="form-control modal-input text-center" -->
-		      <!-- 			 type="number" step="1" -->
-		      <!-- 			 x-ng-model="batch" -->
-		      <!-- 			 x-ng-pattern="/^[+|\-]?\d{1,3}$/" -->
-		      <!-- 			 x-ng-change="params.set_batch(c.cid, batch, params.amounts)" -->
-		      <!-- 			 x-ng-init="batch=params.get_batch(c.cid, params.amounts)"> -->
-		      <!-- 		</td> -->
-		      <!-- 	      </tr> -->
-			      
-		      <!-- 	    </tbody> -->
-		      <!-- 	  </table> -->
-		      <!-- 	</td> -->
-		      <!-- </tr> -->
 		      <tr x-ng-if="inventories.length>1" class="text-center">
-			<td x-ng-if="setting.show_discount" colspan=8></td>
-			<td x-ng-if="!setting.show_discount" colspan=7></td>
+			<td colspan={{stastic_colspan}}></td> 
 			<td class="vert-align">{{select.abs_total}}</td>
 			<td class="vert-align">{{select.should_pay}}</td>
 			<td colspan=2></td>
@@ -826,7 +766,7 @@
 					 x-ng-pattern="pattern.brand"
 					 x-ng-enter=""
 					 typeahead="b.name for b in
-						    brands|filter:$viewValue|limitTo:8"></input>
+						    brands|filter:$viewValue|limitTo:8"/>
 				</div>
 				<!-- <span class="input-group-btn"> -->
 				<!--   <button class="btn btn-default fg-red" x-ng-click="refresh_brand()"> -->
@@ -859,7 +799,7 @@
 					 x-ng-pattern="pattern.type"
 					 x-ng-enter="" 
 					 typeahead="t.name for t in
-						    types|filter:$viewValue|limitTo:8"></input>
+						    types|filter:$viewValue|limitTo:8"/>
 				</div>
 				<!-- <span class="input-group-btn"> -->
 				<!--   <button class="btn btn-default fg-red" x-ng-click="refresh_type()"> -->
@@ -886,7 +826,7 @@
 				       x-ng-enter=""
 				       typeahead-editable="false"
 				       typeahead="f as f.name for f in
-						  firms|filter:$viewValue|limitTo:8"></input>
+						  firms|filter:$viewValue|limitTo:8"/>
 				<span class="input-group-btn">
 				  <button class="btn btn-success" x-ng-click="new_firm()">
 				    <i class="glyphicon glyphicon-plus"></i></button>
@@ -943,7 +883,7 @@
 				       placeholder="吊牌价，支持二位小数"
 				       x-ng-pattern="/^\d+(.\d{1,2})?$/"
 				       x-ng-enter=""
-				       x-ng-model="good.tag_price"></input>
+				       x-ng-model="good.tag_price"/>
 				<span class="input-group-addon bg-white fg-red">*</span> 
 			      </div>
 			    </div>
@@ -963,7 +903,7 @@
 				       placeholder="打包价，支持二位小数"
 				       x-ng-enter=""
 				       x-ng-pattern="/^\d+(.\d{1,2})?$/"
-				       x-ng-model="good.pkg_price"></input>
+				       x-ng-model="good.pkg_price"/>
 				<span class="input-group-addon bg-white fg-red">*</span>
 			      </div>
 			    </div>
@@ -984,7 +924,7 @@
 					 required
 					 placeholder="两位整数，无折扣请输入100"
 					 x-ng-pattern="/^\d{2}$|100$/"
-					 x-ng-model="good.discount"></input>
+					 x-ng-model="good.discount"/>
 				</div>
 				<span class="input-group-addon bg-white fg-red">*</span>
 			      </div>
@@ -1001,7 +941,7 @@
 				<input type="text" readonly
 				       class="form-control"
 				       placeholder="均色均码无需选择"
-				       x-ng-model="good.colors"></input>
+				       x-ng-model="good.colors"/>
 				<span class="input-group-btn">
 				  <button class="btn btn-primary" x-ng-click="select_color()">
 				    <i class="glyphicon glyphicon-arrow-right"></i></button>
@@ -1019,7 +959,7 @@
 				<input type="text" readonly
 				       class="form-control"
 				       placeholder="均色均码无需选择"
-				       x-ng-model="good.sizes"></input>
+				       x-ng-model="good.sizes"/>
 				<span class="input-group-btn">
 				  <button class="btn btn-primary" x-ng-click="select_size()">
 				    <i class="glyphicon glyphicon-arrow-right"></i></button>
@@ -1249,7 +1189,7 @@
 		     placeholder="请输入零售商名称"
 		     x-ng-model="params.retailer.name"
 		     x-ng-minlength="2"
-		     x-ng-maxlength="8"></input>
+		     x-ng-maxlength="8"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -1272,7 +1212,7 @@
 		     ng-pattern="/^\d{3,4}\d{7,8}$/"
 		     placeholder="请输入电话或手机号码，默认为空"
 		     class="form-control"
-		     x-ng-model="params.retailer.mobile"></input>
+		     x-ng-model="params.retailer.mobile"/>
 	      <!-- <span class="input-group-addon bg-white fg-red">*</span>  -->
 	    <!-- </div> -->
 	  </div>
@@ -1293,7 +1233,7 @@
 		     placeholder="请输入零售商联系地址"
 		     x-ng-model="params.retailer.address"
 		     x-ng-minlength="2"
-		     x-ng-maxlength="20"></input>
+		     x-ng-maxlength="20"/>
 	      <span class="input-group-addon bg-white fg-red">*</span> 
 	    </div>
 	  </div>
@@ -1335,7 +1275,7 @@
 	  <tr x-ng-repeat="d in params.drafts">
 	    <td class="vert-align">
 	      <div class="checkbox checkbox-danger checkbox-circle">
-		<input id={{d.sn}} type="checkbox" x-ng-model="d.select"></input>
+		<input id={{d.sn}} type="checkbox" x-ng-model="d.select"/>
 		<label for={{d.sn}}></label>
 	      </div>
 	    </td>
@@ -1387,7 +1327,7 @@
 		     placeholder="请输入厂商名称"
 		     x-ng-model="params.firm.name"
 		     x-ng-minlength="2"
-		     x-ng-maxlength="8"></input>
+		     x-ng-maxlength="8"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -1409,7 +1349,7 @@
 		   ng-pattern="/^\d{3,4}\d{7,8}$/"
 		   placeholder="请输入电话或手机号码，默认为空"
 		   class="form-control"
-		   x-ng-model="params.firm.mobile"></input>
+		   x-ng-model="params.firm.mobile"/>
 	      <!-- <span class="input-group-addon bg-white fg-red">*</span> -->
 	      <!-- </div> -->
 	  </div>
@@ -1429,7 +1369,7 @@
 		     placeholder="请输入您的联系地址"
 		     x-ng-model="params.firm.address"
 		     x-ng-minlength="2"
-		     x-ng-maxlength="20"></input>
+		     x-ng-maxlength="20"/>
 	      <span class="input-group-addon bg-white fg-red">*</span>
 	    </div>
 	  </div>
@@ -1464,7 +1404,7 @@
 	    <td class="text-center vert-align">{{c.type}}</td>
 	    <td x-ng-repeat="s in c.colors">
 	      <div class="checkbox checkbox-danger checkbox-circle">
-		<input id={{s.id}} type="checkbox" x-ng-model="s.select"></input>
+		<input id={{s.id}} type="checkbox" x-ng-model="s.select"/>
 		<label for={{s.id}}>{{s.name}}</label>
 	      </div>
 	    </td>
@@ -1491,7 +1431,7 @@
 	      <div class="checkbox checkbox-danger checkbox-circle">
 		<input id={{g.id}} type="checkbox"
 		       x-ng-model="g.select"
-		       x-ng-click="params.select_group(params.groups, g)"></input>
+		       x-ng-click="params.select_group(params.groups, g)"/>
 		<!-- <input id={{g.id}} type="checkbox" -->
 		<!--        x-ng-model="g.select"></input> -->
 		<label for={{g.id}}>{{g.name}}</label>

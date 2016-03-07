@@ -294,7 +294,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		      show_discount :true,
 		      check_sale    :true,
 		      trace_price   :true,
-		      round         :diablo_round_record};
+		      round         :diablo_round_record,
+		      r_snumber     :diablo_no};
 
     $scope.sell_styles = diablo_sell_style;
 
@@ -357,7 +358,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    $scope.sell_styles[0].id);
     }();
 
-    console.log($scope.price_type);
+    // console.log($scope.price_type); 
     
     // $scope.qtime_length = function(shopId){
     // 	return diablo_base_setting("qtime_length", shopId, base, diablo_yes);
@@ -438,16 +439,21 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
     // employees
     $scope.employees = filterEmployee;
+    // console.log($scope.employees);
     if ($scope.employees.length !== 0){
 	
 	// $scope.select.employee = [];
 	$scope.select.employee = $scope.employees[0];
-	for (var i=0, l=$scope.employees.length; i<l; i++){
-	    if (user.loginEmployee === $scope.employees[i].eid){
-		$scope.select.employee = $scope.employees[i]
-		break;
-	    } 
+	if (user.loginEmployee !== -1){
+	    for (var i=0, l=$scope.employees.length; i<l; i++){
+		if (user.loginEmployee === $scope.employees[i].eid){
+		    $scope.select.employee = $scope.employees[i]
+		    break;
+		} 
+	    }
 	} 
+
+	// console.log($scope.select.employee);
 	
 	// angular.forEach($scope.employees, function(e){
 	//     if (user.loginEmployee === e.id){
@@ -606,9 +612,23 @@ wsaleApp.controller("wsaleNewCtrl", function(
     if (!$scope.setting.q_backend){
 	$scope.match_all_w_inventory();
     }
-    
 
-    console.log($scope.setting);
+    $scope.setting.r_snumber = diablo_base_setting(
+	"r_snumber", $scope.select.shop.id, base, parseInt, diablo_no);
+
+    $scope.stastic_colspan = function(){
+	var all_colspan = 8;
+	if (!$scope.setting.show_discount){
+	    all_colspan -= 1;
+	}
+	if (!$scope.setting.check_sale){
+	    all_colspan -= 1;
+	}
+
+	return all_colspan;
+    }();
+    // console.log($scope.stastic_colspan);
+    // console.log($scope.setting);
     
     // init
     // $scope.refresh();
@@ -807,16 +827,18 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.on_select_good = function(item, model, label){
 	console.log(item);
 
-	// one good can be add only once at the same time
-	for(var i=1, l=$scope.inventories.length; i<l; i++){
-	    if (item.style_number === $scope.inventories[i].style_number
-		&& item.brand_id  === $scope.inventories[i].brand_id){
-		diabloUtilsService.response_with_callback(
-		    false, "销售开单", "开单失败：" + wsaleService.error[2191],
-		    $scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
-		return;
-	    }
-	}; 
+	if (diablo_no === $scope.setting.r_snumber){
+	    // one good can be add only once at the same time
+	    for(var i=1, l=$scope.inventories.length; i<l; i++){
+		if (item.style_number === $scope.inventories[i].style_number
+		    && item.brand_id  === $scope.inventories[i].brand_id){
+		    diabloUtilsService.response_with_callback(
+			false, "销售开单", "开单失败：" + wsaleService.error[2191],
+			$scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
+		    return;
+		}
+	    }; 
+	}
 	
 	// add at first allways 
 	var add = $scope.inventories[0];
@@ -1093,6 +1115,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
 	// console.log(im_print);
 	var base = {
+	    sort:           $scope.setting.r_snumber,
 	    retailer:       $scope.select.retailer.id,
 	    shop:           $scope.select.shop.id,
 	    datetime:       dateFilter($scope.select.date, "yyyy-MM-dd HH:mm:ss"),

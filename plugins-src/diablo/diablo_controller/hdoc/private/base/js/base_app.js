@@ -518,6 +518,7 @@ baseApp.controller("printOptionCtrl", function(
 	    || s.ename === 'bdebt'
 	    || s.ename === 'h_price3_5'
 	    || s.ename === 'm_sgroup'
+	    || s.ename === 'r_snumber'
 	   ){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};

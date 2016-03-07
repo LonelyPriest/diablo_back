@@ -1,5 +1,5 @@
 wgoodApp.controller("wgoodUpdateCtrl", function(
-    $scope, $location, $routeParams, $q, diabloPattern,
+    $scope, $location, $routeParams, $q, $timeout, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
     filterBrand, filterFirm, filterType, filterColor, user, base){
     // console.log(filterBrand); 
@@ -77,6 +77,10 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	$scope.good = angular.copy(good);
 	$scope.good.brand =
 	    get_by_id($scope.good.brand_id, $scope.brands).name;
+	
+	// $scope.o_brand        = $scope.good.brand;
+	// $scope.o_style_number = $scope.good.style_number;
+	
 	$scope.good.type  = get_by_id(good.type_id, $scope.types);
 	$scope.good.firm  = get_by_id(good.firm_id, $scope.firms);
 	$scope.good.sex   = get_by_id(good.sex, $scope.sexs);
@@ -112,6 +116,72 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 
 	// console.log($scope.selectColors);
 	// console.log($scope.good);
+    });
+
+
+    $scope.is_same_good = false;
+    
+    var get_brand = function(brand_name){
+	for (var i=0, l=$scope.brands.length; i<l; i++){
+	    if (brand_name === $scope.brands[i].name){
+		return $scope.brands[i];
+	    }
+	}
+
+	return undefined;
+    };
+    
+    var check_same_good = function(style_number, brand_name){
+	// console.log(brand_name);
+	var brand = get_brand(brand_name);
+	if (angular.isUndefined(brand)
+	    || angular.isUndefined(style_number) || !style_number){
+	    $scope.is_same_good = false;
+	    return false;
+	}
+	
+	wgoodService.get_purchaser_good({
+	    style_number:style_number, brand:brand.id
+	}).then(function(result){
+	    console.log(result);
+	    if (angular.isDefined(result.style_number)){
+		$scope.is_same_good = true;
+		return true;
+	    }
+	    $scope.is_same_good = false;
+	    return false; 
+	})
+    }
+
+    var timeout_sytle_number = undefined;
+    $scope.$watch("good.style_number", function(newValue, oldValue){
+	if(angular.isUndefined(newValue)
+	   || angular.equals(newValue, oldValue)
+	   || angular.equals(newValue, $scope.src_good.style_number)){
+	    return;
+	};
+
+	$timeout.cancel(timeout_sytle_number);
+	timeout_sytle_number = $timeout(function(){
+	    // console.log(newValue, oldValue);
+	    check_same_good(newValue, $scope.good.brand);
+	}, diablo_delay)
+    });
+
+
+    var timeout_brand = undefined;
+    $scope.$watch("good.brand", function(newValue, oldValue){
+	if(angular.isUndefined(newValue)
+	   || angular.equals(newValue, oldValue)
+	   || angular.equals(newValue, $scope.src_good.brand)){
+	    return;
+	}
+
+	$timeout.cancel(timeout_brand);
+	timeout_brand = $timeout(function(){
+	    // console.log(newValue, oldValue); 
+	    check_same_good($scope.good.style_number, newValue);
+	}, diablo_delay) 
     });
 
     $scope.delete_image = function(){

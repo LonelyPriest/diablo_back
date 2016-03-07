@@ -42,6 +42,12 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
     };
 
+    $scope.q_typeahead = function(){
+	// default prompt comes from backend
+	return diablo_base_setting(
+	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
+    };
+    
     $scope.trace_price = function(shopId){
 	return diablo_base_setting(
 	    "ptrace_price", shopId, base, parseInt, diablo_no); 
@@ -64,7 +70,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    base,
 	    parseInt,
 	    $scope.sell_styles[0].id);
-    }();
+    }(); 
 
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
@@ -108,8 +114,6 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     // 	console.log(inv);
     // 	return $scope.get_sell_style(inv.sell_style_id); 
     // }
-    
-    
     
     $scope.page_changed = function(page){
 	// console.log(page);
@@ -284,11 +288,26 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.select.abs_total = 0;
 
 	    // setting
+	    $scope.setting.q_backend     = $scope.q_typeahead($scope.select.shop.id);
 	    $scope.setting.check_sale    = $scope.check_sale($scope.select.shop.id);
 	    $scope.setting.trace_price   = $scope.trace_price($scope.select.shop.id);
 	    $scope.setting.show_discount = $scope.show_discount();
 	    $scope.setting.round         = $scope.p_round();
-	    console.log($scope.setting);
+	    // console.log($scope.setting);
+
+	    $scope.stastic_colspan = function(){
+		var all_colspan = 8;
+		if (!$scope.setting.show_discount){
+		    all_colspan -= 1;
+		}
+		if (!$scope.setting.check_sale){
+		    all_colspan -= 1;
+		}
+
+		return all_colspan;
+	    }();
+
+	    // console.log($scope.stastic_colspan);
 
 	    // console.log($scope.select);
 

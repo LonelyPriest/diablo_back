@@ -211,9 +211,16 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
     {struct, Base}  = ?v(<<"base">>, Payload),
     {struct, Print} = ?v(<<"print">>, Payload),
 
+    NewInvs = case ?v(<<"sort">>, Base, ?NO) of
+		 ?YES -> sort_inventory(onsale, Invs, []);
+		 ?NO  -> Invs
+	     end,
+
+    ?DEBUG("NewInvs ~p", [NewInvs]),
+
     ImmediatelyPrint = ?v(<<"im_print">>, Print, ?YES),
     
-    case ?w_sale:sale(new, Merchant, lists:reverse(Invs), Base) of 
+    case ?w_sale:sale(new, Merchant, NewInvs, Base) of 
     	{ok, RSN} ->
 	    case ImmediatelyPrint of
 		?YES ->
@@ -752,3 +759,96 @@ sale_type(1)-> "退货".
 
 export_type(0) -> trans;
 export_type(1) -> trans_note.
+
+
+sort_inventory(onsale, [], Sorts) ->
+    Sorts;
+sort_inventory(onsale, [{struct, Inv}|T], Sorts) ->
+    %% ?DEBUG("Inv ~p~n, sorts ~p", [Inv, Sorts]),
+    NewSorts =
+	case in_sort(onsale, Inv, Sorts) of
+	    false ->
+		[{struct, Inv}|Sorts];
+	    true ->
+		lists:foldr(
+		  fun({struct, S}, Acc)->
+			  StyleNumber     = ?v(<<"style_number">>, Inv),
+			  Brand           = ?v(<<"brand">>, Inv),
+			  Amounts         = ?v(<<"amounts">>, Inv),
+			  SellTotal       = ?v(<<"sell_total">>, Inv),
+
+			  SortStyleNumber = ?v(<<"style_number">>, S),
+			  SortBrand       = ?v(<<"brand">>, S),
+			  SortAmounts     = ?v(<<"amounts">>, S),
+			  SortSellTotal   = ?v(<<"sell_total">>, S),
+
+			  case StyleNumber =:= SortStyleNumber
+			      andalso Brand =:= SortBrand of
+			      true ->
+				  NewAmounts = 
+				      lists:foldr(
+					fun({struct, A}, _Acc) -> 
+						%% ?DEBUG("A ~p, SortAmounts ~p", [A, SortAmounts]),
+						sort_amount(onsale, A, SortAmounts, [])
+					end, [], Amounts),
+
+				  %% ?DEBUG("newamounts ~p", [NewAmounts]),
+				  NewInv =
+				      [{<<"sell_total">>, SortSellTotal + SellTotal},
+				       {<<"amounts">>, NewAmounts}]
+				      ++ proplists:delete(<<"sell_total">>,
+							  proplists:delete(<<"amounts">>, S)),
+				  [{struct, NewInv}|Acc];
+			      false ->
+				  [{struct, S}|Acc]
+			  end
+		  end, [], Sorts)
+	end,
+    %% NewSorts = in_sort(onsale, Inv, Sorts, []),
+    %% ?DEBUG("newsorts ~p", [NewSorts]),
+    sort_inventory(onsale, T, NewSorts).
+
+in_sort(onsale, _Inv, []) ->
+    false;
+in_sort(onsale, Inv, [{struct, Sorted}|T]) ->
+    StyleNumber     = ?v(<<"style_number">>, Inv),
+    Brand           = ?v(<<"brand">>, Inv),
+    %% Amounts         = ?v(<<"amounts">>, Inv),
+    %% SellTotal       = ?v(<<"sell_total">>, Inv),
+    
+    SortStyleNumber = ?v(<<"style_number">>, Sorted),
+    SortBrand       = ?v(<<"brand">>, Sorted),
+    %% SortAmounts     = ?v(<<"amounts">>, Sorted),
+    %% SortSellTotal   = ?v(<<"sell_total">>, Sorted), 
+    case StyleNumber =:= SortStyleNumber
+	andalso Brand =:= SortBrand of
+	true  -> true; 
+	false -> in_sort(onsale, Inv, T)
+    end.
+
+sort_amount(onsale, [], [], Acc) ->
+    Acc;
+sort_amount(onsale, Amount, [], Acc) ->
+    [{struct, Amount}|Acc];
+sort_amount(onsale, [], [{struct, Sorted}|T],  Acc) ->
+    sort_amount(onsale, [], T, [{struct, Sorted}|Acc]);
+sort_amount(onsale, Amount, [{struct, Sorted}|T], Acc) ->
+    Cid   = ?v(<<"cid">>, Amount),
+    Size  = ?v(<<"size">>, Amount),
+    Count = ?v(<<"sell_count">>, Amount),
+
+    SCid   = ?v(<<"cid">>, Sorted),
+    SSize  = ?v(<<"size">>, Sorted),
+    SCount = ?v(<<"sell_count">>, Sorted),
+
+    case Cid =:= SCid andalso Size =:= SSize of
+	true  ->
+	    sort_amount(onsale, [], T,
+			[{struct, [{<<"cid">>, SCid},
+				   {<<"size">>, SSize},
+				   {<<"sell_count">>, Count + SCount}
+				  ]}|Acc]);
+	false ->
+	    sort_amount(onsale, Amount, T, [{struct, Sorted}|Acc])
+    end.
+    

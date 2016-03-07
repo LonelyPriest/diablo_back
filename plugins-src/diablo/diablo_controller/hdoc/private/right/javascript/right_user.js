@@ -880,7 +880,9 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    }
 		} else {
 		    if (new_account.shop_id === account.shop_id
-			&& new_account.firm_id === account.firm_id){
+			&& new_account.firm_id === account.firm_id
+			&& new_account.employee_id === account.employee_id
+		       ){
 			diabloUtilsService.response(
 			    false, "用户帐户修改",
 			    "用户帐户修改失败：" + rightService.error[1599]);

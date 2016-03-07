@@ -1836,9 +1836,9 @@ detail(print_format, Merchant, Shop) ->
     end;
 
 detail(base_setting, Merchant, Shop) ->
-    ?DEBUG("base_setting with merhcant ~p, Shop ~p", [Merchant, Shop]),
+    %% ?DEBUG("base_setting with merhcant ~p, Shop ~p", [Merchant, Shop]),
     {ok, Settings} = ?w_user_profile:get(setting, Merchant, Shop),
-    ?DEBUG("base setting ~p", [Settings]),
+    %% ?DEBUG("base setting ~p", [Settings]),
     Sort = 
 	lists:foldr(
 	   fun({R}, {Basics, Phones}=Acc) ->
@@ -1859,7 +1859,7 @@ detail(base_setting, Merchant, Shop) ->
 			   end
 		   end
 	   end, {[], []}, Settings),
-    ?DEBUG("setting sort ~p", [Sort]),
+    %% ?DEBUG("setting sort ~p", [Sort]),
     Sort.    
 	    	    
 field_name(<<"brand">>)        -> "品牌";

@@ -519,8 +519,7 @@
 		  </tr>
 
 		  <tr class="text-center">
-		    <td x-ng-if="setting.show_discount" colspan=8></td>
-		    <td x-ng-if="!setting.show_discount" colspan=7></td>
+		    <td colspan={{stastic_colspan}}></td>
 		    <td class="vert-align">{{select.abs_total}}</td>
 		    <td class="vert-align">{{select.should_pay}}</td>
 		    <td></td>
