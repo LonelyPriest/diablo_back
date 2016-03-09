@@ -1,6 +1,14 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-03-09",
+	 content: [
+	     "增加店铺地址打印加粗选项",
+	     "不打印尺码时，可以打印序号选项",
+	     "单行备注可打印" 
+	 ]
+	},
+	
 	{date: "2016-03-07",
 	 content: [
 	     "增加开单时可以重复款号选项"

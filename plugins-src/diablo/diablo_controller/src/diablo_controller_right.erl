@@ -519,10 +519,14 @@ handle_call({update_account, Attrs}, _From, State) ->
 	++ ?utils:v(stime, integer, StartTime)
 	++ ?utils:v(etime, integer, EndTime),
 
-    Sql2 = 
-	["update users set "
-	 ++ ?utils:to_sqls(proplists, comma, Updates)
-	 ++ " where id=" ++ ?to_s(Account)],
+    Sql2 =
+	case Updates of
+	    [] -> [];
+	    _ ->
+		["update users set "
+		 ++ ?utils:to_sqls(proplists, comma, Updates)
+		 ++ " where id=" ++ ?to_s(Account)]
+	end,
     
     AllSqls = Sql1 ++ Sql2,
     Reply =

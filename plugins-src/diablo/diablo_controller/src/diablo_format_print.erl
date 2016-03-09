@@ -219,7 +219,8 @@ column(stastic, {IsTable, SizeNum, Fields}, Totals, Calcs) ->
     {true, WidthCount} = field(count, Fields),
     {true, WidthSize}  = field(size, Fields),
     {true, WidthCalc}  = field(calc, Fields),
-
+    {IsPrintComment, WidthComment} = field(comment, Fields),
+    
     Offset = WidthSize * SizeNum + OffsetCount,
     %% ?DEBUG("offestcount ~p, width count ~p, width size ~p"
     %% 	   ", offfest ~p, width calc ~p",
@@ -235,7 +236,12 @@ column(stastic, {IsTable, SizeNum, Fields}, Totals, Calcs) ->
 	    {Mhc, Mlc} = middle(?TABLE, WidthCalc, CleanCalc),
 	    [phd("|") ++ pading(Offset - 2) ++ phd("|")
 	     ++ pading(Mh) ++ CleanTotal ++ pading(Ml) ++ phd("|")
-	     ++ pading(Mhc) ++ CleanCalc ++ pading(Mlc) ++ phd("|")];
+	     ++ pading(Mhc) ++ CleanCalc ++ pading(Mlc) ++ phd("|")
+	     ++ case IsPrintComment of
+		    true -> pading(WidthComment -  1) ++ phd("|");
+		    false -> []
+		end
+	     ]; 
 	?STRING ->
 	    [pading(Offset) ++ CleanTotal
 	     ++ pading(WidthCount - length(CleanTotal)) ++ CleanCalc]
@@ -245,7 +251,8 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
     %% ?DEBUG("A ~p", [A]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
-    Type        = ?v(<<"type">>, A), 
+    Type        = ?v(<<"type">>, A),
+    Comment     = ?v(<<"comment">>, A),
     Color       = ?v(<<"color">>, A),
     Price       = ?v(<<"fprice">>, A), 
     Discount    = ?v(<<"fdiscount">>, A),
@@ -276,7 +283,9 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
 		  ?to_s(Total) ++ pading(W - width(latin1, Total)) ++ Acc;
 	     ({<<"calc">>, _, _W}, Acc) ->
 		  %% ?DEBUG("round ~p", [?to_s(round(FPrice * Total))]),
-		  ?to_s(clean_zero(FPrice * Total)) ++ Acc
+		  ?to_s(clean_zero(FPrice * Total)) ++ Acc;
+	     ({<<"comment">>, _, W}, Acc) ->
+		  ?to_s(Comment) ++ pading(W - width(chinese, Comment)) ++ Acc
 	  end, [], Fields),
     ?DEBUG("row ~p", [Row]),
     Row;
@@ -285,7 +294,8 @@ row(?TABLE, A, Fields, FlatternNums, Total) ->
     %% ?DEBUG("A ~p", [A]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
-    Type        = ?v(<<"type">>, A), 
+    Type        = ?v(<<"type">>, A),
+    Comment     = ?v(<<"comment">>, A), 
     Color       = ?v(<<"color">>, A),
     Price       = ?v(<<"fprice">>, A), 
     Discount    = ?v(<<"fdiscount">>, A),
@@ -334,9 +344,12 @@ row(?TABLE, A, Fields, FlatternNums, Total) ->
 		  pading(Mh) ++ ?to_s(Total) ++ pading(Ml)
 		      ++ phd("|") ++ Acc;
 	     ({<<"calc">>, _, W}, Acc) ->
-		  CleanCalc = FPrice * Total,
+		  CleanCalc = clean_zero(FPrice * Total),
 		  {Mh, Ml} = middle(?TABLE, W, CleanCalc),
 		  pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml)
+		      ++ phd("|") ++ Acc;
+	     ({<<"comment">>, _, W}, Acc) ->
+		  ?to_s(Comment) ++ pading(W - width(chinese, Comment) -1 )
 		      ++ phd("|") ++ Acc
 	  end, [], Fields),
     %% ?DEBUG("row ~p", [Row]),

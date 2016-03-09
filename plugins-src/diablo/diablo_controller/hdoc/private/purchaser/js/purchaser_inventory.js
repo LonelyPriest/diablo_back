@@ -1471,6 +1471,9 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     };
 			
     // $scope.do_search($scope.current_page);
+    if (angular.isDefined(back_page)){
+	$scope.do_search($scope.current_page);
+    }
 
     $scope.page_changed = function(){
 	// console.log($scope.current_page);

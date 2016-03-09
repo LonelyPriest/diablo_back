@@ -38,7 +38,7 @@
 
 -define(SERVER, ?MODULE).
 -define(PRINT_FIELDS,
-	[brand, style_number, type, color, size_name,
+	[no, brand, style_number, type, color, size_name,
 	 size, price, discount, dprice, hand, count, calc]).
 
 -define(PHONES, [<<"phone1">>,
@@ -276,7 +276,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  Height = ?v(<<"pheight">>, P),
 			  PShop  = ?v(<<"pshop">>, P),
 
-			  ?DEBUG("P ~p", [P]),
+			  %% ?DEBUG("P ~p", [P]),
 			  Server = server(?v(<<"server_id">>, P)),
 
 			  {Setting, Phones}
@@ -293,7 +293,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  %% ?DEBUG("column ~p", [Column]),
 
 			  Head = title(Brand, Model, Column, ShopName)
-			      ++ address(Brand, Model, Column, ShopAddr)
+			      ++ address(Brand, Model, Column, ShopAddr, Setting)
 			      ++ head(Brand, Model, Column, RSN,
 				      PrintRetailer, Retailer, Employee, Date)
 
@@ -453,8 +453,11 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     Len2total = field_len(Fields, <<"count">>, PrintModel, 0),
     ?DEBUG("Len2total ~p", [Len2total]),
 
-    Len2calc = field_len(Fields, <<"cacl">>, PrintModel, 0),
+    Len2calc = field_len(Fields, <<"calc">>, PrintModel, 0),
     ?DEBUG("Len2calc ~p", [Len2calc]),
+
+    Len2comment = field_len(Fields, <<"comment">>, PrintModel, 0),
+    ?DEBUG("Len2comment ~p", [Len2comment]),
     
     {IsHand, _}      = field(hand, Fields),
     {IsSizeName, _}  = field(size_name, Fields),
@@ -467,15 +470,21 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 
     {true, WidthTotal}  = field(<<"count">>, Fields),
     {true, WidthCalc}   = field(<<"calc">>, Fields),
+    {IsPrintComment, WidthComment} = field(<<"comment">>, Fields),
+    ?DEBUG("print comment ~p, width comment ~p", [IsPrintComment, WidthComment]),
     
     %% ColumnModeRowLen =
     %% field_len(Fields, <<"calc">>, PrintModel, 0) + WidthCalc,
     RowFun =
-	fun(Inv, A) ->
+	fun(Inv, A, RowNo) ->
+		%% RowContent = format_row_content(
+		%% 	       PrintTable, PrintModel, IsHand,
+		%% 	       Fields, SizeGroups, Inv, A, RowNo) ++  br(PBrand),
+		%% ?DEBUG("row content ~ts", [RowContent]),
 		left_pading(PBrand, Model) ++ 
 		    format_row_content(
 		      PrintTable, PrintModel, IsHand,
-		      Fields, SizeGroups, Inv, A) ++  br(PBrand)
+		      Fields, SizeGroups, Inv, A, RowNo) ++  br(PBrand)
 		    
 		    ++ case PrintTable of
 			   ?TABLE ->
@@ -487,24 +496,33 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 	end,
     
     StasticFun =
-	fun(?TABLE) ->
-		
+	fun(?TABLE) -> 
 		{Mh, Ml} = middle(?TABLE, WidthTotal, Total),
 		{Mh1, Ml1} = middle(?TABLE, WidthCalc, clean_zero(ShouldPay)),
-		
+
+		%% ?DEBUG("differ ~p", [Len2calc - Len2total - WidthCalc]),
 		left_pading(PBrand, Model) ++ "|" ++ pading(Len2total - 2)
 		    ++ "|" ++ pading(Mh)
 		    ++ ?to_s(Total) ++ pading(Ml)
 		    ++ "|"
-
-		    ++ case Len2calc - Len2total - WidthCalc of
-			   WidthTotal  -> [];
-			   WidthDiffer ->
-			       pading(WidthDiffer - WidthTotal - 1) ++ "|"
+		    
+		    ++ case Len2calc - Len2total - WidthTotal of
+			   0 -> [];
+		    	   %% WidthTotal  ->
+			   %%     pading(WidthTotal - 1) ++ "|";
+		    	   WidthDiffer->
+		    	       %% ?DEBUG("widthDiffer ~p", [WidthDiffer]),
+		    	       pading(WidthDiffer - 1) ++ "|"
 		       end
 		    ++ pading(Mh1)
 		    ++ ?to_s(clean_zero(ShouldPay)) ++ pading(Ml1) 
-		    ++ "|" ++ br(PBrand)
+		    ++ "|"
+
+		    ++ case IsPrintComment of
+			   true  -> pading(WidthComment - 1) ++ phd("|");
+			   false -> []
+		       end
+		    ++ br(PBrand)
 		    
 		    ++ line(add_minus, ?TABLE, ?COLUMN, Fields)
 		%% ++ line(minus, Column)
@@ -559,19 +577,22 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 			     PrintTable, ?COLUMN, PBrand, Model, Fields), 
 		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
 		
-		BodyContent = 
+		{BodyContent, _TotalRowNo} = 
 		    lists:foldr(
-		      fun({struct, Inv}, Acc0)->
-			      Amounts = ?v(<<"amounts">>, Inv), 
-			      lists:foldr(
-				fun({struct, A}, Acc1) ->
-					RowFun(Inv, A) ++ Acc1 
-				end, [], Amounts) ++ Acc0
-		      end, "", Invs)
-		    ++ StasticFun(PrintTable),
-		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
+		      fun({struct, Inv}, {Acc0, No})->
+			      Amounts = ?v(<<"amounts">>, Inv),
+			      {ColumnRow, RowNo} =
+				  lists:foldr(
+				    fun({struct, A}, {Acc1, No1}) -> 
+					    Acc1 ++ {RowFun(Inv, A, No1), No1 + 1}
+				    end, {[], No}, Amounts), 
+			      %% ?DEBUG("rowno ~p", [RowNo]),
+			      {Acc0 ++ ColumnRow, RowNo}
+		      end, {[], 1}, Invs),
+		%% StasticFun(PrintTable),
+		%% ?DEBUG("body content ~ts, Rowno ~p", [?to_b(BodyContent), TotalRowNo]),
 		line(add_minus, ?TABLE, ?COLUMN, Fields) ++ br(PBrand)
-		    ++ BodyHead ++ BodyContent;
+		    ++ BodyHead ++ BodyContent ++ StasticFun(PrintTable);
 	   (no_hand, ?ROW) -> 
 		CombinedInvs  = combine_with_size(Invs, []),
 		?DEBUG("combinedInvs~n~p", [CombinedInvs]),
@@ -587,8 +608,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					      find_size(G, SizeGroups) ++ Acc
 				      end, [], lists:sort(GS)),
 
-			  ?DEBUG("lenght gs ~p, allsize ~p",
-				 [length(GS), AllSize]),
+			  %% ?DEBUG("lenght gs ~p, allsize ~p",
+			  %% 	 [length(GS), AllSize]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
 			      	  true -> [Us || Us <- AllSize,
@@ -694,13 +715,14 @@ classify(by_color, [CId|T], Amounts, Classes) ->
 	  end, Amounts),
     classify(by_color, T, Amounts, [{CId, C}|Classes]).
     
-format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount) ->
+format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, RowNo) ->
     Brand       = ?v(<<"brand_name">>, Inv),
     StyleNumber = ?v(<<"style_number">>, Inv),
     Type        = ?v(<<"type_name">>, Inv),
     Price       = ?v(<<"fprice">>, Inv),
     Discount    = ?v(<<"fdiscount">>, Inv, 100),
-    Hand        = ?v(<<"hand">>, Inv), 
+    Hand        = ?v(<<"hand">>, Inv),
+    Comment     = ?v(<<"comment">>, Inv),
     FPrice      = Price * Discount / 100,
 
     Count = case IsHand of
@@ -715,6 +737,9 @@ format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount)
     lists:foldr(
       fun({F, _, Width}, Acc) ->
 	      case F of
+		  <<"no">>        ->
+		      ?to_s(RowNo)
+			  ++ pading(Width - width(latin1, RowNo)); 
 		  <<"brand">>        ->
 		      ?to_s(Brand)
 			  ++ pading(Width - width(chinese, Brand));
@@ -770,20 +795,25 @@ format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount)
 		      ?to_s(Count) ++ pading(Width - width(latin1, Count)); 
 		  <<"calc">>         ->
 		      %% ?DEBUG("fprice ~p, count ~p", [FPrice, Count]),
-		      ?to_s(clean_zero(FPrice * Count))
+		      ?to_s(clean_zero(FPrice * Count));
+		  <<"Comment">>         ->
+		      CommentLen = width(chinese, Comment), 
+		      ?to_s(Comment) ++ pading(Width - CommentLen)
 	      end ++ Acc 
       end, [], Fields);
 
-format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount) ->
+format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, RowNo) ->
+    %% ?DEBUG("format_row_content with Fields ~p, rowno ~p", [Fields, RowNo]),
     Brand       = ?v(<<"brand_name">>, Inv),
     StyleNumber = ?v(<<"style_number">>, Inv),
     Type        = ?v(<<"type_name">>, Inv),
     Price       = ?v(<<"fprice">>, Inv),
     Discount    = ?v(<<"fdiscount">>, Inv, 100),
-    Hand        = ?v(<<"hand">>, Inv), 
+    Hand        = ?v(<<"hand">>, Inv),
+    Comment     = ?v(<<"comment">>, Inv),
     FPrice      = Price * Discount / 100,
 
-    ?DEBUG("amount ~p", [Amount]),
+    %% ?DEBUG("amount ~p", [Amount]),
     Count = case IsHand of
 		true -> ?v(<<"total">>, Inv);
 		false ->
@@ -797,19 +827,30 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount) 
     
     lists:foldr(
       fun({F, _, Width}, Acc) ->
+	      %% ?DEBUG("F ~p, width ~p", [F, Width]),
 	      case F of
+		  <<"no">> = Name when Name =:= FirstName ->
+		      phd("|") ++ ?to_s(RowNo)
+		  	  ++ pading(Width - width(latin1, RowNo) -2 )
+		  	  ++ phd("|");
+		  
 		  <<"brand">> = Name when Name =:= FirstName ->
 		      phd("|") ++ ?to_s(Brand)
 			  ++ pading(Width - width(chinese, Brand) -2 )
 			  ++ phd("|");
-		  <<"style_number">> = Name when Name =:= FirstName ->
-		      phd("|") ++ ?to_s(StyleNumber)
-			  ++ pading(Width - width(latin1, StyleNumber) -2)
-			  ++ phd("|");
+		  <<"brand">> ->
+		      ?to_s(Brand)
+			  ++ pading(Width - width(chinese, Brand) -1 )
+			  ++ phd("|"); 
+		  %% <<"style_number">> = Name when Name =:= FirstName ->
+		  %%     phd("|") ++ ?to_s(StyleNumber)
+		  %% 	  ++ pading(Width - width(latin1, StyleNumber) -2)
+		  %% 	  ++ phd("|");
 		  <<"style_number">> ->
 		      ?to_s(StyleNumber)
 			  ++ pading(Width - width(latin1, StyleNumber) -1)
-			  ++ phd("|"); 
+			  ++ phd("|");
+		  
 		  <<"type">>         ->
 		      TypeLen = width(chinese, Type),
 		      %% ?DEBUG("StyleNumber ~p, TypeLen ~p",
@@ -875,7 +916,11 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount) 
 		      %% ?DEBUG("fprice ~p, count ~p", [FPrice, Count]),
 		      CleanCalc = round(FPrice * Count),
 		      {Mh, Ml} = middle(?TABLE, Width, CleanCalc),
-		      pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml) ++ phd("|")
+		      pading(Mh) ++ ?to_s(CleanCalc) ++ pading(Ml) ++ phd("|");
+		  <<"comment">>         ->
+		      CommentLen = width(chinese, Comment),
+		      ?to_s(Comment)
+			  ++ pading(Width - CommentLen -1) ++ phd("|") 
 	      end ++ Acc 
       end, [], Fields).
 
@@ -893,24 +938,37 @@ title(Brand, Model, Column, Title) ->
 	++ ?f_print:pading(Start)
 	++ decorate_data(bwh)
 	++ ?to_s(Title)
-	++ decorate_data(cancel_bwh) 
+	++ decorate_data(cancel_bwh)
 	++ ?f_print:br(Brand)
 	++ ?f_print:br(Brand),
-    ?DEBUG("title ~ts", [?to_b(T)]),
+    %% ?DEBUG("title ~ts", [?to_b(T)]),
     T.
 
 %% address
 
-address(_Brand, _Model, 33, Address) ->
+address(_Brand, _Model, 33, Address, _Setting) ->
     "<CB>" ++ ?to_s(Address) ++ "</CB><BR>";
 
-address(Brand, Model, Column, Address) ->
-    Start = (Column - ?f_print:width(chinese, Address)) div 2,
+address(Brand, Model, Column, Address, Setting) ->
+    BlockAddress = ?to_i(?v(<<"baddr">>, Setting, ?NO)),
+    
+    Start =
+	case BlockAddress of
+	    ?YES -> (Column - ?f_print:width(chinese, Address) * 2) div 2;
+	    ?NO ->(Column - ?f_print:width(chinese, Address)) div 2
+	end,
     ?f_print:left_pading(Brand, Model)
 	++ ?f_print:pading(Start)
-	++ decorate_data(block)
+	
+	++ case BlockAddress of
+	       ?YES -> decorate_data(bwh);
+	       ?NO -> decorate_data(block)
+	   end
 	++ ?to_s(Address)
-	++ decorate_data(cancel_block) 
+	++ case BlockAddress of
+	       ?YES -> decorate_data(cancel_bwh);
+	       ?NO -> decorate_data(cancel_block)
+	   end
 	++ ?f_print:br(Brand).
 
 
@@ -936,14 +994,16 @@ head(Brand, Model, 106, RSN, PRetailer, Retailer, Employee, Date) ->
     RetailerName = ?v(<<"name">>, Retailer, []),
     ?f_print:left_pading(Brand, Model)
 	++ "单号：" ++ ?to_s(RSN) ++ ?f_print:pading(4)
-	++ "客户：" ++ ?to_s(RetailerName) ++ ?f_print:pading(20)
-	++ "店员：" ++ ?to_s(Employee) ++ ?f_print:pading(10)
+	++ "客户：" ++ ?to_s(RetailerName)
+	%% ++ "店员：" ++ ?to_s(Employee) ++ ?f_print:pading(10)
 	++ ?f_print:pading(106
 			   - (6 + length(?to_s(RSN)) + 4)
-			   - (6 + ?f_print:width(chinese, RetailerName) + 20)
-			   - (6 + ?f_print:width(chinese, Employee) + 10)
+			   - (6 + ?f_print:width(chinese, RetailerName))
+			   - (6 + ?f_print:width(chinese, Employee))
+			   - 4
 			   - 20 %% length of date
 			  )
+	++ "店员：" ++ ?to_s(Employee) ++ ?f_print:pading(4)
 	++ "日期：" ++ ?to_s(Date) ++ ?f_print:br(Brand)
 	++ case PRetailer of
 	       ?YES ->
@@ -1442,21 +1502,24 @@ combine_with_size([{struct, Inv}|T], Combined) ->
     Colors      = ?v(<<"colors">>, Inv),
     FDiscount   = ?v(<<"fdiscount">>, Inv),
     FPrice      = ?v(<<"fprice">>, Inv),
-    Amounts     = ?v(<<"amounts">>, Inv), 
+    Amounts     = ?v(<<"amounts">>, Inv),
+    Comment     = ?v(<<"comment">>, Inv),
     
     
     A1 = {[{<<"style_number">>, StyleNumber},
 	   {<<"brand">>, Brand},
 	   {<<"type">>, Type},
+	   {<<"comment">>, Comment},
 	   {<<"s_group">>, SizeGroup},
 	   {<<"colors">>, Colors},
 	   {<<"fdiscount">>, FDiscount},
 	   {<<"fprice">>, FPrice},
 	   {<<"amounts">>, Amounts}]},
 
-    UsedSize = lists:foldr(fun({struct, M}, Acc)
-			      -> [?v(<<"size">>, M)|Acc]
-			   end, [], Amounts),
+    UsedSize = lists:foldr(
+		 fun({struct, M}, Acc) ->
+			 [?v(<<"size">>, M)|Acc]
+		 end, [], Amounts),
 	
     %% SellTotal   = ?v(<<"sell_total">>, Inv),
     
@@ -1797,6 +1860,7 @@ detail(print_format, Merchant, Shop) ->
     {ok, Formats} = ?w_user_profile:get(print_format, Merchant, Shop),
     %% ?DEBUG("print formats ~p", [Formats]),
     case lists:filter(fun({Format}) ->
+			      %% ?DEBUG("format ~p", [Format]),
 			      ?v(<<"seq">>, Format) =/= 0
 				  andalso ?v(<<"print">>, Format) =:= 1
 				  andalso ?v(<<"width">>, Format) =/= 0
@@ -1860,7 +1924,7 @@ detail(base_setting, Merchant, Shop) ->
 	   end, {[], []}, Settings),
     %% ?DEBUG("setting sort ~p", [Sort]),
     Sort.    
-	    	    
+field_name(<<"no">>)           -> "序號";
 field_name(<<"brand">>)        -> "品牌";
 field_name(<<"style_number">>) -> "款号";
 field_name(<<"type">>)         -> "类型";
@@ -2001,6 +2065,7 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
 			       %% {<<"brand_name">>, ?v(<<"brand">>, Inv)},
 			       {<<"brand_name">>, GetBrand(Brand)},
 			       {<<"type_name">>,  Type},
+			       {<<"comment">>,    ?v(<<"comment">>, Inv)},
 			       {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
 			       {<<"fprice">>,     ?v(<<"fprice">>, Inv)}, 
 			       {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
@@ -2085,6 +2150,7 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
 			 %% {<<"brand_name">>, ?v(<<"brand">>, Inv)},
 			 {<<"brand_name">>, GetBrand(BrandId)},
 			 {<<"type_name">>,  Type},
+			 {<<"comment">>,    ?v(<<"comment">>, Inv)},
 			 {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
 			 {<<"fprice">>,     ?v(<<"fprice">>, Inv)},
 			 {<<"s_group">>,    ?v(<<"s_group">>, Inv)},

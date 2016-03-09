@@ -173,7 +173,8 @@
 	    <span class="input-group-addon">
 	      <i class="glyphicon glyphicon-hand-right fg-red"></i>
 	      位置</span>
-	    <input x-ng-if="params.pformat.name === 'brand'
+	    <input x-ng-if="params.pformat.name === 'no'
+			    || params.pformat.name === 'brand'
 			    || params.pformat.name === 'calc'
 			    || params.pformat.name === 'comment'"
 		   class="form-control"
@@ -181,14 +182,15 @@
 		   readonly
 		   x-ng-model="params.pformat.seq"/>
 
-	    <input x-ng-if="params.pformat.name !== 'brand'
+	    <input x-ng-if="params.pformat.name !== 'no'
+			    &&params.pformat.name !== 'brand'
 			    && params.pformat.name !== 'calc'
 			    && params.pformat.name !== 'comment'"
 		   class="form-control"
 		   type="text"
 		   name="seq"
 		   x-ng-model="params.pformat.seq"
-		   x-ng-pattern="/^\d{1,2}$/">
+		   x-ng-pattern="/^[+|\-]?\d{1,2}$/">
 
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>

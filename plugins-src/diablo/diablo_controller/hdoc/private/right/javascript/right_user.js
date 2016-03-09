@@ -898,13 +898,12 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    etime: new_account.etime === account.etime
 			? undefined : new_account.etime};
 
-		console.log(update);
 		update.role_id = function(){
 		    if (new_account.type !== 2){
 			return undefined;
 		    } else {
 			return new_account.role.id !== current_role.role_id
-			    ? new_account.role : undefined;
+			    ? new_account.role.id : undefined;
 		    }
 		}();
 		
@@ -920,6 +919,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    new_account.employee_id !== account.employee_id
 		    ? new_account.employee_id : undefined;
 
+		console.log(update);
+		
 		rightService.update_user_account(
 		    update
 		).$promise.then(function(state){

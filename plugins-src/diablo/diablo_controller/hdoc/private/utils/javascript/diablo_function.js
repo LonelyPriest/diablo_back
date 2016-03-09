@@ -346,6 +346,7 @@ var diablo_round = function(value){
 var diablo_full_year = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020];
 
 var diablo_print_field = {
+    no:           "序號",
     brand:        "品牌",
     style_number: "款号",
     type:         "类型",

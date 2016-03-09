@@ -557,14 +557,14 @@ handle_call({trans_detail, Merchant, Conditions}, _From, State) ->
     Sql =
 	" select a.id, a.rsn, a.style_number, a.brand_id, a.type_id"
 	", a.s_group, a.free, a.season, a.firm_id, a.hand, a.total"
-	", a.sell_style, a.fdiscount, a.fprice, a.path"
+	", a.sell_style, a.fdiscount, a.fprice, a.path, a.comment"
 
 	", b.color as color_id, b.size, b.total as amount"
 	" from "
 
 	"(select id, rsn, style_number, brand as brand_id, type as type_id"
 	", s_group, free, season, firm as firm_id, hand, total, sell_style"
-	", fdiscount, fprice, path"
+	", fdiscount, fprice, path, comment"
 	" from w_sale_detail"
 	" where " ++ ?utils:to_sqls(proplists, Conditions) ++ ") a"
 

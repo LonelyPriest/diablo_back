@@ -644,7 +644,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
 	    // backdrop: 'false',
-	    backdrop: 'static',
+	    // backdrop: 'static',
 	    // scope: scope,
 	    resolve:{
 		message: function(){
@@ -664,7 +664,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
 	    // backdrop: 'false',
-	    backdrop: 'static',
+	    // backdrop: 'static',
 	    // scope: scope,
 	    resolve:{
 		message: function(){
@@ -684,7 +684,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	return $modal.open({
 	    templateUrl: '/private/utils/html/modalResponse.html',
 	    controller: 'diabloDialogCtrl',
-	    // backdrop: 'true',
+	    // backdrop: 'false',
 	    backdrop: 'static',
 	    // animation: true,
 	    // openedClass: "modal-open-noscroll",
@@ -711,6 +711,7 @@ diabloUtils.service("diabloUtilsService", function($modal){
 	    // backdrop: 'false',
 	    backdrop: 'static',
 	    openedClass: "modal-open-noscroll",
+	    animation: false,
 	    size:  size,
 	    scope: scope,
 	    resolve:{
@@ -737,11 +738,11 @@ diabloUtils.controller("diabloDialogCtrl", function(
     $scope.show_cancel = angular.isDefined(message.show_cancel) ? message.show_cancel : true;
     
     $scope.cancel = function(){
-	$modalInstance.dismiss('cancel');
+	$modalInstance.close('cancel');
     };
 
     $scope.ok = function() {
-	$modalInstance.dismiss('ok');
+	$modalInstance.close('ok');
 	if (angular.isDefined(message.callback)
 	    && typeof(message.callback) === "function"){
 	    var callback = message.callback;
@@ -769,7 +770,7 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
 	
     	$modalInstance.opened.then(function(){
     	    $('.header').hide();
-            $('.footer').hide(); 
+            $('.footer').hide();
 
 	    var styleEl = document.createElement('style');
 	    var styleSheet;
@@ -815,6 +816,10 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
             unbind();
     	});
     };
+
+
+    $('.modal-backdrop').removeClass('modal-backdrop');
+
     
     
     // $scope.out = {};
@@ -823,11 +828,11 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
     // console.log($scope.params);
         
     $scope.cancel = function(){
-	$modalInstance.dismiss('cancel');
+	$modalInstance.close('cancel');
     };
 
     $scope.ok = function() {
-	$modalInstance.dismiss('ok');
+	$modalInstance.close('ok');
 	if (angular.isDefined(callback) && typeof(callback) === "function"){
 	    callback($scope.params);
 	}	    
