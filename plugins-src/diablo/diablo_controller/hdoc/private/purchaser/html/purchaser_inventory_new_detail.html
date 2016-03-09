@@ -10,12 +10,12 @@
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
 	    <button type="button"
-		    class="btn green purple-stripe hidden-xs hidden-sm"
+		    class="btn green purple-stripe hidden-sm"
 	  	    x-ng-click="add()">入库
 	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
 	    <button type="button"
-		    class="btn red purple-stripe hidden-xs hidden-sm"
+		    class="btn red purple-stripe hidden-sm"
 	  	    x-ng-click="reject()">退货
 	      <i class="glyphicon glyphicon-minus"></i></button>
 
@@ -209,7 +209,7 @@
 		  </tr>
 
 		  <!--Total info-->
-		  <tr x-ng-if="total_items!==0" class="bg-white">
+		  <tr x-ng-if="total_itotal_items && total_items!==0" class="bg-white">
 		    <td x-ng-if="hidden.base" colspan="3"></td>
 		    <td x-ng-if="!hidden.base" colspan="6"></td>
 		    <td class="danger">{{total_amounts}}</td>

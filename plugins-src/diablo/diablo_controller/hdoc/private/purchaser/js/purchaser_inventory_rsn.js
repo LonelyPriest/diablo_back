@@ -459,7 +459,7 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
     }
 
     
-    $scope.do_search($scope.default_page);
+    // $scope.do_search($scope.default_page);
 
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);
@@ -511,7 +511,7 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
 
 
     $scope.edit_rsn_detail = function(inv){
-	console.log(inv);
+	// console.log(inv);
 
 	purchaserService.w_inventory_new_rsn_detail(
 	    {rsn:inv.rsn, style_number:inv.style_number, brand:inv.brand_id}
@@ -659,7 +659,7 @@ purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
     };
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    // $scope.do_search($scope.default_page);
 
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);
@@ -834,7 +834,7 @@ purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
     };
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    // $scope.do_search($scope.default_page);
 
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);

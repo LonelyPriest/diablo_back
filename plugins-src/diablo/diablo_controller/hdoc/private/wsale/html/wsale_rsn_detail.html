@@ -145,7 +145,7 @@
 		    </td>
 		  </tr>
 
-		  <tr x-ng-if="total_items!==0" class="bg-white">
+		  <tr x-ng-if="total_items && total_items!==0" class="bg-white">
 		    <td x-ng-if="!hidden.base" colspan="12"></td>
 		    <td x-ng-if="hidden.base" colspan="9"></td>
 		    <td class="success">{{total_amounts}}</td>

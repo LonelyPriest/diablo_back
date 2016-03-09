@@ -979,7 +979,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     var now = $.now();
     var storage = localStorageService.get(diablo_key_inventory_detail);
-    console.log(storage);
+    // console.log(storage);
     
     if (angular.isDefined(storage) && storage !== null){
     	$scope.filters       = storage.filter;
@@ -1108,7 +1108,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	});
     };
     
-    $scope.do_search($scope.tab_page.page_of_time);
+    // $scope.do_search($scope.tab_page.page_of_time);
         
     /*
      * detail
@@ -1470,7 +1470,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	})
     };
 			
-    $scope.do_search($scope.current_page);
+    // $scope.do_search($scope.current_page);
 
     $scope.page_changed = function(){
 	// console.log($scope.current_page);

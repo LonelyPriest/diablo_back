@@ -146,7 +146,7 @@
 		      </button> 
 		    </td>
 		  </tr>
-		  <tr x-ng-if="total_items!==0" class="bg-white">
+		  <tr x-ng-if="total_items && total_items!==0" class="bg-white">
 		    <td x-ng-if="!hidden.base" colspan="11"></td>
 		    <td x-ng-if="hidden.base" colspan="8"></td>
 		    <td class="danger">{{total_amounts}}</td>

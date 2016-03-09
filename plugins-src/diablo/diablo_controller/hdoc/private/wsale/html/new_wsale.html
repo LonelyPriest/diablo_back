@@ -19,7 +19,7 @@
 	    <!--   <i class="glyphicon glyphicon-plus"></i></button> -->
 	    <button class="btn btn-info purple-stripe"
 		    x-ng-disabled="disable_draft()"
-		    x-ng-click="list_draft()">获取草稿
+		    x-ng-click="list_draft()">草稿
 	      <i class="glyphicon glyphicon-send"></i></button>
 	    
 	    <button class="btn btn-success purple-stripe"
@@ -56,7 +56,7 @@
 		    <i class="glyphicon glyphicon-plus"></i></button> 
 	  	</span>
 		<span class="input-group-btn">
-		  <button class="btn default fg-red red-stripe"
+		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.retailer"
 	  		  x-ng-click="select.retailer=undefined">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>
@@ -132,10 +132,16 @@
 	      </div>
 	    </div>
 	    
-	    <div class="col-xs-9 col-md-9 "> 
+	    <div class="col-xs-2 col-md-2"> 
 	      <div class="input-group">
-		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-yen fg-red"></i>现金</span>
+		<!-- <span class="input-group-addon"> -->
+		<!--   <i class="glyphicon glyphicon-yen fg-red"></i>现金</span> -->
+		<span class="input-group-btn">
+		  <button class="btn default fg-red"
+			  x-ng-disabled="!select.cash"
+	  		  x-ng-click="select.cash=undefined">
+		    <i class="glyphicon glyphicon-pushpin"></i></button>
+		</span>
 		<form name="select.form.cashForm">
 		  <div ng-class="{'has-error':select.form.cashForm.$invalid
 				 && !select.form.cashForm.$pristine}">
@@ -147,13 +153,17 @@
 			   popover-placement="top"
 			   popover-trigger="focus"
 			   popover="支持二位小数"/>
-		  </div>
-		</form>
+		  </div> 
+		</form> 
+	      </div>
+	    </div>
 
-		<span class="input-group-addon">
+	      <div class="col-xs-7 col-md-7"> 
+		<div class="input-group">
+		  <span class="input-group-addon">
 		  <i class="glyphicon glyphicon-credit-card fg-red"></i>
 		  刷卡</span>
-		<form name="select.form.cardForm">
+		  <form name="select.form.cardForm">
 		  <div ng-class="{'has-error':select.form.cardForm.$invalid
 				 && !select.form.cardForm.$pristine}">
 	  	    <input class="form-control"
@@ -204,10 +214,10 @@
 	      </div>
 	    </div>
 	    
-	    <div class="col-sm-9 col-md-9 "> 
+	    <div class="col-sm-2 col-md-2"> 
 	      <div class="input-group">
 		<span class="input-group-addon">
-		  <i class="glyphicon glyphicon-ban-circle fg-red"></i>核销</span>
+		  <i class="glyphicon glyphicon-ban-circle fg-red"></i></span>
 		<form name="select.form.vForm">
 		  <div ng-class="{'has-error':select.form.vForm.$invalid
 				 && !select.form.vForm.$pristine}">
@@ -221,7 +231,11 @@
 			   popover="支持二位小数"/>
 		  </div>
 		</form>
-		
+		</div>
+	    </div>
+	    
+	    <div class="col-sm-7 col-md-7"> 
+	      <div class="input-group">
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>应付</span>
 		<input class="form-control" type="text" readonly

@@ -297,7 +297,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    "m_sgroup", -1, base, parseInt, diablo_no);
     }();
 
-    console.log($scope.base_setting);
+    // console.log($scope.base_setting);
     
     $scope.full_years = diablo_full_year;
 
@@ -1043,7 +1043,7 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     }
     
     $scope.default_page = 1;
-    $scope.do_search($scope.default_page); 
+    // $scope.do_search($scope.default_page); 
     
     // var match_filed = {
     // 	firm:  "firm_id",

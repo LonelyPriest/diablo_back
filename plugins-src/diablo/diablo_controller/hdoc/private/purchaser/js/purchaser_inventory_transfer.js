@@ -677,7 +677,7 @@ purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
     };
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    // $scope.do_search($scope.default_page);
 
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);
@@ -777,7 +777,7 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
     $scope.time   = diabloFilter.default_time($scope.qtime_start); 
     // $scope.time   = diabloFilter.default_time();
 
-    console.log($scope.filter);
+    // console.log($scope.filter);
     
     /*
      * pagination 
@@ -832,7 +832,7 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
     };
     
     // default the first page
-    $scope.do_search($scope.default_page);
+    // $scope.do_search($scope.default_page);
 
     $scope.page_changed = function(){
 	$scope.do_search($scope.current_page);

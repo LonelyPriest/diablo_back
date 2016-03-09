@@ -1365,7 +1365,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    // 	= $scope.select.should_pay + one.fprice * one.sell * one.fdiscount * 0.01;
 	}
 
-	$scope.select.should_pay = $scope.round($scope.select.should_pay); 
+	$scope.select.should_pay = $scope.round($scope.select.should_pay);
+	$scope.select.cash = $scope.select.should_pay;
 	
 
 	// console.log($scope.select.extra_pay);
@@ -2031,7 +2032,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	} 
     };
 
-    $scope.do_search($scope.current_page);
+    // $scope.do_search($scope.current_page);
 
     $scope.save_stastic = function(){
 	localStorageService.set(
