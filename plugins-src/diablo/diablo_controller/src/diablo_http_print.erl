@@ -584,9 +584,9 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 			      {ColumnRow, RowNo} =
 				  lists:foldr(
 				    fun({struct, A}, {Acc1, No1}) -> 
-					    Acc1 ++ {RowFun(Inv, A, No1), No1 + 1}
+					    {Acc1 ++ RowFun(Inv, A, No1), No1 + 1}
 				    end, {[], No}, Amounts), 
-			      %% ?DEBUG("rowno ~p", [RowNo]),
+			      %% ?DEBUG("ColumnRow ~ts, rowno ~p", [ColumnRow, RowNo]),
 			      {Acc0 ++ ColumnRow, RowNo}
 		      end, {[], 1}, Invs),
 		%% StasticFun(PrintTable),
@@ -830,8 +830,9 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
 	      %% ?DEBUG("F ~p, width ~p", [F, Width]),
 	      case F of
 		  <<"no">> = Name when Name =:= FirstName ->
-		      phd("|") ++ ?to_s(RowNo)
-		  	  ++ pading(Width - width(latin1, RowNo) -2 )
+		      {Mh, Ml} = middle(?TABLE, Width - 1, RowNo),
+		      phd("|") 
+		  	  ++ pading(Mh ) ++ ?to_s(RowNo) ++ pading(Ml)
 		  	  ++ phd("|");
 		  
 		  <<"brand">> = Name when Name =:= FirstName ->

@@ -178,7 +178,6 @@
 
 		    <td class="hidden-xxs">
 		      <button class="btn diablo-button purple-plum"
-			      x-ng-disabled="disable_print"
 		    	      x-ng-click="print(r)">
 			打印<i class="glyphicon glyphicon-print"></i></button>
 		    </td>
@@ -207,7 +206,7 @@
 		  </tr>
 
 		  <!--Total info-->
-		  <tr x-ng-if="total_itotal_items && total_items!==0" class="hidden-xxs"> 
+		  <tr x-ng-if="total_items && total_items!==0" class="hidden-xxs"> 
 		    <td x-ng-if="show.base" colspan="6"</td>
 		    <td x-ng-if="!show.base" colspan="3"></td>
 

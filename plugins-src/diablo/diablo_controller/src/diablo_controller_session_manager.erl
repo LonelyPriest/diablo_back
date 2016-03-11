@@ -76,8 +76,7 @@ init([]) ->
     {ok, #state{tref=TRef}}.
 
 handle_call({new, User}, _From, State) ->    
-    ?DEBUG("new session to user ~p", [User]),
-
+    ?DEBUG("new session to user ~p", [User]), 
     UserId       = ?v(<<"id">>, User),
     UserName     = ?v(<<"name">>, User),
     UserType     = ?v(<<"type">>, User),
@@ -85,6 +84,7 @@ handle_call({new, User}, _From, State) ->
     Shop         = ?v(<<"shop_id">>, User),
     Firm         = ?v(<<"firm_id">>, User),
     Employee     = ?v(<<"employee_id">>, User),
+    Retailer     = ?v(<<"retailer_id">>, User), 
     MerchantType = ?v(<<"mtype">>, User),
 
     MS = [{{'_', #session{user_name='$1', _='_'}},
@@ -110,6 +110,7 @@ handle_call({new, User}, _From, State) ->
 			      login_shop  = ?to_i(Shop), 
 			      login_firm  = ?to_i(Firm),
 			      employee_id = ?to_i(Employee),
+			      retailer_id = ?to_i(Retailer),
 			      mtype       = ?to_i(MerchantType),
 			      login_time  = ?utils:current_time(timestamp)}}),
     {reply, {ok, SessionId}, State};
@@ -232,8 +233,8 @@ handle_cast(cleanup_session, State) ->
 		  - Session#session.login_time >= ?TIMEOUT of
 		  true ->
 		      %% not acitivte, delete
-		      ?INFO("session ~p does not activited, delete it",
-			    [Session]),
+		      %% ?INFO("session ~p does not activited, delete it",
+		      %% 	    [Session]),
 		      true = ets:delete(?SESSION, Id),
 		      %% terminate all process
 		      lists:foreach(
@@ -306,6 +307,8 @@ get(login_firm, Session) ->
     Session#session.login_firm;
 get(login_employee, Session) ->
     Session#session.employee_id;
+get(login_retailer, Session) ->
+    Session#session.retailer_id;
 get(mtype, Session) ->
     Session#session.mtype;
 get(time, Session) ->

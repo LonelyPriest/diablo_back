@@ -353,7 +353,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    diablo_sell_style[0].id);
     }();
 
-    console.log($scope.price_type);
+    // console.log($scope.price_type);
 
     // $scope.new_brand = function(){
     // 	var callback = function(params){
@@ -553,24 +553,24 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		     colors:[{name:color.name, id:color.id}]})
 	    }
 	}); 
-	console.log($scope.colors);
+	// console.log($scope.colors);
     });
 
     
 
     wgoodService.list_color_type().then(function(data){
-	console.log(data);
+	// console.log(data);
 	$scope.colorTypes = data;
     });
     
     $scope.new_color = function(){
 	var callback = function(params){
-	    console.log(params.color);
+	    // console.log(params.color);
 	    var color = {name:   params.color.name,
 			 type:   params.color.type.id,
 			 remark: params.color.remark};
 	    wgoodService.add_purchaser_color(color).then(function(state){
-		console.log(state);
+		// console.log(state);
 
 		var append_color = function(newColorId){
 		    var newColor = {
@@ -586,7 +586,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 			     tid:  newColor.tid,
 			     colors:[{name:newColor.name, id:newColor.id}]})
 		    } 
-		    console.log($scope.colors); 
+		    // console.log($scope.colors); 
 		}; 
 		
 		if (state.ecode == 0){
@@ -610,7 +610,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
     // $scope.selectColors = []; 
     $scope.select_color = function(){
 	var callback = function(params){
-	    console.log(params.colors);
+	    // console.log(params.colors);
 	    
 	    $scope.selectColors = []; 
 	    $scope.good.colors="";
@@ -622,7 +622,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		    }
 		})
 	    }); 
-	    console.log($scope.selectColors);
+	    // console.log($scope.selectColors);
 
 	    // save select info
 	    $scope.colors = angular.copy(params.colors);
@@ -675,7 +675,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	};
 	
 	var callback = function(params){
-	    console.log(params);
+	    // console.log(params);
 	    var size = {};
 	    for (var k in params.size){
 		if (angular.isDefined(params.size[k]) && params.size[k]){
@@ -683,10 +683,10 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		}
 	    }
 
-	    console.log(size);
+	    // console.log(size);
 
 	    wgoodService.add_purchaser_size(size).then(function(state){
-	        console.log(state);
+	        // console.log(state);
 	        if (state.ecode == 0){
 		    var append_size_group = function(gid){
 			$scope.groups.push(angular.extend({id:gid}, size));
@@ -712,7 +712,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
     
     $scope.select_size = function(){
 	var callback = function(params){
-	    console.log(params.groups);
+	    // console.log(params.groups);
 	    
 	    $scope.selectGroups = [];
 	    $scope.good.sizes = "";
@@ -722,7 +722,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		    $scope.selectGroups.push(angular.copy(g));
 		}
 	    }); 
-	    console.log($scope.selectGroups);
+	    // console.log($scope.selectGroups);
 
 	    $scope.groups = params.groups;
 	};
@@ -770,8 +770,8 @@ wgoodApp.controller("wgoodNewCtrl", function(
     };
 
     $scope.new_good = function(){
-	console.log($scope.good);
-	console.log($scope.image);
+	// console.log($scope.good);
+	// console.log($scope.image);
 	var good = angular.copy($scope.good);
 	good.firm     = good.firm.id;
 	good.season   = good.season.id;
@@ -818,7 +818,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    }
 	}();
 	
-	console.log(good);
+	// console.log(good);
 	var image  = angular.isDefined($scope.image) && $scope.image
 	    ? $scope.image.dataUrl.replace(/^data:image\/(png|jpg);base64,/, "")
 	    : undefined;
@@ -826,7 +826,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	// console.log(image);
 	
 	wgoodService.add_purchaser_good(good, image).then(function(state){
-	    console.log(state);
+	    // console.log(state);
 	    if (state.ecode == 0){
 		dialog.response_with_callback(
 		    true, "新增货品", "新增货品资料成功！！", $scope,
@@ -848,7 +848,8 @@ wgoodApp.controller("wgoodNewCtrl", function(
 			// reset color
 			$scope.selectColors = [];
 			$scope.good.colors="";
-			console.log($scope.colors);
+			// console.log($scope.colors);
+			
 			angular.forEach($scope.colors, function(colorInfo){
 			    angular.forEach(colorInfo, function(color){
 				// console.log(color);
@@ -860,7 +861,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 			    })
 			});
 
-			console.log($scope.colors);
+			// console.log($scope.colors);
 			
 			$scope.good.style_number = undefined;
 			$scope.good.type = undefined;
@@ -999,7 +1000,7 @@ wgoodApp.controller("wgoodDetailCtrl", function(
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    wgoodService.filter_purchaser_good(
 		$scope.match, search, page, $scope.items_perpage).then(function(result){
-		    console.log(result);
+		    // console.log(result);
 		    if (page === 1){
 			$scope.total_items      = result.total;
 		    }
@@ -1108,7 +1109,7 @@ wgoodApp.controller("wgoodDetailCtrl", function(
 
     var dialog = diabloUtilsService;
     $scope.lookup_detail = function(good){
-	console.log(good);
+	// console.log(good);
 	if (good.color === "0"){
 	    dialog.edit_with_modal(
 		"good-detail.html", undefined, undefined, $scope,
@@ -1150,7 +1151,7 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     	    wgoodService.get_used_purchaser_good({
     		style_number:g.style_number, brand:g.brand_id
     	    }).then(function(result){
-    		console.log(result);
+    		// console.log(result);
     		if (angular.isDefined(result.id)){
     		    g.deleted = false;
     		    dialog.response(

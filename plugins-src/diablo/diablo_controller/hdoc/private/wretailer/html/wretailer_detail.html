@@ -248,13 +248,11 @@
 	      <input class="form-control"
 		     type="tel"
 		     name="mobile"
-		     required
 		     placeholder="请输入电话或手机号码"
 		     class="form-control"
 		     x-ng-model="params.retailer.mobile"
 		     x-ng-pattern="params.pattern.tel_mobile"></input>
 	    </div>
-	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>
 	  <div ng-show="rForm.mobile.$invalid && !rForm.mobile.$pristine">
 	    <span class="fg-red">请输入正确的电话或手机号码</span>
@@ -311,12 +309,10 @@
 		<input type="text"
 		       class="form-control"
 		       name="address"
-		       required
 		       placeholder="请输入您的联系地址"
 		       x-ng-model="params.retailer.address"
 		       x-ng-pattern="params.pattern.name_address"></input>
 	      </div>
-	      <span class="input-group-addon bg-white fg-red">*</span> 
 	    </div>
 	    
 	  <div ng-show="rForm.address.$invalid && !rForm.address.$pristine">

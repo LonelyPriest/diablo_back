@@ -2,14 +2,14 @@ var userApp = angular.module("userApp", ['ngResource']);
 
 
 userApp.factory("userService", function($resource, $q){
-    var _user = $resource("/right/:operation", {operation: '@operation'});
-
-    var _shops     = [];
-    var _rights    = [];
-    var _loginType = undefined;
-    var _loginShop = -1;
-    var _loginFirm = -1;
-    var _employee  = -1;
+    var _user = $resource("/right/:operation", {operation: '@operation'}); 
+    var _shops         = [];
+    var _rights        = [];
+    var _loginType     = undefined;
+    var _loginShop     = -1;
+    var _loginFirm     = -1;
+    var _loginRetailer = -1;
+    var _employee      = -1;
     
     // var _rightShops = [];
 
@@ -55,6 +55,7 @@ userApp.factory("userService", function($resource, $q){
 	    // loginShop:  _loginShop,
 	    loginFirm:     _loginFirm,
 	    loginEmployee: _employee,
+	    loginRetailer: _loginRetailer,
 
 	    // shops exclude the shop that bind to the repository,
 	    // or repository itself
@@ -213,13 +214,14 @@ userApp.factory("userService", function($resource, $q){
 	    return _user.get(
 		{operation: "get_login_user_info"}
 	    ).$promise.then(function(result){
-		console.log(result);
-		_shops     = result.shop;
-		_rights    = result.right;
-		_loginType = result.type;
-		_loginShop = result.login_shop; 
-		_loginFirm = result.login_firm;
-		_employee  = result.login_employee;
+		// console.log(result);
+		_shops         = result.shop;
+		_rights        = result.right;
+		_loginType     = result.type;
+		_loginShop     = result.login_shop; 
+		_loginFirm     = result.login_firm;
+		_employee      = result.login_employee;
+		_loginRetailer = result.login_retailer;
 		return sort();
     	    });
 	}

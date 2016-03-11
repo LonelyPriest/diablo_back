@@ -126,7 +126,7 @@ function filterProvider(){
 		
 		search.start_time = diablo_filter_time(time.start_time, 0, dateFilter); 
 		search.end_time   = diablo_filter_time(time.end_time, 1, dateFilter);
-		console.log(search);
+		// console.log(search);
 
 		callback(search);
 	    },
@@ -160,7 +160,7 @@ function filterProvider(){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
 		    {prompt:viewValue, shop:shop, type:1}).$promise.then(function(invs){
-			console.log(invs);
+			// console.log(invs);
 			return invs.map(function(inv){
 			    return inv.style_number;
 			})
@@ -172,7 +172,7 @@ function filterProvider(){
 		    {operation:'match_w_inventory'},
 		    {prompt:viewValue, shop:shop, firm:firm, type:1}
 		).$promise.then(function(invs){
-		    console.log(invs);
+		    // console.log(invs);
 		    return invs.map(function(inv){
 			return angular.extend(
 			    inv, {name:inv.style_number
@@ -196,7 +196,7 @@ function filterProvider(){
 		    {operation:'match_w_inventory'},
 		    {prompt:viewValue, shop:shop, firm:firm}
 		).$promise.then(function(invs){
-		    console.log(invs);
+		    // console.log(invs);
 		    if (angular.isUndefined(firm)){
 			return invs.map(function(inv){
 			    return inv.style_number;
@@ -216,7 +216,7 @@ function filterProvider(){
 		    {operation:'match_w_inventory'},
 		    {prompt:viewValue, shop:shop, firm:[]}
 		).$promise.then(function(invs){
-		    console.log(invs);
+		    // console.log(invs);
 		    return invs.map(function(inv){
 			return angular.extend(
 			    inv, {name:inv.style_number
@@ -230,7 +230,7 @@ function filterProvider(){
 		    {operation:'match_w_inventory'},
 		    {prompt:viewValue, shop:shop, firm:[]}
 		).$promise.then(function(invs){
-		    console.log(invs);
+		    // console.log(invs);
 		    return invs.map(function(inv){
 			return angular.extend(
 			    inv, {name:inv.style_number
@@ -473,7 +473,7 @@ function normalFilterProvider(){
 		return http.query(
 		    {operation: "list_repo"}
 		).$promise.then(function(repo){
-		    console.log(repo);
+		    // console.log(repo);
 		    return repo.map(function(r){
 			return {name: r.name,
 				id:r.id, py:diablo_pinyin(r.name)};

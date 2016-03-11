@@ -48,7 +48,7 @@ valid_session(Req) ->
 		{true, [_, SessionId]} -> 
 		    case ?session:lookup(SessionId) of
 			{ok, []} -> %% session time out or lost
-			    ?INFO("invalid session ~p", [SessionId]),
+			    %% ?INFO("invalid session ~p", [SessionId]),
 			    {error, {invalid_session}};
 			{ok, _} -> %% valid session 
 			    {ok, valid_session}

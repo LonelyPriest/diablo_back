@@ -760,7 +760,7 @@ diabloUtils.controller("diabloEditDialogCtrl", function(
     $scope, $modalInstance, message){
     // console.log($scope);
     // console.log($modalInstance);
-    console.log(message); 
+    // console.log(message); 
 
     var autoHeight = message.autoHeight;
     

@@ -42,7 +42,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 	    wreportService.daily_report(
 		"by_shop", search, $scope.items_perpage, page
 	    ).then(function(result){
-		console.log(result);
+		// console.log(result);
 
 		var report_data = angular.copy(result.data);
 		
@@ -55,7 +55,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 			} 
 			return true;
 		    })
-		console.log(unused_shops);
+		// console.log(unused_shops);
 
 		$scope.shop_reports = result.data.map(function(d){
 		    return {t_amount: d.t_amount,
@@ -94,7 +94,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 			=  result.t_verificate ? result.t_verificate : 0;
 		}
 
-		console.log($scope.shop_reports);
+		// console.log($scope.shop_reports);
 		diablo_order_page(
 		    page, $scope.items_perpage, $scope.shop_reports); 
 		last_shop_page = page;
@@ -265,7 +265,7 @@ wreportApp.controller("dailyByGood", function(
 	    wreportService.daily_report(
 		"by_good", search, $scope.s_pagination.items_perpage, page
 	    ).then(function(result){
-		console.log(result); 
+		// console.log(result); 
 		// var report_data = angular.copy(result.data); 
 		if (page === 1){
 		    $scope.s_pagination.total_page =

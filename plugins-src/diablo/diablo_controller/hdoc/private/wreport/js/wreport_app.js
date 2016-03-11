@@ -40,7 +40,7 @@ wreportApp.service("wreportService", function($resource, dateFilter){
      * restful
      */
     this.daily_report = function(type, condition, itemsPerpage, currentPage){
-	console.log(itemsPerpage, currentPage);
+	// console.log(itemsPerpage, currentPage);
 	return http.save({operation: "daily_wreport", type: type},
 			 {condition: condition,
 			  page:      currentPage,

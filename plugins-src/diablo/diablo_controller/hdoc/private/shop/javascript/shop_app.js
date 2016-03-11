@@ -153,19 +153,19 @@ shopApp.controller("newShopCtrl", function(
 	$scope.authen_list_repo = true; 
     };
 
-    console.log($scope.authen_list_repo);
+    // console.log($scope.authen_list_repo);
     
 
     $scope.repertories = [];
     if ($scope.authen_list_repo){
 	shopService.list_repo().then(function(repo){
-    	    console.log(repo);
+    	    // console.log(repo);
     	    $scope.repertories = repo.map(function(r){
     		return {name:r.name, id:r.id, py:diablo_pinyin(r.name)}
     	    })
 	});
 	// $scope.repertories = diabloNormalFilter.get_repo();
-	console.log($scope.repertories);
+	// console.log($scope.repertories);
     };
     
     // canlender
@@ -182,9 +182,9 @@ shopApp.controller("newShopCtrl", function(
 
     // $scope.shop = {};
     $scope.new_shop = function(){
-	console.log($scope.shop);
+	// console.log($scope.shop);
 	shopService.add($scope.shop).$promise.then(function(state){
-	    console.log(state);
+	    // console.log(state);
 	    if (state.ecode == 0){
 		diabloUtilsService.response_with_callback(
 		    true, "新增店铺", "恭喜你，店铺 " + $scope.shop.name + " 成功创建！！",
@@ -205,7 +205,7 @@ shopApp.controller("newShopCtrl", function(
 shopApp.controller("shopDetailCtrl", function(
     $scope, $q, diabloUtilsService, shopService, filterEmployee, user){
     // console.log(filterEmployee);
-    console.log(user); 
+    // console.log(user); 
     // employees
     $scope.employees   = filterEmployee;
     // $scope.repertories = filterRepo;
@@ -223,7 +223,7 @@ shopApp.controller("shopDetailCtrl", function(
     if ($scope.authen_list_repo){
 	
 	shopService.list_repo().then(function(repo){
-    	    console.log(repo);
+    	    // console.log(repo);
     	    $scope.repertories = repo.map(function(r){
     		return {name:r.name, id:r.id, py:diablo_pinyin(r.name)}
     	    });
@@ -268,7 +268,7 @@ shopApp.controller("shopDetailCtrl", function(
     $scope.refresh = function(){
 	// $scope.shops = [];
 	shopService.list().$promise.then(function(shops){
-	    console.log(shops);
+	    // console.log(shops);
 	    // $scope.shops = angular.copy(shops);
 	    // angular.forEach($scope.shops, function(s){
 	    // 	$scope.repo = $scope.get_repo(s.repo);
@@ -301,7 +301,7 @@ shopApp.controller("shopDetailCtrl", function(
 	    // 	    }
 	    // 	});
 	    diablo_order($scope.shops);
-	    console.log($scope.shops);
+	    // console.log($scope.shops);
 	});
     };
 
@@ -317,7 +317,7 @@ shopApp.controller("shopDetailCtrl", function(
     $scope.edit_shop = function(old_shop){
 	// console.log(shop);
 	var callback = function(params){
-	    console.log(params);
+	    // console.log(params);
 
 	    var update = {};
 	    for (var o in params.shop){
@@ -327,10 +327,10 @@ shopApp.controller("shopDetailCtrl", function(
 	    }
 	    
 	    update.id = params.shop.id; 
-	    console.log(update);
+	    // console.log(update);
 	    
     	    shopService.update(update).then(function(state){
-    		console.log(state);
+    		// console.log(state);
     		if (state.ecode == 0){
 		    diabloUtilsService.response_with_callback(
 			true, "店铺编辑", "恭喜你，店铺 [" + old_shop.name + "] 信息修改成功！！",
@@ -382,7 +382,7 @@ shopApp.controller("shopDetailCtrl", function(
     $scope.delete_shop = function(shop){
 	var callback = function(){
 	    shopService.destroy(shop).then(function(state){
-    		console.log(state);
+    		// console.log(state);
     		if (state.ecode == 0){
 		    dialog.response_with_callback(
 			true, "删除店铺",

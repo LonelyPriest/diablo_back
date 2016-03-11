@@ -407,6 +407,7 @@
 	  login_shop  = -1    :: integer(), %% which shop to login
 	  login_firm  = -1    :: integer(), %% which firm to login
 	  employee_id = -1    :: integer(),
+	  retailer_id = -1    :: integer(),
 	  mtype       = -1    :: integer(), %% merhcant type 0: saler, 1: wholesaler
 	  login_time          :: string()   %% start time of login
 	 }).

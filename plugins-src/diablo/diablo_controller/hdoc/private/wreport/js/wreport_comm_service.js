@@ -27,7 +27,7 @@ wreportApp.factory("wreportCommService", function(){
     };
     
     service.get_shop_id = function(){
-	console.log(service._user);
+	// console.log(service._user);
 	return service._user.shopIds.length === 0
 	    ? undefined:service._user.shopIds;
     };

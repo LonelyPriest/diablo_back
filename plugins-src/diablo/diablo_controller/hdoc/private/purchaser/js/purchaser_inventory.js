@@ -65,7 +65,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	
 
     $scope.change_firm = function(){
-	console.log($scope.select.firm);
+	// console.log($scope.select.firm);
 	$scope.select.surplus = parseFloat($scope.select.firm.balance);
 	$scope.left_balance  = $scope.select.surplus;
 	
@@ -356,7 +356,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
     };
     
     $scope.on_select_good = function(item, model, label){
-	console.log(item); 
+	// console.log(item); 
 
 	// has been added
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
@@ -403,7 +403,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    add.amount = []; 
 	}
 
-	console.log(add);
+	// console.log(add);
 
 	if (!add.free_color_size){
 	    $scope.add_inventory(add)
@@ -1356,7 +1356,7 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     $scope.prompt = diabloFilter.get_prompt();
 
     var storage = localStorageService.get(diablo_key_invnetory_trans);
-    console.log(storage);
+    // console.log(storage);
 
     if (angular.isDefined(storage) && storage !== null){
     	$scope.filters     = storage.filter;

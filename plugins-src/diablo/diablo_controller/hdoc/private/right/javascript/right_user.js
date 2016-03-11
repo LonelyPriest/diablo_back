@@ -689,7 +689,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 	    promise(rightService.list_account)(),
 	    promise(rightService.list_shop)(),
 	    promise(rightService.list_firm)(),
-	    promise(rightService.list_employee)()
+	    promise(rightService.list_employee)(),
+	    promise(rightService.list_retailer)(),
 	]).then(function(data){
 	    console.log(data);
 	    // $scope.accounts = data[0];
@@ -711,9 +712,17 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 
 	    $scope.employees = data[3].map(function(e){
 		return {
-		    id: e.id,
+		    id:   e.id,
 		    name: e.name,
-		    py: diablo_pinyin(e.name)
+		    py:   diablo_pinyin(e.name)
+		};
+	    });
+
+	    $scope.retailers = data[4].map(function(r){
+		return {
+		    id: r.id,
+		    name: r.name,
+		    py: diablo_pinyin(r.name)
 		};
 	    });
 	    
@@ -730,6 +739,8 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    firm:        diablo_get_object(account.firm_id, $scope.firms),
 		    employee_id: account.employee_id,
 		    employee:    diablo_get_object(account.employee_id, $scope.employees),
+		    retailer_id: account.retailer_id,
+		    retailer:    diablo_get_object(account.retailer_id, $scope.retailers),
 		    stime:       account.stime,
 		    etime:       account.etime,
 		    role_name:   account.role_name,
@@ -864,12 +875,17 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		new_account.employee_id = 
 		    angular.isDefined(new_account.employee)
 		    &&  new_account.employee ? new_account.employee.id : -1;
+
+		new_account.retailer_id = 
+		    angular.isDefined(new_account.retailer)
+		    &&  new_account.retailer ? new_account.retailer.id : -1;
 		
 		if (new_account.type === 2 ){
 		    if (new_account.role.id === current_role.role_id
 			&& new_account.shop_id === account.shop_id
 			&& new_account.firm_id === account.firm_id
 			&& new_account.employee_id === account.employee_id
+			&& new_account.retailer_id === account.retailer_id
 			
 			&& new_account.stime  === account.stime
 			&& new_account.etime === account.etime){
@@ -882,6 +898,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		    if (new_account.shop_id === account.shop_id
 			&& new_account.firm_id === account.firm_id
 			&& new_account.employee_id === account.employee_id
+			&& new_account.retailer_id === account.retailer_id
 		       ){
 			diabloUtilsService.response(
 			    false, "用户帐户修改",
@@ -918,6 +935,10 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 		update.employee_id =
 		    new_account.employee_id !== account.employee_id
 		    ? new_account.employee_id : undefined;
+
+		update.retailer_id =
+		    new_account.retailer_id !== account.retailer_id
+		    ? new_account.retailer_id : undefined;
 
 		console.log(update);
 		

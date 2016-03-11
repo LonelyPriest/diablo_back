@@ -499,12 +499,13 @@ handle_call({update_account_role, Account, NewRole}, _From, State) ->
 
 handle_call({update_account, Attrs}, _From, State) ->
     ?DEBUG("update_account with attrs ~p", [Attrs]),
-    Account   = ?v(<<"account">>, Attrs),
-    LoginShop = ?v(<<"shop">>, Attrs),
-    LoginFirm = ?v(<<"firm">>, Attrs),
+    Account       = ?v(<<"account">>, Attrs),
+    LoginShop     = ?v(<<"shop">>, Attrs),
+    LoginFirm     = ?v(<<"firm">>, Attrs),
     LoginEmployee = ?v(<<"employee">>, Attrs),
-    StartTime = ?v(<<"stime">>, Attrs),
-    EndTime   = ?v(<<"etime">>, Attrs),
+    LoginRetailer = ?v(<<"retailer">>, Attrs),
+    StartTime     = ?v(<<"stime">>, Attrs),
+    EndTime       = ?v(<<"etime">>, Attrs),
 
     Sql1 = case ?v(<<"role">>, Attrs) of
 	      undefined -> [];
@@ -516,6 +517,7 @@ handle_call({update_account, Attrs}, _From, State) ->
     Updates = ?utils:v(shop, integer, LoginShop)
 	++ ?utils:v(firm, integer, LoginFirm)
 	++ ?utils:v(employee, integer, LoginEmployee)
+	++ ?utils:v(retailer, integer, LoginRetailer)
 	++ ?utils:v(stime, integer, StartTime)
 	++ ?utils:v(etime, integer, EndTime),
 
@@ -658,8 +660,11 @@ code_change(_OldVsn, State, _Extra) ->
 %%%=================================================================== 
 account(Conditions) ->
     CorrectConditions = ?utils:correct_condition(<<"a.">>, Conditions),
-    Sql1 = "select a.id, a.name, a.type, a.merchant, a.shop as shop_id"
-	", a.firm as firm_id, employee as employee_id"
+    Sql1 = "select a.id, a.name, a.type, a.merchant"
+	", a.shop as shop_id"
+	", a.firm as firm_id"
+	", a.employee as employee_id"
+	", a.retailer as retailer_id"
 	", a.stime, a.etime, a.max_create, a.create_date"
 	", tc.user_id, tc.role_id, tc.role_name"
 	%% ", b.role_id as role"
