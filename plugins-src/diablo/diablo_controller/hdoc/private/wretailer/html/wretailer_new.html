@@ -108,19 +108,18 @@
 	    <div class="form-group">
 	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
 	      <div class="col-sm-6 col-md-6">
-		<div class="input-group">
+		<!-- <div class="input-group"> -->
 		  <div x-ng-class="{'has-error': retailerNewForm.address.$invalid
 				   && !retailerNewForm.address.$pristine}">
 		    <input type="text"
 			   class="form-control"
 			   name="address"
-			   required
 			   placeholder="请输入您的联系地址"
 			   x-ng-model="retailer.address"
 			   x-ng-pattern="pattern.name_address"/>
 		  </div>
-		  <span class="input-group-addon bg-white fg-red">*</span> 
-		</div>
+		  <!-- <span class="input-group-addon bg-white fg-red">*</span>  -->
+		<!-- </div> -->
 	      </div>
 	      <div ng-show="retailerNewForm.address.$invalid
 			    && !retailerNewForm.address.$pristine">

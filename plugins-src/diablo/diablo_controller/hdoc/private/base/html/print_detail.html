@@ -147,6 +147,14 @@
 			{{yes_no[s.value].cname}}
 		      </span>
 
+		       <span ng-switch-when="e_sgroup1">
+			 {{get_object(s.value, size_groups).name}}
+		       </span>
+
+		       <span ng-switch-when="e_sgroup2">
+			 {{get_object(s.value, size_groups).name}}
+		       </span>
+
 		      <!--default-->
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
@@ -220,38 +228,32 @@
 	      <input x-ng-switch-when="phone1"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-when="phone2"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-when="phone3"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-when="phone4"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-when="phone5"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-when="phone6"
 		     class="form-control" required
 		     name="value"
-		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile" />
+		     x-ng-model="params.setting.value" />
 
 	      <input x-ng-switch-default
 		     class="form-control" required
@@ -263,9 +265,7 @@
 	    <span class="input-group-addon bg-white fg-red">*</span>
 	  </div>
 	  <div ng-show="pForm.value.$invalid && !pForm.value.$pristine">
-	    <span class="fg-red">
-	      联系方式只能是手机或座机，备注不能包含特殊字符
-	    </span>
+	    <span class="fg-red"> 备注不能包含特殊字符 </span>
 	  </div>
 	</div>
 
@@ -422,6 +422,25 @@
 				    y in params.setting.yes_no"
 		      x-ng-init="params.setting.value=
 				 params.setting.yes_no[params.setting.value]">
+	      </select>
+
+	      <select x-ng-switch-when="e_sgroup1"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="y as y.name for
+				    y in params.setting.sgroups"
+		      x-ng-init="params.setting.value=params.init_v ">
+	      </select>
+
+	      <select x-ng-switch-when="e_sgroup2"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="y as y.name for
+				    y in params.setting.sgroups"
+		      x-ng-init="params.setting.value=params.init_v ">
+		      
 	      </select>
 
 	      <div x-ng-switch-when="qtime_start">

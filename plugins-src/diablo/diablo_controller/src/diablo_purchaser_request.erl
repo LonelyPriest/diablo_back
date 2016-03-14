@@ -479,14 +479,25 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 	{ok, []} ->
 	    ?utils:respond(200, Req, ?err(wsale_export_none, Merchant));
 	{ok, Transes} -> 
-	    %% write to file 
-	    {ok, ExportFile, Url} = ?utils:create_export_file("itrans", Merchant, UserId), 
+	    %% write to file
+	    ?DEBUG("export transes ~p", [Transes]),
+	    {ok, ExportFile, Url}
+		= ?utils:create_export_file("itrans", Merchant, UserId),
+	    
 	    case file:open(ExportFile, [append, raw]) of
 		{ok, Fd} -> 
 		    try
 			DoFun = fun(C) -> ?utils:write(Fd, C) end,
-			csv_head(ExportType, DoFun),
-			do_write(ExportType, DoFun, Transes),
+			case ExportType of
+			    stock ->
+				ExportSizes = export_size_group(Merchant),
+				{ok, Colors} = ?w_user_profile:get(color, Merchant),
+				csv_head(stock, ExportSizes, DoFun),
+				do_write(stock, ExportSizes, Colors, DoFun, Transes);
+			    _ ->
+				csv_head(ExportType, DoFun),
+				do_write(ExportType, DoFun, Transes)
+			end,
 			ok = file:datasync(Fd),
 			ok = file:close(Fd)
 		    catch
@@ -689,9 +700,15 @@ filter_condition(trans_note, Rsns, Conditions) ->
 csv_head(trans, Do) ->
     Do("序号,单号,厂商,门店,入单员,采购,数量,现金,刷卡,汇款,核销,费用,帐户欠款,应付,实付,本次欠款,备注,日期");
 csv_head(trans_note, Do) ->
-    Do("序号,单号,厂商,门店,店员,交易类型,款号,品牌,类型,折扣,数量,日期");
-csv_head(stock, Do) ->
-    Do("序号,款号,品牌,类别,性别,厂商,季节,年度,进货价,吊牌价,批发价,折扣,数量,结余,店铺,上架日期").
+    Do("序号,单号,厂商,门店,店员,交易类型,款号,品牌,类型,折扣,数量,日期").
+csv_head(stock, Sizes, Do) ->
+    StringSizes = 
+	lists:foldr(
+	  fun(S, Acc) ->
+		  ?to_s(S) ++ "," ++ Acc
+	  end, [], Sizes),
+    
+    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,单价,金额").
 
 
 do_write(ExportType, Do, Transes) ->
@@ -789,62 +806,36 @@ do_write(trans_note, Do, Count, Amount, Calc, [H|T]) ->
 	++ ?to_s(Date),
     %% ++ ?to_s(Date),
     Do(L),
-    do_write(trans_note, Do, Count + 1, Amount, Calc, T);
+    do_write(trans_note, Do, Count + 1, Amount, Calc, T).
 
-do_write(stock, Do, _Count, Amount, Calc, [])->
-    L = "\r\n" ++ csv(space, "", 12) ++ ?to_s(Amount) ++ ?d ++ ?to_s(Calc),
-    Do(L),
+do_write(stock, _ExportSizes, _AllColors, _Do, [])->
     ok;
-do_write(stock, Do, Count, Amount, Calc, [H|T]) ->
+do_write(stock, ExportSizes, AllColors, Do, [H|T]) -> 
+    %% ?DEBUG("H ~p", [H]),
     StyleNumber = ?v(<<"style_number">>, H),
     Brand       = ?v(<<"brand">>, H), 
     Type        = ?v(<<"type">>, H),
-    %% Color       = ?v(<<"color">>, H),
-    %% Size        = ?v(<<"size">>, H),
-    Sex         = ?v(<<"sex">>, H),
+    Color       = color(name, ?v(<<"color_id">>, H), AllColors),
+    Size        = ?v(<<"size">>, H),
+    PkgPrice    = ?v(<<"pkg_price">>, H), 
+    Total       = ?v(<<"total">>, H), 
     
-    Firm        = ?v(<<"firm">>, H), 
-    Shop        = ?v(<<"shop">>, H),
-    Season      = ?v(<<"season">>, H),
-    Year        = ?v(<<"year">>, H),
-
-    OrgPrice    = ?v(<<"org_price">>, H),
-    TagPrice    = ?v(<<"tag_price">>, H),
-    PkgPrice    = ?v(<<"pkg_price">>, H),
-    %% P3          = ?v(<<"price3">>, H),
-    %% P4          = ?v(<<"price4">>, H),
-    %% P5          = ?v(<<"price5">>, H),
-    Discount    = ?v(<<"discount">>, H), 
-    Total       = ?v(<<"amount">>, H), 
-
-    Date      = ?v(<<"entry_date">>, H),
-
     L = "\r\n"
-	++ ?to_s(Count) ++ ?d
+	++ ?to_s(Brand) ++ ?d 
 	++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
-	++ ?to_s(Brand) ++ ?d
 	++ ?to_s(Type) ++ ?d
-    %% ++ ?to_s(Color) ++ ?d
-    %% ++ ?to_s(Size) ++ ?d
-	++ sex(Sex) ++ ?d
-	++ ?to_s(Firm) ++ ?d
-	++ season(Season) ++ ?d
-	++ ?to_s(Year) ++ ?d
-
-	++ ?to_s(OrgPrice) ++ ?d
-	++ ?to_s(PkgPrice) ++ ?d
-	++ ?to_s(TagPrice) ++ ?d
-    %% ++ ?to_s(P3) ++ ?d
-    %% ++ ?to_s(P4) ++ ?d
-    %% ++ ?to_s(P5) ++ ?d
-	++ ?to_s(Discount) ++ ?d
-	++ ?to_s(Total) ++ ?d
-	++ ?to_s(OrgPrice * Total) ++ ?d
-	
-	++ ?to_s(Shop) ++ ?d 
-	++ ?to_s(Date),
+	++ ?to_s(Color) ++ ?d
+	++ lists:foldr(
+	     fun(S, Acc) when S =:= Size ->
+		     ?to_s(Total) ++ ?d ++ Acc;
+		(_, Acc) ->
+		     "\"\"" ++ ?d ++ Acc
+	     end, [], ExportSizes)
+	++ ?to_s(Total) ++ ?d 
+	++ ?to_s(PkgPrice) ++ ?d 
+	++ ?to_s(PkgPrice * Total) ++ ?d, 
     Do(L),
-    do_write(stock, Do, Count + 1, Amount + Total, Calc + Total * OrgPrice, T).
+    do_write(stock, ExportSizes, AllColors, Do, T).
 
 export_type(0) -> trans;
 export_type(1) -> trans_note;
@@ -853,18 +844,64 @@ export_type(2) -> stock.
 purchaser_type(0) -> "入库";
 purchaser_type(1)-> "退货".
 
-sex(0) ->"女"; 
-sex(1) ->"男".
+%% sex(0) ->"女"; 
+%% sex(1) ->"男".
 
-season(0) -> "春";
-season(1) -> "夏";
-season(2) -> "秋";
-season(3) -> "冬".
+%% season(0) -> "春";
+%% season(1) -> "夏";
+%% season(2) -> "秋";
+%% season(3) -> "冬".
 
 mode(0) -> use_id;
 mode(1) -> use_sell.
 
-csv(space, S, 0) ->
-    S;
-csv(space, S, Num) ->
-    csv(space, "\"\"" ++ ?d ++ S, Num -1).
+%% csv(space, S, 0) ->
+%%     S;
+%% csv(space, S, Num) ->
+%%     csv(space, "\"\"" ++ ?d ++ S, Num -1).
+
+
+export_size_group(Merchant) ->
+    {ok, BaseSettings} = ?w_user_profile:get(setting, Merchant),
+    ExportGroups = 
+	lists:foldr(
+	  fun({S}, Acc) ->
+		  case ?v(<<"ename">>, S) =:= <<"e_sgroup1">>
+		      orelse ?v(<<"ename">>, S) =:= <<"e_sgroup2">> of
+		      true ->
+			  [?v(<<"value">>, S)|Acc];
+		      false ->
+			  Acc
+		  end
+	  end, [], BaseSettings),
+
+    F = fun(S) when S =:= <<>> -> [];
+	   (S) when S =:= [] -> [];
+	   (S) -> [S]
+	end,
+
+    FlatternSizes = 
+	lists:foldr(
+	  fun(G, Acc)->
+		  {ok, Size} = ?w_user_profile:get(size_group, Merchant, ?to_i(G)),
+		  ?DEBUG("size ~p", [Size]),
+		  SI   = ?v(<<"si">>, Size),
+		  SII  = ?v(<<"sii">>, Size),
+		  SIII = ?v(<<"siii">>, Size),
+		  SIV  = ?v(<<"siv">>, Size),
+		  SV   = ?v(<<"sv">>, Size),
+		  SVI  = ?v(<<"svi">>, Size),
+		  F(SI) ++ F(SII) ++ F(SIII) ++ F(SIV) ++ F(SV) ++ F(SVI) ++ Acc 
+	  end, [], ExportGroups),
+
+    ?DEBUG("flattern sizes ~p", [FlatternSizes]),
+    lists:usort(FlatternSizes).
+
+color(name, _ColorId, []) ->
+    []; 
+color(name, ColorId, [{H}|T]) ->
+    case ?v(<<"id">>, H) =:= ColorId of
+	true -> ?v(<<"name">>, H);
+	false -> color(name, ColorId, T)
+    end.
+	    

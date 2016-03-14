@@ -52,6 +52,11 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
     };
 
+    $scope.reject_pgood = function(){
+	return diablo_base_setting(
+	    "reject_pgood", $scope.select.shop.id, base, parseInt, diablo_no);
+    };
+
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail");
     };
@@ -131,6 +136,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 
     $scope.setting.show_discount = $scope.show_discount();
     $scope.setting.round         = $scope.p_round();
+    $scope.setting.reject_pgood  = $scope.reject_pgood();
     
     $scope.setting.q_backend     = $scope.q_typeahead();
     if (!$scope.setting.q_backend){
@@ -508,8 +514,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	} else {
 	    var promise   = diabloPromise.promise;
 	    var condition = {style_number: inv.style_number,
-			     brand: inv.brand_id,
-			     shop:  $scope.select.shop.id};
+			     brand:   inv.brand_id,
+			     shop:    $scope.select.shop.id};
+	    // console.log(condition);
 	    var calls     = [];
 
 	    if ($scope.setting.check_sale === diablo_yes || inv.free !== 0){
@@ -518,11 +525,13 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    }
 
 	    if ($scope.setting.trace_price === diablo_yes){
+		// console.log(condition); 
 		calls.push(promise(
 		    wsaleService.get_last_sale,
 		    angular.extend(
-			{retailer: $scope.select.retailer.id}, condition))());
-	    }
+			{retailer: $scope.select.retailer.id,
+			 r_pgood: $scope.setting.reject_pgood}, condition))());
+	    } 
 	    
 	    $q.all(calls).then(function(data){
 		console.log(data);
@@ -552,9 +561,21 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 			    || inv.free !== 0){
 			    return data[1];
 			} else {
+			    // console.log(data[0]);
 			    return data[0];
 			}
 		    }();
+
+		    // console.log(shop_last_inv.length);
+		    if (diablo_yes === $scope.setting.reject_pgood
+			&& shop_last_inv.length > 1){
+			dialog.response_with_callback(
+			false, "销售退货", "退货失败：" + wsaleService.error[2799],
+			    $scope, function(){
+				$scope.inventories[0] = {$edit:false, $new:true}});
+
+			return;
+		    }
 
 		    // last sale info
 		    inv.lprice    = shop_last_inv.length === 0

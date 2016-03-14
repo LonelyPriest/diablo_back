@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-03-12",
+	 content: [
+	     "增加补单是无法退货的提示",
+	     "修改开单日期为每天0点时统计的问题"
+	 ]
+	},
+	
 	{date: "2016-03-11",
 	 content: [
 	     "品牌最大长度由8个字符改成16个字符",

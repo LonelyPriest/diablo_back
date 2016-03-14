@@ -1583,22 +1583,30 @@ handle_call({stock_export, Merchant, Conditions}, _From, State) ->
 	?sql_utils:cut(fields_with_prifix, realy_conditions(Merchant, Conditions)),
     Sql =
 	"select a.id, a.style_number, a.brand as brand_id"
-	", a.type as type_id, a.sex, a.season, a.amount"
+	", a.type as type_id, a.sex, a.season"
 	", a.firm as firm_id, a.year"
 
 	", a.org_price, a.tag_price, a.pkg_price"
 	", a.discount, a.shop as shop_id, a.entry_date"
+	
+	", b.total"
+	", b.color as color_id"
+	", b.size"
 
-	", b.name as shop"
-	", c.name as brand"
-	", d.name as type"
-	", e.name as firm"
+	%% ", c.name as shop"
+	", d.name as brand"
+	", e.name as type"
+	", f.name as firm"
 
 	" from w_inventory a"
-	" left join shops b on a.shop=b.id"
-	" left join brands c on a.brand=c.id"
-	" left join inv_types d on a.type=d.id"
-	" left join suppliers e on a.firm=e.id"
+	" left join w_inventory_amount b on "
+	" a.style_number=b.style_number and a.brand=b.brand"
+	" and a.shop=b.shop and a.merchant=b.merchant"
+	
+	%% " left join shops c on a.shop=c.id"
+	" left join brands d on a.brand=d.id"
+	" left join inv_types e on a.type=e.id"
+	" left join suppliers f on a.firm=f.id"
 
 	" where "
 	++ ?sql_utils:condition(proplists_suffix, NewConditions)

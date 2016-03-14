@@ -175,6 +175,13 @@ baseApp.service("baseService", function($resource){
 	     stock: delete_stock_data,
 	     sell: delete_sell_data}).$promise;
     };
+
+    var httpGood = $resource("/wgood/:operation/:id",
+    			     {operation: '@operation', id: '@id'});
+
+    this.list_purchaser_size = function(){
+	return httpGood.query({operation: 'list_w_size'}).$promise;
+    };
     
 });
     
@@ -287,9 +294,15 @@ baseApp.controller("bankCardDetailCtrl", function($scope, baseService, diabloUti
 
 baseApp.controller("printOptionCtrl", function(
     $scope, dateFilter, baseService, diabloPattern, diabloUtilsService, user){
+
+    baseService.list_purchaser_size().then(function(sizes){
+	console.log(sizes);
+	$scope.size_groups = [{id:0, name:"== 无尺码组 =="}].concat(sizes); 
+    });
+    
     $scope.shops = [
 	{id: -1, name:"== 请选择店铺或仓库，默认所有店铺配置相同 =="}]
-	.concat(user.sortShops, user.sortRepoes);
+	.concat(user.sortShops, user.sortRepoes); 
     
     $scope.print_types   = baseService.print_types;
     $scope.print_formats = baseService.print_formats;
@@ -298,7 +311,7 @@ baseApp.controller("printOptionCtrl", function(
     $scope.prompt_types  = baseService.prompt_types;
     $scope.round_names   = baseService.round_names;
     $scope.price_types   = diablo_sell_style;
-    console.log($scope.print_formats);
+    // console.log($scope.print_formats);
 
     $scope.show_switch = function(name){
 	if (name === 'pum'
@@ -360,12 +373,16 @@ baseApp.controller("printOptionCtrl", function(
 	    }
 	}
     };
+
+    $scope.get_object = function(id, objs){
+	return diablo_get_object(parseInt(id), objs);
+    };
     
     $scope.refresh = function(shop){
 	baseService.list_setting(
 	    baseService.print_setting
 	).then(function(data){
-	    console.log(data);
+	    // console.log(data); 
 	    $scope.settings = 
 		$scope.shops.map(function(s){
 		    setting = data.filter(function(d){
@@ -453,10 +470,11 @@ baseApp.controller("printOptionCtrl", function(
 	    var update;
 	    if (s.ename==="qtime_start"){
 		update = dateFilter(setting.value, "yyyy-MM-dd");
-	    } else if (s.ename==="price_type"){
+	    } else if (s.ename==="price_type"
+		       || s.ename === 'e_sgroup1'
+		       || s.ename === 'e_sgroup2'){
 		update = setting.value.id;
-	    }
-	    else {
+	    } else {
 		update = typeof(setting.value) === 'object'
 		    ? setting.value.value : setting.value;
 	    };
@@ -503,6 +521,9 @@ baseApp.controller("printOptionCtrl", function(
 	if (s.ename === 'price_type'){
 	    angular.extend(s, {price_types: $scope.price_types}); 
 	};
+	if (s.ename === 'e_sgroup1' || s.ename === 'e_sgroup2'){
+	    angular.extend(s, {sgroups: $scope.size_groups});
+	};
 	
 	if (s.ename === 'ptable'
 	    || s.ename === 'pretailer'
@@ -535,6 +556,11 @@ baseApp.controller("printOptionCtrl", function(
 	    angular.extend(s, {time_length: $scope.time_length}); 
 	};
 
+	if (s.ename === 'e_sgroup1' || s.ename === 'e_sgroup2'){
+	    console.log(s.value, $scope.size_groups);
+	    v = $scope.get_object(s.value, $scope.size_groups);
+	};
+
 	var qtime = {};
 	if (s.ename === 'qtime_start'){
 	    qtime.isOpened = false;
@@ -548,10 +574,11 @@ baseApp.controller("printOptionCtrl", function(
 	
 	dialog.edit_with_modal(
 	    "edit-setting.html", undefined, callback, $scope,
-	    {setting: s,
-	     init_v: v,
-	     qtime: qtime,
-	     to_i: diablo_set_integer,
+	    {setting:    s,
+	     init_v:     v,
+	     qtime:      qtime,
+	     to_i:       diablo_set_integer,
+	     // get_object: $scope.get_object,
 	     patterns: {tel_mobile: diabloPattern.tel_mobile,
 			remark:    diabloPattern.comment}});
     }

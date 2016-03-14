@@ -90,8 +90,6 @@ function filterProvider(){
 		    _prompt.tshop = promptValues;
 		}
 
-		
-
 		return _filter;
 	    },
 
@@ -407,17 +405,16 @@ function normalFilterProvider(){
     var _shops         = [];
     
     this.$get = function($resource){
-	var _employeeHttp = $resource("/employ/:operation", {operation: '@operation'});
-	var _retailerHttp =$resource("/wretailer/:operation", {operation: '@operation'});
+	var _employeeHttp = $resource("/employ/:operation",    {operation: '@operation'});
+	var _retailerHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _provinceHttp = $resource("/wretailer/:operation", {operation: '@operation'});
-	var _cityHttp = $resource("/wretailer/:operation", {operation: '@operation'});
-	var _baseHttp = $resource("/wbase/:operation", {operation: '@operation'});
-	var _invHttp  = $resource("/purchaser/:operation", {operation:'@operation'},
+	var _cityHttp     = $resource("/wretailer/:operation", {operation: '@operation'});
+	var _baseHttp     = $resource("/wbase/:operation",     {operation: '@operation'});
+	var _invHttp      = $resource("/purchaser/:operation", {operation:'@operation'},
 				  {
 				      post_get: {method: 'POST', isArray: true}
 				  });
-	// var _goodHttp = $resource("/wgood/:operation/:id", {operation: '@operation', id: '@id'});
-
+	
 	var _shopHttp = $resource("/shop/:operation/:id",
     				  {operation: '@operation', id: '@id'});
 	

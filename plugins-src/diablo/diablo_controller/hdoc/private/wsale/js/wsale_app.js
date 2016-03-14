@@ -142,6 +142,7 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 	2701: "文件导出失败，请重试或联系服务人员查找原因！！",
 	2702: "文件导出失败，没有任何数据需要导出，请重新设置查询条件！！",
 	2699: "修改前后信息一致，请重新编辑修改项！！",
+	2799: "该款号为补单，无法退货，请重新选择款号！！",
 	9001: "数据库操作失败，请联系服务人员！！"};
 
     this.rsn_title = ["开单明细", "退货明细", "销售明细"];
@@ -255,7 +256,9 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 				  {style_number: inv.style_number,
 				   brand:        inv.brand,
 				   shop:         inv.shop,
-				   retailer:     inv.retailer}).$promise;
+				   retailer:     inv.retailer,
+				   r_pgood:      inv.r_pgood
+				  }).$promise;
     };
 
     this.w_sale_rsn_detail = function(inv){

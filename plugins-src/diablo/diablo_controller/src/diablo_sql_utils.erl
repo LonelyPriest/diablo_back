@@ -93,7 +93,7 @@ time_condition(Time, TimeField, le) ->
     case Time of
 	undefined -> [];
 	Time ->
-	    ?to_s(TimeField) ++ "<=\"" ++ ?to_s(Time) ++ "\""
+	    ?to_s(TimeField) ++ "<\"" ++ ?to_s(Time) ++ "\""
     end.
 
 count_table(Table, Merchant, Conditions) ->

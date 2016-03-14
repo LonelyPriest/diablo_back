@@ -130,7 +130,8 @@ action(Session, Req, {"get_last_sale"}, Payload) ->
 
     case ?w_sale:sale(last, Merchant, Payload) of
 	{ok, Last} ->
-	    ?utils:respond(200, batch, Req, {Last});
+	    %% ?DEBUG("last ~p", [Last]),
+	    ?utils:respond(200, batch, Req, Last);
 	{error, Error} ->
 	    ?utils:respond(200, Req, Error)
     end;

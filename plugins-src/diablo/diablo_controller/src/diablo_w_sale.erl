@@ -423,13 +423,17 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
     ?DEBUG("last_sale with merchant ~p, condtions ~p", [Merchant, Conditions]),
     Retailer = ?v(<<"retailer">>, Conditions),
     Shop     = ?v(<<"shop">>, Conditions),
+    RPGood   = ?v(<<"r_pgood">>, Conditions, 0),
+    
     C1 = [{<<"a.shop">>, Shop},
 	  {<<"a.merchant">>, Merchant},
 	  {<<"a.retailer">>, Retailer},
 	  {<<"a.type">>, 0}],
 
-    C2 = proplists:delete(<<"retailer">>,
-			  proplists:delete(<<"shop">>, Conditions)),
+    C2 = proplists:delete(
+	   <<"r_pgood">>,
+	   proplists:delete(<<"retailer">>,
+			    proplists:delete(<<"shop">>, Conditions))),
     CorrectC2 = ?utils:correct_condition(<<"b.">>, C2),
 
     Sql = 
@@ -438,7 +442,11 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
 	" from w_sale a, w_sale_detail b"
 	" where a.rsn=b.rsn" ++ ?sql_utils:condition(proplists, C1)
 	++ " and " ++ ?utils:to_sqls(proplists, CorrectC2)
-	++ " order by id desc limit 1",
+	++ " order by id desc "
+	++ case RPGood of
+	    0 -> "limit 1";
+	    _ -> "limit 2"
+	end,
 
     %% Sql = "select a.id, a.rsn, a.style_number, a.sell_style"
     %% 	", a.fdiscount, a.fprice"
@@ -452,7 +460,7 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
     %% 	%% ++ ?sql_utils:condition(proplists, C2)
     %% 	++ " where " ++ ?utils:to_sqls(proplists, CorrectC2)
     %% 	++ " order by id desc limit 1",
-    Reply = ?sql_utils:execute(s_read, Sql),
+    Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 
 handle_call({get_sale_rsn, Merchant, Conditions}, _From, State) ->

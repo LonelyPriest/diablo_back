@@ -644,9 +644,8 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 			  ?DEBUG("SortAmounts ~p", [SortAmounts]),
 
 			  FlatternAmounts =
-			      flattern(amount,
-				       {PrintTable, Column, length(Sizes),
-					Fields}, SortAmounts),
+			      flattern(amount, {PrintTable, Column, length(Sizes),
+						Fields}, SortAmounts),
 			  %% ?DEBUG("flattern amounts ~ts",
 			  %% 	 [?to_b(FlatternAmounts)]),
 
