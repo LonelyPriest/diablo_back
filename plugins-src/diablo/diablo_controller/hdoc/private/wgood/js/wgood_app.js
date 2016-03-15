@@ -864,8 +864,8 @@ wgoodApp.controller("wgoodNewCtrl", function(
 			// console.log($scope.colors);
 			
 			$scope.good.style_number = undefined;
-			$scope.good.type = undefined;
-			$scope.goodForm.type.$pristine = true;
+			// $scope.good.type = undefined;
+			// $scope.goodForm.type.$pristine = true;
 			$scope.goodForm.style_number.$pristine = true;
 
 			/*
@@ -914,6 +914,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	$scope.selectGroups = [];
 	$scope.selectColors = [];
 	$scope.good = {
+	    // type:      $scope.good.type,
 	    sex:       $scope.good.sex,
 	    year:      $scope.good.year,
 	    season:    $scope.good.season,

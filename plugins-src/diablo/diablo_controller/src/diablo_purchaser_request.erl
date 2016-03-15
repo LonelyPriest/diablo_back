@@ -492,8 +492,11 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 			    stock ->
 				ExportSizes = export_size_group(Merchant),
 				{ok, Colors} = ?w_user_profile:get(color, Merchant),
+
+				NewTranses = sort_stock(Transes, []),
+				?DEBUG("newTranses ~p", [NewTranses]),
 				csv_head(stock, ExportSizes, DoFun),
-				do_write(stock, ExportSizes, Colors, DoFun, Transes);
+				do_write(stock, ExportSizes, Colors, DoFun, NewTranses);
 			    _ ->
 				csv_head(ExportType, DoFun),
 				do_write(ExportType, DoFun, Transes)
@@ -810,32 +813,186 @@ do_write(trans_note, Do, Count, Amount, Calc, [H|T]) ->
 
 do_write(stock, _ExportSizes, _AllColors, _Do, [])->
     ok;
-do_write(stock, ExportSizes, AllColors, Do, [H|T]) -> 
+do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) -> 
     %% ?DEBUG("H ~p", [H]),
     StyleNumber = ?v(<<"style_number">>, H),
     Brand       = ?v(<<"brand">>, H), 
     Type        = ?v(<<"type">>, H),
-    Color       = color(name, ?v(<<"color_id">>, H), AllColors),
-    Size        = ?v(<<"size">>, H),
+    %% Color       = color(name, ?v(<<"color_id">>, H), AllColors),
+    %% Size        = ?v(<<"size">>, H),
     PkgPrice    = ?v(<<"pkg_price">>, H), 
-    Total       = ?v(<<"total">>, H), 
+    %% Total       = ?v(<<"total">>, H),
+
+    Amounts     = ?v(<<"amounts">>, H),
+    ColorIds    = ?v(<<"color_ids">>, H),
+
+    Sorts = 
+	lists:foldr(
+	  fun(CId, Acc)->
+		  [{CId, sort_by_color(CId, ExportSizes, Amounts)}|Acc]
+	  end, [], ColorIds),
+    ?DEBUG("sorts ~p", [Sorts]),
+
+    lists:foreach(
+      fun({CId, Counts})-> 
+	      {Total1, Row} =
+		  lists:foldr(
+		    fun(C, {Calc1, Acc1})->
+			    {C + Calc1, case C =:= 0 of
+					    true -> "\"\"" ++ ?d;
+					    false -> ?to_s(C) ++ ?d
+					end ++ Acc1}
+		    end, {0, []}, Counts),
+
+	      NewRow = 
+		  "\r\n"
+		  ++ ?to_s(Brand) ++ ?d 
+		  ++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
+		  ++ ?to_s(Type) ++ ?d
+		  ++ color(name, CId, AllColors) ++ ?d
+		  ++ Row
+		  ++ ?to_s(Total1) ++ ?d
+		  ++ ?to_s(Total1 * PkgPrice),
+
+	      Do(NewRow)
+      end, Sorts),
     
-    L = "\r\n"
-	++ ?to_s(Brand) ++ ?d 
-	++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
-	++ ?to_s(Type) ++ ?d
-	++ ?to_s(Color) ++ ?d
-	++ lists:foldr(
-	     fun(S, Acc) when S =:= Size ->
-		     ?to_s(Total) ++ ?d ++ Acc;
-		(_, Acc) ->
-		     "\"\"" ++ ?d ++ Acc
-	     end, [], ExportSizes)
-	++ ?to_s(Total) ++ ?d 
-	++ ?to_s(PkgPrice) ++ ?d 
-	++ ?to_s(PkgPrice * Total) ++ ?d, 
-    Do(L),
     do_write(stock, ExportSizes, AllColors, Do, T).
+
+sort_stock([], Sorts) ->
+    Sorts;
+sort_stock([{Inv}|T], Sorts) ->
+    case in_sort(Inv, Sorts) of
+	false  ->
+	    StyleNumber = ?v(<<"style_number">>, Inv),
+	    BrandId     = ?v(<<"brand_id">>, Inv),
+	    Brand       = ?v(<<"brand">>, Inv),
+	    
+	    
+	    Type        = ?v(<<"type">>, Inv),
+	    ColorId     = ?v(<<"color_id">>, Inv), 
+	    Size        = ?v(<<"size">>, Inv),
+	    Count       = ?v(<<"total">>, Inv),
+
+	    ColorIds    = [ColorId],
+	    
+	    PkgPrice    = ?v(<<"pkg_price">>, Inv),
+
+	    Amounts = [{struct, [{<<"cid">>, ColorId},
+				 {<<"size">>, Size},
+				 {<<"count">>, Count}]}], 
+
+	    NewInv = {struct, [{<<"style_number">>, StyleNumber},
+			       {<<"brand_id">>, BrandId},
+			       %% {<<"brand_name">>, ?v(<<"brand">>, Inv)},
+			       {<<"brand">>, Brand},
+			       {<<"type">>,  Type},
+			       {<<"pkg_price">>, PkgPrice},
+			       {<<"color_ids">>, ColorIds},
+			       {<<"amounts">>,    Amounts}]},
+	    %% ?DEBUG("new inv ~p", [NewInv]),
+	    sort_stock(T, [NewInv|Sorts]);
+	true ->
+	    NewSorts = combine_inventory(Inv, Sorts, []),
+	    sort_stock(T, NewSorts)
+    end.
+
+in_sort(_Inv, []) ->
+    false;
+in_sort(Inv, [{struct, H}|T]) ->
+    StyleNumber = ?v(<<"style_number">>, H),
+    BrandId     = ?v(<<"brand_id">>, H),
+    case ?v(<<"style_number">>, Inv) =:= StyleNumber
+	andalso ?v(<<"brand_id">>, Inv) =:= BrandId of
+	true ->
+	    true;
+	false ->
+	    in_sort(Inv, T)
+    end.
+                                                    
+combine_inventory(_Inv, [], Combines) ->
+    Combines;
+combine_inventory(Inv, [{struct, H}|T], Combines) ->
+    %% ?DEBUG("combine inv ~p", [Inv]),
+    StyleNumber = ?v(<<"style_number">>, H),
+    BrandId     = ?v(<<"brand_id">>, H),
+
+    case ?v(<<"style_number">>, Inv) =:= StyleNumber
+	andalso ?v(<<"brand_id">>, Inv) =:= BrandId of
+	true -> 
+	    ColorId = ?v(<<"color_id">>, Inv),
+	    Size    = ?v(<<"size">>, Inv),
+	    Count   = ?v(<<"total">>, Inv),
+
+
+	    ColorIds = ?v(<<"color_ids">>, H), 
+	    NewColorIds = case lists:member(ColorId, ColorIds) of
+			      true -> ColorIds;
+			      false -> [ColorId|ColorIds]
+			  end,
+	    %% ?DEBUG("new color Ids ~p", [NewColorIds]),
+
+	    Amounts = ?v(<<"amounts">>, H),
+	    
+	    {Found, FoundAmounts} = 
+		lists:foldr(fun({struct, A}, {F, Acc})->
+				    case ?v(<<"cid">>, A) =:= ColorId
+					andalso ?v(<<"size">>, A) =:= Size of
+					true ->
+					    {true, [{struct,
+						     [{<<"cid">>, ColorId},
+						      {<<"size">>, Size}, 
+						      {<<"count">>,
+						       Count + ?v(<<"count">>, A)}
+						     ]}|Acc]};
+					false ->
+					    {F, [{struct, A}|Acc]}
+				    end
+			    end, {false, []}, Amounts),
+
+	    ?DEBUG("found ~p, FoundAmounts ~p", [Found, FoundAmounts]),
+	    
+	    NewAmounts = case Found of
+			     true -> FoundAmounts;
+			     false ->
+				 [{struct, [{<<"cid">>, ColorId},
+					    {<<"size">>, Size}, 
+					    {<<"count">>, Count}]}
+				  |Amounts]
+			 end,
+
+	    combine_inventory(Inv, T,
+	      [{struct, [{<<"style_number">>, StyleNumber},
+			 {<<"brand_id">>, BrandId},
+			 %% {<<"brand_name">>, ?v(<<"brand">>, Inv)},
+			 {<<"brand">>,      ?v(<<"brand">>, H)},
+			 {<<"type">>,       ?v(<<"type">>, H)},
+			 {<<"pkg_price">>,  ?v(<<"pkg_price">>, H)},
+			 {<<"color_ids">>,  NewColorIds},
+			 {<<"amounts">> ,   NewAmounts}]}|Combines]);
+	false ->
+	    combine_inventory(Inv, T, [{struct, H}|Combines])
+    end.
+
+sort_by_color(CId, Sizes, Amounts)->
+    sort_by_color(CId, Sizes, Amounts, []).
+
+sort_by_color(_CId, [], _Amounts, Counts)->
+    lists:reverse(Counts);
+sort_by_color(CId, [Size|T], Amounts, Counts)->
+    C = get_amount(CId, Size, Amounts),
+    sort_by_color(CId, T, Amounts, [C|Counts]).
+
+get_amount(_CId, _Size, []) ->
+    0;
+get_amount(CId, Size, [{struct, Amount}|T]) ->
+    case ?v(<<"cid">>, Amount) =:= CId
+	andalso ?to_s(?v(<<"size">>, Amount)) =:= ?to_s(Size) of
+	true -> 
+	       ?v(<<"count">>, Amount);
+	false ->
+	    get_amount(CId, Size, T)
+    end.
 
 export_type(0) -> trans;
 export_type(1) -> trans_note;
@@ -901,7 +1058,7 @@ color(name, _ColorId, []) ->
     []; 
 color(name, ColorId, [{H}|T]) ->
     case ?v(<<"id">>, H) =:= ColorId of
-	true -> ?v(<<"name">>, H);
+	true -> ?to_s(?v(<<"name">>, H));
 	false -> color(name, ColorId, T)
     end.
 	    

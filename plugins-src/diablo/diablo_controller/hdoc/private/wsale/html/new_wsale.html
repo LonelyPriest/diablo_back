@@ -139,7 +139,7 @@
 		<span class="input-group-btn">
 		  <button class="btn default fg-red"
 			  x-ng-disabled="!select.cash"
-	  		  x-ng-click="select.cash=undefined">
+	  		  x-ng-click="select.cash=0">
 		    <i class="glyphicon glyphicon-pushpin"></i></button>
 		</span>
 		<form name="select.form.cashForm">
@@ -149,10 +149,7 @@
 			   type="number" step="0.01"
 			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.cash"
-			   placeholder="现金"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+			   placeholder="现金"/>
 		  </div> 
 		</form> 
 	      </div>
@@ -170,10 +167,7 @@
 			   type="number" step="0.01"
 			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.card"
-			   placeholder="刷卡"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+			   placeholder="刷卡" />
 		  </div>
 		</form>
 
@@ -225,10 +219,7 @@
 			   type="number" step="0.01"
 			   x-ng-pattern=pattern.money
 	  		   x-ng-model="select.verificate"
-			   placeholder="核销"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+			   placeholder="核销" />
 		  </div>
 		</form>
 		</div>
@@ -284,10 +275,7 @@
 			   type="number" step="0.01"
 			   placeholder="关联费用"
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
-	  		   x-ng-model="select.extra_pay"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+	  		   x-ng-model="select.extra_pay" />
 		  </div>
 		</form> 
 	      </div>
@@ -439,10 +427,7 @@
 				     type="number" step="1"
 				     required
 				     x-ng-model="inv.fdiscount"
-				     x-ng-pattern="/^\d{2}$|100$/"
-				     popover-placement="top"
-				     popover-trigger="focus"
-				     popover="默认上次折扣"/>
+				     x-ng-pattern="/^\d{2}$|100$/" />
 			    </div>
 			  </form>
 			</td> 
@@ -465,10 +450,7 @@
 				     type="number" step="0.01"
 				     required
 				     x-ng-pattern="/^\d+(.\d{1,2})?$/"
-				     x-ng-model="inv.fprice"
-				     popover-placement="top"
-				     popover-trigger="focus"
-				     popover="默认上次成交价"/>
+				     x-ng-model="inv.fprice" />
 			    </div>
 			  </form>
 			</td> 
@@ -491,10 +473,7 @@
 				     required
 				     x-ng-pattern="pattern.sell"
 				     x-ng-model="inv.sell"
-				     x-ng-change="auto_save_free(inv)"
-				     popover-placement="top"
-				     popover-trigger="focus"
-				     popover="均色均码直接输入数量"/>
+				     x-ng-change="auto_save_free(inv)" />
 			    </div> 
 			  </form>
 

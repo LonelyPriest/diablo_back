@@ -176,10 +176,7 @@
 			   type="number" step="0.01" 
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
 	  		   x-ng-model="select.extra_pay"
-			   placeholder="关联费用"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   placeholder="关联费用"/>
 		  </div>
 		</form> 
 	      </div>
@@ -298,10 +295,7 @@
 				   type="number" step="0.01"
 		      		   required
 				   x-ng-pattern="pattern.price"
-		      		   x-ng-model="inv.fprice"
-		      		   popover-placement="top"
-		      		   popover-trigger="focus"
-		      		   popover="默认上次拿货价"/>
+		      		   x-ng-model="inv.fprice" />
 		      	</div>
 		      </form>
 		    </td>
@@ -317,10 +311,7 @@
 				     type="number" step="1"
 				     required
 				     x-ng-model="inv.fdiscount"
-				     x-ng-pattern="/^\d{2}$|100$/"
-				     popover-placement="top"
-				     popover-trigger="focus"
-				     popover="默认上次折扣"></input>
+				     x-ng-pattern="/^\d{2}$|100$/" />
 			    </div>
 			  </form>
 		    </td>
@@ -343,10 +334,7 @@
 				   required
 				   x-ng-pattern="pattern.reject"
 				   x-ng-model="inv.reject"
-				   x-ng-change="auto_save_free(inv)"
-				   popover-placement="top"
-				   popover-trigger="focus"
-				   popover="均色均码直接输入数量"></input>
+				   x-ng-change="auto_save_free(inv)" />
 		      </form>
 		    </td>
 
