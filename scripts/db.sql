@@ -712,7 +712,7 @@ create table w_sale(
     e_pay_type     TINYINT  default -1,
     e_pay          DECIMAL(10, 2) default 0, -- max: 99999999.99
     
-    type           TINYINT  default -1, -- 0:sale 1:reject 
+    type           TINYINT  default -1, -- 0:sale 1:reject 2: ssale
     state          TINYINT  default 0,  -- 0: wait for check, 1: checked
     check_date     DATETIME default null, -- date of last change
     entry_date     DATETIME,

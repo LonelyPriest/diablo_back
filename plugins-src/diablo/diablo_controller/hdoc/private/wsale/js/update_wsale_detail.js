@@ -238,26 +238,17 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     var rsn     = $routeParams.rsn
     var promise = diabloPromise.promise;
     wsaleService.get_w_sale_new(rsn).then(function(result){
-    // $q.all([
-    // 	promise(wsaleService.get_w_sale_new, rsn)(),
-    // 	promise(wsaleService.w_sale_rsn_detail, {rsn:rsn})()
-    // ]).then(function(result){
 	console.log(result);
 	if (result.ecode === 0){
 	    // result[0] is the record detail
 	    // result[1] are the inventory detail that the record is included
 	    var base        = result.sale;
 	    var invs        = result.inv;
-	    var sell_detail = result.detail; 
-
-	    // var date = base.entry_date.substr(0,10).split("-")
-	    // var time = base.entry_date.substr(11, 8).split(":");
-	    // console.log(datetime);
+	    var sell_detail = result.detail;
+	    
 	    $scope.old_select.rsn      = base.rsn;
 	    $scope.old_select.rsn_id   = base.id;
-	    $scope.old_select.datetime = diablo_set_datetime(base.entry_date);
-	    // $scope.old_select.datetime   = new Date(
-	    // 	date[0], date[1]-1, date[2], time[0], time[1], time[2]);
+	    $scope.old_select.datetime = diablo_set_datetime(base.entry_date); 
 	    $scope.old_select.retailer = $scope.get_object(
 		base.retailer_id, $scope.retailers);
 
@@ -271,7 +262,6 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    }
 
 	    console.log($scope.old_select);
-	    // $scope.old_select.surplus    = $scope.old_select.retailer.balance;
 	    $scope.old_select.surplus    = base.balance;
 	    $scope.old_select.shop       = $scope.get_object(base.shop_id,   $scope.shops);
 	    $scope.old_select.employee   = $scope.get_object(base.employ_id, $scope.employees);
@@ -283,7 +273,8 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.old_select.verificate = base.verificate;
 	    $scope.old_select.should_pay = base.should_pay;
 	    $scope.old_select.has_pay    = base.has_pay;
-
+	    $scope.old_select.mode       = base.type;
+	    
 	    $scope.select = angular.extend($scope.select, $scope.old_select);
 	    $scope.select.abs_total = 0;
 
@@ -693,16 +684,11 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    old_should_pay: $scope.old_select.should_pay,
 	    old_has_pay:    $scope.old_select.has_pay, 
 	    old_datetime:   dateFilter($scope.old_select.datetime, "yyyy-MM-dd HH:mm:ss"),
+	    mode:          $scope.old_select.mode, 
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
 	    total:         seti($scope.select.total)
-	};
-
-	// var print = {
-	//     shop:     $scope.select.shop.name,
-	//     employ:   $scope.select.employee.name,
-	//     retailer: $scope.select.retailer.name
-	// };
+	}; 
 
 	console.log(added);
 	console.log(base);
@@ -819,14 +805,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
     /*
      * add
-     */
-    // $scope.valid_free_size_sell = function(inv){
-    // 	if (angular.isDefined(inv.sell)
-    // 	    && inv.sell > inv.total){
-    // 	    return false;
-    // 	}
-    // 	return true;
-    // };
+     */ 
     
     var in_amount = function(amounts, inv){
 	for(var i=0, l=amounts.length; i<l; i++){

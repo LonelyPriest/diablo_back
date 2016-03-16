@@ -138,6 +138,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
     EPay       = ?v(<<"e_pay">>, Props, 0),
 
     Total      = ?v(<<"total">>, Props, 0),
+    SellMode   = ?v(<<"mode">>, Props, ?WHOLESALER),
 
     Sql0 = "select id, name, balance from w_retailer"
 	" where id=" ++ ?to_s(Retailer)
@@ -150,7 +151,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		       ["M-", ?to_i(Merchant),
 			"-S-", ?to_i(Shop), "-",
 			?inventory_sn:sn(w_sale_new_sn, Merchant)]),
-	    RealyShop = realy_shop(Merchant, Shop),
+	    RealyShop = realy_shop(Merchant, Shop, SellMode),
 	    Sql1 = 
 		lists:foldr(
 		  fun({struct, Inv}, Acc0)->
@@ -193,7 +194,10 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		++ "\"" ++ ?to_s(Comment) ++ "\","
 		++ ?to_s(EPayType) ++ ","
 		++ ?to_s(EPay) ++ ","
-		++ ?to_s(type(new)) ++ ","
+		++ ?to_s(case SellMode of
+			     ?SALER -> type(snew);
+			     _      -> type(new)
+			 end) ++ ","
 		++ "\"" ++ ?to_s(DateTime) ++ "\");",
 
 	    Sql3 = "update w_retailer set balance=balance+"
@@ -202,18 +206,8 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
 
 	    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
-	    %% ?DEBUG("Sqls ~p", [AllSql]),
 	    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
-	    %% ?w_user_profile:update(retailer, Merchant),
-	    {reply, Reply, State};
-	%% {reply, {ok, RSn}, State}
-	%% case ?mysql:fetch(transaction, AllSql) of
-	%% 	{error, Error} ->
-	%% 	    ?DEBUG("failed to new good, error: ~p", [Error]),
-	%% 	    {reply, {error, ?err(db_error, Error)}, State};
-	%% 	{ok, _} ->
-	%% 	    {reply, {ok, SaleSn}, State}
-	%% end;
+	    {reply, Reply, State}; 
 	Error ->
 	    {reply, Error, State}
     end;
@@ -251,8 +245,9 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     OldDatetime  = ?v(<<"old_datetime">>, Props),
 
     Total        = ?v(<<"total">>, Props),
+    SellMode     = ?v(<<"mode">>, Props, ?WHOLESALER),
 
-    RealyShop    = realy_shop(Merchant, Shop),
+    RealyShop    = realy_shop(Merchant, Shop, SellMode),
 
     Sql1 = sql(update_wsale,
 	       RSN, Merchant, RealyShop, Datetime, OldDatetime, Inventories),
@@ -616,6 +611,7 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
     Comment    = ?v(<<"comment">>, Props, ""),
     ShouldPay  = ?v(<<"should_pay">>, Props, 0), 
     Total      = ?v(<<"total">>, Props, 0),
+    SellMode   = ?v(<<"mode">>, Props, ?WHOLESALER),
 
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),
     EPay       = ?v(<<"e_pay">>, Props, 0),
@@ -630,7 +626,7 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
 	    Sn = lists:concat(["M-", ?to_i(Merchant),
 			       "-S-", ?to_i(Shop), "-R-",
 			       ?inventory_sn:sn(w_sale_reject_sn, Merchant)]),
-	    {ShopType, RealyShop} = realy_shop(reject, Merchant, Shop),
+	    {ShopType, RealyShop} = realy_shop(reject, Merchant, Shop, SellMode),
 
 	    Sql1 =
 		case ShopType of
@@ -1500,8 +1496,9 @@ filter_table(w_sale_with_page, Merchant, CurrentPage, ItemsPerPage, Conditions) 
 	++ ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage), 
     Sql.
     
-type(new) -> 0;
-type(reject) -> 1.
+type(new)    -> 0;
+type(reject) -> 1;
+type(snew)   -> 2.
 
 direct(0) -> wsale;
 direct(1) -> wreject;
@@ -1527,30 +1524,29 @@ sort_condition(wsale, Merchant, Conditions) ->
 	       TimeSql -> " and " ++ TimeSql
 	   end.
 
-realy_shop(Merchant, ShopId) ->
+realy_shop(_Merchant, ShopId, ?SALER) ->
+    ShopId; 
+realy_shop(Merchant, ShopId, ?WHOLESALER) ->
     case ?w_user_profile:get(shop, Merchant, ShopId) of
 	{ok, []} -> ShopId;
 	{ok, [{ShopInfo}]} -> 
 	    case ?v(<<"repo">>, ShopInfo) of
-		-1 ->
-		    ShopId;
-		RepoId ->
-		    RepoId 
+		-1     -> ShopId;
+		RepoId -> RepoId 
 	    end
     end.
 
-realy_shop(reject, Merchant, ShopId) ->
+realy_shop(reject, _Merchant, ShopId, ?SALER) ->
+    ShopId;
+realy_shop(reject, Merchant, ShopId, ?WHOLESALER) ->
     case ?w_user_profile:get(shop, Merchant, ShopId) of
 	{ok, []} -> ShopId;
 	{ok, [{ShopInfo}]} -> 
 	    case ?v(<<"repo">>, ShopInfo) of
-		-1 ->
-		    {?SHOP, ShopId};
-		RepoId ->
-		    {?v(<<"type">>, ShopInfo), RepoId}
+		-1     -> {?SHOP, ShopId};
+		RepoId -> {?v(<<"type">>, ShopInfo), RepoId}
 	    end
     end.
-    
 
 filter_condition(wsale, [], Acc1, Acc2) ->
     {lists:reverse(Acc1), lists:reverse(Acc2)};

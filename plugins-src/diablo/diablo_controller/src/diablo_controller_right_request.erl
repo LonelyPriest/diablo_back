@@ -254,7 +254,7 @@ action(Session, Req, {"list_sales_children"}) ->
 	    ?WHOLESALER ->
 		{?right_w_sale,
 		 [?new_w_sale, ?reject_w_sale, ?print_w_sale,
-		  ?update_w_sale, ?check_w_sale]}
+		  ?update_w_sale, ?check_w_sale, ?new_s_sale]}
 	end,
     
     {ok, Children} =

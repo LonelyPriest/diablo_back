@@ -16,6 +16,10 @@ var diablo_in_round = 0;
 var diablo_in_stock = 1;
 var diablo_in_back  = 2;
 
+// sell mode
+var diablo_ssale  = 0;
+var diablo_wsale  = 1;
+
 /*
  * storage key
  */

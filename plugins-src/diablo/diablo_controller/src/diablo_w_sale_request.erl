@@ -554,6 +554,9 @@ sidebar(Session) ->
 	Shops ->
 	    WSale = ?w_inventory_request:authen_shop_action(
 		       {?new_w_sale, "new_wsale", "销售开单", "glyphicon glyphicon-usd"}, Shops),
+	    
+	    SSale = ?w_inventory_request:authen_shop_action(
+		       {?new_s_sale, "new_ssale", "零售开单", "glyphicon glyphicon-yen"}, Shops),
 	    %% WSale =
 	    %% 	[{{"wsale", "销售开单", "glyphicon glyphicon-usd"},
 	    %% 	  ?w_inventory_request:authen_shop_action(
@@ -581,7 +584,7 @@ sidebar(Session) ->
 	    SaleD =
 		[{"wsale_rsn_detail", "交易明细", "glyphicon glyphicon-map-marker"}],
 
-	    L1 = ?menu:sidebar(level_1_menu, WSale ++ WReject ++ SaleR ++ SaleD),
+	    L1 = ?menu:sidebar(level_1_menu, WSale ++ SSale ++ WReject ++ SaleR ++ SaleD),
 	    %% L2 = ?menu:sidebar(level_1_menu, SaleDetail),
 
 	    L1

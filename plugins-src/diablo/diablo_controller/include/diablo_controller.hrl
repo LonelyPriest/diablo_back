@@ -10,10 +10,10 @@
 
 %% shop
 -define(SHOP_MASTER, 1).
+
 -define(SHOP, 0).
 -define(REPERTORY, 1).
 -define(BAD_REPERTORY, 2).
-
 
 %% merchant type
 -define(SALER, 0).
@@ -188,6 +188,7 @@
 -define(print_w_sale,       ?right_w_sale + 4).
 -define(update_w_sale,      ?right_w_sale + 5).
 -define(check_w_sale,       ?right_w_sale + 6).
+-define(new_s_sale,         ?right_w_sale + 7).
 
 %% inventory
 -define(new_w_order,    ?right_w_inventory + 1).
