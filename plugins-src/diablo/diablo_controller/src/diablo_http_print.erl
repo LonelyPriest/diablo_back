@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([print/4, print/2, call/2]).
+-export([print/4, print/2, call/2, get_printer/2]).
 
 -export([server/1,
 	 title/4, head/7, head/8,  body_head/6,
@@ -122,6 +122,42 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 
+get_printer(Merchant, ShopId) ->
+    {Printers, ShopInfo} =
+	case ?w_user_profile:get(shop, Merchant, ShopId) of
+	    {ok, []} -> {[], []};
+	    {ok, [{Shop}]} ->
+		case ?v(<<"repo">>, Shop) of
+		    -1 ->
+			case ?w_user_profile:get(print, Merchant, ShopId) of
+			    {ok, []} -> {[], []};
+			    {ok, [{P1}]} -> 
+				{[[{<<"pshop">>, ShopId}|P1]], Shop};
+			    {ok, Ps} ->
+				%% ?DEBUG("printers of shop ~p", [Ps]),
+				{lists:foldr(
+				   fun({P1}, Acc)->
+					   [[{<<"pshop">>, ShopId}|P1] | Acc]
+				   end, [], Ps), Shop}
+			end;
+		    RepoId ->
+			{[case ?w_user_profile:get(print, Merchant, ShopId) of
+			      {ok, []} -> [];
+			      {ok, [{P1}]} ->
+				  [{<<"pshop">>, ShopId}|P1]
+			  end,
+			  case ?w_user_profile:get(print, Merchant, RepoId) of
+			      {ok, []} -> [];
+			      {ok, [{P2}]} -> [{<<"pshop">>, RepoId}|P2]
+			  end], Shop}
+		end
+	end,
+
+    %% ?DEBUG("printers ~p", [Printers]),
+    VPrinters = [P || P <- Printers, length(P) =/= 0 ],
+    ?DEBUG("printers ~p", [VPrinters]),
+    {VPrinters, ShopInfo}.
+
 call(Parent, {print, RSN, Merchant}) ->
     ?DEBUG("print with rsn ~p, merchant ~p", [RSN, Merchant]), 
     try 
@@ -200,7 +236,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			    {ok, [{P1}]} -> 
 				{[[{<<"pshop">>, ShopId}|P1]], Shop};
 			    {ok, Ps} ->
-				?DEBUG("printers of shop ~p", [Ps]),
+				%% ?DEBUG("printers of shop ~p", [Ps]),
 				{lists:foldr(
 				   fun({P1}, Acc)->
 					   [[{<<"pshop">>, ShopId}|P1] | Acc]
@@ -927,7 +963,7 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
 
 title(_Brand, _Model, 33, Title) ->
     T = "<CB>" ++ ?to_s(Title) ++ "</CB><BR>", 
-    ?DEBUG("title ~ts", [?to_b(T)]),
+    %% ?DEBUG("title ~ts", [?to_b(T)]),
     T;
 
 title(Brand, Model, Column, Title) ->

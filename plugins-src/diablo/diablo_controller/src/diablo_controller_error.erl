@@ -174,7 +174,9 @@ success(update_wprinter_format, FId) ->
 success(add_wprinter_format_to_shop, Shop) ->
     {0, "Success to add wprint format of shop " ++ ?to_s(Shop)};
 
-
+%% report
+success(print_wreport, _None) ->
+    {0, "Success to print report."};
 
 %% base
 success(base_new_card, CardNo) ->
@@ -373,6 +375,9 @@ error(stock_been_checked, SN) ->
     {2502, "stock of SN " ++ ?to_s(SN) ++ "has been checked."};
 error(stock_been_canceled, SN) ->
     {2503, "stock of SN " ++ ?to_s(SN) ++ "has been canceled."};
+
+%% report
+
 
 %% base
 error(base_card_exist, CardNo) ->

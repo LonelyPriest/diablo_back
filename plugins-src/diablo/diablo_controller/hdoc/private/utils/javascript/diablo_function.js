@@ -20,6 +20,11 @@ var diablo_in_back  = 2;
 var diablo_ssale  = 0;
 var diablo_wsale  = 1;
 
+// report
+var diablo_by_shop     = "by_shop";
+var diablo_by_retailer = "by_retailer";
+var diablo_by_good     = "by_good";
+
 /*
  * storage key
  */

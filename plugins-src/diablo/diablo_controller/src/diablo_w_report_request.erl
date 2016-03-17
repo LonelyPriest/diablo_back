@@ -25,39 +25,8 @@ action(Session, Req) ->
     Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 
-%%--------------------------------------------------------------------
-%% @desc: GET action
-%%--------------------------------------------------------------------
-action(Session, Req, {"list_shop"}) ->
-    ?DEBUG("list_shop with session ~p", [Session]),
-    Merchant = ?session:get(merchant, Session),
-    ?utils:respond(batch, fun() -> ?shop:lookup(Merchant) end, Req);
-%% {ok, M} = ?shop:lookup(?session:get(merchant, Session)),
-%% ?utils:respond(200, batch, Req, M);
-
-action(Session, Req, {"list_repo"}) ->
-    ?DEBUG("list_repo with session ~p", [Session]),
-    Merchant = ?session:get(merchant, Session),
-    ?utils:respond(batch, fun() -> ?shop:repo(list, Merchant) end, Req); 
-
-%%--------------------------------------------------------------------
-%% @desc: DELTE action
-%%-------------------------------------------------------------------- 
-action(Session, Req, {"delete_shop", Id}) ->
-    ?DEBUG("delete_shop with session ~p, id ~p", [Session, Id]),
-
-    Merchant = ?session:get(merchant, Session),
-    ?utils:respond(normal,
-		   fun()-> ?shop:shop(delete, Merchant, Id) end,
-		   fun(ShopId)-> ?succ(delete_shop, ShopId) end,
-		   Req).
-
-%% case ?shop:shop(delete, Merchant, ?to_i(Id)) of
-%% 	{ok, ShopId} ->
-%% 	    ?utils:respond(200, Req, ?succ(delete_shop, ShopId));
-%% 	{error, Error} ->
-%% 	    ?utils:respond(200, Req, Error)
-%% end. 
+action(Session, _Req, Action) ->
+    ?DEBUG("receive unkown action ~p with session ~p", [Action, Session]).
 
 %% ================================================================================
 %% POST
@@ -76,7 +45,119 @@ action(Session, Req, {"daily_wreport", Type}, Payload) ->
        fun(_Match, CurrentPage, ItemsPerPage, Conditions) ->
 	       ?w_report:report(
 		  ?to_a(Type), Merchant, CurrentPage, ItemsPerPage, Conditions)
-       end, Req, Payload).
+       end, Req, Payload);
+
+action(Session, Req, {"print_wreport", Type}, Payload) ->
+    ?DEBUG("print_wreport with session ~p, type ~p, payload~n~p",
+	  [Session, Type, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    {struct, Content}  = ?v(<<"content">>, Payload),
+    
+    ShopId   = ?v(<<"shop">>, Content, []),
+    Datetime = ?v(<<"datetime">>, Content),
+    %% SPay     = ?v(<<"spay">>, Payload),
+    
+    HPay     = ?v(<<"hpay">>, Content, 0),
+    Cash     = ?v(<<"cash">>, Content, 0),
+    Card     = ?v(<<"card">>, Content, 0),
+    Wire     = ?v(<<"wire">>, Content, 0),
+    VPay     = ?v(<<"vpay">>, Content, 0) ,
+
+    ResponseFun =
+	fun(PCode, PInfo) ->
+		?utils:respond(200, Req, ?succ(print_wreport, ShopId),
+			       [{<<"pcode">>, PCode},
+				{<<"pinfo">>, PInfo}])
+	end,
+
+    {VPrinters, ShopInfo} = ?wifi_print:get_printer(Merchant, ShopId),
+
+    case VPrinters of
+	[] ->
+	    {error, ?err(shop_not_printer, ShopId)};
+	_  -> 
+	    ShopName = ?to_s(?v(<<"name">>, ShopInfo)) ++ "（日报表）", 
+
+	    PrintInfo = 
+		lists:foldr(
+		  fun(P, Acc) ->
+			  SN     = ?v(<<"sn">>, P),
+			  Key    = ?v(<<"code">>, P),
+			  Path   = ?v(<<"server_path">>, P),
+
+			  Brand  = ?v(<<"brand">>, P),
+			  Model  = ?v(<<"model">>, P),
+
+			  Column = ?v(<<"pcolumn">>, P),
+			  Height = ?v(<<"pheight">>, P),
+			  
+			  %% ?DEBUG("P ~p", [P]),
+			  Server = ?wifi_print:server(?v(<<"server_id">>, P)), 
+
+			  Head = ?wifi_print:title(Brand, Model, Column, ShopName),
+
+			  Body = 
+			      "日期：" ++ ?to_s(Datetime) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      %% ++ ?f_print:decorate_data(bwh)
+			      ++ "备用金：" ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "营业额：" ++ ?to_s(HPay) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "现金：" ++ ?to_s(Cash) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "刷卡：" ++ ?to_s(Card) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "汇款：" ++ ?to_s(Wire) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "核销：" ++ ?to_s(VPay) ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "开支：" ++ ?f_print:br(Brand)
+			      ++ ?f_print:br(Brand)
+			      ++ "余额：" ++ ?f_print:br(Brand),
+			      %% ++ ?f_print:decorate_data(cancel_bwh),
+			  
+			  PrintContent = Head ++ Body, 
+			  NoUpgradeDevices = ["1004", "1001", "1002", "1003", "1023"],
+
+			  DBody = 
+			      case lists:member(
+				     ?to_s(SN), NoUpgradeDevices) of
+			  	  true ->
+				      %% auto page
+			  	      ?f_print:pagination(
+			  		 auto, Height * 10, PrintContent);
+			  	  false ->
+				      %% no page
+				      ?f_print:pagination(
+					 just_size, Height * 10, PrintContent)
+			      end, 
+			  ?DEBUG("server ~p", [Server]),
+			  [{SN, fun() when Server =:= rcloud ->
+					?wifi_print:start_print(
+					   rcloud, Brand, Model, Height,
+					   SN, Key, Path, DBody);
+				   () when Server =:= fcloud ->
+					?wifi_print:start_print(
+					  fcloud, SN, Key, Path, PrintContent) 
+				end}|Acc] 
+		  end, [], VPrinters),
+	    
+	    case ?wifi_print:multi_print(PrintInfo) of
+		{Success, []} ->
+		    ResponseFun(0, Success); 
+		{[], Failed} ->
+		    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+			     || {DeviceId, ECode} <- Failed],
+		    ResponseFun(1, PInfo); 
+		{_Success, Failed} when is_list(Failed)->
+		    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+			     || {DeviceId, ECode} <- Failed],
+		    ResponseFun(2, PInfo);
+		{error, {ECode, _EInfo}} ->
+		    ResponseFun(ECode, [])
+	    end
+    end.
 
 sidebar(Session) ->
     AuthenFun =

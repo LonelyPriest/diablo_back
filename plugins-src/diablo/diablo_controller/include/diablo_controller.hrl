@@ -261,6 +261,7 @@
 -define(quarter_wreport, ?right_w_report + 4).
 -define(half_wreport,    ?right_w_report + 5).
 -define(year_wreport,    ?right_w_report + 6).
+-define(print_wreport,   ?right_w_report + 7).
 
 
 %% -----------------------------------------------------------------------------

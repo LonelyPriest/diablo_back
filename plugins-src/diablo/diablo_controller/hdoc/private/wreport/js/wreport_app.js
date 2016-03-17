@@ -31,8 +31,22 @@ wreportApp.config(['$routeProvider', function($routeProvider){
 }]);
 
 wreportApp.service("wreportService", function($resource, dateFilter){
-    this.error = {};
-
+    this.error = {
+	2411: "打印机编号错误！！",
+	2412: "服务器处理订单失败！！", 
+	2413: "打印内容太长！！",
+	2414: "打印请求参数错误！！",
+	2415: "打印请求超时，请稍后再试或联系服务人员！！",
+	2416: "未知原因，请系统服务人员！！",
+	
+	2417: "发送打印请求失败，请确保网络通畅！！",
+	
+	2418: "打印机打印失败，请联系服务人员查找原因！！",
+	2419: "打印机未连接！！",
+	2420: "打印机缺纸！！",
+	2421: "打印状态未知，请联系服务人员！！",
+	2422: "打印机连接设备不存在，请检查设备编号是否正确！！"};
+    
     var http = $resource("/wreport/:operation/:type",
     			 {operation: '@operation', type: '@type'});
     
@@ -45,6 +59,11 @@ wreportApp.service("wreportService", function($resource, dateFilter){
 			 {condition: condition,
 			  page:      currentPage,
 			  count:     itemsPerpage}).$promise;
+    };
+
+    this.print_wreport = function(type, content){
+	return http.save({operation: "print_wreport"},
+			 {type:type, content: content}).$promise;
     };
     
 });

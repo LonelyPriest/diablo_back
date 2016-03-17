@@ -1,5 +1,6 @@
 wreportApp.controller("wreportDailyCtrl", function(
-    $scope, diabloFilter, wreportService, wreportCommService,
+    $scope, dateFilter, diabloFilter, diabloUtilsService,
+    wreportService, wreportCommService,
     filterEmployee, filterRetailer, user){
     wreportCommService.set_employee(filterEmployee);
     wreportCommService.set_retailer(filterRetailer);
@@ -40,7 +41,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 	diabloFilter.do_filter([], day, function(search){
 	    search.shop = wreportCommService.get_shop_id(); 
 	    wreportService.daily_report(
-		"by_shop", search, $scope.items_perpage, page
+		diablo_by_shop, search, $scope.items_perpage, page
 	    ).then(function(result){
 		// console.log(result);
 
@@ -100,7 +101,37 @@ wreportApp.controller("wreportDailyCtrl", function(
 		last_shop_page = page;
 	    })
 	}) 
-    }; 
+    };
+
+    $scope.print = function(){
+	wreportService.print_wreport(
+	    diablo_by_shop, {shop: wreportCommService.get_shop_id()[0],
+			     datetime: dateFilter(now, "yyyy-MM-dd HH:mm:ss"),
+			     hpay: $scope.total_hpay,
+			     cash: $scope.total_cash,
+			     card: $scope.total_card,
+			     wire: $scope.total_wire,
+			     vpay: $scope.total_verificate}
+	).then(function(status){
+	    console.log(status);
+	    var messsage = "";
+	    if (status.pcode === 0){
+		messsage = "打印成功！！请等待服务器打印．．．";
+		diabloUtilsService.response(true, "日报表打印", messsage); 
+	    } else {
+		message = "打印失败！！"
+		if (status.pinfo.length === 0){
+		    messsage += wreportService.error[status.pcode]
+		} else {
+		    angular.forEach(status.pinfo, function(p){
+			messsage += "[" + p.device + "] " + wreportService.error[p.ecode]
+		    })
+		};
+		diabloUtilsService.response(false, "日报表打印", messsage); 
+	    }
+
+	})
+    };
 });
 
 wreportApp.controller("dailyByRetailer", function(

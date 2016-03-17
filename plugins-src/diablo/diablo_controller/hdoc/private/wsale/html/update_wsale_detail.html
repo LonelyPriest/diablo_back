@@ -116,7 +116,7 @@
 	  	<input class="form-control"
 		       type="text"
 		       placeholder="备注"
-	  	       x-ng-model="select.comment"></input> 
+	  	       x-ng-model="select.comment"/>
 	      </div>
 	    </div>
 	    
@@ -206,24 +206,24 @@
 	  		   x-ng-model="select.verificate"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form>
 		
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>应付</span>
 		<input class="form-control" type="text" readonly
-		       x-ng-model="select.should_pay"></input>
+		       x-ng-model="select.should_pay"/>
 
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>实付</span>
 	  	<input class="form-control" readonly
-	  	       x-ng-model="select.has_pay"></input>
+	  	       x-ng-model="select.has_pay"/>
 
 		<span class="input-group-addon">
 		  <i class="glyphicon glyphicon-yen fg-red"></i>结余</span>
 	  	<input class="form-control" type="text" readonly
-	  	       x-ng-model="select.left_balance"></input> 
+	  	       x-ng-model="select.left_balance"/>
 	      </div>
 	    </div> 
 	  </div> <!--END row-->
@@ -261,7 +261,7 @@
 	  		   x-ng-model="select.e_pay"
 			   popover-placement="top"
 			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+			   popover="支持二位小数"/>
 		  </div>
 		</form> 
 	      </div>
@@ -315,7 +315,27 @@
 		  <tr class="text-center" ng-repeat="inv in inventories">
 		    
 		    <td>{{inv.order_id}}</td>
-		    <td class="col-md-2 text-left vert-align">
+		    
+		    <td x-ng-if="!setting.q_backend"
+			class="col-md-2 text-left vert-align">
+		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
+		      <form name="inv.form.good" ng-if="inv.$new">
+			<div ng-class="{'has-error':inv.form.good.$invalid
+				       && !inv.form.good.$pristine}">
+			  <input class="form-control text-left" type="text"
+				 required
+				 x-ng-model="inv.style_number"
+				 placeholder="货号"
+				 typeahead-editable="false"
+				 typeahead-on-select="on_select_good($item, $model, $label)"
+				 typeahead="g as g.name for g in
+					    all_w_inventory|filter:$viewValue|limitTo:20"/>
+			</div>
+		      </form>
+		    </td>
+		    
+		    <td x-ng-if="setting.q_backend"
+		       class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" ng-if="inv.$new">
 			<div ng-class="{'has-error':inv.form.good.$invalid
@@ -329,7 +349,7 @@
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
 				 typeahead="g as g.name for g in
-					    match_style_number($viewValue)|limitTo:8"></input>
+					    match_style_number($viewValue)|limitTo:8"/>
 			  <span x-ng-show="loading">
 			    <i class="glyphicon glyphicon-refresh"></i>
 			  </span>

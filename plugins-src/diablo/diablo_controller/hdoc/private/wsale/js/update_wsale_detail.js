@@ -1,6 +1,6 @@
 wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope, $routeParams, $q, dateFilter, diabloUtilsService,
-    diabloPromise, diabloFilter, diabloPattern,
+    diabloPromise, diabloFilter, diabloPattern, diabloNormalFilter,
     wgoodService, purchaserService, wretailerService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
     filterBrand, filterColor, filterType, base){
@@ -74,6 +74,29 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
+    };
+
+    var now = $.now();
+    $scope.qtime_start = function(shopId){
+	return diablo_base_setting(
+	    "qtime_start", shopId, base, function(v){return v},
+	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
+    };
+    
+    $scope.match_all_w_inventory = function(){
+	diabloNormalFilter.match_all_w_inventory(
+	    {shop:$scope.select.shop.id,
+	     start_time:$scope.qtime_start($scope.select.shop.id)}
+	).$promise.then(function(invs){
+	    // console.log(invs);
+	    $scope.all_w_inventory = 
+		invs.map(function(inv){
+		    var name = inv.style_number
+			+ "，" + inv.brand + "，" + inv.type;
+		    return angular.extend(
+			inv, {name:name, py: diablo_pinyin(name)});
+		}); 
+	});
     };
 
     // pagination
@@ -284,6 +307,10 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.setting.trace_price   = $scope.trace_price($scope.select.shop.id);
 	    $scope.setting.show_discount = $scope.show_discount();
 	    $scope.setting.round         = $scope.p_round();
+
+	    if (!$scope.setting.q_backend){
+		$scope.match_all_w_inventory();
+	    }
 	    // console.log($scope.setting);
 
 	    $scope.stastic_colspan = function(){

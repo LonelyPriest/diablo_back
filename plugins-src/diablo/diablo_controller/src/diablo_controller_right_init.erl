@@ -366,7 +366,9 @@ init([]) ->
 	 {?half_wreport,
 	  <<"年中报表">>, <<"half_wreport">>, ?right_w_report},
 	 {?year_wreport,
-	  <<"年报表">>, <<"year_wreport">>, ?right_w_report} 
+	  <<"年报表">>,  <<"year_wreport">>, ?right_w_report},
+	 {?print_wreport,
+	  <<"报表打印">>, <<"print_wreport">>, ?right_w_report} 
 	],
     
     %% rainbow
