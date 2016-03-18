@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-03-18",
+	 content: [
+	     "增加修改销售时可以进行中文联想",
+	     "增加日报表可打印功能"
+	 ]
+	},
+	
 	{date: "2016-03-12",
 	 content: [
 	     "增加补单是无法退货的提示",

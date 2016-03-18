@@ -555,28 +555,15 @@ sidebar(Session) ->
 	    WSale = ?w_inventory_request:authen_shop_action(
 		       {?new_w_sale, "new_wsale", "销售开单", "glyphicon glyphicon-usd"}, Shops),
 	    
-	    SSale = ?w_inventory_request:authen_shop_action(
-		       {?new_s_sale, "new_ssale", "零售开单", "glyphicon glyphicon-yen"}, Shops),
-	    %% WSale =
-	    %% 	[{{"wsale", "销售开单", "glyphicon glyphicon-usd"},
-	    %% 	  ?w_inventory_request:authen_shop_action(
-	    %% 	    {?new_w_sale, "new_wsale", "开单", "glyphicon glyphicon-plus"}, Shops)
-	    %% 	  ++ [{"new_wsale_detail", "开单详情", "glyphicon glyphicon-briefcase"}]
-	    %% 	  %% ++ [{"new_wsale_rsn_detail", "开单明细"}]
-	    %% 	 }],
+	    SSale = case ?right_auth:authen(?new_s_sale, Session) of
+			{ok, ?new_s_sale} -> 
+			    [{"new_ssale", "零售开单", "glyphicon glyphicon-yen"}];
+			_ -> []
+		    end, 
 
 	    WReject = ?w_inventory_request:authen_shop_action(
 			 {?reject_w_sale,
-			  "reject_wsale", "销售退货", "glyphicon glyphicon-arrow-left"}, Shops),
-
-	    %% WReject =
-	    %% 	[{{"wsale", "销售退货", "glyphicon glyphicon-arrow-left"},
-	    %% 	  ?w_inventory_request:authen_shop_action(
-	    %% 	     {?reject_w_sale,
-	    %% 	      "reject_wsale", "退货", "glyphicon glyphicon-plus"}, Shops)
-	    %% 	  ++ [{"reject_wsale_detail", "退货详情", "glyphicon glyphicon-briefcase"}]
-	    %% 	  %% ++ [{"reject_wsale_rsn_detail", "退货明细"}]
-	    %%  }],
+			  "reject_wsale", "销售退货", "glyphicon glyphicon-arrow-left"}, Shops), 
 
 	    SaleR =
 		[{"new_wsale_detail", "交易记录", "glyphicon glyphicon-download"}],

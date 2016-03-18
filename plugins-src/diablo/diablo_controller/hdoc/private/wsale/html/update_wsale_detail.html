@@ -131,10 +131,7 @@
 			   type="number" step="0.01" 
 			   placeholder="现金"
 			   x-ng-pattern=pattern.money
-	  		   x-ng-model="select.cash"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+	  		   x-ng-model="select.cash"/>
 		  </div>
 		</form>
 
@@ -147,10 +144,7 @@
 			   type="number" step="0.01" 
 			   placeholder="刷卡"
 			   x-ng-pattern=pattern.money
-	  		   x-ng-model="select.card"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"></input>
+	  		   x-ng-model="select.card" />
 		  </div>
 		</form>
 
@@ -203,10 +197,7 @@
 			   type="number" step="0.01" 
 			   placeholder="核销"
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
-	  		   x-ng-model="select.verificate"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+	  		   x-ng-model="select.verificate" />
 		  </div>
 		</form>
 		
@@ -258,10 +249,7 @@
 			   readonly
 			   placeholder="关联费用"
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
-	  		   x-ng-model="select.e_pay"
-			   popover-placement="top"
-			   popover-trigger="focus"
-			   popover="支持二位小数"/>
+	  		   x-ng-model="select.e_pay" />
 		  </div>
 		</form> 
 	      </div>
@@ -361,30 +349,7 @@
 		    <td class="vert-align">{{inv.brand.name}}</td>
 		    <td x-ng-if="setting.check_sale"
 			class="vert-align">{{inv.total}}
-		    </td>
-		    <!-- <td class="vert-align">{{inv.last_discount}}</td> -->
-		    <!-- <td class="vert-align">{{inv.type}}</td> -->
-		    <!-- <td class="vert-align">{{sexs[inv.sex]}}</td> -->
-		    <!-- <td>{{inv.firm}}</td> -->
-		    <!-- <td class="vert-align">{{seasons[inv.season]}}</td> -->
-		    
-		    <!-- <td class="vert-align">{{inv.last_fprice}}</td> -->
-		    <!-- <td class="vert-align">{{inv.last_discount}}</td>  -->
-
-		    <!-- price style-->
-		    <!-- <td class="vert-align"> -->
-		    <!--   <div ng-if="!inv.$new && !inv.free_update">{{inv.sell_style.name}}</div>  -->
-		    <!--   <div x-ng-if="inv.$new && inv.free_color_size && inv.sell_style -->
-		    <!-- 		    || !inv.$new && inv.free_update"> -->
-		    <!-- 	<select class="form-control table-select" -->
-		    <!-- 		x-ng-model="inv.sell_style" -->
-		    <!-- 		x-ng-change="inv.fprice=inv[inv.sell_style.f]" -->
-		    <!-- 		x-ng-options="s as s.name for s -->
-		    <!-- 			      in sell_styles|filter:$viewValue|limitTo:8"> -->
-		    <!-- 	  <\!-- <option value="">{{inv.sell_style.name}}<option> -\->  -->
-		    <!-- 	</select> -->
-		    <!--   </div> -->
-		    <!-- </td> -->
+		    </td> 
 
 		    <td class="vert-align">
 		      <div>{{inv.sell_style.name}}</div> 
@@ -410,10 +375,7 @@
 				 type="number" step="1" 
 				 required
 				 x-ng-model="inv.fdiscount"
-				 x-ng-pattern="/^\d{2}$|100$/"
-				 popover-placement="top"
-				 popover-trigger="focus"
-				 popover="默认上次折扣"></input>
+				 x-ng-pattern="/^\d{2}$|100$/"/>
 			</div>
 		      </form>
 		    </td> 
@@ -433,10 +395,7 @@
 				 type="number" step="0.01" 
 				 required
 				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
-				 x-ng-model="inv.fprice"
-				 popover-placement="top"
-				 popover-trigger="focus"
-				 popover="默认上次成交价"></input>
+				 x-ng-model="inv.fprice"/>
 			</div>
 		      </form>
 		    </td> 
@@ -456,10 +415,7 @@
 				 placeholder="数量"
 				 required
 				 x-ng-pattern="/^[+|\-]?[1-9][0-9]*$/"
-				 x-ng-model="inv.sell"
-				 popover-placement="top"
-				 popover-trigger="focus"
-				 popover="均色均码直接输入数量">
+				 x-ng-model="inv.sell"/>
 			</div>
 		      </form>
 		    </td>

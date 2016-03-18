@@ -4,7 +4,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     wgoodService, purchaserService, wretailerService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
     filterBrand, filterColor, filterType, base){
-    console.log(user);
+    // console.log(user);
 
     $scope.pattern     = {money: diabloPattern.decimal_2};
     $scope.shops       = user.sortShops;
@@ -261,7 +261,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     var rsn     = $routeParams.rsn
     var promise = diabloPromise.promise;
     wsaleService.get_w_sale_new(rsn).then(function(result){
-	console.log(result);
+	// console.log(result);
 	if (result.ecode === 0){
 	    // result[0] is the record detail
 	    // result[1] are the inventory detail that the record is included
@@ -284,7 +284,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 		$scope.old_select.e_pay      = base.e_pay; 
 	    }
 
-	    console.log($scope.old_select);
+	    // console.log($scope.old_select);
 	    $scope.old_select.surplus    = base.balance;
 	    $scope.old_select.shop       = $scope.get_object(base.shop_id,   $scope.shops);
 	    $scope.old_select.employee   = $scope.get_object(base.employ_id, $scope.employees);
@@ -451,7 +451,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     };
     
     $scope.on_select_good = function(item, model, label){
-	console.log(item);
+	// console.log(item);
 	// one good can be add only once at the same time
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    if (item.style_number === $scope.inventories[i].style_number
@@ -467,7 +467,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	var add = $scope.inventories[0];
 	add = $scope.copy_select(add, item); 
 
-	console.log(add); 
+	//　console.log(add); 
 	$scope.add_inventory(add);
 	
 	return;
@@ -553,7 +553,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    }
 	}
 
-	console.log(changedAmounts);
+	// console.log(changedAmounts);
 	return changedAmounts;
     };
     
@@ -622,14 +622,14 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    }
 	} 
 
-	console.log(changedInvs);
+	// console.log(changedInvs);
 	return changedInvs;
     }; 
     
     $scope.save_wsale = function(){
 	$scope.has_saved = true; 
 	console.log($scope.inventories); 
-	console.log($scope.select);
+	// console.log($scope.select);
 	
 	if (angular.isUndefined($scope.select.retailer)
 	    || diablo_is_empty($scope.select.retailer)
@@ -641,7 +641,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	}; 
 
 	var updates = get_update_inventory();
-	console.log(updates);
+	// console.log(updates);
 	var added = [];
 	
 	for(var i=0, l=updates.length; i<l; i++){
@@ -717,10 +717,10 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    total:         seti($scope.select.total)
 	}; 
 
-	console.log(added);
-	console.log(base);
+	// console.log(added);
+	// console.log(base);
 	
-	console.log($scope.old_select);
+	// console.log($scope.old_select);
 	var new_datetime = dateFilter($scope.select.datetime, "yyyy-MM-dd");
 	var old_datetime = dateFilter($scope.old_select.datetime, "yyyy-MM-dd");
 	if (added.length === 0
@@ -745,7 +745,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	wsaleService.update_w_sale_new({
 	    inventory:added.length === 0 ? undefined : added, base:base
 	}).then(function(result){
-	    console.log(result);
+	    // console.log(result);
 	    if (result.ecode == 0){
 		msg = "销售单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
@@ -922,7 +922,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     };
 
     $scope.add_free_inventory = function(inv){
-	console.log(inv);
+	// console.log(inv);
 	inv.$edit = true;
 	inv.$new  = false;
 	inv.amounts[0].sell_count = inv.sell;
@@ -963,7 +963,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    };
 	    
 	    $q.all(calls).then(function(data){
-		console.log(data);
+		// console.log(data);
 		// data[0] is the inventory belong to the shop
 		// data[1] is the last sale of the shop
 
@@ -986,15 +986,6 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 		    console.log(inv.amounts);
 		};
 		
-		
-		// if (shop_now_inv.length === 0 ){
-		//     diabloUtilsService.response(
-		// 	false, "销售开单", "开单失败：" + wsaleService.error[2190]);
-		//     return;
-		// };
-
-		
-
 		// last sale info
 		if ($scope.setting.trace_price === diablo_yes){
 		    var shop_last_inv = function(){
@@ -1021,6 +1012,9 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 
 		if(inv.free === 0){
 		    inv.free_color_size = true;
+		    if (angular.isUndefined(inv.amounts)){
+			inv.amounts = [{cid:0, size:0}];
+		    }
 		} else{
 		    inv.free_color_size = false;
 
