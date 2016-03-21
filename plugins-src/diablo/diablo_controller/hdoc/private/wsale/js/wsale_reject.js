@@ -23,6 +23,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 
     $scope.pattern = {reject:diabloPattern.positive_num,
 		      price:diabloPattern.positive_decimal_2};
+
+    $scope.sell_styles = diablo_sell_style;
     
     var dialog     = diabloUtilsService;
 
@@ -59,7 +61,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail");
-    };
+    }; 
 
     var now = $.now();
     $scope.qtime_start = function(shopId){
@@ -67,6 +69,15 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    "qtime_start", shopId, base, function(v){return v},
 	    dateFilter(diabloFilter.default_start_time(now), "yyyy-MM-dd"));
     };
+
+    $scope.price_type = function(shopId){
+	return diablo_base_setting(
+	    "price_type",
+		-1,
+	    base,
+	    parseInt,
+	    $scope.sell_styles[0].id);
+    }();
     
     $scope.select  = {
 	shop: $scope.shops[0],
@@ -89,8 +100,6 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	$scope.select.employee = $scope.employees[0];
     }
     
-    $scope.sell_styles = diablo_sell_style;
-
     // init
     $scope.inventories = [];
     $scope.inventories.push({$edit:false, $new:true});
@@ -142,7 +151,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     if (!$scope.setting.q_backend){
 	diabloNormalFilter.match_all_w_inventory(
 	    {shop:$scope.select.shop.id,
-	     start_time:$scope.qtime_start($scope.select.shop.id)}
+	     start_time:$scope.qtime_start($scope.select.shop.id),
+	     qtype: diablo_use_repo}
 	).$promise.then(function(invs){
 	    // console.log(invs);
 	    $scope.all_w_inventory = 
@@ -165,7 +175,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     // }
     
     $scope.match_style_number = function(viewValue){
-	return diabloFilter.match_w_sale(viewValue, $scope.select.shop.id);
+	return diabloFilter.match_w_sale(
+	    viewValue, $scope.select.shop.id, diablo_use_repo);
     }
     
     $scope.copy_select = function(add, src){
@@ -193,7 +204,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	add.path         = src.path;
 	add.s_group      = src.s_group;
 	add.free         = src.free;
-	add.sell_style   = $scope.sell_styles[0]; 
+	add.sell_style   = $scope.sell_styles[$scope.price_type - 1];
+	// add.sell_style   = $scope.sell_styles[0]; 
 	return add; 
     };
     
@@ -502,7 +514,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
     
     $scope.add_inventory = function(inv){
-	// console.log(inv); 
+	console.log(inv); 
 	console.log($scope.setting);
 	if ($scope.setting.check_sale === diablo_no
 	    && $scope.setting.trace_price === diablo_no

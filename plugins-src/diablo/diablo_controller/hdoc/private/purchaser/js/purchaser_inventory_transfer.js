@@ -5,7 +5,7 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
     filterSizeGroup, filterColor, base){
     // console.log(user); 
     // console.log(filterShop);
-    $scope.shops             = user.sortBadRepoes.concat(user.sortShops);
+    $scope.shops = user.sortBadRepoes.concat(user.sortShops, user.sortRepoes);
     console.log($scope.shops);
     $scope.to_shops          = [];
     
@@ -581,7 +581,9 @@ purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
     user, filterShop, filterEmployee, base){
     // console.log($routeParams);
 
-    $scope.from_shops = user.sortShops;
+    $scope.from_shops = user.sortBadRepoes.concat(user.sortShops, user.sortRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds, user.repoIds);
+    
     $scope.goto_page = diablo_goto_page;
 
     $scope.go_transfer = function(){
@@ -638,10 +640,11 @@ purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
     
     $scope.do_search = function(page){
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if ((angular.isUndefined(search.fshopo)
+	    console.log(search);
+	    if ((angular.isUndefined(search.fshop)
 		 || !search.fshop || search.fshop.length === 0)){
 		search.fshop = $scope.from_shops.length
-		    === 0 ? undefined : user.shopIds;
+		    === 0 ? undefined : $scope.shopIds;
 	    };
 	    
 	    // if ((angular.isUndefined(search.tshop)
@@ -736,7 +739,9 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
     diabloFilter, purchaserService, wgoodService,
     user, filterShop, filterEmployee, base){
 
-    $scope.to_shops  = user.sortShops;
+    $scope.to_shops  = user.sortBadRepoes.concat(user.sortShops, user.sortRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds, user.repoIds);
+    // console.log($scope.to_shops);
     $scope.goto_page = diablo_goto_page;
 
     $scope.go_transfer = function(){
@@ -757,7 +762,7 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
     diabloFilter.reset_field();
     diabloFilter.add_field("rsn", []);
     // diabloFilter.add_field("fshop",     user.sortShops);
-    diabloFilter.add_field("tshop",     user.sortShops);
+    diabloFilter.add_field("tshop",     $scope.to_shops);
     // diabloFilter.add_field("firm",     filterFirm);
     diabloFilter.add_field("employee", filterEmployee); 
 
@@ -802,7 +807,7 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
 	    if ((angular.isUndefined(search.tshop)
 	    	 || !search.tshop || search.tshop.length === 0)){
 	    	search.tshop = $scope.to_shops.length
-	    	    === 0 ? undefined : user.shopIds;
+	    	    === 0 ? undefined : $scope.shopIds;
 	    }
 
 	    purchaserService.filter_transfer_w_inventory(

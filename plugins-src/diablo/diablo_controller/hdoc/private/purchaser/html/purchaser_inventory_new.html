@@ -303,7 +303,7 @@
 				 typeahead-editable="false"
 				 typeahead-on-select="on_select_good($item, $model, $label)" 
 				 typeahead="g as g.name for g in
-					    all_w_goods|filter:$viewValue|limitTo:20"/>
+					    all_w_goods|filter:{name:$viewValue}|limitTo:20"/>
 			  <span x-ng-show="loading">
 			    <i class="glyphicon glyphicon-refresh"></i>
 			  </span>

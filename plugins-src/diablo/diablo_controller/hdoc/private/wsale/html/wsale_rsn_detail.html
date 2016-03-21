@@ -104,8 +104,9 @@
 		    <td>{{inv.order_id}}</td> 
 		    <td>{{inv.rsn}}</td>
 		    <td x-ng-if="!hidden.base" x-ng-switch on="inv.sell_type">
-		      <span x-ng-switch-when=0>开单</span>
+		      <span x-ng-switch-when=0>开单</span> 
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-pink" x-ng-switch-when=2>零售</span>
 		    </td>
 		    <td x-ng-if="!hidden.base">{{inv.shop.name}}</td>
 		    <td x-ng-if="!hidden.base">{{inv.employee.name}}</td>
@@ -123,9 +124,9 @@
 		    <td>{{inv.fdiscount}}</td>
 		    <td>{{inv.fprice}}</td>
 		    <td x-ng-switch on="inv.sell_type">
-		      <span x-ng-switch-when=0>{{inv.total}}</span>
 		      <span class="fg-red" x-ng-switch-when=1>
 			{{inv.total}}</span>
+		      <span x-ng-switch-default>{{inv.total}}</span> 
 		    </td>
 		    <td>
 		      <span x-ng-if="setting.round===1">

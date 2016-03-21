@@ -223,10 +223,13 @@ function filterProvider(){
 		})
 	    }, 
 
-	    match_w_sale: function(viewValue, shop){
+	    match_w_sale: function(viewValue, shop, qtype){
 		return resource.query_by_post(
 		    {operation:'match_w_inventory'},
-		    {prompt:viewValue, shop:shop, firm:[]}
+		    {prompt:viewValue,
+		     shop:shop,
+		     firm:[],
+		     qtype: qtype}
 		).$promise.then(function(invs){
 		    // console.log(invs);
 		    return invs.map(function(inv){

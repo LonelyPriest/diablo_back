@@ -8,7 +8,6 @@ wretailerApp.controller('wretailerTransCtrl', function(
     var retailer_id = parseInt($routeParams.retailer);
     $scope.retailer = diablo_get_object(retailer_id, filterRetailer);
     // console.log($scope.retailer);
-
     $scope.shops     = user.sortBadRepoes.concat(user.sortShops);
     $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
     $scope.goto_page = diablo_goto_page;

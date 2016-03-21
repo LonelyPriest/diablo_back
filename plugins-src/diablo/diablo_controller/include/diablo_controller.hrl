@@ -15,6 +15,10 @@
 -define(REPERTORY, 1).
 -define(BAD_REPERTORY, 2).
 
+%% repo
+-define(NO_REPO, 0). 
+-define(USE_REPO, 1). 
+
 %% merchant type
 -define(SALER, 0).
 -define(WHOLESALER, 1).

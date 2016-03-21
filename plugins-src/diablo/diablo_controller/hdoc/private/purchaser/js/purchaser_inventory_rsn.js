@@ -146,14 +146,14 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
     
     // var permitShops =  user.shopIds;
     // $scope.shops = user.sortAvailabeShops;
-    $scope.shops   = user.sortShops.concat(user.sortBadRepoes);
-    $scope.shopIds = user.shopIds.concat(user.badrepoIds);
+    $scope.shops   = user.sortShops.concat(user.sortBadRepoes, user.sortRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds, user.repoIds);
     $scope.goto_page = diablo_goto_page;
     
     
     // style_number
     $scope.match_style_number = function(viewValue){
-	return diabloFilter.match_w_inventory(viewValue, user.shopIds)
+	return diabloFilter.match_w_inventory(viewValue, $scope.shopIds)
     }; 
     
     // initial
@@ -200,7 +200,7 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
 	    	|| !search.shop || search.shop.length === 0){
 	    	// search.shop = user.shopIds;
 		search.shop = user.shopIds.length
-		    === 0 ? undefined : user.shopIds;
+		    === 0 ? undefined : $scope.shopIds;
 	    };
 
 	    if (angular.isUndefined(search.rsn)){
@@ -216,7 +216,7 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
 		    }
 		    
 		    angular.forEach(result.data, function(d){
-			d.shop = diablo_get_object(d.shop_id, user.sortShops);
+			d.shop = diablo_get_object(d.shop_id, $scope.shops);
 			d.firm = diablo_get_object(d.firm_id, filterFirm);
 			d.brand = diablo_get_object(d.brand_id, filterBrand);
 		    });
@@ -566,8 +566,10 @@ purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
     
     // var permitShops =  user.shopIds;
     // $scope.shops = user.sortAvailabeShops;
-    $scope.shops   = user.sortShops;
-    $scope.shopIds = user.shopIds;
+    // $scope.shops   = user.sortShops;
+    // $scope.shopIds = user.shopIds;
+    $scope.shops  = user.sortBadRepoes.concat(user.sortShops, user.sortRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds, user.repoIds);
     
     // style_number
     $scope.match_style_number = function(viewValue){
@@ -623,7 +625,7 @@ purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
 
     $scope.do_search = function(page){
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if ((angular.isUndefined(search.fshopo)
+	    if ((angular.isUndefined(search.fshop)
 		 || !search.fshop || search.fshop.length === 0)){
 		search.fshop = $scope.shops.length
 		    === 0 ? undefined : $scope.shopIds;
@@ -739,8 +741,9 @@ purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
     
     // var permitShops =  user.shopIds;
     // $scope.shops = user.sortAvailabeShops;
-    $scope.shops   = user.sortShops;
-    $scope.shopIds = user.shopIds;
+    // $scope.shops   = user.sortShops;
+    $scope.shops  = user.sortBadRepoes.concat(user.sortShops, user.sortRepoes);
+    $scope.shopIds = user.shopIds.concat(user.badrepoIds, user.repoIds);
     
     // style_number
     $scope.match_style_number = function(viewValue){
@@ -796,7 +799,7 @@ purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
 
     $scope.do_search = function(page){
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if ((angular.isUndefined(search.tshopo)
+	    if ((angular.isUndefined(search.tshop)
 		 || !search.tshop || search.tshop.length === 0)){
 		search.tshop = $scope.shops.length
 		    === 0 ? undefined : $scope.shopIds; ;

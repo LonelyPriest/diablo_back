@@ -5,7 +5,7 @@ purchaserApp.controller("purchaserInventoryFixCtrl", function(
     console.log(user);
 
     // var allowedshops = rightAction.get_w_shops(user.sortShops, "fix_w_inventory");
-    $scope.shops = user.sortShops;
+    $scope.shops = user.sortShops.concat(user.sortRepoes, user.sortBadRepoes);
     
     // $scope.shops = user.sortAvailabeShops;
     

@@ -360,11 +360,22 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 
 	// has been added
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
-	    if (item.style_number === $scope.inventories[i].style_number
-		&& item.brand_id  === $scope.inventories[i].brand_id){
+	    var select = $scope.inventories[i];
+	    if (item.style_number === select.style_number
+		&& item.brand_id  === select.brand_id){
 		diabloUtilsService.response_with_callback(
 		    false, "新增库存", "新增库存失败：" + purchaserService.error[2099],
 		    $scope, function(){ $scope.inventories[0] = {$edit:false, $new:true}});
+		return;
+	    }
+
+	    if (item.firm_id !== select.firm_id){
+		diabloUtilsService.response(
+		    false,
+		    "新增库存",
+		    "新增库存失败：" + purchaserService.error[2092]
+			+ "货品厂商：" + diablo_get_object(item.firm_id, $scope.firms).name
+			+ "，入库厂商：" + diablo_get_object(select.firm_id, $scope.firms).name);
 		return;
 	    }
 	}
@@ -511,6 +522,7 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    || diablo_is_empty($scope.select.shop)
 	    || angular.isUndefined($scope.select.employee)
 	    || diablo_is_empty($scope.select.employee)){
+	    $scope.has_saved = false; 
 	    diabloUtilsService.response(
 		false, "新增库存", "新增库存失败：" + purchaserService.error[2096]);
 	    return;
@@ -519,6 +531,17 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	var added = [];
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    var add = $scope.inventories[i];
+	    if (add.firm_id !== $scope.select.firm.id){
+		$scope.has_saved = false; 
+		diabloUtilsService.response(
+		    false,
+		    "新增库存",
+		    "新增库存失败：" + purchaserService.error[2093]
+			+ "货品厂商：" + diablo_get_object(add.firm_id, $scope.firms).name
+			+ "，所选厂商：" + $scope.select.firm.name);
+		return;
+	    };
+	    
 	    added.push({
 		good        : add.id,
 		style_number: add.style_number,
@@ -930,8 +953,8 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     $scope.chart_data = {};
     
-    $scope.shops     = user.sortShops.concat(user.sortBadRepoes);
-    $scope.shopIds   = user.shopIds.concat(user.badrepoIds);
+    $scope.shops     = user.sortShops.concat(user.sortBadRepoes, user.sortRepoes);
+    $scope.shopIds   = user.shopIds.concat(user.badrepoIds, user.repoIds);
     
     $scope.sexs      = diablo_sex;
     $scope.seasons   = diablo_season;
@@ -945,7 +968,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 
     $scope.$watch("tab_active", function(newValue, oldValue){
 	console.log(newValue, oldValue);
-    }, false)
+    }, false);
     // console.log($scope.show_orgprice);
 
     // $scope.shops = user.sortShops;
@@ -1064,7 +1087,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	    purchaserService.filter_purchaser_inventory_group(
 		mode, $scope.match, search, page, $scope.items_perpage
 	    ).then(function(result){
-		console.log(result);
+		// console.log(result);
 
 		if (mode === 1){
 		    var labels  = [];
@@ -1159,7 +1182,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 		 brand:        inv.brand_id,
 		 rsn:          $routeParams.rsn ? $routeParams.rsn:undefined,
 		 shop:         inv.shop_id,
-		 qtype:        1}
+		 qtype:        diablo_no_repo}
 	    ).then(function(invs){
 		console.log(invs);
 		var order_sizes = wgoodService.format_size_group(

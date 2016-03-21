@@ -342,7 +342,7 @@
 				     typeahead-editable="false"
 				     typeahead-on-select="on_select_good($item, $model, $label)"
 				     typeahead="g as g.name for g in
-						all_w_inventory|filter:$viewValue|limitTo:20"/>
+						all_w_inventory|filter:{name:$viewValue}|limitTo:20"/>
 			    </div>
 			  </form>
 			</td>
@@ -450,7 +450,9 @@
 				     type="number" step="0.01"
 				     required
 				     x-ng-pattern="/^\d+(.\d{1,2})?$/"
-				     x-ng-model="inv.fprice" />
+				     x-ng-model="inv.fprice"
+				     x-ng-change="auto_save_free_of_price(inv)"
+				     />
 			    </div>
 			  </form>
 			</td> 

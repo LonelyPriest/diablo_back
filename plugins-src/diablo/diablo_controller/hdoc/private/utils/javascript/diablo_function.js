@@ -25,6 +25,10 @@ var diablo_by_shop     = "by_shop";
 var diablo_by_retailer = "by_retailer";
 var diablo_by_good     = "by_good";
 
+// repo
+var diablo_no_repo  = 0;
+var diablo_use_repo = 1;
+
 /*
  * storage key
  */

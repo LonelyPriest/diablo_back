@@ -171,13 +171,13 @@ wretailerApp.service("wretailerService", function($resource, dateFilter){
     			 {operation: '@operation', id: '@id'});
 
     this.new_wretailer = function(r){
-	var balance = r.balance;
+	var balance = diablo_set_integer(r.balance);
 	var province = angular.isDefined(r.province) && r.province ? r.province.id : undefined;
 	var city = angular.isDefined(r.city) && r.city ? r.city : undefined; 
 	return http.save(
 	    {operation:"new_w_retailer"},
 	    {name:     r.name,
-	     balance:  angular.isDefined(balance) ? parseFloat(balance) : 0,
+	     balance:  balance,
 	     mobile:   r.mobile,
 	     address:  r.address,
 	     province: province,
