@@ -159,8 +159,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 		invs.map(function(inv){
 		    var name =
 			inv.style_number + "，" + inv.brand + "，" + inv.type;
+		    var prompt = name + "," + diablo_pinyin(name);
 		    return angular.extend(
-			inv, {name:name, py: diablo_pinyin(name)}); 
+			inv, {name:name, prompt:prompt}); 
 		})
 	});
     };

@@ -139,6 +139,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 
     Total      = ?v(<<"total">>, Props, 0),
     SellMode   = ?v(<<"mode">>, Props, ?WHOLESALER),
+    SysCustomer = ?v(<<"sys_customer">>, Props, false),
 
     Sql0 = "select id, name, balance from w_retailer"
 	" where id=" ++ ?to_s(Retailer)
@@ -151,6 +152,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		       ["M-", ?to_i(Merchant),
 			"-S-", ?to_i(Shop), "-",
 			?inventory_sn:sn(w_sale_new_sn, Merchant)]),
+	    
 	    RealyShop = realy_shop(Merchant, Shop, SellMode),
 	    Sql1 = 
 		lists:foldr(
@@ -165,10 +167,12 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 			  end
 		  end, [], Inventories), 
 
-	    CurrentBalance = case ?v(<<"balance">>, Account) of
-				 <<>> -> 0;
-				 R -> R
-			     end,
+	    TrueBalance = ?v(<<"balance">>, Account),
+	    CurrentBalance = 
+		case SysCustomer orelse TrueBalance =:= <<>> of
+		    true -> 0;
+		    false -> TrueBalance
+		end,
 
 	    Sql2 = "insert into w_sale(rsn"
 		", employ, retailer, shop, merchant, balance"
@@ -1059,7 +1063,7 @@ wsale(delete, RSN, _DateTime, Merchant, Shop, Inventory, Amounts)
 	     end(),
 
     ["update w_inventory set amount=amount+" ++ ?to_s(Metric)
-     ++ ",sell=sell+" ++ ?to_s(Metric) 
+     ++ ",sell=sell-" ++ ?to_s(Metric) 
      ++ " where style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
      ++ " and brand=" ++ ?to_s(Brand)
      ++ " and shop=" ++ ?to_s(Shop)

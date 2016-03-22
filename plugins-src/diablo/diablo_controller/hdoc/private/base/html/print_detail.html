@@ -155,6 +155,10 @@
 			 {{get_object(s.value, size_groups).name}}
 		       </span>
 
+		       <span ng-switch-when="s_customer">
+			 {{get_object(s.value, retailers).name}}
+		       </span>
+
 		      <!--default-->
 		      <span ng-switch-default>{{s.value}}</span>
 		    </td>
@@ -590,6 +594,15 @@
 				 params.setting.yes_no[params.setting.value]">
 	      </select>
 
+	      <input x-ng-switch-when="s_customer" type="text"
+		     class="form-control" required
+		     name="value"
+		     x-ng-model="params.setting.value"
+		     typeahead-editable="false"
+		     typeahead="c as c.name for c in
+				params.setting.retailers|filter:$viewValue|limitTo:8"
+		     x-ng-init="params.setting.value=params.init_v "/>
+	      
 	      <input x-ng-switch-when="pum" type="text"
 		     class="form-control" required
 		     name="value"
@@ -606,11 +619,8 @@
 		     class="form-control" required
 		     name="value"
 		     x-ng-model="params.setting.value"
-		     x-ng-pattern="params.patterns.tel_mobile"/>
-
-
-
-
+		     x-ng-pattern="params.patterns.tel_mobile"/> 
+	      
 	      <input x-ng-switch-default
 		     class="form-control" type="text"
 		     required

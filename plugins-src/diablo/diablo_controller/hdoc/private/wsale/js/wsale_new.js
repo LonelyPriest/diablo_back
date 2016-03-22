@@ -46,59 +46,41 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
     // base setting
     $scope.trace_price = function(shopId){
-	return diablo_base_setting(
-	    "ptrace_price", shopId, base, parseInt, diablo_no); 
-    };
+	return wsaleUtils.trace_price(shopId, base)};
 
     $scope.immediately_print = function(shopId){
-	return diablo_base_setting(
-	    "pim_print", shopId, base, parseInt, diablo_no); 
+	return wsaleUtils.im_print(shopId, base)
     };
 
     $scope.q_typeahead = function(){
 	// default prompt comes from backend
-	return diablo_base_setting(
-	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
+	return wsaleUtils.typeahead($scope.select.shop.id, base)
     };
     // console.log($scope.q_typeahead); 
 
     $scope.show_discount = function(){
-	return diablo_base_setting(
-	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
+	return wsaleUtils.show_discount($scope.select.shop.id, base); 
     };
 
     $scope.p_round = function(){
-	return diablo_base_setting(
-	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
+	return wsaleUtils.get_round($scope.select.shop.id, base); 
+    };
+
+    $scope.get_price_type = function(shopId){
+	return wsaleUtils.price_type(shopId, base, $scope.sell_styles[0].id); 
     };
 
     $scope.check_sale = function(shopId){
-	return diablo_base_setting(
-	    "check_sale", shopId, base, parseInt, diablo_yes);
-    };
-
-    $scope.price_type = function(shopId){
-	return diablo_base_setting(
-	    "price_type",
-		-1,
-	    base,
-	    parseInt,
-	    $scope.sell_styles[0].id);
-    }();
+	return wsaleUtils.check_sale(shopId, base); 
+    }; 
 
     $scope.auto_cash = function(shopId){
-	return diablo_base_setting(
-	    "auto_cash", shopId, base, parseInt, diablo_no);
+	return wsaleUtils.auto_cash(shopId, base); 
     };
 
+    $scope.setting.sys_customer = wsaleUtils.sys_customer(base);
+    // console.log($scope.setting.sys_customer);
     // console.log($scope.price_type); 
-    
-    // $scope.qtime_length = function(shopId){
-    // 	return diablo_base_setting("qtime_length", shopId, base, diablo_yes);
-    // }();
-
-    
-
     // console.log($scope.q_typeahead);
     
     $scope.sexs            = diablo_sex;
@@ -126,7 +108,6 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	reject_total:   0
 	// extra_pay: 0.00
     }; 
-
     // console.log($scope.select);
     
     
@@ -146,6 +127,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
 	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
 	$scope.setting.auto_cash = $scope.auto_cash($scope.select.shop.id);
+	$scope.price_type = $scope.get_price_type($scope.select.shop.id, base);
+	
 	wsaleGoodService.set_shop($scope.select.shop.id);
     }
     
@@ -154,23 +137,23 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    if(shopId === $scope.shops[i].id){
 		return $scope.shops[i];
 	    }
-    }
+    };
 
     $scope.change_shop = function(){
 	$scope.local_save();
-	$scope.setting.trace_price =
-	    $scope.trace_price($scope.select.shop.id);
+	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
 	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
 	$scope.setting.auto_cash = $scope.auto_cash($scope.select.shop.id);
 	$scope.setting.show_discount = $scope.show_discount();
 	$scope.setting.round         = $scope.p_round();
+	$scope.price_type = $scope.get_price_type($scope.select.shop.id, base);
 	
 	wsaleGoodService.set_shop($scope.select.shop.id);
 
 	if (!$scope.setting.q_backend){
 	    $scope.match_all_w_inventory();
 	}
-    } 
+    };
 
     // employees
     $scope.employees = filterEmployee;
@@ -187,16 +170,6 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		} 
 	    }
 	} 
-
-	// console.log($scope.select.employee);
-	
-	// angular.forEach($scope.employees, function(e){
-	//     if (user.loginEmployee === e.id){
-	// 	$scope.select.employee.splice(0, 1, e);
-	//     } else {
-	// 	$scope.select.employee.push(e);
-	//     }
-	// });
     };
     
     $scope.find_employee = function(number){
@@ -209,7 +182,6 @@ wsaleApp.controller("wsaleNewCtrl", function(
     // retailer;
     $scope.retailers = filterRetailer;
     if ($scope.retailers.length !== 0){
-	
 	$scope.select.retailer = $scope.retailers[0];
 	if (user.loginRetailer !== -1){
 	    for (var i=0, l=$scope.retailers.length; i<l; i++){
@@ -219,10 +191,14 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		} 
 	    }
 	}
+
+	if ($scope.setting.sys_customer === $scope.select.retailer.id){
+	    $scope.select.surplus = 0;
+	} else {
+	    var balance = diablo_set_float($scope.select.retailer.balance);
+	    $scope.select.surplus = angular.isUndefined(balance) ? 0 : balance;
+	}
 	
-	var balance = $scope.select.retailer.balance;
-	$scope.select.surplus = angular.isDefined(balance)
-	    && !isNaN(balance) && balance ? parseFloat($scope.select.retailer.balance) : 0;
 	$scope.select.left_balance = $scope.select.surplus;
     };
     
@@ -234,12 +210,17 @@ wsaleApp.controller("wsaleNewCtrl", function(
     }
 
     $scope.change_retailer = function(){
-	var balance = $scope.select.retailer.balance;
-	$scope.select.surplus = angular.isDefined(balance)
-	    && !isNaN(balance) && balance ? parseFloat($scope.select.retailer.balance) : 0;
+	if ($scope.setting.sys_customer === $scope.select.retailer.id){
+	    $scope.select.surplus = 0;
+	} else {
+	    var balance = diablo_set_float($scope.select.retailer.balance);
+	    $scope.select.surplus = angular.isUndefined(balance) ? 0 : balance;
+	}
+	
 	// $scope.select.surplus = parseFloat($scope.select.retailer.balance);
 	$scope.local_save();
 	$scope.re_calculate();
+	
 	// image mode, refresh image
 	if ($scope.wsale_mode[1].active){
 	    $scope.page_changed($scope.current_page); 
@@ -340,8 +321,10 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		invs.map(function(inv){
 		    var name = inv.style_number
 			+ "，" + inv.brand + "，" + inv.type;
+		    var prompt = name + "," + diablo_pinyin(name);
+		    
 		    return angular.extend(
-			inv, {name:name, py: diablo_pinyin(name)});
+			inv, {name:name, prompt:prompt});
 		});
 
 	    wsaleGoodService.set_prompt_inventory($scope.all_w_inventory);
@@ -856,6 +839,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    verificate:     setv($scope.select.verificate),
 	    should_pay:     setv($scope.select.should_pay),
 	    has_pay:        setv($scope.select.has_pay),
+	    sys_customer:   $scope.setting.sys_customer === $scope.select.retailer.id,
 
 	    e_pay_type:     angular.isUndefined(e_pay) ? undefined : $scope.select.extra_pay_type.id,
 	    e_pay:          e_pay,
@@ -911,8 +895,12 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		$scope.local_remove();
 		$scope.disable_refresh = false;
 		// modify current balance of retailer
-		$scope.select.retailer.balance = $scope.select.left_balance;
-		$scope.select.surplus = $scope.select.retailer.balance;
+		if ($scope.select.retailer.id === $scope.setting.sys_customer){
+		    $scope.select.surplus = 0;
+		} else {
+		    $scope.select.retailer.balance = $scope.select.left_balance;
+		    $scope.select.surplus = $scope.select.retailer.balance;
+		} 
 		
 		if (im_print === diablo_yes){
 		    var show_message = "开单" + print(result);

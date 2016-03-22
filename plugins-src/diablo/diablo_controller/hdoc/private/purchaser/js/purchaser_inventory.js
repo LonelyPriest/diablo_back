@@ -341,9 +341,11 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	).then(function(goods){
 	    // console.log(invs);
 	    $scope.all_w_goods =  goods.map(function(g){
+		var name = g.style_number
+		    + "，" + g.brand + "，" + g.type;
+		var prompt = name + "," + diablo_pinyin(name);
 		return angular.extend(
-		    g, {name:g.style_number + "，"
-			+ g.brand + "，" + g.type})
+		    g, {name:name, prompt:prompt});
 	    });
 
 	    // console.log($scope.all_w_goods);

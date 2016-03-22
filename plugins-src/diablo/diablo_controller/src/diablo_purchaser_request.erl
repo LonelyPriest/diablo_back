@@ -491,6 +491,7 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 			case ExportType of
 			    stock ->
 				ExportSizes = export_size_group(Merchant),
+				?DEBUG("export sizes ~p", [ExportSizes]),
 				{ok, Colors} = ?w_user_profile:get(color, Merchant),
 
 				NewTranses = sort_stock(Transes, []),
@@ -708,10 +709,13 @@ csv_head(stock, Sizes, Do) ->
     StringSizes = 
 	lists:foldr(
 	  fun(S, Acc) ->
-		  ?to_s(S) ++ "," ++ Acc
+		  case S =:= 0 of
+		      true -> "均码";
+		      false -> ?to_s(S)
+		  end ++ "," ++ Acc
 	  end, [], Sizes),
     
-    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,单价,金额").
+    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,批发价,金额").
 
 
 do_write(ExportType, Do, Transes) ->
@@ -831,7 +835,7 @@ do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) ->
 	  fun(CId, Acc)->
 		  [{CId, sort_by_color(CId, ExportSizes, Amounts)}|Acc]
 	  end, [], ColorIds),
-    ?DEBUG("sorts ~p", [Sorts]),
+    %% ?DEBUG("sorts ~p", [Sorts]),
 
     lists:foreach(
       fun({CId, Counts})-> 
@@ -852,6 +856,7 @@ do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) ->
 		  ++ color(name, CId, AllColors) ++ ?d
 		  ++ Row
 		  ++ ?to_s(Total1) ++ ?d
+		  ++ ?to_s(PkgPrice) ++ ?d
 		  ++ ?to_s(Total1 * PkgPrice),
 
 	      Do(NewRow)
@@ -950,7 +955,7 @@ combine_inventory(Inv, [{struct, H}|T], Combines) ->
 				    end
 			    end, {false, []}, Amounts),
 
-	    ?DEBUG("found ~p, FoundAmounts ~p", [Found, FoundAmounts]),
+	    %% ?DEBUG("found ~p, FoundAmounts ~p", [Found, FoundAmounts]),
 	    
 	    NewAmounts = case Found of
 			     true -> FoundAmounts;
@@ -1042,17 +1047,25 @@ export_size_group(Merchant) ->
 	  fun(G, Acc)->
 		  {ok, Size} = ?w_user_profile:get(size_group, Merchant, ?to_i(G)),
 		  ?DEBUG("size ~p", [Size]),
-		  SI   = ?v(<<"si">>, Size),
-		  SII  = ?v(<<"sii">>, Size),
-		  SIII = ?v(<<"siii">>, Size),
-		  SIV  = ?v(<<"siv">>, Size),
-		  SV   = ?v(<<"sv">>, Size),
-		  SVI  = ?v(<<"svi">>, Size),
-		  F(SI) ++ F(SII) ++ F(SIII) ++ F(SIV) ++ F(SV) ++ F(SVI) ++ Acc 
+		  case Size of
+		      [] -> Acc;
+		      _ ->
+			  SI   = ?v(<<"si">>, Size),
+			  SII  = ?v(<<"sii">>, Size),
+			  SIII = ?v(<<"siii">>, Size),
+			  SIV  = ?v(<<"siv">>, Size),
+			  SV   = ?v(<<"sv">>, Size),
+			  SVI  = ?v(<<"svi">>, Size),
+			  F(SI) ++ F(SII) ++ F(SIII)
+			      ++ F(SIV) ++ F(SV) ++ F(SVI) ++ Acc
+		  end
 	  end, [], ExportGroups),
 
-    ?DEBUG("flattern sizes ~p", [FlatternSizes]),
-    lists:usort(FlatternSizes).
+    %% ?DEBUG("flattern sizes ~p", [FlatternSizes]),
+    case FlatternSizes of
+	[] -> [0];
+	_ -> lists:usort(FlatternSizes)
+    end.
 
 color(name, _ColorId, []) ->
     []; 

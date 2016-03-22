@@ -229,7 +229,7 @@
 				 typeahead-editable="false"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead="g as g.name for g in
-					    all_w_inventory|filter:{name:$viewValue}|limitTo:20"/>
+					    all_w_inventory|filter:{prompt:$viewValue}|limitTo:20"/>
 			</div>
 		      </form>
 		    </td>

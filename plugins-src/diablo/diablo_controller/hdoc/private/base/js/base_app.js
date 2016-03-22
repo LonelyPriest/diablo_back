@@ -182,11 +182,16 @@ baseApp.service("baseService", function($resource){
     this.list_purchaser_size = function(){
 	return httpGood.query({operation: 'list_w_size'}).$promise;
     };
+
+    var retailerHttp = $resource("/wretailer/:operation", {operation: '@operation'});
+    this.list_retailer = function(){
+	return retailerHttp.query({operation: 'list_w_retailer'}).$promise;
+    }
     
 });
     
 baseApp.controller("bankCardNewCtrl", function($scope, baseService, diabloUtilsService){
-    console.log($scope);
+    // console.log($scope);
 
     $scope.new_card = function(){
 	console.log($scope.card);
@@ -285,15 +290,21 @@ baseApp.controller("bankCardDetailCtrl", function($scope, baseService, diabloUti
 
 	dialog.request(
 	    "删除银行卡",
-	    "确定要删除该银行卡吗？", callback, undefined, $scope);
-	
-	
+	    "确定要删除该银行卡吗？", callback, undefined, $scope); 
     }
 });
 
 
 baseApp.controller("printOptionCtrl", function(
     $scope, dateFilter, baseService, diabloPattern, diabloUtilsService, user){
+
+    // retailer
+    baseService.list_retailer().then(function(retailers){
+	$scope.retailers = retailers.map(function(r){
+	    return {name: r.name, id:r.id, py:diablo_pinyin(r.name)};
+	}).concat([{name:"== 系统默认 ==", id:0}]);
+	// console.log($scope.retailers);
+    });
 
     baseService.list_purchaser_size().then(function(sizes){
 	console.log(sizes);
@@ -472,7 +483,8 @@ baseApp.controller("printOptionCtrl", function(
 		update = dateFilter(setting.value, "yyyy-MM-dd");
 	    } else if (s.ename==="price_type"
 		       || s.ename === 'e_sgroup1'
-		       || s.ename === 'e_sgroup2'){
+		       || s.ename === 'e_sgroup2'
+		       || s.ename === 's_customer'){
 		update = setting.value.id;
 	    } else {
 		update = typeof(setting.value) === 'object'
@@ -505,7 +517,6 @@ baseApp.controller("printOptionCtrl", function(
 	    })
 	};
 
-	var v;
 	if (s.ename === 'ptype'){
 	    angular.extend(s, {ptypes: $scope.print_types}); 
 	};
@@ -523,6 +534,9 @@ baseApp.controller("printOptionCtrl", function(
 	};
 	if (s.ename === 'e_sgroup1' || s.ename === 'e_sgroup2'){
 	    angular.extend(s, {sgroups: $scope.size_groups});
+	};
+	if (s.ename === 's_customer'){
+	    angular.extend(s, {retailers: $scope.retailers});
 	};
 	
 	if (s.ename === 'ptable'
@@ -543,6 +557,8 @@ baseApp.controller("printOptionCtrl", function(
 	   ){
 	    angular.extend(s, {yes_no: $scope.yes_no}); 
 	};
+
+	var v; 
 	if (s.ename === 'qtime_length'){
 	    v = function(){
 		for (var i=0, l=$scope.time_length.length; i<l; i++){
@@ -561,6 +577,11 @@ baseApp.controller("printOptionCtrl", function(
 	    v = $scope.get_object(s.value, $scope.size_groups);
 	};
 
+	if (s.ename === 's_customer'){
+	    // console.log(s.value, $scope.size_groups);
+	    v = $scope.get_object(s.value, $scope.retailers);
+	};
+
 	var qtime = {};
 	if (s.ename === 'qtime_start'){
 	    qtime.isOpened = false;
@@ -569,8 +590,7 @@ baseApp.controller("printOptionCtrl", function(
 		event.stopPropagation();
 		// qtime.isOpened = true;
 	    };
-	};
-	
+	}; 
 	
 	dialog.edit_with_modal(
 	    "edit-setting.html", undefined, callback, $scope,

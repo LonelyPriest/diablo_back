@@ -996,7 +996,7 @@ decompose_size(Sizes) ->
     decompose_size(Sizes, [], []).
 
 decompose_size([], GIds, GNames) ->
-    {lists:sort(GIds), GNames};
+    {lists:sort(GIds), lists:usort(GNames)};
 decompose_size([{struct, SizeGroup}|T], GIds, GNames) ->
 
     decompose_size(

@@ -555,11 +555,17 @@ sidebar(Session) ->
 	    WSale = ?w_inventory_request:authen_shop_action(
 		       {?new_w_sale, "new_wsale", "销售开单", "glyphicon glyphicon-usd"}, Shops),
 	    
-	    SSale = case ?right_auth:authen(?new_s_sale, Session) of
-			{ok, ?new_s_sale} -> 
-			    [{"new_ssale", "零售开单", "glyphicon glyphicon-yen"}];
-			_ -> []
-		    end, 
+	    SSale = case ?session:get(type, Session) of
+			?MERCHANT ->
+			    case ?right_auth:authen(?new_s_sale, Session) of
+				{ok, ?new_s_sale} -> 
+				    [{"new_ssale", "零售开单", "glyphicon glyphicon-yen"}];
+				_ -> []
+			    end;
+			?USER ->
+			    ?w_inventory_request:authen_shop_action(
+			       {?new_s_sale, "new_ssale", "零售开单", "glyphicon glyphicon-yen"}, Shops)
+		    end,
 
 	    WReject = ?w_inventory_request:authen_shop_action(
 			 {?reject_w_sale,

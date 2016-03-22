@@ -38,40 +38,32 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     $scope.get_object = diablo_get_object;
 
     $scope.show_discount = function(){
-	return diablo_base_setting(
-	    "show_discount", $scope.select.shop.id, base, parseInt, diablo_yes);
-    };
+	return wsaleUtils.show_discount($scope.select.shop.id, base); 
+    }; 
 
     $scope.q_typeahead = function(){
 	// default prompt comes from backend
-	return diablo_base_setting(
-	    "qtypeahead", $scope.select.shop.id, base, parseInt, diablo_yes);
+	return wsaleUtils.typeahead($scope.select.shop.id, base); 
     };
     
     $scope.trace_price = function(shopId){
-	return diablo_base_setting(
-	    "ptrace_price", shopId, base, parseInt, diablo_no); 
-    };
-
+	return wsaleUtils.trace_price(shopId, base)
+    }; 
+    
     $scope.p_round = function(){
-	return diablo_base_setting(
-	    "pround", $scope.select.shop.id, base, parseInt, diablo_round_record);
+	return wsaleUtils.get_round($scope.select.shop.id, base); 
     };
 
     $scope.check_sale = function(shopId){
-	return diablo_base_setting(
-	    "check_sale", shopId, base, parseInt, diablo_yes);
+	return wsaleUtils.check_sale(shopId, base); 
     };
 
-    $scope.price_type = function(shopId){
-	return diablo_base_setting(
-	    "price_type",
-		-1,
-	    base,
-	    parseInt,
-	    $scope.sell_styles[0].id);
-    }(); 
+    $scope.get_price_type = function(shopId){
+	return wsaleUtils.price_type(shopId, base, $scope.sell_styles[0].id); 
+    };
 
+    // $scope.setting.sys_customer = wsaleUtils.sys_customer(base);
+    
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
     };
@@ -93,8 +85,9 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 		invs.map(function(inv){
 		    var name = inv.style_number
 			+ "，" + inv.brand + "，" + inv.type;
+		    var prompt = name + "," + diablo_pinyin(name);
 		    return angular.extend(
-			inv, {name:name, py: diablo_pinyin(name)});
+			inv, {name:name, prompt:prompt}); 
 		}); 
 	});
     };
@@ -307,6 +300,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    $scope.setting.trace_price   = $scope.trace_price($scope.select.shop.id);
 	    $scope.setting.show_discount = $scope.show_discount();
 	    $scope.setting.round         = $scope.p_round();
+	    $scope.price_type            = $scope.get_price_type($scope.select.shop.id);
 
 	    if (!$scope.setting.q_backend){
 		$scope.match_all_w_inventory();
