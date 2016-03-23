@@ -996,7 +996,15 @@ decompose_size(Sizes) ->
     decompose_size(Sizes, [], []).
 
 decompose_size([], GIds, GNames) ->
-    {lists:sort(GIds), lists:usort(GNames)};
+    {lists:sort(GIds),
+     lists:foldr(
+       fun(G, Acc)->
+	       case lists:member(G, Acc) of
+		   true -> Acc;
+		   false -> [G|Acc]
+	       end
+       end, [], GNames)};
+
 decompose_size([{struct, SizeGroup}|T], GIds, GNames) ->
 
     decompose_size(

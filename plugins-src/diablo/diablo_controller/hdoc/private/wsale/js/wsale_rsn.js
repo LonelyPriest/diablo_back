@@ -62,7 +62,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
     // $scope.filters = [];
 
     var storage = localStorageService.get(diablo_key_wsale_trans_detail);
-    console.log(storage);
+    // console.log(storage);
     
     if (use_storage && angular.isDefined(storage) && storage !== null){
     	$scope.filters     = storage.filter;
@@ -293,7 +293,7 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 		|| !search.shop || search.shop.length === 0){
 		search.shop = $scope.shopIds.length === 0 ? undefined : $scope.shopIds; 
 	    }
-	    console.log(search);
+	    // console.log(search);
 	    
 	    wsaleService.csv_export(
 		wsaleService.export_type.trans_note, search

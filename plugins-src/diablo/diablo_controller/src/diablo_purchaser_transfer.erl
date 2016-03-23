@@ -238,8 +238,7 @@ check_transfer(Merchant, CheckProps) ->
     RSN = ?v(<<"rsn">>, CheckProps),
     TShop = ?v(<<"tshop">>, CheckProps),
     Now = ?v(<<"datetime">>, CheckProps,
-	     ?utils:current_time(format_localtime)),
-
+	     ?utils:current_time(format_localtime)), 
     
     Sql1 = "update w_inventory_transfer set"
 	" state=" ++ ?to_s(?IN_STOCK)
@@ -352,16 +351,16 @@ check_transfer(Merchant, CheckProps) ->
 			["update w_inventory set"
 			 " amount=amount+" ++ ?to_s(Amount)
 			 ++ ", org_price=" ++ ?to_s(OrgPrice)
-			 %% ++ ", tag_price=" ++ ?to_s(TagPrice)
-			 %% ++ ", pkg_price=" ++ ?to_s(PkgPrice)
+			 ++ ", tag_price=" ++ ?to_s(TagPrice)
+			 ++ ", pkg_price=" ++ ?to_s(PkgPrice)
 			 %% ++ ", price3=" ++ ?to_s(P3)
 			 %% ++ ", price4=" ++ ?to_s(P4)
 			 %% ++ ", price5=" ++ ?to_s(P5)
 			 %% ++ ", discount=" ++ ?to_s(Discount)
 			 ++ ", change_date="
 			 ++ "\"" ++ ?to_s(Now) ++ "\""
-			 ++ ", entry_date="
-			 ++ "\"" ++ ?to_s(Now) ++ "\""
+			 %% ++ ", entry_date="
+			 %% ++ "\"" ++ ?to_s(Now) ++ "\""
 			 ++ " where id=" ++ ?to_s(?v(<<"id">>, R))
 
 			 %% "update w_inventory_amount a inner join("

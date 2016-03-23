@@ -62,7 +62,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	return wsaleUtils.price_type(shopId, base, $scope.sell_styles[0].id); 
     };
 
-    // $scope.setting.sys_customer = wsaleUtils.sys_customer(base);
+    $scope.setting.sys_customer = wsaleUtils.sys_customer(base);
     
     $scope.go_back = function(){
 	diablo_goto_page("#/new_wsale_detail/" + $routeParams.ppage);
@@ -705,10 +705,11 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    old_should_pay: $scope.old_select.should_pay,
 	    old_has_pay:    $scope.old_select.has_pay, 
 	    old_datetime:   dateFilter($scope.old_select.datetime, "yyyy-MM-dd HH:mm:ss"),
-	    mode:          $scope.old_select.mode, 
+	    mode:           $scope.old_select.mode,
+	    sys_customer:   $scope.setting.sys_customer === $scope.select.retailer.id,
 	    
 	    // left_balance:  parseFloat($scope.select.left_balance),
-	    total:         seti($scope.select.total)
+	    total:          seti($scope.select.total)
 	}; 
 
 	// console.log(added);

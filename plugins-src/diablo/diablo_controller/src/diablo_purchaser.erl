@@ -413,8 +413,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		"style_number=\'" ++ ?to_s(S) ++ "\'"
 		    ++ " and brand=" ++ ?to_s(B)
 		    ++ " and merchant=" ++ ?to_s(Merchant) 
-	end,
-    
+	end, 
 
     RC = fun(S, B) ->
 		 "style_number=\'" ++ ?to_s(S) ++ "\'"
@@ -433,7 +432,10 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 			++?utils:v(change_date, string, DateTime),
 		    Sql2 = "update w_inventory set "
 			++ ?utils:to_sqls(proplists, comma, UpdateInv)
-			++ " where " ++ C(true, OrgStyleNumber, OrgBrand),
+		    %% ++ " where " ++ C(true, OrgStyleNumber, OrgBrand),
+		    %% stylenumber and brand do not changed,
+		    %% update all
+			++ " where " ++ C(false, OrgStyleNumber, OrgBrand),
 		    
 		    {reply,
 		     ?sql_utils:execute(
@@ -468,7 +470,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 			    ", " ++ ?to_s(Total) ++
 			    ", \'" ++ ?to_s(DateTime) ++ "\')"
 		end,
-
+	    
 	    UpdateFun =
 		fun(UId, Total) ->
 			"update w_inventory_amount"

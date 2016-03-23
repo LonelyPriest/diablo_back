@@ -503,21 +503,21 @@ action(Session, Req, {"w_sale_export"}, Payload) ->
     {struct, Conditions} = ?v(<<"condition">>, Payload),
 
 
-    NewConditions = 
-	case ExportType of
-	    trans_note ->
-		{struct, CutConditions} = ?v(<<"condition">>, Payload),
-		{ok, Q} = ?w_sale:sale(get_rsn, Merchant, CutConditions),
-		{struct, C} =
-		    ?v(<<"fields">>,
-		       ?w_inventory_request:filter_condition(
-			  trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], CutConditions)),
-		C;
-	    trans -> Conditions
-	end,
+    %% NewConditions = 
+    %% 	case ExportType of
+    %% 	    trans_note ->
+    %% 		{struct, CutConditions} = ?v(<<"condition">>, Payload),
+    %% 		{ok, Q} = ?w_sale:sale(get_rsn, Merchant, CutConditions),
+    %% 		{struct, C} =
+    %% 		    ?v(<<"fields">>,
+    %% 		       ?w_inventory_request:filter_condition(
+    %% 			  trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], CutConditions)),
+    %% 		C;
+    %% 	    trans -> Conditions
+    %% 	end,
 	    
     
-    case ?w_sale:export(ExportType, Merchant, NewConditions) of
+    case ?w_sale:export(ExportType, Merchant, Conditions) of
 	{ok, []} ->
 	    ?utils:respond(200, Req, ?err(wsale_export_no_date, Merchant));
 	{ok, Transes} -> 
@@ -653,7 +653,7 @@ batch_responed(Fun, Req) ->
 csv_head(trans, Do) ->
     Do("序号,单号,交易类型,门店,店员,客户,数量,现金,刷卡,汇款,核销,费用,帐户欠款,应付,实付,本次欠款,备注,开单日期");
 csv_head(trans_note, Do) ->
-    Do("序号,单号,交易类型,门店,店员,客户,款号,品牌,类型,厂商,单价,折扣,数量,小计,备注,日期").
+    Do("序号,单号,交易类型,门店,客户,款号,品牌,类型,厂商,数量,价格,折扣,小计,备注,日期").
 
 
 do_write(trans, _Do, _Count, [])->
@@ -708,17 +708,16 @@ do_write(trans_note, Do, Count, [H|T]) ->
     Rsn         = ?v(<<"rsn">>, H),
     SType        = ?v(<<"sell_type">>, H),
     Shop        = ?v(<<"shop">>, H),
-    Employee    = ?v(<<"employee">>, H),
+    %% Employee    = ?v(<<"employee">>, H),
     Retailer    = ?v(<<"retailer">>, H),
     StyleNumber = ?v(<<"style_number">>, H),
     Brand       = ?v(<<"brand">>, H), 
     Type        = ?v(<<"type">>, H),
     Firm        = ?v(<<"firm">>, H),
-    %% Color       = ?v(<<"color">>, H),
-    %% Size        = ?v(<<"size">>, H),
+    
+    Total       = ?v(<<"total">>, H), 
+    FPrice      = ?v(<<"fprice">>, H), 
     FDiscount   = ?v(<<"fdiscount">>, H),
-    FPrice      = ?v(<<"fprice">>, H),
-    Total       = ?v(<<"total">>, H),
 
     %% ?DEBUG("FDiscount ~p, FPrice ~p, Total ~p, rsn ~p", [FDiscount, FPrice, Total, Rsn]),
     Calc        = ?to_f(case FDiscount of
@@ -733,17 +732,17 @@ do_write(trans_note, Do, Count, [H|T]) ->
 	++ ?to_s(Rsn) ++ ?d
 	++ sale_type(SType) ++ ?d
 	++ ?to_s(Shop) ++ ?d
-	++ ?to_s(Employee) ++ ?d
+	%% ++ ?to_s(Employee) ++ ?d
 	++ ?to_s(Retailer) ++ ?d
 	++ ?to_s(StyleNumber) ++ ?d
 	++ ?to_s(Brand) ++ ?d
 	++ ?to_s(Type) ++ ?d
 	++ ?to_s(Firm) ++ ?d
+	++ ?to_s(Total) ++ ?d 
 	%% ++ ?to_s(Color) ++ ?d
 	%% ++ ?to_s(Size) ++ ?d
 	++ ?to_s(FPrice) ++ ?d 
 	++ ?to_s(FDiscount) ++ ?d
-	++ ?to_s(Total) ++ ?d
 	++ ?to_s(Calc) ++ ?d 
 	++ ?to_s(Comment) ++ ?d
 	++ ?to_s(Date),
@@ -752,7 +751,8 @@ do_write(trans_note, Do, Count, [H|T]) ->
     do_write(trans_note, Do, Count + 1, T).
     
 sale_type(0) -> "开单";
-sale_type(1)-> "退货".
+sale_type(1) -> "退货";
+sale_type(2) -> "零售".
 
 export_type(0) -> trans;
 export_type(1) -> trans_note.

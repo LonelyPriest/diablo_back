@@ -629,7 +629,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 			true, "文件导出成功", "创建文件成功，请点击确认下载！！", undefined,
 			function(){window.location.href = result.url;}) 
 		} else {
-		    diablo.response(
+		    dialog.response(
 			false, "文件导出失败", "创建文件失败：" + wsaleService.error[result.ecode]);
 		} 
 	    }); 
