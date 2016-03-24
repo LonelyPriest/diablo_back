@@ -1,0 +1,134 @@
+<!--BEGIN header-->
+<div class="row">
+  <div class="col-sm-12 col-md-12">
+    <ul class="page-breadcrumb breadcrumb">
+      <li>
+        <i class="glyphicon glyphicon-menu-hamburger fg-red"></i>
+	<a href="javascript:;">零售商结帐</a>
+        <i class="glyphicon glyphicon-menu-right fg-red"></i>
+      </li>
+      <li>
+        <a href="javascript:;">结帐</a>
+      </li>
+    </ul>
+  </div>
+</div> <!--END header-->
+
+<!--BEGIN row -->
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="portlet box blue">
+      <!--BEGIN portlet-body-->
+      <div class="portlet-body form">
+	<!--BEGIN from -->
+	<form class="form-horizontal" name="rForm" novalidate>
+	  <!--BEGIN form body-->
+	  <div class="form-body">
+	    <!--Name-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">名称</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <div x-ng-class="{'has-error':rForm.name.$invalid
+				   && !rForm.name.$pristine}">
+		    <input type="text"
+			   class="form-control"
+			   name="name"
+			   required
+			   placeholder="请选择零售商"
+			   x-ng-model="retailer"
+			   typeahead-editable="false"
+			   typeahead="r as r.name for r in
+				      retailers|filter:{prompt:$viewValue}|limitTo:15"/>
+		  </div>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div>
+	      <div ng-show="rForm.name.$invalid
+			    && !rForm.name.$pristine">
+		<span class="fg-red">零售商必须从下拉列表中选择</span>
+	      </div> 
+	    </div> 
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">帐户欠款</label>
+	      <div class="col-sm-6 col-md-6">
+		<input class="form-control"
+		       type="text"
+		       readonly
+		       x-ng-model="retailer.balance" />
+	      </div> 
+	    </div>
+
+	    <!--mobile-->
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系方式</label>
+	      <div class="col-sm-6 col-md-6"> 
+		<input type="text" 
+		       class="form-control"
+		       readonly
+		       x-ng-model="retailer.mobile"/>
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">联系地址</label>
+	      <div class="col-sm-6 col-md-6">
+		<input type="text"
+		       class="form-control"
+		       readonly
+		       x-ng-model="retailer.address" />
+	      </div> 
+	    </div>
+
+	    <div class="form-group">
+	      <label class="col-sm-3 col-md-3 control-label">结账金额</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <input class="form-control"
+			 type="number" step="0.01"
+			 name="bill"
+			 required
+			 placeholder="请输入结账金额，支持二位小数"
+			 x-ng-model="bill"
+			 x-ng-pattern="pattern.decimal_2"/>
+		  <span class="input-group-addon bg-white fg-red">*</span> 
+		</div>
+	      </div>
+	      <div ng-show="rForm.bill.$invalid && !rForm.bill.$pristine">
+		<span class="fg-red">请输入正确的数字，支持两位小数</span>
+	      </div> 
+	    </div>
+
+	    <div class="form-group diablo-good-form-group">
+	      <label class="col-sm-3 col-md-3 control-label">结账年度</label>
+	      <div class="col-sm-6 col-md-6">
+		<div class="input-group">
+		  <select class="form-control"
+			  x-ng-model="check_year"
+			  x-ng-options="y for y in full_years"></select>
+		  <span class="input-group-addon bg-white fg-red">*</span>
+		</div>
+	      </div> 
+	    </div>
+	    
+	  </div><!--END form body-->
+
+	  <!--BEGIN form action-->
+	  <div class="form-actions fluid">
+	    <div class="col-md-offset-3 col-md-6">
+	      <span class="pull-right">
+		<button class="btn btn-primary"
+			ng-disabled="rForm.$invalid "
+			x-ng-click="check_bill()">确认</button>
+		<button class="btn btn-warning"
+			x-ng-click="cancel()">取消</button>
+	      </span>
+	    </div>
+	  </div> <!--END form action-->
+
+	</form> <!--END form-->
+      </div> <!--END portlet body from-->
+    </div> <!--END portlet box-->
+  </div> <!--END col-md-12-->
+</div><!--END row-->

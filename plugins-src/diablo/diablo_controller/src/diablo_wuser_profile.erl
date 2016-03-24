@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([new/1, new/2, get/1, get/2, get/3, update/2, set_default/1]).
+-export([new/1, new/2, get/1, get/2, get/3, get/4, update/2, set_default/1]).
 -export([filter/3]).
 
 -define(SERVER, ?MODULE). 
@@ -104,6 +104,11 @@ get(user_nav, Merchant, Session) ->
     gen_server:call(?SERVER, {get_user_nav, Merchant, Session});
 get(user, Merchant, UserId) ->
     gen_server:call(?SERVER, {get_user_profile, Merchant, UserId}).
+
+
+%%
+get(setting, Merchant, Shop, Option) ->
+    gen_server:call(?SERVER, {get_setting_profile, Merchant, Shop, Option}).
 
 
 set_default(Merchant) ->
@@ -360,6 +365,22 @@ handle_call({get_setting_profile, Merchant, Shop}, _From, State) ->
 	    S  -> S
 	end,
     {reply, {ok, Setting}, State};
+
+handle_call({get_setting_profile, Merchant, Shop, Option}, _From, State) ->
+    MS = ms(Merchant, setting),
+    Select = select(MS, fun() -> ?w_base:setting(list, Merchant) end),
+    Setting = 
+	case filter(Select, <<"shop">>, Shop) of
+	    [] -> filter(Select, <<"shop">>, -1);
+	    S  -> S
+	end,
+
+    OkValue =
+	case filter(Setting, <<"ename">>, Option) of
+	    [] -> [];
+	    Value -> ?v(<<"value">>, Value)
+	end,
+    {reply, {ok, OkValue}, State};
 
 
 handle_call({get_size_group_profile, Merchant}, _From, State) ->

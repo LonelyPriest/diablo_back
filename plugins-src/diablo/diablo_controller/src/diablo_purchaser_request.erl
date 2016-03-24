@@ -459,6 +459,11 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 
     {struct, Conditions} = ?v(<<"condition">>, Payload),
 
+    ExportColor = case ?w_user_profile:get(setting, Merchant, -1, <<"e_color">>) of
+		      {ok, []} -> false;
+		      {ok, _} -> true
+		  end,
+
     NewConditions = 
 	case ExportType of
 	    trans_note ->
@@ -471,7 +476,7 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 			 trans_note, [?v(<<"rsn">>, Rsn) || {Rsn} <- Q], CutConditions)),
 		C;
 	    trans -> Conditions;
-	    stock -> Conditions
+	    stock -> [{<<"export_color">>, ExportColor}|Conditions]
 	end,
 
 
@@ -480,7 +485,7 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 	    ?utils:respond(200, Req, ?err(wsale_export_none, Merchant));
 	{ok, Transes} -> 
 	    %% write to file
-	    ?DEBUG("export transes ~p", [Transes]),
+	    %% ?DEBUG("export transes ~p", [Transes]),
 	    {ok, ExportFile, Url}
 		= ?utils:create_export_file("itrans", Merchant, UserId),
 	    
@@ -491,13 +496,19 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 			case ExportType of
 			    stock ->
 				ExportSizes = export_size_group(Merchant),
-				?DEBUG("export sizes ~p", [ExportSizes]),
+				%% ?DEBUG("export sizes ~p", [ExportSizes]),
 				{ok, Colors} = ?w_user_profile:get(color, Merchant),
 
-				NewTranses = sort_stock(Transes, []),
-				?DEBUG("newTranses ~p", [NewTranses]),
-				csv_head(stock, ExportSizes, DoFun),
-				do_write(stock, ExportSizes, Colors, DoFun, NewTranses);
+				NewTranses = sort_stock(Transes, ExportColor, []),
+				%% ?DEBUG("newTranses ~p", [NewTranses]),
+				csv_head(stock, ExportColor, ExportSizes, DoFun),
+				case ExportColor of
+				    true ->
+					do_write(stock, ExportSizes, Colors,
+						 DoFun, NewTranses);
+				    false ->
+					do_write(stock, DoFun, NewTranses)
+				end;
 			    _ ->
 				csv_head(ExportType, DoFun),
 				do_write(ExportType, DoFun, Transes)
@@ -705,7 +716,7 @@ csv_head(trans, Do) ->
     Do("序号,单号,厂商,门店,入单员,采购,数量,现金,刷卡,汇款,核销,费用,帐户欠款,应付,实付,本次欠款,备注,日期");
 csv_head(trans_note, Do) ->
     Do("序号,单号,厂商,门店,店员,交易类型,款号,品牌,类型,折扣,数量,日期").
-csv_head(stock, Sizes, Do) ->
+csv_head(stock, _ExportColor = true, Sizes, Do) ->
     StringSizes = 
 	lists:foldr(
 	  fun(S, Acc) ->
@@ -715,7 +726,9 @@ csv_head(stock, Sizes, Do) ->
 		  end ++ "," ++ Acc
 	  end, [], Sizes),
     
-    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,批发价,金额").
+    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,批发价,金额");
+csv_head(stock, _ExportColor = false, _Sizes, Do) ->
+    Do("品牌,款号,类别,厂商,数量,进价,金额").
 
 
 do_write(ExportType, Do, Transes) ->
@@ -813,9 +826,41 @@ do_write(trans_note, Do, Count, Amount, Calc, [H|T]) ->
 	++ ?to_s(Date),
     %% ++ ?to_s(Date),
     Do(L),
-    do_write(trans_note, Do, Count + 1, Amount, Calc, T).
+    do_write(trans_note, Do, Count + 1, Amount, Calc, T);
 
-do_write(stock, _ExportSizes, _AllColors, _Do, [])->
+do_write(stock, Do, _Count, Amount, Calc, [])->
+    ?DEBUG("amount ~p, calc ~p", [Amount, Calc]),
+    L = "\r\n" ++ csv(space, [], 4)
+	++ ?to_s(Amount) ++ ?d
+	++ csv(space, [], 1)
+	++ ?to_s(round(Calc)),
+    Do(L);
+do_write(stock, Do, Count, Amount, Calc, [H|T]) ->
+    ?DEBUG("do_write stock count ~p", [Count]),
+    StyleNumber = ?v(<<"style_number">>, H),
+    Brand       = ?v(<<"brand">>, H), 
+    Type        = ?v(<<"type">>, H),
+    Firm        = ?v(<<"firm">>, H),
+    OrgPrice    = ?v(<<"org_price">>, H),
+    %% TagPrice    = ?v(<<"tag_price">>, H),
+    %% PkgPrice    = ?v(<<"pkg_price">>, H),
+    %% Discount    = ?v(<<"discount">>, H),
+    Total       = ?v(<<"total">>, H),
+
+    L = "\r\n"
+	++ ?to_s(Brand) ++ ?d
+	++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
+	++ ?to_s(Type) ++ ?d
+	++ ?to_s(Firm) ++ ?d
+	++ ?to_s(Total) ++ ?d
+	++ ?to_s(OrgPrice) ++ ?d
+	++ ?to_s(OrgPrice * Total) ++ ?d,
+	
+	
+    Do(L),
+    do_write(stock, Do, Count + 1, Amount + Total, Calc + OrgPrice * Total, T).
+    
+do_write(stock,  _ExportSizes, _AllColors, _Do, [])->
     ok;
 do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) -> 
     %% ?DEBUG("H ~p", [H]),
@@ -864,9 +909,11 @@ do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) ->
     
     do_write(stock, ExportSizes, AllColors, Do, T).
 
-sort_stock([], Sorts) ->
+sort_stock([], _ExportColor, Sorts) ->
     Sorts;
-sort_stock([{Inv}|T], Sorts) ->
+sort_stock(Transe, ExportColor=false, _Sorts) ->
+    sort_stock([], ExportColor, Transe);
+sort_stock([{Inv}|T], ExportColor=true, Sorts) ->
     case in_sort(Inv, Sorts) of
 	false  ->
 	    StyleNumber = ?v(<<"style_number">>, Inv),
@@ -896,10 +943,10 @@ sort_stock([{Inv}|T], Sorts) ->
 			       {<<"color_ids">>, ColorIds},
 			       {<<"amounts">>,    Amounts}]},
 	    %% ?DEBUG("new inv ~p", [NewInv]),
-	    sort_stock(T, [NewInv|Sorts]);
+	    sort_stock(T, ExportColor, [NewInv|Sorts]);
 	true ->
 	    NewSorts = combine_inventory(Inv, Sorts, []),
-	    sort_stock(T, NewSorts)
+	    sort_stock(T, ExportColor, NewSorts)
     end.
 
 in_sort(_Inv, []) ->
@@ -1017,10 +1064,10 @@ purchaser_type(1)-> "退货".
 mode(0) -> use_id;
 mode(1) -> use_sell.
 
-%% csv(space, S, 0) ->
-%%     S;
-%% csv(space, S, Num) ->
-%%     csv(space, "\"\"" ++ ?d ++ S, Num -1).
+csv(space, S, 0) ->
+    S;
+csv(space, S, Num) ->
+    csv(space, "\"\"" ++ ?d ++ S, Num -1).
 
 
 export_size_group(Merchant) ->

@@ -1595,44 +1595,85 @@ handle_call({new_trans_note_export, Merchant, Conditions}, _From, State)->
 handle_call({stock_export, Merchant, Conditions}, _From, State) ->
     %% {StartTime, EndTime, NewConditions} =
     %% 	?sql_utils:cut(fields_with_prifix, realy_conditions(Merchant, Conditions)),
+    ExportColor = ?v(<<"export_color">>, Conditions),
+    CutConditions = proplists:delete(<<"export_color">>, Conditions),
     {StartTime, EndTime, NewConditions} =
-	?sql_utils:cut(fields_with_prifix, Conditions),
+	?sql_utils:cut(fields_with_prifix, CutConditions),
     Sql =
-	"select a.id, a.style_number, a.brand as brand_id"
-	", a.type as type_id, a.sex, a.season"
-	", a.firm as firm_id, a.year"
+	case ExportColor of
+	    true ->
+		"select a.id, a.style_number, a.brand as brand_id"
+		    ", a.type as type_id, a.sex, a.season"
+		    ", a.firm as firm_id, a.year"
 
-	", a.org_price, a.tag_price, a.pkg_price"
-	", a.discount, a.shop as shop_id, a.entry_date"
-	
-	", b.total"
-	", b.color as color_id"
-	", b.size"
+		    ", a.org_price, a.tag_price, a.pkg_price"
+		    ", a.discount, a.shop as shop_id, a.entry_date"
 
-	%% ", c.name as shop"
-	", d.name as brand"
-	", e.name as type"
-	", f.name as firm"
+		    ", b.total"
+		    ", b.color as color_id"
+		    ", b.size"
 
-	" from w_inventory a"
-	" left join w_inventory_amount b on "
-	" a.style_number=b.style_number and a.brand=b.brand"
-	" and a.shop=b.shop and a.merchant=b.merchant"
-	
-	%% " left join shops c on a.shop=c.id"
-	" left join brands d on a.brand=d.id"
-	" left join inv_types e on a.type=e.id"
-	" left join suppliers f on a.firm=f.id"
+		%% ", c.name as shop"
+		    ", d.name as brand"
+		    ", e.name as type"
+		    ", f.name as firm"
 
-	" where "
-	++ ?sql_utils:condition(proplists_suffix, NewConditions)
-	++ "a.merchant=" ++ ?to_s(Merchant)
-	++ case ?sql_utils:condition(time_with_prfix, StartTime, EndTime) of
-	       [] -> [];
-	       TimeSql ->  " and " ++ TimeSql
-	   end
-	++ " and a.deleted=" ++ ?to_s(?NO)
-	++ " order by a.id desc",
+		    " from w_inventory a"
+		    " left join w_inventory_amount b on "
+		    " a.style_number=b.style_number and a.brand=b.brand"
+		    " and a.shop=b.shop and a.merchant=b.merchant"
+
+		%% " left join shops c on a.shop=c.id"
+		    " left join brands d on a.brand=d.id"
+		    " left join inv_types e on a.type=e.id"
+		    " left join suppliers f on a.firm=f.id"
+
+		    " where "
+		    ++ ?sql_utils:condition(proplists_suffix, NewConditions)
+		    ++ "a.merchant=" ++ ?to_s(Merchant)
+		    ++ case ?sql_utils:condition(time_with_prfix, StartTime, EndTime) of
+			   [] -> [];
+			   TimeSql ->  " and " ++ TimeSql
+		       end
+		    ++ " and a.deleted=" ++ ?to_s(?NO)
+		    ++ " order by a.id desc";
+	    false ->
+		"select a.id, a.style_number, a.brand as brand_id"
+		    ", a.type as type_id, a.sex, a.season"
+		    ", a.firm as firm_id, a.year, a.amount as total"
+
+		    ", a.org_price, a.tag_price, a.pkg_price"
+		    ", a.discount, a.shop as shop_id, a.entry_date"
+
+		    %% ", b.total"
+		    %% ", b.color as color_id"
+		    %% ", b.size"
+
+		%% ", c.name as shop"
+		    ", d.name as brand"
+		    ", e.name as type"
+		    ", f.name as firm"
+
+		    " from w_inventory a"
+		    %% " left join w_inventory_amount b on "
+		    %% " a.style_number=b.style_number and a.brand=b.brand"
+		    %% " and a.shop=b.shop and a.merchant=b.merchant"
+
+		%% " left join shops c on a.shop=c.id"
+		    " left join brands d on a.brand=d.id"
+		    " left join inv_types e on a.type=e.id"
+		    " left join suppliers f on a.firm=f.id"
+
+		    " where "
+		    ++ ?sql_utils:condition(proplists_suffix, NewConditions)
+		    ++ "a.merchant=" ++ ?to_s(Merchant)
+		    ++ case ?sql_utils:condition(time_with_prfix, StartTime, EndTime) of
+			   [] -> [];
+			   TimeSql ->  " and " ++ TimeSql
+		       end
+		    ++ " and a.deleted=" ++ ?to_s(?NO)
+		    ++ " order by a.id desc"
+	end, 
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
 

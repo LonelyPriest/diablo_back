@@ -29,6 +29,10 @@ var diablo_by_good     = "by_good";
 var diablo_no_repo  = 0;
 var diablo_use_repo = 1;
 
+// check bill
+// var diablo_check_bill_last = 0;
+// var diablo_check_bill_new  = 1;
+
 /*
  * storage key
  */

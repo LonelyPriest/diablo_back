@@ -232,6 +232,7 @@
 -define(del_w_retailer,    ?right_w_retailer + 2).
 -define(update_w_retailer, ?right_w_retailer + 3).
 -define(list_w_retailer,   ?right_w_retailer + 4).
+-define(bill_w_retailer,   ?right_w_retailer + 5).
 
 %% wprint
 -define(new_w_print_server,  ?right_w_print + 1).

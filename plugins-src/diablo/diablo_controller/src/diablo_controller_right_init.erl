@@ -303,7 +303,9 @@ init([]) ->
     	 {?del_w_retailer,
 	  <<"删除零售商">>, <<"del_w_retailer">>,   ?right_w_retailer},
 	 {?update_w_retailer,
-	  <<"修改零售商">>, <<"update_w_retailer">>,?right_w_retailer}
+	  <<"修改零售商">>, <<"update_w_retailer">>,?right_w_retailer},
+	 {?bill_w_retailer,
+	  <<"零售商结账">>, <<"bill_w_retailer">>,?right_w_retailer}
     	],
     
     %% print

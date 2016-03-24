@@ -22,6 +22,7 @@
 
 -export([retailer/2, retailer/3, retailer/4]).
 -export([province/2, city/2, city/4]).
+-export([bill/3]).
 
 -define(SERVER, ?MODULE). 
 
@@ -61,6 +62,9 @@ province(list, Merchant) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, list_province).
    
+bill(check, Merchant, Attrs) ->
+    Name = ?wpool:get(?MODULE, Merchant),
+    gen_server:call(Name, {bill_check, Merchant, Attrs}).
 
 start_link(Name) ->
     gen_server:start_link({local, Name}, ?MODULE, [], []).
@@ -231,6 +235,56 @@ handle_call(list_province, _From, State) ->
     Sql = "select id, name from province where deleted=" ++  ?to_s(?NO),
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
+
+handle_call({bill_check, Merchant, Attrs}, _From, State) ->
+    ?DEBUG("bill_check with merchant ~p, attrs ~p", [Merchant, Attrs]),
+
+    %% CurrentYear = ?utils:current_time(year),
+    
+    %% Retailer    = ?v(<<"retailer">>, Attrs),
+    %% Balance     = ?v(<<"balance">>, Attrs),
+    %% Bill        = ?v(<<"bill">>, Attrs, 0),
+    %% CheckYear   = ?v(<<"check_year">>, Attrs),
+
+    
+    
+    %% Sqls = ["update w_retailer set balance=balance-" ++ ?to_s(Bill)
+    %% 	    ++ ", change_date=now()"
+    %% 	    ++ " where id=" ++ ?to_s(Retailer)
+    %% 	    ++ " and merchant=" ++ ?to_s(Merchant),
+
+    %% 	    "insert into w_sale(rsn"
+    %% 	    ", employ, retailer, shop, merchant, balance"
+    %% 	    ", has_pay, cash, card"
+    %% 	    ", comment, type, entry_date) values("
+    %% 	    ++ "\"" ++ ?to_s(SaleSn) ++ "\","
+    %% 	    ++ "\"" ++ ?to_s(Employe) ++ "\","
+    %% 	    ++ ?to_s(Retailer) ++ ","
+    %% 	    ++ ?to_s(Shop) ++ ","
+    %% 	    ++ ?to_s(Merchant) ++ ","
+    %% 	    ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+    %% 		   true  -> ?to_s(Balance) ++ ",";
+    %% 		   false -> ?to_s(CurrentBalance) ++ ","
+    %% 	       end
+    %% 	    ++ ?to_s(ShouldPay) ++ ","
+    %% 	    ++ ?to_s(HasPay) ++ ","
+    %% 	    ++ ?to_s(Cash) ++ ","
+    %% 	    ++ ?to_s(Card) ++ ","
+    %% 	    ++ ?to_s(Wire) ++ ","
+    %% 	    ++ ?to_s(VerifyPay) ++ ","
+    %% 	    ++ ?to_s(Total) ++ ","
+    %% 	    ++ "\"" ++ ?to_s(Comment) ++ "\","
+    %% 	    ++ ?to_s(EPayType) ++ ","
+    %% 	    ++ ?to_s(EPay) ++ ","
+    %% 	    ++ ?to_s(case SellMode of
+    %% 			 ?SALER -> type(snew);
+    %% 			 _      -> type(new)
+    %% 		     end) ++ ","
+    %% 	    ++ "\"" ++ ?to_s(DateTime) ++ "\");",
+	    
+    %% 	   ]
+    {reply, ok, State};
+    
 
 handle_call(_Request, _From, State) ->
     Reply = ok,

@@ -137,6 +137,8 @@ success(update_w_retailer, Retailer) ->
     {0, "Success to update retailer " ++ ?to_s(Retailer)};
 success(delete_w_retailer, Retailer) ->
     {0, "Success to delete retailer " ++ ?to_s(Retailer)};
+success(bill_w_retailer, Retailer) ->
+    {0, "Success to bill retailer " ++ ?to_s(Retailer)};
 
 %% wsale
 success(new_w_sale, RSn) ->

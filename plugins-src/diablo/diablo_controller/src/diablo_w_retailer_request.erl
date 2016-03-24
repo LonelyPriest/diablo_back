@@ -117,8 +117,22 @@ action(Session, Req, {"update_w_retailer", Id}, Payload) ->
 		Error ->
 		    ?utils:respond(200, Req, Error)
 	    end
-    end.
+    end;
 		
+action(Session, Req, {"bill_w_retailer"}, Payload) ->
+    ?DEBUG("bill wretailer with session ~p~npaylaod ~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    Retaierl = ?v(<<"retailer">>, Payload),
+
+    case ?w_retailer:bill(check, Merchant, Payload) of
+	{ok, Retaierl} ->
+	    ?utils:respond(200,
+			   Req,
+			   ?succ(bill_w_retailer, Retaierl));
+	Error ->
+	    ?utils:respond(200, Req, Error)
+    end.
+    
 
 sidebar(Session) -> 
     S1 = [{"wretailer_detail", "零售商详情", "glyphicon glyphicon-book"}
@@ -133,8 +147,19 @@ sidebar(Session) ->
 		[]
 	end,
 
+    S3 = 
+	case ?right_auth:authen(?bill_w_retailer, Session) of
+	    {ok, ?bill_w_retailer} ->
+		[{{"wretailer", "零售商结账", "glyphicon glyphicon-check"},
+		  [{"bill", "结帐", "glyphicon glyphicon-check"},
+		  {"bill_detail", "结帐详情", "glyphicon glyphicon-leaf"}]
+		 }];
+	    _ ->
+		[]
+	end,
+
     %% ?menu:sidebar(
        %% level_2_menu,
        %% [{{"wretailer", "零售商管理", "glyphicon glyphicon-map-marker"}, S1 ++ S2}]).
-    ?menu:sidebar(level_1_menu, S2 ++ S1).
+    ?menu:sidebar(level_1_menu, S2 ++ S1) ++ ?menu:sidebar(level_2_menu, S3).
        
