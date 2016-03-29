@@ -61,6 +61,11 @@ wreportApp.service("wreportService", function($resource, dateFilter){
 			  count:     itemsPerpage}).$promise;
     };
 
+    this.daily_bill = function(condition){
+	return http.save({operation: "daily_bill"},
+			 {condition: condition}).$promise;
+    };
+
     this.print_wreport = function(type, content){
 	return http.save({operation: "print_wreport"},
 			 {type:type, content: content}).$promise;

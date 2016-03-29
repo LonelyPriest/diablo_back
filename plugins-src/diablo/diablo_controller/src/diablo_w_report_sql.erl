@@ -18,7 +18,6 @@ sale(new_by_shop, Merchant, Conditions) ->
 	", sum(total) as t_amount"
 	", sum(should_pay) as t_spay"
 	", sum(has_pay) as t_hpay"
-	", sum(has_pay) as t_hpay"
 	", sum(cash) as t_cash"
 	", sum(card) as t_card"
 	", sum(wire) as t_wire"
@@ -27,6 +26,7 @@ sale(new_by_shop, Merchant, Conditions) ->
 	++ " where " ++ ?utils:to_sqls(proplists, NewConditions)
 	++ " and merchant=" ++ ?to_s(Merchant)
 	++ " and " ++ ?sql_utils:condition(time_no_prfix, StartTime, EndTime)
+	++ " and type in (0, 1, 2)" 
 	++ " and deleted=" ++ ?to_s(?NO)
 	++ " group by shop";
 

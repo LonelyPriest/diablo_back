@@ -121,6 +121,8 @@
 		    <td x-ng-if="show.base" x-ng-switch on="r.type">
 		      <span x-ng-switch-when=0>开单</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
+		      <span class="fg-pink" x-ng-switch-when=2>零售</span>
+		      <span class="fg-blue" x-ng-switch-when=9>结账</span>
 		    </td>
 
 		    <td x-ng-if="show.base">{{r.shop.name}}</td>
@@ -147,7 +149,9 @@
 		      <span class="fg-darkRed" x-ng-switch-when=1>
 			{{round(r.should_pay)}}
 		      </span>
-		    </td> 
+		      <span class="fg-pink" x-ng-switch-when=2>{{r.should_pay}}</span>
+		      <span class="fg-blue" x-ng-switch-default>{{r.should_pay}}</span>
+		    </td>
 
 		    
 		    <td>{{r.has_pay}}</td>
@@ -156,25 +160,6 @@
 		    <td> {{round(r.balance + r.should_pay + r.e_pay
 		      - r.has_pay - r.verificate)}}
 		    </td>
-		    
-		    <!-- <td x-ng-switch on="r.type"> -->
-		    <!--   <span x-ng-switch-when=0> -->
-		    <!-- 	{{round(r.balance + r.should_pay + r.e_pay - r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!--   <span class="fg-red" x-ng-switch-when=1> -->
-		    <!-- 	{{round(r.balance + r.should_pay + r.e_pay - r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!-- </td> -->
-		    
-		    <!-- <\!-- <td>{{r.should_pay + r.balance - r.has_pay}}</td> -\-> -->
-		    <!-- <td x-ng-switch on="r.type"> -->
-		    <!--   <span x-ng-switch-when=0> -->
-		    <!-- 	{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!--   <span class="bg-red" x-ng-switch-when=1> -->
-		    <!-- 	{{float_sub(float_add(r.balance, r.should_pay + r.e_pay), r.has_pay)}} -->
-		    <!--   </span> -->
-		    <!-- </td> -->
 		    
 		    <td x-ng-if="show.comment">
 		      <span x-ng-switch on="r.comment">
@@ -186,7 +171,8 @@
 		    
 		    <td>
 		      <button class="btn diablo-button btn-primary"
-		    	 x-ng-click="trans_rsn_detail(r)">
+			      x-ng-disabled="r.type===9"
+		    	      x-ng-click="trans_rsn_detail(r)">
 			明细<i class="glyphicon glyphicon-map-marker"></i></button>
 
 		      <button class="btn diablo-button btn-danger"

@@ -47,6 +47,36 @@ action(Session, Req, {"daily_wreport", Type}, Payload) ->
 		  ?to_a(Type), Merchant, CurrentPage, ItemsPerPage, Conditions)
        end, Req, Payload);
 
+action(Session, Req, {"daily_bill"}, Payload) ->
+    ?DEBUG("daily_bill with session ~p, paylaod~n~p", [Session, Payload]), 
+    Merchant = ?session:get(merchant, Session),
+    {struct, Conditions} = ?v(<<"condition">>, Payload),
+
+    case ?w_report:bill(total, Merchant, Conditions) of
+	{ok, []} -> 
+	    ?utils:respond(
+	       200, object, Req, {[{<<"ecode">>, 0},
+				   {<<"total">>, 0},
+				   {<<"data">>, []}]});
+	{ok, R1} ->
+	    case ?w_report:bill(detail, Merchant, Conditions) of
+		{ok, R2} ->
+		    {Total, Others} =
+			{?v(<<"total">>, R1), proplists:delete(<<"total">>, R1)},
+		    ?utils:respond(
+		       200,
+		       object,
+		       Req,
+		       {[{<<"ecode">>, 0},
+			 {<<"total">>, Total},
+			 {<<"data">>, R2}] ++ Others});
+		{error, Error} ->
+		    ?utils:respond(200, Req, Error)
+	    end;
+	{error, Error} ->
+	    ?utils:respond(200, Req, Error)
+    end;
+
 action(Session, Req, {"print_wreport", Type}, Payload) ->
     ?DEBUG("print_wreport with session ~p, type ~p, payload~n~p",
 	  [Session, Type, Payload]),

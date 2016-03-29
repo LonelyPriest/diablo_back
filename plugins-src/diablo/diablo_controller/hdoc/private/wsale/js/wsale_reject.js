@@ -402,7 +402,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 			    show_dialog("退货单打印", show_message); 
 			})
 		    };
-		    
+
+		    diabloFilter.reset_retailer(); 
 		    dialog.request(
 			"退货单打印", "退货成功，是否打印退货单？",
 			yes_callback, undefined, $scope)
@@ -563,9 +564,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 		    inv.colors  = sort.color;
 		    inv.amounts = sort.sort; 
 		    
-		    console.log(inv.sizes);
-		    console.log(inv.colors);
-		    console.log(inv.amounts); 
+		    // console.log(inv.sizes);
+		    // console.log(inv.colors);
+		    // console.log(inv.amounts); 
 		}
 
 		if ($scope.setting.trace_price === diablo_yes){

@@ -124,7 +124,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
     DateTime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)),
     Employe    = ?v(<<"employee">>, Props),
 
-    Balance    = ?v(<<"balance">>, Props, 0), 
+    %% Balance    = ?v(<<"balance">>, Props, 0), 
     Cash       = ?v(<<"cash">>, Props, 0),
     Card       = ?v(<<"card">>, Props, 0),
     Wire       = ?v(<<"wire">>, Props, 0),
@@ -184,10 +184,11 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 		++ ?to_s(Retailer) ++ ","
 		++ ?to_s(Shop) ++ ","
 		++ ?to_s(Merchant) ++ ","
-		++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		       true  -> ?to_s(Balance) ++ ",";
-		       false -> ?to_s(CurrentBalance) ++ ","
-		   end
+		++ ?to_s(CurrentBalance) ++ ","
+	    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+	    %%        true  -> ?to_s(Balance) ++ ",";
+	    %%        false -> ?to_s(CurrentBalance) ++ ","
+	    %%    end
 		++ ?to_s(ShouldPay) ++ ","
 		++ ?to_s(HasPay) ++ ","
 		++ ?to_s(Cash) ++ ","
@@ -617,7 +618,7 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
     DateTime   = ?v(<<"datetime">>, Props, ?utils:current_time(localtime)),
     Employe    = ?v(<<"employee">>, Props),
 
-    Balance    = ?v(<<"balance">>, Props), 
+    %% Balance    = ?v(<<"balance">>, Props), 
     Comment    = ?v(<<"comment">>, Props, ""),
     ShouldPay  = ?v(<<"should_pay">>, Props, 0), 
     Total      = ?v(<<"total">>, Props, 0),
@@ -667,10 +668,11 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
 		++ ?to_s(Retailer) ++ ","
 		++ ?to_s(Shop) ++ ","
 		++ ?to_s(Merchant) ++ ","
-		++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		       true -> ?to_s(Balance) ++ ",";
-		       false -> ?to_s(CurrentBalance) ++ ","
-		   end
+		++ ?to_s(CurrentBalance) ++ ","
+		%% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		%%        true -> ?to_s(Balance) ++ ",";
+		%%        false -> ?to_s(CurrentBalance) ++ ","
+		%%    end
 		++ ?to_s(-ShouldPay) ++ "," 
 		++ ?to_s(-Total) ++ ","
 		++ "\"" ++ ?to_s(Comment) ++ "\","

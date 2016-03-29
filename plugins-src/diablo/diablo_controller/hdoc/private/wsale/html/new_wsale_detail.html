@@ -129,6 +129,7 @@
 		      <span x-ng-switch-when=0>开单</span>
 		      <span class="fg-red" x-ng-switch-when=1>退货</span>
 		      <span class="fg-pink" x-ng-switch-when=2>零售</span>
+		      <span class="fg-blue" x-ng-switch-when=9>结账</span>
 		    </td>
 		    <td x-ng-if="show.base">{{r.shop.name}}</td>
 		    <td x-ng-if="show.base">{{r.employee.name}}</td>
@@ -152,7 +153,9 @@
 		      <span class="fg-red" x-ng-switch-when=1>
 			{{round(r.should_pay)}}
 		      </span>
-		      <span x-ng-switch-default>{{round(r.should_pay)}}</span>
+		      <!-- <span x-ng-switch-default>{{round(r.should_pay)}}</span> -->
+		      <span class="fg-pink" x-ng-switch-when=2>{{r.should_pay}}</span>
+		      <span class="fg-blue" x-ng-switch-default>{{r.should_pay}}</span>
 		    </td>
 
 		    <td>{{r.has_pay}}</td>
@@ -186,6 +189,7 @@
 		    
 		    <td x-ng-if="show.action" class="hidden-xxs">
 		      <button class="btn diablo-button btn-primary"
+			      x-ng-disabled="r.type===9"
 		    	      x-ng-click="rsn_detail(r)">
 			明细<i class="glyphicon glyphicon-map-marker"></i>
 		      </button>

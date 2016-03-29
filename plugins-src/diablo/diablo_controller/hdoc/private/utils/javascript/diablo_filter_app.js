@@ -386,9 +386,15 @@ function filterProvider(){
 
 			return _retailers;
 		    });    
-		}
-		
+		} 
+	    },
+
+	    reset_retailer: function(){
+		console.log("reset_retailer");
+		_retailers = [];
 	    }
+
+	    // 
 	    
 	}
     }

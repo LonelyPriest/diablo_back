@@ -165,7 +165,11 @@ call(Parent, {print, RSN, Merchant}) ->
 	?DEBUG("sale ~p", [Sale]),
 	{ok, Details} =
 	    ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
-	?DEBUG("details ~p", [Details]),
+	%% ?DEBUG("details ~p", [Details]),
+
+	NewDetails = [ {D1} || {D1} <- Details, ?v(<<"total">>, D1) < 0 ]  ++
+	    [ {D2} || D2 <- Details, ?v(<<"total">>, D2) >= 0 ],
+	%% ?DEBUG("newdetails ~p", [NewDetails]),
 
 	{ok, Retailer} = ?w_user_profile:get(
 			    retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
@@ -182,7 +186,7 @@ call(Parent, {print, RSN, Merchant}) ->
 	    end,
 
 	{SortInvs, STotal, RTotal} = sort_inventory(
-					Merchant, GetBrand, Details, [], 0, 0),
+					Merchant, GetBrand, NewDetails, [], 0, 0),
 	%% ?DEBUG("sorts ~p", [SortInvs]),
 	?DEBUG("stotal ~p, rtotal ~p", [STotal, RTotal]),
 	RSNAttrs = [{<<"shop">>,       ?v(<<"shop_id">>, Sale)},

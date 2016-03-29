@@ -237,54 +237,61 @@ handle_call(list_province, _From, State) ->
     {reply, Reply, State};
 
 handle_call({bill_check, Merchant, Attrs}, _From, State) ->
-    ?DEBUG("bill_check with merchant ~p, attrs ~p", [Merchant, Attrs]),
+    ?DEBUG("bill_check with merchant ~p, attrs ~p", [Merchant, Attrs]), 
+    Retailer    = ?v(<<"retailer">>, Attrs),
+    Bill        = ?v(<<"bill">>, Attrs, 0),
+    CheckYear   = ?v(<<"check_year">>, Attrs),
+    Shop        = ?v(<<"shop">>, Attrs),
+    Employee    = ?v(<<"employee">>, Attrs),
+    Comment     = ?v(<<"comment">>, Attrs, []),
+    Datetime    = ?utils:current_time(format_localtime),
+    {Cash, Card, Wire}  = case ?v(<<"mode">>, Attrs) of
+			      0 -> {Bill, 0, 0} ;
+			      1 -> {0, Bill, 0};
+			      2 -> {0, 0, Bill}
+			  end,
 
-    %% CurrentYear = ?utils:current_time(year),
-    
-    %% Retailer    = ?v(<<"retailer">>, Attrs),
-    %% Balance     = ?v(<<"balance">>, Attrs),
-    %% Bill        = ?v(<<"bill">>, Attrs, 0),
-    %% CheckYear   = ?v(<<"check_year">>, Attrs),
 
-    
-    
-    %% Sqls = ["update w_retailer set balance=balance-" ++ ?to_s(Bill)
-    %% 	    ++ ", change_date=now()"
-    %% 	    ++ " where id=" ++ ?to_s(Retailer)
-    %% 	    ++ " and merchant=" ++ ?to_s(Merchant),
-
-    %% 	    "insert into w_sale(rsn"
-    %% 	    ", employ, retailer, shop, merchant, balance"
-    %% 	    ", has_pay, cash, card"
-    %% 	    ", comment, type, entry_date) values("
-    %% 	    ++ "\"" ++ ?to_s(SaleSn) ++ "\","
-    %% 	    ++ "\"" ++ ?to_s(Employe) ++ "\","
-    %% 	    ++ ?to_s(Retailer) ++ ","
-    %% 	    ++ ?to_s(Shop) ++ ","
-    %% 	    ++ ?to_s(Merchant) ++ ","
-    %% 	    ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-    %% 		   true  -> ?to_s(Balance) ++ ",";
-    %% 		   false -> ?to_s(CurrentBalance) ++ ","
-    %% 	       end
-    %% 	    ++ ?to_s(ShouldPay) ++ ","
-    %% 	    ++ ?to_s(HasPay) ++ ","
-    %% 	    ++ ?to_s(Cash) ++ ","
-    %% 	    ++ ?to_s(Card) ++ ","
-    %% 	    ++ ?to_s(Wire) ++ ","
-    %% 	    ++ ?to_s(VerifyPay) ++ ","
-    %% 	    ++ ?to_s(Total) ++ ","
-    %% 	    ++ "\"" ++ ?to_s(Comment) ++ "\","
-    %% 	    ++ ?to_s(EPayType) ++ ","
-    %% 	    ++ ?to_s(EPay) ++ ","
-    %% 	    ++ ?to_s(case SellMode of
-    %% 			 ?SALER -> type(snew);
-    %% 			 _      -> type(new)
-    %% 		     end) ++ ","
-    %% 	    ++ "\"" ++ ?to_s(DateTime) ++ "\");",
+    Sql0 = "select id, name, balance from w_retailer"
+	" where id=" ++ ?to_s(Retailer)
+	++ " and merchant=" ++ ?to_s(Merchant)
+	++ " and deleted=" ++ ?to_s(?NO),
+    case ?sql_utils:execute(s_read, Sql0) of 
+	{ok, Account} ->
+	    SaleSn = lists:concat(
+		       ["M-", ?to_i(Merchant),
+			"-S-", ?to_i(Shop), "-",
+			?inventory_sn:sn(w_sale_new_sn, Merchant)]), 
 	    
-    %% 	   ]
-    {reply, ok, State};
-    
+	    LastBalance = ?v(<<"balance">>, Account),
+	    Sql2 = "insert into w_sale(rsn"
+		", employ, retailer, shop, merchant, balance"
+		", has_pay, cash, card, wire, comment"
+		", type, bill_date, entry_date) values("
+		++ "\"" ++ ?to_s(SaleSn) ++ "\","
+		++ "\"" ++ ?to_s(Employee) ++ "\","
+		++ ?to_s(Retailer) ++ ","
+		++ ?to_s(Shop) ++ ","
+		++ ?to_s(Merchant) ++ ","
+		++ ?to_s(LastBalance) ++ ","
+		++ ?to_s(Bill) ++ ","
+		++ ?to_s(Cash) ++ ","
+		++ ?to_s(Card) ++ ","
+		++ ?to_s(Wire) ++ ","
+		++ "\"" ++ ?to_s(Comment) ++ "\"," 
+		++ ?to_s(9) ++ ","
+		++ ?to_s(CheckYear) ++ ","
+		++ "\"" ++ ?to_s(Datetime) ++ "\");",
+
+	    Sql3 = "update w_retailer set balance=balance-" ++ ?to_s(Bill) 
+		++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+
+	    AllSql = [Sql2, Sql3],
+	    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
+	    {reply, Reply, State};
+	Error ->
+	    {reply, Error, State}
+    end;
 
 handle_call(_Request, _From, State) ->
     Reply = ok,

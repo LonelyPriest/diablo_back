@@ -642,7 +642,9 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 			    var name = good.style_number
 				+ "，" + good.brand + "，"+ good.type;
 			    var prompt = angular.extend(
-				good, {name: name, py: diablo_pinyin(name)});
+				good, {name: name,
+				       prompt: name + "," + diablo_pinyin(name),
+				       py: diablo_pinyin(name)});
 
 			    wsaleGoodService.add_prompt_inventory(prompt);
 			    $scope.$emit("change_prompt_inventory");

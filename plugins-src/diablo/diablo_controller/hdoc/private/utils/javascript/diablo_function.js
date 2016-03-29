@@ -205,6 +205,7 @@ var diablo_format_year = function(objects){
 
 var diablo_goto_page = function(url){
     window.location = url;
+    return;
 };
 
 var diablo_sidebar_goto_page = function(node, url){

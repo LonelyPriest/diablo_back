@@ -878,7 +878,9 @@ pass_action(wholesaler) ->
      %% print
      <<"get_w_print_content">>,
 	 
-     <<"delete_expire_data">>
+     <<"delete_expire_data">>,
+
+     <<"daily_bill">>
      %% shop
      %% <<"list_repo">>
     ].

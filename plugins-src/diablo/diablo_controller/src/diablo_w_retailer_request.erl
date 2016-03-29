@@ -122,13 +122,15 @@ action(Session, Req, {"update_w_retailer", Id}, Payload) ->
 action(Session, Req, {"bill_w_retailer"}, Payload) ->
     ?DEBUG("bill wretailer with session ~p~npaylaod ~p", [Session, Payload]),
     Merchant = ?session:get(merchant, Session),
-    Retaierl = ?v(<<"retailer">>, Payload),
+    Retailer = ?v(<<"retailer">>, Payload),
 
     case ?w_retailer:bill(check, Merchant, Payload) of
-	{ok, Retaierl} ->
+	{ok, SN} ->
+	    ?w_user_profile:update(retailer, Merchant), 
 	    ?utils:respond(200,
 			   Req,
-			   ?succ(bill_w_retailer, Retaierl));
+			   ?succ(bill_w_retailer, Retailer),
+			   [{<<"rsn">>, ?to_b(SN)}]); 
 	Error ->
 	    ?utils:respond(200, Req, Error)
     end.
@@ -151,8 +153,9 @@ sidebar(Session) ->
 	case ?right_auth:authen(?bill_w_retailer, Session) of
 	    {ok, ?bill_w_retailer} ->
 		[{{"wretailer", "零售商结账", "glyphicon glyphicon-check"},
-		  [{"bill", "结帐", "glyphicon glyphicon-check"},
-		  {"bill_detail", "结帐详情", "glyphicon glyphicon-leaf"}]
+		  [{"bill", "结帐", "glyphicon glyphicon-check"}
+		  %% {"bill_detail", "结帐详情", "glyphicon glyphicon-leaf"}
+		  ]
 		 }];
 	    _ ->
 		[]

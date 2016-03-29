@@ -91,7 +91,7 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 	when('/wretailer/bill', {
 	    templateUrl: '/private/wretailer/html/wretailer_bill_check.html',
 	    controller: 'wretailerBillCheckCtrl',
-	    resolve: angular.extend({}, retailer) 
+	    resolve: angular.extend({}, employee, user) 
 	}).
 	when('/wretailer/bill_detail', {
 	    templateUrl: '/private/wretailer/html/wretailer_bill_detail.html',

@@ -19,7 +19,7 @@
 	 terminate/2, code_change/3]).
 
 %% daily
--export([report/4, report/5]).
+-export([bill/3, report/4, report/5]).
 
 -define(SERVER, ?MODULE). 
 
@@ -46,6 +46,11 @@ report(by_good, Merchant, CurrentPage, ItemsPerPage, Conditions) ->
     gen_server:call(
       ?SERVER, {by_good, Merchant, CurrentPage, ItemsPerPage, Conditions}).
 
+bill(total, Merchant, Conditions) ->
+    gen_server:call(?SERVER, {bill_total, Merchant, Conditions});
+bill(detail, Merchant, Conditions) ->
+    gen_server:call(?SERVER, {bill_detail, Merchant, Conditions}).
+
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
@@ -65,7 +70,8 @@ handle_call({total, by_shop, Merchant, Conditions}, _From, State) ->
 	", sum(card) as t_card"
 	", sum(wire) as t_wire"
 	", sum(verificate) as t_verificate",
-    Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant, Conditions), 
+    Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant,
+				 Conditions ++ [{<<"type">>, [0, 1, 2]}]),
     Reply = ?sql_utils:execute(s_read, Sql),
     {reply, Reply, State};
 
@@ -74,9 +80,7 @@ handle_call({total, by_retailer, Merchant, Conditions}, _From, State) ->
     SortConditions = ?w_sale:sort_condition(
 			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]),
     
-    CountSql = "select count(distinct shop, merchant, retailer) as total"
-    %% ", sum(total) as t_amount"
-    %% ", sum(should_pay) as t_spay"
+    CountSql = "select count(distinct shop, merchant, retailer) as total" 
 	", sum(cash) as t_cash"
 	", sum(card) as t_card"
 	", sum(wire) as t_wire"
@@ -84,7 +88,6 @@ handle_call({total, by_retailer, Merchant, Conditions}, _From, State) ->
 	", sum(has_pay) as t_hpay"
 	" from w_sale a"
 	" where " ++ SortConditions,
-    %% Sql = ?sql_utils:count_table(w_sale, CountSql, Merchant, Conditions), 
     Reply = ?sql_utils:execute(s_read, CountSql),
     {reply, Reply, State};
 
@@ -145,6 +148,39 @@ handle_call({by_good, Merchant, CurrentPage, ItemsPerPage, Conditions},
     Sql = ?w_report_sql:sale(
 	     new_by_good_with_pagination,
 	     Merchant, Conditions, CurrentPage, ItemsPerPage),
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+
+handle_call({bill_total, Merchant, Conditions}, _From, State) ->
+    CountSql = "count(distinct shop, merchant) as total" 
+	", sum(has_pay) as t_hpay"
+	", sum(cash) as t_cash"
+	", sum(card) as t_card"
+	", sum(wire) as t_wire"
+	", sum(verificate) as t_verificate",
+    Sql = ?sql_utils:count_table(
+	     w_sale, CountSql, Merchant, Conditions ++ [{<<"type">>, 9}]),
+    Reply = ?sql_utils:execute(s_read, Sql),
+    {reply, Reply, State};
+
+handle_call({bill_detail, Merchant, Conditions}, _From, State) ->
+    {StartTime, EndTime, NewConditions} = 
+	?sql_utils:cut(fields_no_prifix, Conditions),
+    Sql = 
+	"select shop as shop_id"
+	", bill_date"
+	", sum(has_pay) as t_hpay"
+	", sum(cash) as t_cash"
+	", sum(card) as t_card"
+	", sum(wire) as t_wire"
+	" from w_sale"
+	++ " where " ++ ?utils:to_sqls(proplists, NewConditions)
+	++ " and merchant=" ++ ?to_s(Merchant)
+	++ " and " ++ ?sql_utils:condition(time_no_prfix, StartTime, EndTime)
+	++ " and type=9" 
+	++ " and deleted=" ++ ?to_s(?NO)
+	++ " group by shop, bill_date",
+    
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};
     
