@@ -1354,7 +1354,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
     C2 =
 	fun(Color, Size) ->
 		?utils:to_sqls(
-		   proplists, [{<<"rsn">>, RSN},
+		   proplists, [{<<"rsn">>, ?to_b(RSN)},
 			       {<<"style_number">>, StyleNumber},
 			       {<<"brand">>, Brand},
 			       {<<"color">>, Color},

@@ -787,7 +787,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		diabloUtilsService.response(
 		    false, "销售开单", "开单失败：序号["
 			+ add.order_id.toString() + "]"
-			+ wsaleService.error[2192]);
+			+ wsaleService.error[2193]);
 		return;
 	    };
 	    
