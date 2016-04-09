@@ -155,6 +155,10 @@
 			 {{get_object(s.value, size_groups).name}}
 		       </span>
 
+		       <span ng-switch-when="e_sgroup3">
+			 {{get_object(s.value, size_groups).name}}
+		       </span>
+
 		       <span ng-switch-when="s_customer">
 			 {{get_object(s.value, retailers).name}}
 		       </span>
@@ -438,6 +442,16 @@
 	      </select>
 
 	      <select x-ng-switch-when="e_sgroup2"
+		      class="form-control" required
+		      name="value"
+		      x-ng-model="params.setting.value"
+		      x-ng-options="y as y.name for
+				    y in params.setting.sgroups"
+		      x-ng-init="params.setting.value=params.init_v ">
+		      
+	      </select>
+
+	      <select x-ng-switch-when="e_sgroup3"
 		      class="form-control" required
 		      name="value"
 		      x-ng-model="params.setting.value"

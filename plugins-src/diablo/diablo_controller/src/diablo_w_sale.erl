@@ -537,7 +537,7 @@ handle_call({rsn_detail, Merchant, Conditions}, _From, State) ->
     C = ?utils:to_sqls(proplists, Conditions),
     Sql = "select id, rsn, style_number, brand as brand_id, color as color_id"
 	", size, total as amount"
-	" from w_sale_detail_amount" 
+	" from w_sale_detail_amount"
 	" where " ++ C,
 
     %% "select a.id, a.rsn, a.style_number"
@@ -865,7 +865,7 @@ handle_call({new_trans_note_export, Merchant, Conditions}, _From, State)->
 	" where b.rsn=a.rsn"
 	
 	" and " ++ C1
-	++ ?sql_utils:condition(proplists_suffix, CorrectDetailCondtions)
+	++ ?sql_utils:condition(proplists, CorrectDetailCondtions)
 	++ " order by b.id desc) a"
 
     	" left join brands b on a.brand_id=b.id"
@@ -1538,6 +1538,8 @@ sort_condition(wsale, Merchant, Conditions) ->
 	       TimeSql -> " and " ++ TimeSql
 	   end.
 
+realy_shop(_Merchant, ShopId, ?BILL) ->
+    ShopId; 
 realy_shop(_Merchant, ShopId, ?SALER) ->
     ShopId; 
 realy_shop(Merchant, ShopId, ?WHOLESALER) ->

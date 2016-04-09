@@ -22,6 +22,7 @@
 %% merchant type
 -define(SALER, 0).
 -define(WHOLESALER, 1).
+-define(BILL, 9).
 
 %% move state
 -define(MOVING, 0).

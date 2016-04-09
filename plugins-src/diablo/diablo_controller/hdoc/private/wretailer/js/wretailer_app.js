@@ -45,6 +45,9 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
     
     var s_group = {"filterSizeGroup": function(diabloFilter){
 	return diabloFilter.get_size_group()}};
+
+    var color = {"filterColor": function(diabloFilter){
+	return diabloFilter.get_color()}};
     
     var retailer = {"filterRetailer": function(diabloNormalFilter){
 	return diabloNormalFilter.get_wretailer()}};
@@ -85,7 +88,8 @@ wretailerApp.config(['$routeProvider', function($routeProvider){
 	when('/wretailer_trans_rsn/:retailer?/:rsn?/:ppage?', {
 	    templateUrl: '/private/wretailer/html/wretailer_trans_rsn_detail.html',
 	    controller: 'wretailerTransRsnDetailCtrl',
-	    resolve: angular.extend({}, brand, firm, retailer, employee, s_group, type, user, base)
+	    resolve: angular.extend(
+		{}, brand, firm, color, retailer, employee, s_group, type, user, base)
 	}).
 	// bill check
 	when('/wretailer/bill', {
@@ -121,7 +125,7 @@ wretailerApp.service("wretailerService", function($resource, dateFilter){
      	2101: "已存在同样的零售商！！",
 	9001: "数据库操作失败，请联系服务人员！！"};
 
-    this.sort_inventory = function(invs, orderSizes){
+    this.sort_inventory = function(invs, orderSizes, allColors){
 	// console.log(invs);
 	// console.log(orderSizes);
 	var in_sort = function(sorts, inv){
@@ -147,8 +151,11 @@ wretailerApp.service("wretailerService", function($resource, dateFilter){
 	    if (!in_array(used_sizes, inv.size)){
 		used_sizes.push(inv.size);
 	    };
+
+	    var color_obj = diablo_get_object(inv.color_id, allColors);
+	    var color = {cid:inv.color_id,
+			 cname: angular.isDefined(color_obj) ? color_obj.name : undefined};
 	    
-	    var color = {cid:inv.color_id, cname: inv.color};
 	    if (!in_array(colors, color)){
 		colors.push(color)
 	    };

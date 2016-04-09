@@ -484,6 +484,7 @@ baseApp.controller("printOptionCtrl", function(
 	    } else if (s.ename==="price_type"
 		       || s.ename === 'e_sgroup1'
 		       || s.ename === 'e_sgroup2'
+		       || s.ename === 'e_sgroup3'
 		       || s.ename === 's_customer'){
 		update = setting.value.id;
 	    } else {
@@ -532,7 +533,9 @@ baseApp.controller("printOptionCtrl", function(
 	if (s.ename === 'price_type'){
 	    angular.extend(s, {price_types: $scope.price_types}); 
 	};
-	if (s.ename === 'e_sgroup1' || s.ename === 'e_sgroup2'){
+	if (s.ename === 'e_sgroup1'
+	    || s.ename === 'e_sgroup2'
+	    || s.ename === 'e_sgroup3'){
 	    angular.extend(s, {sgroups: $scope.size_groups});
 	};
 	if (s.ename === 's_customer'){
@@ -572,7 +575,9 @@ baseApp.controller("printOptionCtrl", function(
 	    angular.extend(s, {time_length: $scope.time_length}); 
 	};
 
-	if (s.ename === 'e_sgroup1' || s.ename === 'e_sgroup2'){
+	if (s.ename === 'e_sgroup1'
+	    || s.ename === 'e_sgroup2'
+	    || s.ename === 'e_sgroup3'){
 	    console.log(s.value, $scope.size_groups);
 	    v = $scope.get_object(s.value, $scope.size_groups);
 	};

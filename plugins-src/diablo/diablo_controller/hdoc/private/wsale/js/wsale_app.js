@@ -580,7 +580,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 
     $scope.update_detail = function(r){
 	$scope.save_stastic();
-	if (r.type === 0){
+	if (r.type === 0 || r.type == 9){
 	    diablo_goto_page(
 		'#/update_wsale_detail/'
 		    + r.rsn + "/" + $scope.current_page.toString()); 

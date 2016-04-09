@@ -232,9 +232,8 @@ wretailerApp.controller('wretailerTransCtrl', function(
 
 wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
-    wgoodService, wretailerService,
-    filterBrand, filterFirm, filterRetailer, filterEmployee, filterSizeGroup,
-    filterType, user, base){
+    wgoodService, wretailerService, filterBrand, filterFirm, filterColor,
+    filterRetailer, filterEmployee, filterSizeGroup, filterType, user, base){
     // console.log($routeParams);
 
     // console.log(filterEmployee);
@@ -408,7 +407,7 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
 	    console.log(result);
 	    
 	    var order_sizes = wgoodService.format_size_group(inv.s_group, filterSizeGroup);
-	    var sort = wretailerService.sort_inventory(result.data, order_sizes);
+	    var sort = wretailerService.sort_inventory(result.data, order_sizes, filterColor);
 	    inv.total       = sort.total; 
 	    inv.colors      = sort.color;
 	    inv.sizes       = sort.size;

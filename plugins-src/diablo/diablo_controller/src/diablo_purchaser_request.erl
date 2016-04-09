@@ -496,7 +496,7 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 			case ExportType of
 			    stock ->
 				ExportSizes = export_size_group(Merchant),
-				%% ?DEBUG("export sizes ~p", [ExportSizes]),
+				?DEBUG("export sizes ~p", [ExportSizes]),
 				{ok, Colors} = ?w_user_profile:get(color, Merchant),
 
 				NewTranses = sort_stock(Transes, ExportColor, []),
@@ -1076,14 +1076,15 @@ export_size_group(Merchant) ->
 	lists:foldr(
 	  fun({S}, Acc) ->
 		  case ?v(<<"ename">>, S) =:= <<"e_sgroup1">>
-		      orelse ?v(<<"ename">>, S) =:= <<"e_sgroup2">> of
+		      orelse ?v(<<"ename">>, S) =:= <<"e_sgroup2">>
+		      orelse ?v(<<"ename">>, S) =:= <<"e_sgroup3">> of
 		      true ->
 			  [?v(<<"value">>, S)|Acc];
 		      false ->
 			  Acc
 		  end
 	  end, [], BaseSettings),
-
+    
     F = fun(S) when S =:= <<>> -> [];
 	   (S) when S =:= [] -> [];
 	   (S) -> [S]
@@ -1111,7 +1112,13 @@ export_size_group(Merchant) ->
     %% ?DEBUG("flattern sizes ~p", [FlatternSizes]),
     case FlatternSizes of
 	[] -> [0];
-	_ -> lists:usort(FlatternSizes)
+	_ -> lists:foldr(
+	       fun(S, Acc) ->
+		       case lists:member(S, Acc) of
+			   true -> Acc;
+			   false -> [S|Acc]
+		       end
+	       end, [], FlatternSizes)
     end.
 
 color(name, _ColorId, []) ->

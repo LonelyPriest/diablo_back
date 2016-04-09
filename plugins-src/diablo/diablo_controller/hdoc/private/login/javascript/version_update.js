@@ -1,6 +1,13 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-04-10",
+	 content: [
+	     "导出尺码组个数增加至3个",
+	     "库存导出时，修正尺码组排列方式"
+	 ]
+	},
+	
 	{date: "2016-03-28",
 	 content: [
 	     "修正零售商累计欠款同步刷新",
