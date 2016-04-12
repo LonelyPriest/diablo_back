@@ -648,14 +648,24 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 					      find_size(G, SizeGroups) ++ Acc
 				      end, [], lists:sort(GS)),
 
-			  %% ?DEBUG("lenght gs ~p, allsize ~p",
-			  %% 	 [length(GS), AllSize]),
+			  ?DEBUG("lenght gs ~p, allsize ~p",
+			  	 [length(GS), AllSize]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
-			      	  true -> [Us || Us <- AllSize,
-						 lists:member(Us, UsedSizes)];
+			      	  true ->
+				      lists:foldr(
+					fun(Us, Acc) ->
+						case lists:member(Us, UsedSizes)
+						    andalso not lists:member(Us, Acc)
+						of true -> [Us|Acc];
+						    false -> Acc
+						end
+							
+					end, [], AllSize); 
 			      	  false -> AllSize
 			      end,
+
+			  ?DEBUG("sizes ~p", [Sizes]),
 			  
 			  AFun =
 			      fun(Color, A) ->

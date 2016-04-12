@@ -89,16 +89,16 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 
     // filter
     diabloFilter.reset_field(); 
-    diabloFilter.add_field("sell_type", sell_type);
-    diabloFilter.add_field("rsn", []); 
-    diabloFilter.add_field("style_number", $scope.match_style_number); 
+    diabloFilter.add_field("style_number", $scope.match_style_number);
+    diabloFilter.add_field("firm",     filterFirm);
     diabloFilter.add_field("brand",    filterBrand);
     diabloFilter.add_field("type",     filterType);
-    diabloFilter.add_field("year",     diablo_full_year); 
-    diabloFilter.add_field("shop",     $scope.shops);
+    diabloFilter.add_field("year",     diablo_full_year);
     diabloFilter.add_field("retailer", filterRetailer);
-    diabloFilter.add_field("employee", filterEmployee);
-    diabloFilter.add_field("firm",     filterFirm);
+    diabloFilter.add_field("shop",     $scope.shops);
+    diabloFilter.add_field("employee", filterEmployee); 
+    diabloFilter.add_field("sell_type", sell_type); 
+    diabloFilter.add_field("rsn", []); 
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();

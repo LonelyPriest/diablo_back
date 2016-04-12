@@ -441,9 +441,12 @@ decorate_data(height) ->
     ?to_s(<<16#1b, 16#77, 16#01>>);
 decorate_data(cancel_height) ->
     ?to_s(<<16#1b, 16#77, 16#00>>).
+phd(c) ->
+    [124];
 phd(_D) ->
     "|".
     %% ?to_s(<<16#1b, 16#77, 16#01>>) ++ D ++ ?to_s(<<16#1b, 16#77, 16#00>>).
+
 
 line_space('1/9') ->
     [27, 51, 16];
@@ -534,7 +537,7 @@ pagination(just_size, PaperHeight, Body) ->
     case 9 + 4.5 * length(Tokens) + 9 > PaperHeight of
 	true ->
 	    %% 15k, use 6 not 8
-	    PackageSize = 15 * 1024 * 6,
+	    PackageSize = 10 * 1024 * 6,
 	    case BodySize =< PackageSize of
 		true ->
 		    {false, [?to_b(Body)]};

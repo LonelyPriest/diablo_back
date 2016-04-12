@@ -176,7 +176,7 @@ wreportApp.controller("wreportDailyCtrl", function(
     $scope.print = function(){
 	wreportService.print_wreport(
 	    diablo_by_shop, {shop: wreportCommService.get_shop_id()[0],
-			     datetime: dateFilter(now, "yyyy-MM-dd HH:mm:ss"),
+			     datetime: dateFilter($scope.current_day, "yyyy-MM-dd HH:mm:ss"),
 			     hpay: $scope.total_hpay,
 			     cash: $scope.total_cash,
 			     card: $scope.total_card,
@@ -191,10 +191,10 @@ wreportApp.controller("wreportDailyCtrl", function(
 	    } else {
 		message = "打印失败！！"
 		if (status.pinfo.length === 0){
-		    messsage += wreportService.error[status.pcode]
+		    messsage += common_error[status.pcode]
 		} else {
 		    angular.forEach(status.pinfo, function(p){
-			messsage += "[" + p.device + "] " + wreportService.error[p.ecode]
+			messsage += "[" + p.device + "] " + common_error[p.ecode]
 		    })
 		};
 		diabloUtilsService.response(false, "日报表打印", messsage); 

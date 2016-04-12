@@ -1,6 +1,14 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-04-12",
+	 content: [
+	     "增加客户对帐单打印功能",
+	     "多尺码组打印时，合并相同尺码",
+	     "增加客户欠款排序"
+	 ]
+	},
+	
 	{date: "2016-04-10",
 	 content: [
 	     "导出尺码组个数增加至3个",

@@ -705,8 +705,8 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     // initial
     $scope.filters = [];
     diabloFilter.reset_field();
+    diabloFilter.add_field("style_number", diabloFilter.match_style_number); 
     diabloFilter.add_field("firm", filterFirm);
-    diabloFilter.add_field("style_number", diabloFilter.match_style_number);
     diabloFilter.add_field("brand", filterBrand);
     diabloFilter.add_field("type", filterType);
 

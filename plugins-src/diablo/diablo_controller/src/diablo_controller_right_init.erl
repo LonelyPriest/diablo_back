@@ -305,7 +305,9 @@ init([]) ->
 	 {?update_w_retailer,
 	  <<"修改零售商">>, <<"update_w_retailer">>,?right_w_retailer},
 	 {?bill_w_retailer,
-	  <<"零售商结账">>, <<"bill_w_retailer">>,?right_w_retailer}
+	  <<"零售商结账">>, <<"bill_w_retailer">>,?right_w_retailer},
+	 {?print_w_retailer_trans,
+	  <<"对帐单打印">>, <<"print_w_retailer_trans">>,?right_w_retailer}
     	],
     
     %% print

@@ -67,7 +67,14 @@
 		      <tr>
 			<th>序号</th>
 			<th>名称</th>
-			<th class="danger">欠款</th>
+			<th>欠款
+			  <span x-ng-if="triangle.top"
+				x-ng-click="sort_retailer(0); triangle.top=false"
+				class="glyphicon glyphicon-triangle-top fg-red"></span>
+			  <span x-ng-if="!triangle.top"
+				x-ng-click="sort_retailer(1); triangle.top=true"
+				class="glyphicon glyphicon-triangle-bottom fg-red"></span>
+			</th>
 			<th>联系方式</th>
 			<th>所在省（直辖市）</th>
 			<th>所在市</th>

@@ -22,7 +22,7 @@
 
 -export([retailer/2, retailer/3, retailer/4]).
 -export([province/2, city/2, city/4]).
--export([bill/3]).
+-export([bill/3, print_trans/2]).
 
 -define(SERVER, ?MODULE). 
 
@@ -65,6 +65,10 @@ province(list, Merchant) ->
 bill(check, Merchant, Attrs) ->
     Name = ?wpool:get(?MODULE, Merchant),
     gen_server:call(Name, {bill_check, Merchant, Attrs}).
+
+print_trans(Merchant, Attrs) ->
+    Name = ?wpool:get(?MODULE, Merchant),
+    gen_server:call(Name, {print_trans, Merchant, Attrs}).
 
 start_link(Name) ->
     gen_server:start_link({local, Name}, ?MODULE, [], []).
@@ -292,6 +296,29 @@ handle_call({bill_check, Merchant, Attrs}, _From, State) ->
 	Error ->
 	    {reply, Error, State}
     end;
+
+handle_call({print_trans, Merchant, Attrs}, _From, State) ->
+    ?DEBUG("print_trans with merchant ~p, attrs ~p", [Merchant, Attrs]),
+
+    {StartTime, EndTime, NewConditions} = ?sql_utils:cut(fields_with_prifix, Attrs),
+    Sql = "select a.id, a.rsn, a.retailer as retailer_id, a.shop as shop_id"
+	", a.balance, a.should_pay, a.has_pay, a.cash, a.card"
+	", a.wire, a.verificate, a.total, a.comment, a.entry_date"
+    %% ", b.name as employee"
+	", c.name as retailer"
+	", d.name as shop"
+	" from w_sale a"
+    %% ++ " left join employees b on a.employ=b.number"
+    %% ++ " and b.merchant=" ++ ?to_s(Merchant)
+	++ " left join w_retailer c on a.retailer=c.id"
+	++ " left join shops d on a.shop=d.id"
+	++ " where a.merchant=" ++ ?to_s(Merchant)
+	++ ?sql_utils:condition(proplists, NewConditions)
+	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime),
+    
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+    
 
 handle_call(_Request, _From, State) ->
     Reply = ok,

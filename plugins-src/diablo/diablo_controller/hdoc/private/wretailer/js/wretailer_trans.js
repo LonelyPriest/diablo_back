@@ -146,7 +146,8 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		|| !search.shop || search.shop.length === 0){
 		search.shop = $scope.shopIds.length === 0 ? undefined : $scope.shopIds; 
 	    }
-	    
+
+	    $scope.print_condition = search; 
 	    search.retailer = retailer_id;
 	    
 	    wretailerService.filter_w_sale_new(
@@ -224,9 +225,34 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	    callback, undefined, $scope); 
     };
 
-    $scope.print = function(r){
-	
-    }; 
+    $scope.print_trans = function(){
+	console.log($scope.print_condition);
+
+	var callback = function(){
+	    wretailerService.print_trans($scope.print_condition).then(function(status){
+		console.log(status);
+		var messsage = "";
+		if (status.pcode === 0){
+		    messsage = "打印成功！！请等待服务器打印．．．";
+		    diabloUtilsService.response(true, "对帐单打印", messsage); 
+		} else {
+		    message = "打印失败！！"
+		    if (status.pinfo.length === 0){
+			messsage += common_error[status.pcode]
+		    } else {
+			angular.forEach(status.pinfo, function(p){
+			    messsage += "[" + p.device + "] " + common_error[p.ecode]
+			})
+		    };
+		    diabloUtilsService.response(false, "对帐单打印", messsage); 
+		}
+	    })
+	};
+
+	diabloUtilsService.request(
+	    "对帐单打印", "确定要打印客户对帐单吗？",
+	    callback, undefined, $scope); 
+    };
 })
 
 

@@ -79,6 +79,7 @@ wretailerApp.controller("wretailerDetailCtrl", function(
     $scope.round      = diablo_round;
     $scope.pagination = {};
     $scope.map        = {active:false};
+    $scope.triangle   = {top:true};
     
     var dialog = diabloUtilsService;
     var f_add  = diablo_float_add;
@@ -209,7 +210,9 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 		r.province = diablo_get_object(r.pid, $scope.provinces);
 		r.city     = diablo_get_object(r.cid, $scope.cities);
 		$scope.total_balance = $scope.total_balance + $scope.round(r.balance);
-	    })
+	    });
+
+	    
 	    
 	    diablo_order($scope.retailers);
 
@@ -266,6 +269,26 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 
     $scope.new_retailer = function(){
 	$location.path("/wretailer_new"); 
+    };
+
+    $scope.sort_retailer = function(sort_by){
+	
+	$scope.retailers.sort(function(r1, r2){
+	    if (sort_by === 0){
+		return r2.balance - r1.balance;
+	    }
+	    if (sort_by === 1){
+		return r1.balance - r2.balance;
+	    }
+	    
+	});
+
+	diablo_order($scope.retailers);
+	diabloPagination.set_data($scope.retailers);
+	diabloPagination.set_items_perpage($scope.pagination.items_perpage);
+	$scope.total_items = diabloPagination.get_length(); 
+	$scope.filter_retailers =
+	    diabloPagination.get_page($scope.pagination.default_page);
     };
 
     $scope.trans_info = function(r){

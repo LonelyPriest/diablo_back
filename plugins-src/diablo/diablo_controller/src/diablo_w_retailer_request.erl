@@ -8,6 +8,11 @@
 -export([action/2, action/3, action/4]).
 
 
+-import(?f_print,
+	[width/2, middle/3, middle/4,
+	 pading/1, clean_zero/1, br/1,
+	 line/2, phd/1, line_space/1]).
+
 %%--------------------------------------------------------------------
 %% @desc: GET action
 %%--------------------------------------------------------------------
@@ -133,6 +138,132 @@ action(Session, Req, {"bill_w_retailer"}, Payload) ->
 			   [{<<"rsn">>, ?to_b(SN)}]); 
 	Error ->
 	    ?utils:respond(200, Req, Error)
+    end;
+
+action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
+    ?DEBUG("print_w_retailer_trans with session ~p~npaylaod ~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    Retailer = ?v(<<"retailer">>, Payload),
+
+    {ok, RetailerInfo} = ?w_user_profile:get(retailer, Merchant, Retailer),
+    RetailerName = ?v(<<"name">>, RetailerInfo),
+    
+    case ?w_retailer:print_trans(Merchant, Payload) of
+	{ok, []} ->
+	    ?utils:respond(200, Req, ?err(print_w_retailer_no_transe, Retailer));
+	{ok, Rs} ->
+	    %% ?DEBUG("print rs ~p", [Rs]),
+	    RsLength = erlang:length(Rs),
+	    [ShopId|_]   = ?v(<<"shop">>, Payload),
+	    ResponseFun =
+		fun(PCode, PInfo) ->
+			?utils:respond(200, Req, ?succ(print_wreport, ShopId),
+				       [{<<"pcode">>, PCode},
+					{<<"pinfo">>, PInfo}])
+		end,
+	    
+	    {VPrinters, ShopInfo} = ?wifi_print:get_printer(Merchant, ShopId),
+
+	    case VPrinters of
+		[] ->
+		    ?utils:respond(200, Req, ?err(shop_not_printer, ShopId));
+		_  -> 
+		    Head = ?to_s(?v(<<"name">>, ShopInfo))
+			++ "－" ++ ?to_s(RetailerName) ++ "（对帐单）", 
+
+		    PrintInfo = 
+			lists:foldr(
+			  fun(P, Acc) ->
+				  SN     = ?v(<<"sn">>, P),
+				  Key    = ?v(<<"code">>, P),
+				  Path   = ?v(<<"server_path">>, P),
+
+				  Brand  = ?v(<<"brand">>, P),
+				  Model  = ?v(<<"model">>, P),
+
+				  Column = ?v(<<"pcolumn">>, P),
+				  Height = ?v(<<"pheight">>, P),
+
+				  %% ?DEBUG("P ~p", [P]),
+				  Server = ?wifi_print:server(?v(<<"server_id">>, P)), 
+
+				  Title = ?wifi_print:title(Brand, Model, Column, Head)
+				      ++ br(Brand) ++ line(minus, 99) ++ br(Brand),
+
+				  TableHead = phd(c) ++ "序号" ++ phd(c)
+				      ++ pading(7) ++ "单号" ++ pading(7) ++ phd(c)
+				      ++ pading(1) ++ "数量" ++ pading(1) ++ phd(c)
+				      ++ "帐户欠款" ++ phd(c)
+				      ++ pading(1) ++ "应付" ++ pading(1) ++ phd(c)
+				      ++ pading(1) ++ "费用" ++ pading(1) ++ phd(c)
+				      ++ pading(1) ++ "核销" ++ pading(1) ++ phd(c)
+				      ++ pading(1) ++ "实付" ++ pading(1) ++ phd(c)
+				      ++ "本次欠款" ++ phd(c)
+				      ++ pading(8) ++ "日期" ++ pading(8) ++ phd(c)
+				      ++ br(Brand) ++ line(minus, 99),
+
+				  {Body, _} = lists:foldr(
+					   fun({R}, {Acc1, No})->
+						   {br(Brand)
+						    ++ phd(c) ++ m(latin1, 4, No) ++ phd(c)
+						    ++ row(print, R)
+						    ++ br(Brand)
+						    ++ line(minus, 99)
+						    ++ Acc1, No - 1}
+					   end, {[], RsLength}, Rs),
+				  %% ?DEBUG("body ~p", [Body]),
+
+				  PrintContent = Title 
+				      ++ TableHead
+				      ++ Body
+				      ++ br(Brand)
+				      ++ pading(99 - 20) ++ ?utils:current_time(format_localtime),
+				  NoUpgradeDevices = ["1004", "1001", "1002", "1003", "1023"],
+
+				  DBody = 
+				      case lists:member(
+					     ?to_s(SN), NoUpgradeDevices) of
+					  true ->
+					      %% auto page
+					      ?f_print:pagination(
+						 auto, Height * 10, PrintContent);
+					  false ->
+					      %% no page
+					      ?f_print:pagination(
+						 just_size, Height * 10, PrintContent)
+				      end, 
+				  ?DEBUG("server ~p", [Server]),
+				  [{SN, fun() when Server =:= rcloud ->
+						?wifi_print:start_print(
+						   rcloud, Brand, Model, Height,
+						   SN, Key, Path, DBody);
+					   () when Server =:= fcloud ->
+						?wifi_print:start_print(
+						   fcloud, SN, Key, Path, PrintContent) 
+					end}|Acc] 
+			  end, [], VPrinters),
+
+		    case ?wifi_print:multi_print(PrintInfo) of
+			{Success, []} ->
+			    ResponseFun(0, Success); 
+			{[], Failed} ->
+			    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+				     || {DeviceId, ECode} <- Failed],
+			    ResponseFun(1, PInfo); 
+			{_Success, Failed} when is_list(Failed)->
+			    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+				     || {DeviceId, ECode} <- Failed],
+			    ResponseFun(2, PInfo);
+			{error, {ECode, _EInfo}} ->
+			    ResponseFun(ECode, [])
+		    end
+	    end,
+	    
+	    ?utils:respond(200,
+			   Req,
+			   ?succ(print_w_retailer_trans, Retailer)); 
+	Error ->
+	    ?utils:respond(200, Req, Error)
     end.
     
 
@@ -166,3 +297,31 @@ sidebar(Session) ->
        %% [{{"wretailer", "零售商管理", "glyphicon glyphicon-map-marker"}, S1 ++ S2}]).
     ?menu:sidebar(level_1_menu, S2 ++ S1) ++ ?menu:sidebar(level_2_menu, S3).
        
+
+m(latin1, Width, Number) ->
+    Length = width(latin1, Number),
+    Mh = (Width - Length) div 2,
+    Ml = Width - Length - Mh, 
+    pading(Mh) ++ ?to_s(Number) ++ pading(Ml).
+
+row(print, Sale) ->
+    SN = ?v(<<"rsn">>, Sale),
+    Total = ?v(<<"total">>, Sale),
+    LBalance = ?v(<<"balance">>, Sale, 0),
+    SPay = ?v(<<"should_pay">>, Sale, 0),
+    EPay = ?v(<<"e_pay">>, Sale, 0),
+    VPay = ?v(<<"verificate">>, Sale, 0),
+    HPay = ?v(<<"has_pay">>, Sale, 0),
+    EDate = ?v(<<"entry_date">>, Sale),
+
+    CBalance = LBalance + SPay + EPay - HPay,
+    ?to_s(SN) ++ pading(18 - width(latin1, SN)) ++ phd(c)
+	++ m(latin1, 6, Total) ++ phd(c)
+	++ m(latin1, 8, clean_zero(LBalance)) ++ phd(c)
+	++ m(latin1, 6, clean_zero(SPay)) ++ phd(c)
+	++ m(latin1, 6, clean_zero(EPay)) ++ phd(c)
+	++ m(latin1, 6, clean_zero(VPay)) ++ phd(c)
+	++ m(latin1, 6, clean_zero(HPay)) ++ phd(c)
+	++ m(latin1, 8, clean_zero(CBalance)) ++ phd(c)
+	++ ?to_s(EDate) ++ pading(20 - width(latin1, EDate)) ++ phd(c).
+	       

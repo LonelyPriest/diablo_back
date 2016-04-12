@@ -259,7 +259,12 @@ wretailerApp.service("wretailerService", function($resource, dateFilter){
     this.check_w_sale_new = function(rsn){
 	return http_wsale.save({operation: "check_w_sale"},
 			       {rsn: rsn}).$promise;
-    }; 
+    };
+
+    this.print_trans = function(condition){
+	return http.save(
+	    {operation: "print_w_retailer_trans"}, condition).$promise;
+    }
 });
 
 // wretailerApp.controller("wretailerTopCtrl", function(
