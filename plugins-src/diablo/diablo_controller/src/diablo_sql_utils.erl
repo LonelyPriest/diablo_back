@@ -53,6 +53,8 @@ condition(time_with_prfix, Start, End) ->
     time_condition(Start, "a.entry_date", ge)
 	++ " and " ++ time_condition(End, "a.entry_date", le);
 
+condition(page_desc, undefined, ItemsPerPage) ->
+    condition(page_desc, 1, ItemsPerPage);
 condition(page_desc, CurrentPage, ItemsPerPage) ->
     " order by id desc"
 	++ " limit " ++ ?to_s((CurrentPage-1)*ItemsPerPage)
@@ -60,6 +62,9 @@ condition(page_desc, CurrentPage, ItemsPerPage) ->
 
 condition(page_desc, use_id, CurrentPage, ItemsPerPage) ->
     condition(page_desc, CurrentPage, ItemsPerPage);
+
+condition(page_desc, use_sell, undefined, ItemsPerPage) ->
+    condition(page_desc, use_sell, 1, ItemsPerPage);
 condition(page_desc, use_sell, CurrentPage, ItemsPerPage) ->
     " order by sell desc"
 	++ " limit " ++ ?to_s((CurrentPage-1)*ItemsPerPage)

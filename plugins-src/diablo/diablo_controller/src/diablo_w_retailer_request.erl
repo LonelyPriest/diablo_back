@@ -217,7 +217,7 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 				      ++ TableHead
 				      ++ Body
 				      ++ br(Brand)
-				      ++ pading(99 - 20) ++ ?utils:current_time(format_localtime),
+				      ++ pading(99 - 16) ++ ?utils:current_time(format_localtime),
 				  NoUpgradeDevices = ["1004", "1001", "1002", "1003", "1023"],
 
 				  DBody = 
@@ -315,7 +315,7 @@ row(print, Sale) ->
     EDate = ?v(<<"entry_date">>, Sale),
 
     CBalance = LBalance + SPay + EPay - HPay,
-    ?to_s(SN) ++ pading(18 - width(latin1, SN)) ++ phd(c)
+    pading(1) ++ ?to_s(SN) ++ pading(17 - width(latin1, SN)) ++ phd(c)
 	++ m(latin1, 6, Total) ++ phd(c)
 	++ m(latin1, 8, clean_zero(LBalance)) ++ phd(c)
 	++ m(latin1, 6, clean_zero(SPay)) ++ phd(c)

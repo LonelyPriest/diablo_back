@@ -314,7 +314,8 @@ handle_call({print_trans, Merchant, Attrs}, _From, State) ->
 	++ " left join shops d on a.shop=d.id"
 	++ " where a.merchant=" ++ ?to_s(Merchant)
 	++ ?sql_utils:condition(proplists, NewConditions)
-	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime),
+	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime)
+	++ " order by id",
     
     Reply = ?sql_utils:execute(read, Sql),
     {reply, Reply, State};

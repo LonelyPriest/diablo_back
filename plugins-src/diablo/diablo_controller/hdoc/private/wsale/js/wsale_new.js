@@ -210,6 +210,11 @@ wsaleApp.controller("wsaleNewCtrl", function(
     }
 
     $scope.change_retailer = function(){
+	if (angular.isUndefined($scope.select.retailer)){
+	    dialog.response(false, "选择客户", "客户只能从下拉列表中选择，请重新选择客户！！");
+	    return;
+	}
+	
 	if ($scope.setting.sys_customer === $scope.select.retailer.id){
 	    $scope.select.surplus = 0;
 	} else {
