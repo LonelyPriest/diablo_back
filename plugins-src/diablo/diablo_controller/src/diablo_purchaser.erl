@@ -1715,7 +1715,7 @@ sql(wnew, RSN, Merchant, Shop, Firm, Date, DateTime, Inventories) ->
     RealyShop = realy_shop(Merchant, Shop),
     lists:foldr(
       fun({struct, Inv}, Acc0)->
-	      Amounts      = lists:reverse(?v(<<"amount">>, Inv)),
+	      Amounts = lists:reverse(?v(<<"amount">>, Inv)),
 	      ?w_good_sql:amount_new(
 		 RSN, Merchant, RealyShop,
 		 Firm, Date, DateTime, Inv, Amounts) ++ Acc0 

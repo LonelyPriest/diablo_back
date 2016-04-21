@@ -10,13 +10,18 @@
 	  <button type="button" class="btn red"
 		    x-ng-click="go_back()">返回
 	      <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
+
+	  <button class="btn btn-info purple-stripe"
+		  x-ng-disabled="disable_draft()"
+		  x-ng-click="list_draft()">草稿
+	    <i class="glyphicon glyphicon-send"></i></button>
 	  
 	  <button class="btn btn-success purple-stripe"
 		  x-ng-disabled="disable_save()"
 		  x-ng-click="save_inventory()">保存
 	    <i class="glyphicon glyphicon-save"></i></button>
 	  <button class="btn btn-danger purple-stripe"
-		  x-ng-disabled="disable_refresh()"
+		  x-ng-disabled="disable_refresh"
 		  x-ng-click="refresh()">下一单
 	    <i class="glyphicon glyphicon-plus"></i></button>
 	</div>
@@ -583,21 +588,59 @@
 	      <span x-ng-switch-default>{{c.cname}}</span>
 	    </td>
 	    
-	    <!-- <td class="col-md-1">{{c.cname}}</td> -->
 	    <td x-ng-repeat="s in params.sizes">
 	      {{params.get_amount(c.cid, s, params.amounts).reject_count}} 
 	    </td>
 	  </tr>
 	</tbody>
       </table>
-    </div> <!--END table-responsive-->
-    <!-- <image x-ng-show="params.path" -->
-    <!-- 	   class="img-responsive img-thumbnail" -->
-    <!-- 	   ng-src="{{params.path}}"></image> -->
+    </div> <!--END table-responsive--> 
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-primary" x-ng-click="ok()">保存</button>
+    <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="wreject-draft.html">
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-condensed table-advanced">
+	<thead>
+	  <tr>
+	    <th></th>
+	    <th>单号</th>
+	    <th>客户</th>
+	    <!-- <th>数量</th>  -->
+	    <th>店员</th>
+	    <th>店铺</th>
+	    <!-- <th>时间</th> -->
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr x-ng-repeat="d in params.drafts">
+	    <td class="vert-align">
+	      <div class="checkbox checkbox-danger checkbox-circle">
+		<input id={{d.sn}} type="checkbox" x-ng-model="d.select"/>
+		<label for={{d.sn}}></label>
+	      </div>
+	    </td>
+	    <td>{{d.sn}}</td>
+	    <td>{{d.retailer.name}}</td>
+	    <td>{{d.employee.name}}</td>
+	    <td>{{d.shop.name}}</td>
+	    <!-- <td>{{d.datetime}}</td>  -->
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary"
+	    x-ng-disabled="!params.valid(params.drafts)"
+	    x-ng-click="ok()">确定</button>
     <button class="btn btn-warning" x-ng-click="cancel()">取消</button>
   </div>
 </script>

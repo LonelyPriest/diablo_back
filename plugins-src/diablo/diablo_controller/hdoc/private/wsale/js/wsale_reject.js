@@ -1,6 +1,7 @@
 wsaleApp.controller("wsaleRejectCtrl", function(
-    $scope, $q, $timeout, dateFilter, diabloUtilsService, diabloPromise,
-    diabloPattern, diabloFilter, diabloNormalFilter, wgoodService,
+    $scope, $q, $timeout, localStorageService, dateFilter,
+    diabloUtilsService, diabloPromise, diabloPattern,
+    diabloFilter, diabloNormalFilter, wgoodService,
     purchaserService, wsaleService, user, filterRetailer, filterEmployee,
     filterSizeGroup, filterColor, base){
     // console.log(base);
@@ -25,6 +26,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 		      price:diabloPattern.positive_decimal_2};
 
     $scope.sell_styles = diablo_sell_style;
+    $scope.disable_refresh = true;
     
     var dialog     = diabloUtilsService;
 
@@ -102,12 +104,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     
     // init
     $scope.inventories = [];
-    $scope.inventories.push({$edit:false, $new:true});
-
-    
-    $scope.disable_refresh = function(){
-	return $scope.has_saved ? false:true;
-    };
+    $scope.inventories.push({$edit:false, $new:true}); 
     
     $scope.refresh = function(){
 	$scope.inventories = [];
@@ -119,17 +116,14 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	$scope.select.comment = undefined;
 	$scope.select.left_balance = $scope.select.retailer.balance;
 
-	$scope.has_saved = false;
-
-	$scope.has_saved = false;
-
-	// $scope.get_retailer(); 
+	$scope.disable_refresh = true;
+	$scope.has_saved = false; 
     };
 
     $scope.change_retailer = function(){
 	$scope.select.surplus = $scope.select.retailer.balance;
+	$scope.local_save();
 	$scope.re_calculate();
-	// $scope.refresh();
     };
     
     // calender
@@ -164,16 +158,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 			inv, {name:name, prompt:prompt}); 
 		})
 	});
-    };
-
-    // $scope.get_repo = function(){
-    // 	// console.log($scope.shops);
-    // 	if ($scope.select.shop.repo !== -1){
-    // 	    return diablo_get_object($scope.select.shop.repo, $scope.repoes);
-    // 	} else{
-    // 	    return $scope.select.shop; 
-    // 	}
-    // }
+    }; 
     
     $scope.match_style_number = function(viewValue){
 	return diabloFilter.match_w_sale(
@@ -211,8 +196,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     };
     
     $scope.on_select_good = function(item, model, label){
-	// console.log(item);
-
+	// console.log(item); 
 	// one good can be add only once at the same time
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    if (item.style_number === $scope.inventories[i].style_number
@@ -242,7 +226,118 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	$scope.add_inventory(add);
 	
 	return;
-    }; 
+    };
+
+    // local save
+    var key_re = /^wj-[0-9-]+$/; 
+    var current_key = function(){
+	return "wj-" + $scope.select.retailer.id.toString()
+	    + "-" + $scope.select.shop.id.toString()
+	    + "-" + $scope.select.employee.id.toString();
+    };
+
+    var draft_keys = function(){
+	// return [];
+	var keys = localStorageService.keys();
+	return keys.filter(function(k){
+	    return key_re.test(k); 
+	});
+    };
+
+    $scope.local_save = function(){
+	var key = current_key();
+	// var now = $.now();
+	localStorageService.set(
+	    key,
+	    {t:now, v:$scope.inventories.filter(function(inv){
+		return inv.$new === false;})
+	    }) 
+    };
+
+    $scope.local_remove = function(){
+	var key = current_key();
+	localStorageService.remove(key);
+    }
+
+    $scope.disable_draft = function(){
+	if (draft_keys().length === 0){
+	    return true;
+	}
+	
+	if ($scope.inventories.length !== 1){
+	    return true;
+	};
+	
+	return false;
+    };
+
+    $scope.list_draft = function(){
+	var key_fix = draft_keys(); 
+	// console.log(key_fix); 
+	var drafts = key_fix.map(function(k){
+	    var p = k.split("-");
+	    return {
+		sn:k,
+		retailer:diablo_get_object(parseInt(p[1]), $scope.retailers),
+		shop:diablo_get_object(parseInt(p[2]), $scope.shops),
+		employee:diablo_get_object(p[3], $scope.employees)
+	    }
+	});
+
+	// console.log(drafts) 
+	var callback = function(params){
+	    var select_draft = params.drafts.filter(function(d){
+	    	return angular.isDefined(d.select) && d.select
+	    })[0];
+
+	    console.log($scope.select);
+	    $scope.select.retailer =
+	    	diablo_get_object(select_draft.retailer.id, $scope.retailers);
+	    $scope.select.shop =
+	    	diablo_get_object(select_draft.shop.id, $scope.shops);
+	    $scope.select.employee =
+	    	diablo_get_object(select_draft.employee.id, $scope.employees);
+
+	    $scope.select.surplus = $scope.select.retailer.balance; 
+	    var one = localStorageService.get(select_draft.sn);
+	    
+	    if (angular.isDefined(one) && null !== one){
+	        $scope.inventories = angular.copy(one.v);
+	        console.log($scope.inventories); 
+	        $scope.inventories.unshift({$edit:false, $new:true}); 
+	    	$scope.disable_refresh = false;
+	        $scope.re_calculate();		
+	    } 
+	};
+
+	// console.log(drafts);
+	diabloUtilsService.edit_with_modal(
+	    "wreject-draft.html", undefined, callback, undefined,
+	    {drafts:drafts,
+	     valid: function(drafts){
+	    	 for (var i=0, l=drafts.length; i<l; i++){
+	    	     if (angular.isDefined(drafts[i].select) && drafts[i].select){
+	    		 return true;
+	    	     }
+	    	 } 
+	    	 return false;
+	     },
+	     
+	     select: function(drafts, d){
+	    	 for (var i=0, l=drafts.length; i<l; i++){
+	    	     if (d.sn !== drafts[i].sn){
+	    		 drafts[i].select = false;
+	    	     }
+	    	 }
+	     }
+	    }
+	); 
+    };
+
+
+    // $scope.disable_refresh = function(){
+    // 	return $scope.has_saved && draft_keys().length === 0 ? false:true;
+    // };
     
     /*
      * save all
@@ -363,8 +458,10 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	wsaleService.reject_w_sale({
 	    inventory:added, base:base, print:print
 	}).then(function(result){
-	    console.log(result);
+	    // console.log(result);
 	    if (result.ecode == 0){
+		$scope.local_remove();
+		
 		var msg = "";
 		var rsn = result.rsn;
 		if (im_print === diablo_yes){
@@ -511,7 +608,9 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	inv.order_id = $scope.inventories.length; 
 	// add new line
 	$scope.inventories.unshift({$edit:false, $new:true});
-	
+
+	$scope.disable_refresh = false;
+	$scope.local_save();
 	$scope.re_calculate(); 
     };
     
@@ -615,10 +714,13 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 		    var after_add = function(){
 			inv.$edit = true;
 			inv.$new = false;
-			// oreder
+			// order
 			inv.order_id = $scope.inventories.length; 
 			// add new line
-			$scope.inventories.unshift({$edit:false, $new:true}); 
+			$scope.inventories.unshift({$edit:false, $new:true});
+
+			$scope.disable_refresh = false;
+			$scope.local_save();
 			$scope.re_calculate(); 
 		    };
 		    
@@ -679,7 +781,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    $scope.inventories[i].order_id = l - i;
 	}
-
+	
+	$scope.local_save();
 	$scope.re_calculate(); 
 	
     };
@@ -721,6 +824,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    inv.reject     = result.reject;
 	    inv.fdiscount  = result.fdiscount;
 	    inv.fprice     = result.fprice;
+	    
+	    $scope.local_save();
 	    $scope.re_calculate(); 
 	};
 
@@ -749,6 +854,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
 	inv.amounts[0].reject_count = inv.reject;
+
+	$scope.local_save();
 	$scope.re_calculate(); 
     };
 

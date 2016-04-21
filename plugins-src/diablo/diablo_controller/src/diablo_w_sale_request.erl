@@ -212,36 +212,48 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
     {struct, Base}  = ?v(<<"base">>, Payload),
     {struct, Print} = ?v(<<"print">>, Payload),
 
+    ImmediatelyPrint = ?v(<<"im_print">>, Print, ?YES),
+
     NewInvs = case ?v(<<"sort">>, Base, ?NO) of
 		 ?YES -> sort_inventory(onsale, Invs, []);
 		 ?NO  -> Invs
 	     end,
-
-    ?DEBUG("NewInvs ~p", [NewInvs]),
-
-    ImmediatelyPrint = ?v(<<"im_print">>, Print, ?YES),
     
-    case ?w_sale:sale(new, Merchant, NewInvs, Base) of 
-    	{ok, RSN} ->
-	    case ImmediatelyPrint of
-		?YES ->
-		    SuccessRespone =
-			fun(PCode, PInfo) ->
-				?utils:respond(200, Req, ?succ(new_w_sale, RSN),
-					       [{<<"rsn">>, ?to_b(RSN)},
-						{<<"pcode">>, PCode},
-						{<<"pinfo">>, PInfo}])
-			end,
-		    print(RSN, Merchant, SuccessRespone);
-		?NO ->
-		    ?utils:respond(200, Req, ?succ(new_w_sale, RSN),
-				   [{<<"rsn">>, ?to_b(RSN)}])
-	    end,
-	    ?w_user_profile:update(retailer, Merchant);
-	    %% delete draft
-	    %% ?w_sale_draft:delete(wsale_draft, Merchant, Base);
-    	{error, Error} ->
-    	    ?utils:respond(200, Req, Error)
+    %% ?DEBUG("NewInvs ~p", [NewInvs]), 
+    %% check invs
+    case check_inventory(oncheck, NewInvs) of
+	{ok, _} -> 
+	    case ?w_sale:sale(new, Merchant, NewInvs, Base) of 
+		{ok, RSN} ->
+		    case ImmediatelyPrint of
+			?YES ->
+			    SuccessRespone =
+				fun(PCode, PInfo) ->
+					?utils:respond(
+					   200, Req, ?succ(new_w_sale, RSN),
+					   [{<<"rsn">>, ?to_b(RSN)},
+					    {<<"pcode">>, PCode},
+					    {<<"pinfo">>, PInfo}])
+				end,
+			    print(RSN, Merchant, SuccessRespone);
+			?NO ->
+			    ?utils:respond(200, Req, ?succ(new_w_sale, RSN),
+					   [{<<"rsn">>, ?to_b(RSN)}])
+		    end,
+		    ?w_user_profile:update(retailer, Merchant);
+		%% delete draft
+		%% ?w_sale_draft:delete(wsale_draft, Merchant, Base);
+		{error, Error} ->
+		    ?utils:respond(200, Req, Error)
+	    end;
+	{error, EInv} ->
+	    StyleNumber = ?v(<<"style_number">>, EInv),
+	    ?utils:respond(
+	       200,
+	       Req,
+	       ?err(wsale_invalid_inv, StyleNumber),
+	       [{<<"style_number">>, StyleNumber},
+		{<<"order_id">>, ?v(<<"order_id">>, EInv)}])
     end;
 
 action(Session, Req, {"update_w_sale"}, Payload) ->
@@ -848,4 +860,25 @@ sort_amount(onsale, Amount, [{struct, Sorted}|T], Acc) ->
 	false ->
 	    sort_amount(onsale, Amount, T, [{struct, Sorted}|Acc])
     end.
+
+check_inventory(oncheck, []) ->
+    {ok, none};
+check_inventory(oncheck, [{struct, Inv}|T]) ->
+    Amounts = ?v(<<"amounts">>, Inv),
+
+    Count = ?v(<<"sell_total">>, Inv),
+    DCount = lists:foldr(
+	      fun({struct, A}, Acc)->
+		      ?v(<<"sell_count">>, A) + Acc
+	      end, 0, Amounts),
+
+    case Count =:= DCount of
+	true -> check_inventory(oncheck, T); 
+	false -> {error, Inv}
+    end.
+	    
+	    
+
     
+    
+						    

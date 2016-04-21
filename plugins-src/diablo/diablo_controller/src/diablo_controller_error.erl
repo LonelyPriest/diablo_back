@@ -347,6 +347,8 @@ error(wsale_export_error, Error) ->
     {2701, "failed to export file: " ++ ?to_s(Error)};
 error(wsale_export_no_date, Merchant) ->
     {2702, "no date to export of merchant: " ++ ?to_s(Merchant)};
+error(wsale_invalid_inv, StyleNumber) ->
+    {2703, "error style number " ++ ?to_s(StyleNumber) ++ "."};
 
 %% about print
 error(invalid_sn, PrintSN) ->
@@ -383,6 +385,7 @@ error(stock_been_checked, SN) ->
     {2502, "stock of SN " ++ ?to_s(SN) ++ "has been checked."};
 error(stock_been_canceled, SN) ->
     {2503, "stock of SN " ++ ?to_s(SN) ++ "has been canceled."};
+
 
 %% report
 

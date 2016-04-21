@@ -1,6 +1,11 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-04-15",
+	 content: [
+	     "退货单增加草稿能力"]
+	},
+	
 	{date: "2016-04-12",
 	 content: [
 	     "增加客户对帐单打印功能",

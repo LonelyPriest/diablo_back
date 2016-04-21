@@ -543,6 +543,14 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 			+ "，所选厂商：" + $scope.select.firm.name);
 		return;
 	    };
+
+	    if (angular.isUndefined(add.style_number)){
+		diabloUtilsService.response(
+		    false, "新增库存", "新增库存失败：序号["
+			+ add.order_id.toString() + "]"
+			+ purchaserService.error[2091]);
+		return;
+	    };
 	    
 	    added.push({
 		good        : add.id,

@@ -126,7 +126,7 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 	2190: "该款号库存不存在！！请确认本店是否进货该款号！！",
 	2191: "该货号已存在，请选择新的货号！！",
 	2192: "客户或营业员不存在，请建立客户或营业员资料！！",
-	2193: "款号未知，请检查后重新保存！！", 
+	2193: "款号未知，请检查后重新保存！！",
 	2401: "店铺打印机不存在或打印处理暂停状态！！",
 	
 	2411: "打印机编号错误！！",
@@ -147,6 +147,7 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 	2601: "获取零售商历史记录失败！！",
 	2701: "文件导出失败，请重试或联系服务人员查找原因！！",
 	2702: "文件导出失败，没有任何数据需要导出，请重新设置查询条件！！",
+	2703: "明细未知，请删除后重新添加！！", 
 	2699: "修改前后信息一致，请重新编辑修改项！！",
 	2799: "该款号为补单，无法退货，请重新选择款号！！",
 	9001: "数据库操作失败，请联系服务人员！！"};
@@ -334,12 +335,12 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     		    {name:"=0", id:1, py:diablo_pinyin("等于0")}];
     
     // initial 
-    diabloFilter.reset_field(); 
+    diabloFilter.reset_field();
+    diabloFilter.add_field("retailer", filterRetailer);
+    diabloFilter.add_field("has_pay",  has_pay);
     diabloFilter.add_field("rsn", []);
     diabloFilter.add_field("shop",     $scope.shops);
-    diabloFilter.add_field("retailer", filterRetailer);
     diabloFilter.add_field("employee", filterEmployee);
-    diabloFilter.add_field("has_pay",  has_pay);
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
@@ -372,11 +373,6 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 
     //
     $scope.sequence_pagination = function(){
-	// var shop = -1;
-	// if ($scope.shopIds.length === 1){
-	//     shop = $scope.shopIds[0];
-	// };
-
 	return diablo_sequence_page() === diablo_yes
 	    ? diablo_yes
 	    : diablo_base_setting(
@@ -432,6 +428,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	    $scope.total_card       = stastic.total_card;
 	    $scope.total_wire       = stastic.total_wire;
 	    $scope.total_verificate = stastic.total_verificate;
+	    $scope.total_epay       = stastic.total_epay;
 
 	    // recover 
 	    $location.path("/new_wsale_detail", false);
@@ -466,18 +463,15 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		    $scope.total_items      = result.total;
 		    $scope.total_amounts    = result.t_amount;
 		    $scope.total_spay       = $scope.round(result.t_spay);
-		    // $scope.total_spay       = result.t_spay;
 		    $scope.total_hpay       = $scope.round(result.t_hpay);
 		    $scope.total_cash       = result.t_cash;
 		    $scope.total_card       = result.t_card;
 		    $scope.total_wire       = result.t_wire;
 		    $scope.total_verificate = result.t_verificate;
-
+		    $scope.total_epay       = result.t_epay; 
 		    $scope.records = [];
 		}
 		
-		// console.log($scope);
-
 		angular.forEach(result.data, function(d){
 		    d.shop     = diablo_get_object(d.shop_id, $scope.shops);
 		    d.employee = diablo_get_object(d.employee_id, filterEmployee);
@@ -491,10 +485,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 		} else {
 		    diablo_order(
 			result.data, (page_num - 1) * $scope.items_perpage + 1);
-		    $scope.records = $scope.records.concat(result.data);
-
-		    // console.log($scope.records);
-		    
+		    $scope.records = $scope.records.concat(result.data); 
 		}
 		
 	    })
@@ -531,6 +522,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
 	     total_card:       $scope.total_card,
 	     total_wire:       $scope.total_wire,
 	     total_verificate: $scope.total_verificate,
+	     total_epay:       $scope.total_epay,
 	     t:                now});
     };
     
@@ -656,54 +648,7 @@ wsaleApp.controller("wsaleGuideCtrl", function($scope){
 
 wsaleApp.controller("wsaleCtrl", function(
     $scope, localStorageService){
-    diablo_remove_local_storage(localStorageService);
-
-    // cache 
-    // var promise  = diabloPromise.promise;
-    // var filter   = diabloShareFilter;
-    // $q.all([
-    // 	// promise(user)(),
-    // 	promise(filter.get_right)(),
-    // 	promise(filter.get_shop)(),
-    // 	promise(filter.get_brand)(),
-    // 	promise(filter.get_firm)(),
-    // 	promise(filter.get_type)(),
-    // 	promise(filter.get_employee)(),
-    // 	promise(filter.get_retailer)(),
-    // 	promise(filter.get_size_group)(),
-    // 	promise(filter.get_base_setting)()
-
-    // ]).then(function(data){
-    // 	console.log(data);
-
-    // 	// console.log(wsaleGoodService);
-	
-    // 	wsaleGoodService.set_user(data[0], data[1]);
-    // 	// brand
-    // 	wsaleGoodService.set_brand(angular.copy(data[2]));
-    // 	// firm
-    // 	wsaleGoodService.set_firm(angular.copy(data[3]));
-    // 	// type
-    // 	wsaleGoodService.set_type(angular.copy(data[4]));
-    // 	// employee
-    // 	wsaleGoodService.set_employee(angular.copy(data[5]));
-    // 	// retailer
-    // 	wsaleGoodService.set_retailer(angular.copy(data[6]));
-    // 	// size
-    // 	wsaleGoodService.set_size_group(data[7]);
-    // 	// base
-    // 	wsaleGoodService.set_base(data[8]);
-
-    // 	// console.log(wsaleGoodService.get_user());
-    // 	// console.log(wsaleGoodService.get_brand());
-    // 	// console.log(wsaleGoodService.get_firm());
-    // 	// console.log(wsaleGoodService.get_type());
-    // 	// console.log(wsaleGoodService.get_employee());
-    // 	// console.log(wsaleGoodService.get_retailer());
-    // 	// console.log(wsaleGoodService.get_size_group());
-    // 	// console.log(wsaleGoodService.get_base());
-    // })
-    
+    diablo_remove_local_storage(localStorageService); 
 });
 
 wsaleApp.controller("loginOutCtrl", function($scope, $resource){

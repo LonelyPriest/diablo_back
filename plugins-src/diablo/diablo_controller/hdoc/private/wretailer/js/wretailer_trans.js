@@ -134,6 +134,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	    $scope.total_card       = stastic.total_card;
 	    $scope.total_wire       = stastic.total_wire;
 	    $scope.total_verificate = stastic.total_verificate;
+	    $scope.total_epay       = stastic.total_epay;
 	    
 	    $location.path("/retailer_trans/" + retailer_id.toString(), false);
 	    $routeParams.page = undefined;
@@ -163,6 +164,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
 		    $scope.total_card       = result.t_card;
 		    $scope.total_wire       = result.t_wire;
 		    $scope.total_verificate = result.t_verificate;
+		    $scope.total_epay       = result.t_epay;
 		}
 		angular.forEach(result.data, function(d){
 		    d.shop = diablo_get_object(d.shop_id, $scope.shops);
@@ -195,6 +197,7 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	     total_card        :$scope.total_card,
 	     total_wire        :$scope.total_wire,
 	     total_verificate  :$scope.total_verificate,
+	     total_epay        :$scope.total_epay,
 	     t:                 now});
 	
     	diablo_goto_page("#/wretailer_trans_rsn/" + retailer_id.toString()

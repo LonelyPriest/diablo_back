@@ -427,19 +427,10 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	
 	return false;
     };
-
-    // $scope.list_draft_test = function(){
-    // 	var callback = function(params){
-    // 	};
-    // 	diabloUtilsService.edit_with_modal("wsale-draft.html", undefined, callback, undefined, undefined);
-    // };
     
     $scope.list_draft = function(){
 	
-	var key_fix = draft_keys();
-	
-	// console.log(key_fix);
-	
+	var key_fix = draft_keys();	
 	var drafts = key_fix.map(function(k){
 	    var p = k.split("-");
 	    return {sn:k,
@@ -463,6 +454,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    	diablo_get_object(select_draft.shop.id, $scope.shops);
 	    $scope.select.employee =
 	    	diablo_get_object(select_draft.employee.id, $scope.employees);
+
+	    $scope.select.surplus = $scope.select.retailer.balance;
 	    
 	    var one = localStorageService.get(select_draft.sn);
 	    
@@ -758,11 +751,12 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    var batch = [];
 	    for(var i=0, l=amounts.length; i<l; i++){
 		var a = amounts[i];
-		if (angular.isDefined(a.sell_count) && a.sell_count){
+		var sell_count = diablo_set_integer(a.sell_count);
+		if (angular.isDefined(sell_count)){
 		    var new_a = {
 			cid:        a.cid,
 			size:       a.size, 
-			sell_count: parseInt(amounts[i].sell_count)};
+			sell_count: sell_count};
 		    
 		    if (angular.isDefined(a.batch) && a.batch){
 			if (!in_array(batch, parseInt(a.batch))){
@@ -787,7 +781,6 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    var add = $scope.inventories[i];
 	    // var batch = add.batch;
 	    // console.log(batch);
-	    var amount_info = get_sales(add.amounts);
 	    if (angular.isUndefined(add.style_number)){
 		diabloUtilsService.response(
 		    false, "销售开单", "开单失败：序号["
@@ -796,8 +789,18 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		return;
 	    };
 	    
+	    var amount_info = get_sales(add.amounts); 
+	    if (amount_info.amounts.length === 0){
+	    	diabloUtilsService.response(
+	    	    false, "销售开单", "开单失败：序号["
+	    		+ add.order_id.toString()
+	    		+ "，款号" + add.style_number + "] "
+	    		+ wsaleService.error[2703]);
+	    	return;
+	    }
+	    
 	    added.push({
-		id          : add.id,
+		order_id    : add.order_id,
 		style_number: add.style_number,
 		brand       : add.brand_id,
 		brand_name  : add.brand,
@@ -870,7 +873,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    inventory:added.length === 0 ? undefined : added,
 	    base:base, print:print
 	}).then(function(result){
-	    // console.log(result);
+	    console.log(result);
 	    var rsn = result.rsn;
 
 	    var print = function(result){
@@ -923,7 +926,14 @@ wsaleApp.controller("wsaleNewCtrl", function(
 			yes_callback, undefined, $scope)
 		}
 		
-	    } else{
+	    } else if (result.ecode === 2703){
+		dialog.response_with_callback(
+	    	    false, "销售开单", "开单失败："
+			+ "序号[" + result.order_id.toString()
+			+ "，款号"  + result.style_number + "] "
+			+ wsaleService.error[2703],
+		    $scope, function(){$scope.has_saved = false});
+	    } else {
 	    	dialog.response_with_callback(
 	    	    false, "销售开单", "开单失败：" + wsaleService.error[result.ecode],
 		    $scope, function(){$scope.has_saved = false});

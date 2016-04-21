@@ -155,6 +155,7 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
     // error information
     this.error = {
 	2001: "货品资料已存在！！",
+	2091: "款号未知，请检查后重新保存！！", 
 	2092: "入库货品厂商不一致！！",
 	2093: "入库货品的厂商与选择的厂商不一致！！",
 	2094: "修改前后信息一致，请重新编辑修改项！！", 

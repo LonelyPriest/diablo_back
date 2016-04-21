@@ -1461,6 +1461,7 @@ count_table(w_sale, Merchant, Conditions) ->
     	", sum(a.card) as t_card"
     	", sum(a.wire) as t_wire"
     	", sum(a.verificate) as t_verificate"
+	", sum(a.e_pay) as t_epay"
 	" from w_sale a where " ++ SortConditions,
     %% SubSql = "select a.rsn, a.total, a.should_pay, a.has_pay"
     %% 	", a.cash, a.card, a.wire, a.verificate"
