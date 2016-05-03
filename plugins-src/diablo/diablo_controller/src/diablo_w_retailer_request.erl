@@ -163,13 +163,19 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 		end,
 	    
 	    {VPrinters, ShopInfo} = ?wifi_print:get_printer(Merchant, ShopId),
+	    {ok, MerchantInfo} = ?wifi_print:detail(merchant, Merchant), 
+	    {ok, Banks}        = ?wifi_print:detail(bank, Merchant), 
+	    {Setting, Phones}  = ?wifi_print:detail(base_setting, Merchant, ShopId),
+
+	    ShopAddr = ?v(<<"address">>, ShopInfo), 
+	    Mobile   = ?v(<<"mobile">>, MerchantInfo),
 
 	    case VPrinters of
 		[] ->
 		    ?utils:respond(200, Req, ?err(shop_not_printer, ShopId));
 		_  -> 
 		    Head = ?to_s(?v(<<"name">>, ShopInfo))
-			++ "－" ++ ?to_s(RetailerName) ++ "（对帐单）", 
+			++ "－" ++ ?to_s(RetailerName) ++ "（对帐单）",
 
 		    PrintInfo = 
 			lists:foldr(
@@ -188,7 +194,9 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 				  Server = ?wifi_print:server(?v(<<"server_id">>, P)), 
 
 				  Title = ?wifi_print:title(Brand, Model, Column, Head)
-				      ++ br(Brand) ++ line(minus, 99) ++ br(Brand),
+				      ++ ?wifi_print:address(
+					    Brand, Model, Column, ShopAddr, Setting)
+				      ++ br(Brand) ++ line(minus, 99) ++ br(Brand), 
 
 				  TableHead = phd(c) ++ "序号" ++ phd(c)
 				      ++ pading(7) ++ "单号" ++ pading(7) ++ phd(c)
@@ -217,8 +225,31 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 				      ++ TableHead
 				      ++ Body
 				      ++ br(Brand)
-				      ++ pading(99 - 16) ++ ?utils:current_time(format_localtime),
-				  NoUpgradeDevices = ["1004", "1001", "1002", "1003", "1023"],
+				      ++ case ?to_i(?v(<<"pccmix">>, Setting, 0)) of
+					     0 ->
+						 ?wifi_print:body_foot(
+						    format_default,
+						    Brand,
+						    Model,
+						    Column,
+						    Banks,
+						    Mobile,
+						    Phones);
+					     1 ->
+					      ?wifi_print:body_foot(
+						format_column,
+						 Brand,
+						 Model,
+						 Column,
+						 Banks,
+						 [{<<"phone">>, Mobile, []}|Phones],
+						 [])
+					 end
+				      ++ pading(99 - 16)
+				      ++ ?utils:current_time(format_localtime),
+				  
+				  NoUpgradeDevices =
+				      ["1004", "1001", "1002", "1003", "1023"],
 
 				  DBody = 
 				      case lists:member(

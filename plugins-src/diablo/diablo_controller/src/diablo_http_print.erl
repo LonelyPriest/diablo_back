@@ -23,8 +23,8 @@
 -export([print/4, print/2, call/2, get_printer/2]).
 
 -export([server/1,
-	 title/4, head/7, head/8,  body_head/6,
-	 row/2, body_foot/7, detail/2, detail/3,
+	 title/4, address/5, head/7, head/8,  body_head/6,
+	 row/2, body_foot/7, body_foot/8, detail/2, detail/3,
 	 start_print/8, start_print/5,
 	 multi_print/1, get_printer_state/4, multi_send/5]).
 
@@ -1007,6 +1007,7 @@ address(Brand, Model, Column, Address, Setting) ->
 	    ?YES -> (Column - ?f_print:width(chinese, Address) * 2) div 2;
 	    ?NO ->(Column - ?f_print:width(chinese, Address)) div 2
 	end,
+    ?DEBUG("address start ~p", [Start]),
     ?f_print:left_pading(Brand, Model)
 	++ ?f_print:pading(Start)
 	

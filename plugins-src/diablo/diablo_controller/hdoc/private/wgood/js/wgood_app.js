@@ -42,7 +42,7 @@ wgoodApp.config(['$routeProvider', function($routeProvider){
 	when('/wgood_update/:id?', {
 	    templateUrl: '/private/wgood/html/wgood_update.html',
             controller: 'wgoodUpdateCtrl',
-	    resolve: angular.extend({}, brand, firm, type, color, user, base)
+	    resolve: angular.extend({}, brand, firm, type, color, s_group, user, base)
 	}).
 	when('/wgood_new', {
 	    templateUrl: '/private/wgood/html/wgood_new.html',

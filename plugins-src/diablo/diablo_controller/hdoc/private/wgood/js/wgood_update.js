@@ -1,8 +1,9 @@
 wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope, $location, $routeParams, $q, $timeout, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
-    filterBrand, filterFirm, filterType, filterColor, user, base){
-    // console.log(filterBrand); 
+    filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
+    user, base){
+    // console.log(filterSizeGroup); 
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
     $scope.full_years = diablo_full_year;
@@ -28,6 +29,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope.firms  = filterFirm;
     $scope.types  = filterType;
     $scope.brands = filterBrand;
+    $scope.groups = filterSizeGroup;
     $scope.colors = [];
 
     // [{type:"红色", tid:1
@@ -112,11 +114,32 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 
 	if ($scope.selectColors.length === 0){
 	    $scope.good.color_desc = "均色";
-	} 
+	}
 
+	var select_groups = $scope.good.s_group.split(",").map(function(s){
+	    return parseInt(s);
+	})
+	
+	// console.log(select_groups);
+	$scope.selectGroups = angular.copy($scope.groups);
+	angular.forEach($scope.selectGroups, function(g){
+	    if (in_array(select_groups, g.id)){
+		g.select = true;
+		g.disabled = true;
+	    }
+	});
+	// $scope.selectGroups = $scope.good.s_group.split(",");
 	// console.log($scope.selectColors);
 	// console.log($scope.good);
+
+	$scope.disable_select_size = function(){
+	    // console.log(good);
+	    // var select_groups = good.s_group.split(",");
+	    return $scope.good.free === 0 || select_groups.length >= 2;
+	}
     });
+
+    
 
 
     $scope.is_same_good = false;
@@ -328,6 +351,31 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     };
 
     
+    $scope.select_size = function(){
+	var callback = function(params){
+	    $scope.good.size = "";
+	    angular.forEach(params.groups, function(g){
+		if (angular.isDefined(g.select) && g.select){
+		    $scope.good.size += g.name + "；";
+		    // $scope.selectGroups.push(angular.copy(g));
+		}
+	    });
+	    $scope.selectGroups = params.groups; 
+	};
+	
+	var select_group = function(groups, g){
+	    for(var i=0, l=groups.length; i<l; i++){
+		if (!groups[i].disabled && groups[i].id !== g.id){
+		    groups[i].select = false;
+		}
+	    }
+	};
+
+	diabloUtilsService.edit_with_modal(
+	    "select-size.html", undefined,
+	    callback, $scope, {groups: $scope.selectGroups,
+			       select_group: select_group}, true);
+    }; 
     
     /*
      * update good
@@ -370,7 +418,32 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	    } else{
 		return wgoodService.free_color.toString();;
 	    }
-	}(); 
+	}();
+	
+	update_good.s_group  = function(){
+	    var s_group = $scope.selectGroups.filter(function(g){
+		return g.select;
+	    }).map(function(g){
+		return g.id;
+	    }).toString();
+	    return s_group;
+	}();
+
+	update_good.size = function(){
+	    var s_group = $scope.selectGroups.filter(function(g){
+		return g.select;
+	    });
+	    
+	    var groups = [];
+	    angular.forEach(s_group, function(g){
+		for(var i=0, l=diablo_sizegroup.length; i<l; i++){
+	    	    var k = diablo_sizegroup[i];
+	    	    if(g[k] && !in_array(groups, g[k])) groups.push(g[k]);
+		}
+	    }) 
+	    
+	    return groups.toString();
+	}();
 	
 	console.log(update_good);
 	console.log($scope.src_good);
@@ -411,8 +484,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	// changed_good.brand_id = update_good.brand_id;
 	// changed_good.style_number = update_good.style_number;
 	
-	console.log(changed_good);
-	
+	// console.log(changed_good);
 	if (diablo_is_empty(changed_good) && angular.isUndefined(image)){
 	    diabloUtilsService.response(
 		false, "修改货品",

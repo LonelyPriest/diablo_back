@@ -395,7 +395,7 @@
 		  </div>
 		  <span class="input-group-btn">
 		    <button class="btn btn-primary"
-			    x-ng-disabled="good.free===0"
+			    x-ng-disabled="disable_select_size()"
 			    x-ng-click="select_size()">
 		      <i class="glyphicon glyphicon-arrow-right"></i>
 		    </button> 
@@ -680,7 +680,7 @@
 		<input id={{s.id}}
 		       type="checkbox"
 		       x-ng-disabled="s.disabled"
-		       x-ng-model="s.select"></input>
+		       x-ng-model="s.select"/>
 		<label for={{s.id}}>{{s.name}}</label>
 	      </div>
 	    </td>
@@ -705,7 +705,9 @@
 	  <tr class="text-center" x-ng-repeat="g in params.groups">
 	    <td class="vert-align">
 	      <div class="checkbox checkbox-danger checkbox-circle">
-		<input id={{g.id}} type="checkbox"
+		<input id={{g.id}}
+		       type="checkbox"
+		       x-ng-disabled="g.disabled"
 		       x-ng-model="g.select"
 		       x-ng-click="params.select_group(params.groups, g)"/>
 		<!-- <input id={{g.id}} type="checkbox" -->

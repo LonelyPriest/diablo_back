@@ -365,6 +365,8 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
     Discount       = ?v(<<"discount">>, Attrs),
     
     Colors         = ?v(<<"color">>, Attrs),
+    SizeGroup      = ?v(<<"s_group">>, Attrs),
+    Sizes          = ?v(<<"size">>, Attrs),
     Path           = ?v(<<"path">>, Attrs),
     
     %% Date     = ?utils:current_time(localdate),
@@ -384,7 +386,9 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 	++ ?utils:v(price3, float, P3)
 	++ ?utils:v(price4, float, P4)
 	++ ?utils:v(price5, float, P5)
-	++ ?utils:v(discount, integer, Discount) 
+	++ ?utils:v(discount, integer, Discount)
+	++ ?utils:v(s_group, string, SizeGroup)
+	%% ++ ?utils:v(size, string, Sizes)
 	++ ?utils:v(path, string, Path),
 	%% ++ ?utils:v(change_date, string, DateTime),
 
@@ -392,7 +396,9 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 	++ case ?utils:v(color, string, Colors) of
 	       [] -> [];
 	       U -> U ++ ?utils:v(free, integer, 1)
-	   end ++ ?utils:v(change_date, string, DateTime),
+	   end
+	++ ?utils:v(size, string, Sizes)
+	++ ?utils:v(change_date, string, DateTime),
 
     Sql1 = 
 	"update w_inventory_good set "
@@ -426,7 +432,18 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 	true ->
 	    case UpdateBase of
 		[] ->
+		    %% case ?utils:v(s_group, string, SizeGroup) of
+			%% [] -> 
 		    {reply, ?sql_utils:execute(write, Sql1, GoodId), State};
+			%% USGroup ->
+		    %% 	    Sql01 = 
+		    %% 		[Sql1, "update w_inventory set "
+		    %% 		 ++ ?utils:to_sqls(proplists, comma, USGroup)
+		    %% 		 ++ " where merchant=" ++ ?to_s(Merchant)
+		    %% 		 ++ " and " ++ C(true, OrgStyleNumber, OrgBrand)],
+		    %% 	    {reply, ?sql_utils:execute(
+		    %% 		       transaction, Sql01, GoodId), State}
+		    %% end;
 		_  ->
 		    UpdateInv = UpdateBase
 			++?utils:v(change_date, string, DateTime),
