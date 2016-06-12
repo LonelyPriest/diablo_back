@@ -239,9 +239,8 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
 			?NO ->
 			    ?utils:respond(200, Req, ?succ(new_w_sale, RSN),
 					   [{<<"rsn">>, ?to_b(RSN)}])
-		    end,
-		    ?w_user_profile:update(retailer, Merchant);
-		%% delete draft
+		    end;
+		    %% delete draft
 		%% ?w_sale_draft:delete(wsale_draft, Merchant, Base);
 		{error, Error} ->
 		    ?utils:respond(200, Req, Error)

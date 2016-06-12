@@ -138,9 +138,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	    return $scope.good.free === 0 || select_groups.length >= 2;
 	}
     });
-
     
-
 
     $scope.is_same_good = false;
     
@@ -425,8 +423,9 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 		return g.select;
 	    }).map(function(g){
 		return g.id;
-	    }).toString();
-	    return s_group;
+	    });
+
+	    return s_group.length !== 0 ? s_group.toString() : $scope.src_good.s_group;
 	}();
 
 	update_good.size = function(){
@@ -440,13 +439,15 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	    	    var k = diablo_sizegroup[i];
 	    	    if(g[k] && !in_array(groups, g[k])) groups.push(g[k]);
 		}
-	    }) 
-	    
-	    return groups.toString();
+	    })
+
+	    return groups.length !== 0 ? groups.toString() : $scope.src_good.size;
 	}();
 	
 	console.log(update_good);
 	console.log($scope.src_good);
+
+	// return;
 
 	// get changed
 	var changed_good = {};

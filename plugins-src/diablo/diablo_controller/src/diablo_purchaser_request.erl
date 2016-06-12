@@ -461,7 +461,8 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 
     ExportColor = case ?w_user_profile:get(setting, Merchant, -1, <<"e_color">>) of
 		      {ok, []} -> false;
-		      {ok, _} -> true
+		      {ok, <<"1">>} -> true;
+		      {ok, <<"0">>} -> false
 		  end,
 
     NewConditions = 
@@ -504,8 +505,8 @@ action(Session, Req, {"w_inventory_export"}, Payload) ->
 				csv_head(stock, ExportColor, ExportSizes, DoFun),
 				case ExportColor of
 				    true ->
-					do_write(stock, ExportSizes, Colors,
-						 DoFun, NewTranses);
+					do_write(stock_with_color, ExportSizes, Colors,
+						 DoFun, NewTranses, 0);
 				    false ->
 					do_write(stock, DoFun, NewTranses)
 				end;
@@ -726,7 +727,7 @@ csv_head(stock, _ExportColor = true, Sizes, Do) ->
 		  end ++ "," ++ Acc
 	  end, [], Sizes),
     
-    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,批发价,金额");
+    Do("品牌,款号,类别,颜色," ++ StringSizes ++ "数量,批发价,进价,金额");
 csv_head(stock, _ExportColor = false, _Sizes, Do) ->
     Do("品牌,款号,类别,厂商,数量,进价,金额").
 
@@ -858,18 +859,20 @@ do_write(stock, Do, Count, Amount, Calc, [H|T]) ->
 	
 	
     Do(L),
-    do_write(stock, Do, Count + 1, Amount + Total, Calc + OrgPrice * Total, T).
+    do_write(stock, Do, Count + 1, Amount + Total, Calc + OrgPrice * Total, T);
     
-do_write(stock,  _ExportSizes, _AllColors, _Do, [])->
+do_write(stock_with_color,  _ExportSizes, _AllColors, _Do, [], Total)->
+    ?DEBUG("total ~p", [Total]),
     ok;
-do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) -> 
+do_write(stock_with_color, ExportSizes, AllColors, Do, [{struct, H}|T], Total) ->
     %% ?DEBUG("H ~p", [H]),
     StyleNumber = ?v(<<"style_number">>, H),
     Brand       = ?v(<<"brand">>, H), 
     Type        = ?v(<<"type">>, H),
     %% Color       = color(name, ?v(<<"color_id">>, H), AllColors),
     %% Size        = ?v(<<"size">>, H),
-    PkgPrice    = ?v(<<"pkg_price">>, H), 
+    PkgPrice    = ?v(<<"pkg_price">>, H),
+    OrgPrice    = ?v(<<"org_price">>, H),
     %% Total       = ?v(<<"total">>, H),
 
     Amounts     = ?v(<<"amounts">>, H),
@@ -882,32 +885,34 @@ do_write(stock, ExportSizes, AllColors, Do, [{struct, H}|T]) ->
 	  end, [], ColorIds),
     %% ?DEBUG("sorts ~p", [Sorts]),
 
-    lists:foreach(
-      fun({CId, Counts})-> 
-	      {Total1, Row} =
-		  lists:foldr(
-		    fun(C, {Calc1, Acc1})->
-			    {C + Calc1, case C =:= 0 of
-					    true -> "\"\"" ++ ?d;
-					    false -> ?to_s(C) ++ ?d
-					end ++ Acc1}
-		    end, {0, []}, Counts),
+    NewTotal = 
+	lists:foldl(
+	  fun({CId, Counts}, Acc)-> 
+		  {Total1, Row} =
+		      lists:foldr(
+			fun(C, {Calc1, Acc1})->
+				{C + Calc1, case C =:= 0 of
+						true -> "\"\"" ++ ?d;
+						false -> ?to_s(C) ++ ?d
+					    end ++ Acc1}
+			end, {0, []}, Counts),
 
-	      NewRow = 
-		  "\r\n"
-		  ++ ?to_s(Brand) ++ ?d 
-		  ++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
-		  ++ ?to_s(Type) ++ ?d
-		  ++ color(name, CId, AllColors) ++ ?d
-		  ++ Row
-		  ++ ?to_s(Total1) ++ ?d
-		  ++ ?to_s(PkgPrice) ++ ?d
-		  ++ ?to_s(Total1 * PkgPrice),
+		  NewRow = 
+		      "\r\n"
+		      ++ ?to_s(Brand) ++ ?d 
+		      ++ " \"" ++ string:strip(?to_s(StyleNumber)) ++ "\"" ++ ?d
+		      ++ ?to_s(Type) ++ ?d
+		      ++ color(name, CId, AllColors) ++ ?d
+		      ++ Row
+		      ++ ?to_s(Total1) ++ ?d 
+		      ++ ?to_s(PkgPrice) ++ ?d
+		      ++ ?to_s(OrgPrice) ++ ?d
+		      ++ ?to_s(Total1 * OrgPrice),
 
-	      Do(NewRow)
-      end, Sorts),
-    
-    do_write(stock, ExportSizes, AllColors, Do, T).
+		  Do(NewRow),
+		  Acc + Total1
+	  end, Total, Sorts),
+    do_write(stock_with_color, ExportSizes, AllColors, Do, T, NewTotal).
 
 sort_stock([], _ExportColor, Sorts) ->
     Sorts;
@@ -929,6 +934,7 @@ sort_stock([{Inv}|T], ExportColor=true, Sorts) ->
 	    ColorIds    = [ColorId],
 	    
 	    PkgPrice    = ?v(<<"pkg_price">>, Inv),
+	    OrgPrice    = ?v(<<"org_price">>, Inv),
 
 	    Amounts = [{struct, [{<<"cid">>, ColorId},
 				 {<<"size">>, Size},
@@ -940,6 +946,7 @@ sort_stock([{Inv}|T], ExportColor=true, Sorts) ->
 			       {<<"brand">>, Brand},
 			       {<<"type">>,  Type},
 			       {<<"pkg_price">>, PkgPrice},
+			       {<<"org_price">>, OrgPrice},
 			       {<<"color_ids">>, ColorIds},
 			       {<<"amounts">>,    Amounts}]},
 	    %% ?DEBUG("new inv ~p", [NewInv]),
@@ -975,8 +982,7 @@ combine_inventory(Inv, [{struct, H}|T], Combines) ->
 	    ColorId = ?v(<<"color_id">>, Inv),
 	    Size    = ?v(<<"size">>, Inv),
 	    Count   = ?v(<<"total">>, Inv),
-
-
+	    
 	    ColorIds = ?v(<<"color_ids">>, H), 
 	    NewColorIds = case lists:member(ColorId, ColorIds) of
 			      true -> ColorIds;
@@ -1020,6 +1026,7 @@ combine_inventory(Inv, [{struct, H}|T], Combines) ->
 			 {<<"brand">>,      ?v(<<"brand">>, H)},
 			 {<<"type">>,       ?v(<<"type">>, H)},
 			 {<<"pkg_price">>,  ?v(<<"pkg_price">>, H)},
+			 {<<"org_price">>,  ?v(<<"org_price">>, H)},
 			 {<<"color_ids">>,  NewColorIds},
 			 {<<"amounts">> ,   NewAmounts}]}|Combines]);
 	false ->

@@ -690,7 +690,7 @@ rightUserApp.controller("accountUserDetailCtrl", function(
 	    promise(rightService.list_shop)(),
 	    promise(rightService.list_firm)(),
 	    promise(rightService.list_employee)(),
-	    promise(rightService.list_retailer)(),
+	    promise(rightService.list_retailer)()
 	]).then(function(data){
 	    console.log(data);
 	    // $scope.accounts = data[0];

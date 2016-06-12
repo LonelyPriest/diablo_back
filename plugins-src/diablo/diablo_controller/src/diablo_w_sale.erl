@@ -212,6 +212,7 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 
 	    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
 	    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
+	    ?w_user_profile:update(retailer, Merchant),
 	    {reply, Reply, State}; 
 	Error ->
 	    {reply, Error, State}

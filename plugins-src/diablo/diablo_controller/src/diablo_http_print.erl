@@ -184,7 +184,7 @@ call(Parent, {print, RSN, Merchant}) ->
 			FindBrand -> ?v(<<"name">>, FindBrand)
 		    end
 	    end,
-
+	
 	{SortInvs, STotal, RTotal} = sort_inventory(
 					Merchant, GetBrand, NewDetails, [], 0, 0),
 	%% ?DEBUG("sorts ~p", [SortInvs]),
@@ -488,19 +488,21 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     Fields     = detail(print_format, Merchant, Shop),
     PrintModel = ?to_i(?v(<<"pformat">>, Setting, ?COLUMN)),
     PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
-    ?DEBUG("PrintModel ~p, PrintTable ~p", [PrintModel, PrintTable]),
+
+    %% ?DEBUG("PrintModel ~p, PrintTable ~p", [PrintModel, PrintTable]),
 
     Len2total = field_len(Fields, <<"count">>, PrintModel, 0),
-    ?DEBUG("Len2total ~p", [Len2total]),
+    %% ?DEBUG("Len2total ~p", [Len2total]),
 
     Len2calc = field_len(Fields, <<"calc">>, PrintModel, 0),
-    ?DEBUG("Len2calc ~p", [Len2calc]),
+    %% ?DEBUG("Len2calc ~p", [Len2calc]),
 
-    Len2comment = field_len(Fields, <<"comment">>, PrintModel, 0),
-    ?DEBUG("Len2comment ~p", [Len2comment]),
+    %% Len2comment = field_len(Fields, <<"comment">>, PrintModel, 0),
+    %% ?DEBUG("Len2comment ~p", [Len2comment]),
     
     {IsHand, _}      = field(hand, Fields),
     {IsSizeName, _}  = field(size_name, Fields),
+    {IsSize, _}      = field(size, Fields),
     
     {ok, SizeGroups} = 
 	case IsHand orelse IsSizeName orelse PrintModel =:= ?ROW of
@@ -974,6 +976,15 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
 	      end ++ Acc 
       end, [], Fields).
 
+%% combin_inv_amount(with_color, [Amount|T], NewAmounts) ->
+%%     Color = ?v(<<"cid">>, Amount),
+%%     lists:foldr(
+%%       fun({struct, A}, Acc) ->
+%% 	      case Color =:= ?v(<<"cid">>, A) of
+%% 		  true ->
+%% 		      NewAmoo
+%%       end, [], NewAmounts)
+    
 
 title(_Brand, _Model, 33, Title) ->
     T = "<CB>" ++ ?to_s(Title) ++ "</CB><BR>", 
@@ -2149,8 +2160,7 @@ in_sort(Inv, [{struct, H}|T]) ->
 	    in_sort(Inv, T)
     end.
 
-combine_inventory(_Merchant, _GetBrand, _Inv, [],
-		  Combines, STotal, RTotal) ->
+combine_inventory(_Merchant, _GetBrand, _Inv, [], Combines, STotal, RTotal) ->
     {Combines, STotal, RTotal};
 combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
 		  Combines, STotal, RTotal) ->
@@ -2230,11 +2240,10 @@ get_color(ColorId, [{struct, H}|T]) ->
 	    get_color(ColorId, T)
     end.
 
-
 phone(Phone, []) ->
     ?to_s(Phone);
 phone(Phone, <<>>) ->
     ?to_s(Phone);
 phone(Phone, Remark) ->
-    ?DEBUG("remark ~p", [Remark] ),
+    %% ?DEBUG("remark ~p", [Remark] ),
     ?to_s(Phone) ++ "（" ++ ?to_s(Remark) ++ "）".
