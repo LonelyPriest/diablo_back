@@ -632,7 +632,9 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    diabloUtilsService.response(
 		false, "销售单编辑", "销售单编辑失败：" + wsaleService.error[2192]);
 	    return;
-	}; 
+	};
+
+	$scope.re_calculate();
 
 	var updates = get_update_inventory();
 	// console.log(updates);

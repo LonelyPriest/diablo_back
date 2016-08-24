@@ -745,7 +745,9 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		false, "销售开单", "开单失败：" + wsaleService.error[2192]);
 	    return;
 	};
-	
+
+	// recalculate
+	$scope.re_calculate();
 	var get_sales = function(amounts){
 	    var sale_amounts = [];
 	    var batch = [];
@@ -834,6 +836,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	// console.log(im_print);
 	var base = {
 	    sort:           $scope.setting.r_snumber,
+	    round:          $scope.setting.round,
 	    retailer:       $scope.select.retailer.id,
 	    shop:           $scope.select.shop.id,
 	    datetime:       dateFilter($scope.select.date, "yyyy-MM-dd HH:mm:ss"),
@@ -1527,18 +1530,23 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	if (inv.$new && inv.free_color_size){
 	    return;
 	};
-	
+
 	if (angular.isUndefined(inv.fprice)
 	    || inv.fprice === 0){
 	    return;
-	} 
+	}
 
 	$timeout.cancel($scope.timeout_auto_save);
 	$scope.timeout_auto_save = $timeout(function(){
 	    // console.log(inv); 
 	    // if (inv.$new && inv.free_color_size){
 	    // 	$scope.add_free_inventory(inv);
-	    // }; 
+	    // };
+	    if (angular.isUndefined(inv.fprice)
+		|| inv.fprice === 0){
+		$timeout.cancel($scope.timeout_auto_save);
+		return;
+	    } 
 
 	    if (!inv.$new && inv.free_update){
 		$scope.save_free_update(inv); 

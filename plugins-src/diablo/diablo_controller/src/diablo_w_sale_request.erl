@@ -218,11 +218,14 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
 		 ?YES -> sort_inventory(onsale, Invs, []);
 		 ?NO  -> Invs
 	     end,
+
+    ShouldPay = ?v(<<"should_pay">>, Base),
+    Round = ?v(<<"round">>, Base),
     
     %% ?DEBUG("NewInvs ~p", [NewInvs]), 
     %% check invs
-    case check_inventory(oncheck, NewInvs) of
-	{ok, _} -> 
+    case check_inventory(oncheck, Round, 0, ShouldPay, NewInvs) of
+	{ok, _} ->
 	    case ?w_sale:sale(new, Merchant, NewInvs, Base) of 
 		{ok, RSN} ->
 		    case ImmediatelyPrint of
@@ -252,7 +255,12 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
 	       Req,
 	       ?err(wsale_invalid_inv, StyleNumber),
 	       [{<<"style_number">>, StyleNumber},
-		{<<"order_id">>, ?v(<<"order_id">>, EInv)}])
+		{<<"order_id">>, ?v(<<"order_id">>, EInv)}]);
+	{error, Moneny, ShouldPay} ->
+	    ?utils:respond(
+	       200,
+	       Req,
+	       ?err(wsale_invalid_pay, Moneny))
     end;
 
 action(Session, Req, {"update_w_sale"}, Payload) ->
@@ -261,7 +269,7 @@ action(Session, Req, {"update_w_sale"}, Payload) ->
     Merchant = ?session:get(merchant, Session),
     Invs            = ?v(<<"inventory">>, Payload, []),
     {struct, Base}  = ?v(<<"base">>, Payload),
-
+    
     case ?w_sale:sale(update, Merchant, lists:reverse(Invs), Base) of
     	{ok, RSN} -> 
     	    ?utils:respond(
@@ -860,19 +868,29 @@ sort_amount(onsale, Amount, [{struct, Sorted}|T], Acc) ->
 	    sort_amount(onsale, Amount, T, [{struct, Sorted}|Acc])
     end.
 
-check_inventory(oncheck, []) ->
-    {ok, none};
-check_inventory(oncheck, [{struct, Inv}|T]) ->
-    Amounts = ?v(<<"amounts">>, Inv),
-
+check_inventory(oncheck, _Round, Moneny, ShouldPay, []) ->
+    ?DEBUG("Moneny ~p, ShouldPay, ~p", [Moneny, ShouldPay]),
+    case round(Moneny) == ShouldPay of
+	true -> {ok, none};
+	false -> {error, round(Moneny), ShouldPay}
+    end;
+check_inventory(oncheck, Round, Money, ShouldPay, [{struct, Inv}|T]) ->
+    Amounts = ?v(<<"amounts">>, Inv), 
     Count = ?v(<<"sell_total">>, Inv),
     DCount = lists:foldr(
 	      fun({struct, A}, Acc)->
 		      ?v(<<"sell_count">>, A) + Acc
 	      end, 0, Amounts),
-
+    
+    FDiscount = ?v(<<"fdiscount">>, Inv),
+    FPrice = ?v(<<"fprice">>, Inv),
+    Calc = case Round of
+	       1 -> round(FDiscount * FPrice * Count / 100);
+	       0 -> FDiscount * FPrice * Count / 100
+	   end,
+    
     case Count =:= DCount of
-	true -> check_inventory(oncheck, T); 
+	true -> check_inventory(oncheck, Round, Money + Calc, ShouldPay, T); 
 	false -> {error, Inv}
     end.
 	    

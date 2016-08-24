@@ -349,6 +349,8 @@ error(wsale_export_no_date, Merchant) ->
     {2702, "no date to export of merchant: " ++ ?to_s(Merchant)};
 error(wsale_invalid_inv, StyleNumber) ->
     {2703, "error style number " ++ ?to_s(StyleNumber) ++ "."};
+error(wsale_invalid_pay, Pay) ->
+    {2704, "error should pay " ++ ?to_s(Pay) ++ "."};
 
 %% about print
 error(invalid_sn, PrintSN) ->

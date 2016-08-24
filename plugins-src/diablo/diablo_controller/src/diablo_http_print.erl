@@ -502,7 +502,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     
     {IsHand, _}      = field(hand, Fields),
     {IsSizeName, _}  = field(size_name, Fields),
-    {IsSize, _}      = field(size, Fields),
+    %% {IsSize, _}      = field(size, Fields),
     
     {ok, SizeGroups} = 
 	case IsHand orelse IsSizeName orelse PrintModel =:= ?ROW of
@@ -1408,8 +1408,9 @@ body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 	++ "打印日期：" ++ ?utils:current_time(format_localtime).
 
 body_foot(format_default, Brand, Model, Column, Banks, Mobile, Phones) ->
+    ?DEBUG("banks ~p", [Banks]),
     {SBank, _} = 
-	lists:foldr(
+	lists:foldl(
 	  fun({Bank}, {S, L}) ->
 		  N  = ?v(<<"name">>, Bank),
 		  B  = ?v(<<"bank">>, Bank),
