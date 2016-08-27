@@ -886,7 +886,8 @@ check_inventory(oncheck, Round, Money, ShouldPay, [{struct, Inv}|T]) ->
     FPrice = ?v(<<"fprice">>, Inv),
     Calc = case Round of
 	       1 -> round(FDiscount * FPrice * Count / 100);
-	       0 -> FDiscount * FPrice * Count / 100
+	       0 -> FDiscount * FPrice * Count / 100;
+	       undefined -> FDiscount * FPrice * Count / 100
 	   end,
     
     case Count =:= DCount of

@@ -1,6 +1,11 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-08-25",
+	 content: [
+	     "加强应付款项的校验，避免出现应付款项不一致的情况"]
+	},
+	
 	{date: "2016-05-03",
 	 content: [
 	     "尺码组可以在原来的基础上动态增加一组，均色均码不支持",

@@ -111,7 +111,7 @@ wgoodApp.service("wgoodService", function($resource, $http, dateFilter){
 	    angular.forEach(size_groups, function(g){
 		if (parseInt(id) === g.id){
 		    angular.forEach(diablo_sizegroup, function(sname){
-			if (g[sname]){
+			if (g[sname] && !in_array(gnames, g[sname])){
 			    gnames.push(g[sname]);
 			}
 		    })

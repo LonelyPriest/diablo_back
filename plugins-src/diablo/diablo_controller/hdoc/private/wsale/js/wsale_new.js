@@ -1097,7 +1097,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
 	$scope.select.should_pay = $scope.round($scope.select.should_pay);
 
-	if ($scope.setting.auto_cash){
+	if ($scope.setting.auto_cash &&!$scope.has_saved) {
 	    $scope.select.cash = $scope.select.should_pay; 
 	}
 	
@@ -1359,8 +1359,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 			after_add();
 		    };
 		    
-		    var modal_size = diablo_valid_dialog(inv.sizes);
-		    var large_size = modal_size === 'lg' ? true : false;
+		    // var modal_size = diablo_valid_dialog(inv.sizes);
+		    // var large_size = modal_size === 'lg' ? true : false;
 		    var payload = {
 			// last_discount:  inv.last_discount,
 			// last_fprice:    inv.last_fprice,
@@ -1369,7 +1369,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 			fdiscount:      inv.fdiscount,
 			fprice:         inv.fprice,
 			sizes:          inv.sizes,
-			large_size:     large_size,
+			large_size:     true,
 			colors:         inv.colors,
 			amounts:        inv.amounts,
 			path:           inv.path,
@@ -1381,7 +1381,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
 		    $scope.params = angular.copy(payload);
 		    diabloUtilsService.edit_with_modal(
-			"wsale-new.html", modal_size, callback, $scope, payload); 
+			"wsale-new.html", 'lg', callback, $scope, payload); 
 		}; 
 	    });
 	} 
@@ -1457,8 +1457,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    $scope.re_calculate(); 
 	};
 
-	var modal_size = diablo_valid_dialog(inv.sizes);
-	var large_size = modal_size === 'lg' ? true : false;
+	// var modal_size = diablo_valid_dialog(inv.sizes);
+	// var large_size = modal_size === 'lg' ? true : false;
 	
 	var payload = {sell_styles:  $scope.sell_styles,
 		       sell_style:   $scope.get_sell_style(inv.sell_style.id),
@@ -1466,7 +1466,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		       fdiscount:    inv.fdiscount,
 		       fprice:       inv.fprice,
 		       sizes:        inv.sizes,
-		       large_size:   large_size,
+		       large_size:   true,
 		       colors:       inv.colors, 
 		       amounts:      inv.amounts,
 		       path:         inv.path,
@@ -1477,7 +1477,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		       valid_sell:   valid_sell,
 		       valid:        valid_all_sell}; 
 	diabloUtilsService.edit_with_modal(
-	    "wsale-new.html", modal_size, callback, $scope, payload)
+	    "wsale-new.html", 'lg', callback, $scope, payload)
     };
 
     $scope.save_free_update = function(inv){

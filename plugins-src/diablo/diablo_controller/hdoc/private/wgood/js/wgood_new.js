@@ -360,7 +360,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	}; 
 	
 	diabloUtilsService.edit_with_modal(
-	    "select-color.html", undefined,
+	    "select-color.html", 'lg',
 	    callback, $scope, {colors:$scope.colors}, true);
     }; 
 

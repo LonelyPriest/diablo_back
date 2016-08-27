@@ -800,7 +800,7 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 		       get_amount: get_amount,
 		       valid_amount: valid_amount};
 	diabloUtilsService.edit_with_modal(
-	    "inventory-new.html", undefined, callback, $scope, payload)
+	    "inventory-new.html", 'lg', callback, undefined, payload)
     };
 
     $scope.save_update = function(inv){
