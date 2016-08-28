@@ -34,8 +34,10 @@ sale(new_by_retailer, Merchant, Conditions) ->
     ?DEBUG("new_by_retailer with merchant ~p, conditions ~p",
 	   [Merchant, Conditions]), 
     %% 0: has_pay > 0 
-    SortConditions = ?w_sale:sort_condition(
-			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]),
+    %% SortConditions = ?w_sale:sort_condition(
+    %% 			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]),
+
+    SortConditions = ?w_sale:sort_condition(wsale, Merchant, Conditions),
     
     %% {StartTime, EndTime, NewConditions} = 
     %% 	?sql_utils:cut(fields_no_prifix, Conditions), 

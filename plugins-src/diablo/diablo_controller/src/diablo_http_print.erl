@@ -23,7 +23,7 @@
 -export([print/4, print/2, call/2, get_printer/2]).
 
 -export([server/1,
-	 title/4, address/5, head/7, head/8,  body_head/6,
+	 title/4, address/5, head/8,  body_head/6,
 	 row/2, body_foot/7, body_foot/8, detail/2, detail/3,
 	 start_print/8, start_print/5,
 	 multi_print/1, get_printer_state/4, multi_send/5]).
@@ -483,6 +483,55 @@ print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S) ->
     	%% ++ body_foot(PBrand, Model, 33, Banks, Mobile, Setting),
 
     Content;
+
+
+print_content(_ShopId, <<"feie">>=PBrand, <<"HOT80">>=Model, 48, Merchant, _Setting, Invs, _T, _S) ->
+    ?DEBUG("==== invs ~p", [Invs]), 
+    TFun = fun(Amounts) ->
+		   lists:foldr(
+		     fun({struct, A}, Acc) ->
+			     case ?w_sale:direct(?v(<<"direct">>, A)) of
+				 wreject ->
+				     ?v(<<"reject_count">>, A) + Acc;
+				 _ ->
+				     ?v(<<"sell_count">>, A) + Acc
+			     end
+		     end, 0, Amounts)
+	   end,
+
+    %% body_head(Merchant, PBrand, Model, 48)
+    {_, Content} = lists:foldl(
+		     fun({struct, Inv}, {Seq, Acc0})->
+			     Amounts     = ?v(<<"amounts">>, Inv), 
+			     StyleNumber = ?v(<<"style_number">>, Inv),
+			     Brand       = ?v(<<"brand_name">>, Inv),
+			     Type        = ?v(<<"type_name">>, Inv),
+			     FPrice      = ?v(<<"fprice">>, Inv),
+			     FDiscount   = ?v(<<"fdiscount">>, Inv),
+			     SellTotal   = TFun(Amounts),
+			     Comment     = ?v(<<"comment">>, Inv, []),
+			     Calc        = FDiscount * FPrice * SellTotal / 100,
+
+			     CleanFPrice = clean_zero(FPrice),
+			     CleanCalc = clean_zero(Calc),
+
+			     {Seq + 1,
+
+			      Acc0
+			      ++ ?to_s(Seq) ++ pading(6 - length(?to_s(Seq)))
+			      ++ ?to_s(StyleNumber) ++ "/" ++ ?to_s(Brand) ++ "/" ++ ?to_s(Type)
+			      ++ br(PBrand)
+			      ++ pading(20)
+			      ++ ?to_s(SellTotal) ++ pading(6 - length(?to_s(SellTotal)))
+			      ++ ?to_s(CleanFPrice) ++ pading(6 - length(?to_s(CleanFPrice)))
+			      ++ ?to_s(CleanCalc) ++ pading(6 - length(?to_s(CleanCalc)))
+			      ++ ?to_s(Comment) ++ br(Brand)} 
+		     end, {1, []}, Invs),
+
+    %% ++ body_stastic(PBrand, Model, 33, Attrs) 
+    %% ++ body_foot(PBrand, Model, 33, Banks, Mobile, Setting),
+    ?DEBUG("content ~p", [Content]),
+    body_head(Merchant, PBrand, Model, 48) ++ Content;
     
 print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay) -> 
     Fields     = detail(print_format, Merchant, Shop),
@@ -986,10 +1035,8 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
 %%       end, [], NewAmounts)
     
 
-title(_Brand, _Model, 33, Title) ->
-    T = "<CB>" ++ ?to_s(Title) ++ "</CB><BR>", 
-    %% ?DEBUG("title ~ts", [?to_b(T)]),
-    T;
+title(<<"feie">> = _Brand, _Model, _Column, Title) ->
+    "<CB>" ++ ?to_s(Title) ++ "</CB><BR>";
 
 title(Brand, Model, Column, Title) ->
     ?DEBUG("title ~ts", [?to_b(Title)]),
@@ -1007,7 +1054,8 @@ title(Brand, Model, Column, Title) ->
 
 %% address
 
-address(_Brand, _Model, 33, Address, _Setting) ->
+address(<<"feie">> = _Brand, _Model, _Column, Address, _Setting) ->
+    ?DEBUG("address:brand ~p, Model ~p", [_Brand, _Model]),
     "<CB>" ++ ?to_s(Address) ++ "</CB><BR>";
 
 address(Brand, Model, Column, Address, Setting) ->
@@ -1034,7 +1082,7 @@ address(Brand, Model, Column, Address, Setting) ->
 	++ ?f_print:br(Brand).
 
 
-head(<<"feie">> = Brand, <<"PIN76">> = Model, 33, RSN, Retailer, Employee, Date) ->
+head(<<"feie">> = Brand, <<"PIN76">> = Model, 33, RSN, _PRetailer, Retailer, Employee, Date) ->
     ?DEBUG("feie head brand ~p", [Brand]),
     "单号：" ++ ?to_s(RSN)
 	++ case 5 + length(?to_s(RSN)) + 17 =< 33 of
@@ -1050,9 +1098,21 @@ head(<<"feie">> = Brand, <<"PIN76">> = Model, 33, RSN, Retailer, Employee, Date)
 	       true -> ?f_print:pading(2);
 	       false -> ?f_print:br(Brand)
 	   end 
-	++ "店员：" ++ ?to_s(Employee) ++ ?f_print:br(Brand).
+	++ "店员：" ++ ?to_s(Employee) ++ ?f_print:br(Brand);
+
+head(<<"feie">> = Brand, <<"HOT80">> = _Model, 48, RSN, _PRetailer, Retailer, Employee, Date) ->
+    RetailerName = ?v(<<"name">>, Retailer, []),
+    "单号：" ++ ?to_s(RSN)
+	++ pading(48 - (6 + length(?to_s(RSN))) - (6 + width(chinese, Employee)))
+	++ "店员：" ++ ?to_s(Employee)
+	++ br(Brand)
+
+	++ "客户：" ++ ?to_s(RetailerName) 
+	++ pading(48 - (6 + width(chinese, RetailerName)) - (6 + length(?to_s(Date))))
+	++ "日期：" ++ ?to_s(Date) ++ ?f_print:br(Brand);
     
-head(Brand, Model, 106, RSN, PRetailer, Retailer, Employee, Date) -> 
+head(Brand, Model, 106, RSN, PRetailer, Retailer, Employee, Date) ->
+    ?DEBUG("employee ~p", [Employee]),
     RetailerName = ?v(<<"name">>, Retailer, []),
     ?f_print:left_pading(Brand, Model)
 	++ "单号：" ++ ?to_s(RSN) ++ ?f_print:pading(4)
@@ -1078,8 +1138,8 @@ head(Brand, Model, 106, RSN, PRetailer, Retailer, Employee, Date) ->
 	   end;
 
 
-
 head(Brand, Model, Column, RSN, PRetailer, Retailer, Employee, Date) ->
+    ?DEBUG("employee ~p", [Employee]),
     RetailerName = ?v(<<"name">>, Retailer, []),
     ?f_print:left_pading(Brand, Model)
 	++ "单号：" ++ ?to_s(RSN)
@@ -1105,8 +1165,16 @@ body_head(_Merchant, Brand, Model, 33) ->
 	++ "款号" ++ ?f_print:pading(14 - 4)
 	++ "单价" ++ ?f_print:pading(6 - 4)
 	++ "数量" ++ ?f_print:pading(6 - 4)
-	++ "小计" ++ ?f_print:br(Brand).
+	++ "小计" ++ ?f_print:br(Brand);
 
+body_head(_Merchant, <<"feie">>=Brand, <<"HOT80">>=_Model, 48) ->
+    "序号" ++ pading(2)
+	++ "款号" ++ pading(10)
+	++ "数量" ++ pading(2)
+	++ "单价" ++ pading(2)
+	++ "小计" ++ pading(2)
+	++ "备注"
+	++ br(Brand).
 
 body_head(?TABLE, ?COLUMN, Brand, Model, Fields) ->
     [{FName, _, _}|_T] = Fields,
@@ -1218,6 +1286,46 @@ body_stastic(Brand, Model, 33, _Setting, Attrs) ->
 	
 	++ ?f_print:left_pading(Brand, Model) ++ "累计欠款：" ++ ?to_s(AccDet) 
 	++ ?f_print:br(Brand);
+
+body_stastic(<<"feie">>=Brand, <<"HOT80">>=_Model, 48, _Setting, Attrs) ->
+    LastBalance  = ?v(<<"balance">>, Attrs), 
+    Cash         = ?v(<<"cash">>, Attrs, 0),
+    Card         = ?v(<<"card">>, Attrs, 0),
+    Wire         = ?v(<<"wire">>, Attrs, 0),
+    VerifyPay    = ?v(<<"verificate">>, Attrs, 0),
+    ShouldPay    = ?v(<<"should_pay">>, Attrs, 0),
+    Total        = ?v(<<"total">>, Attrs, 0),
+    Comment      = ?v(<<"comment">>, Attrs, []),
+    Direct       = ?v(<<"direct">>, Attrs),
+    STotal       = ?v(<<"stotal">>, Attrs),
+    RTotal       = ?v(<<"rtotal">>, Attrs),
+    Debt         = ShouldPay - Cash - Card - Wire - VerifyPay,
+
+    {DebtName, AccDet} = debt(Direct, LastBalance, Debt),
+
+    %% pading(20) ++ ?to_s(Total) ++ br(Brand)
+
+    line(minus, 48) ++ br(Brand)
+
+	++ "总计：" ++ "<L>" ++ ?to_s(Total) ++ "</L>"
+	++  "（售：" ++ "<L>" ++ ?to_s(STotal) ++ "</L>" ++ pading(1)
+	++ "退：" ++ "<L>" ++ ?to_s(erlang:abs(RTotal)) ++ "</L>）"
+	++ br(Brand)
+
+	++ "总金额：" ++ "<L>" ++ ?to_s(ShouldPay) ++ "</L>"
+	++ pading(1) ++ "备注：" ++ ?to_s(Comment)
+	++ br(Brand)
+
+	++ line(minus, 48) ++ br(Brand)
+
+	++ "<L>上次欠款：" ++ ?to_s(LastBalance) ++ "</L>"
+	++ br(Brand)
+
+	++ "<L>" ++ DebtName ++ ?to_s(Debt) ++ "</L>"
+	++ br(Brand) 
+
+	++ "<L>累计欠款：" ++ ?to_s(AccDet)  ++ "</L>"
+	++ br(Brand);
 
 body_stastic(Brand, Model, 50, Setting, Attrs) ->
     LastBalance  = ?v(<<"balance">>, Attrs, 0), 

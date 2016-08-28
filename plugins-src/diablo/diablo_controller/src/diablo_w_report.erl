@@ -77,8 +77,9 @@ handle_call({total, by_shop, Merchant, Conditions}, _From, State) ->
 
 handle_call({total, by_retailer, Merchant, Conditions}, _From, State) ->
     %% 0: has_pay > 0
-    SortConditions = ?w_sale:sort_condition(
-			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]),
+    %% SortConditions = ?w_sale:sort_condition(
+    %% 			wsale, Merchant, [{<<"has_pay">>, 0}|Conditions]), 
+    SortConditions = ?w_sale:sort_condition(wsale, Merchant, Conditions),
     
     CountSql = "select count(distinct shop, merchant, retailer) as total" 
 	", sum(cash) as t_cash"

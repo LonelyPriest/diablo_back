@@ -67,7 +67,7 @@ wprintApp.service("wprintService", function($resource, dateFilter){
 			   {chinese:"映美",   name:"jolimark"},
 			   {chinese:"飞鹅",   name:"feie"}];
 
-    this.paper_columns  = [33, 50, 80, 106];
+    this.paper_columns  = [33, 48, 50, 80, 106];
     this.paper_heights  = [0, 14, 28];
     
     this.print_status = [{cname:"启动", value: 0},

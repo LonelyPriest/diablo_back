@@ -131,7 +131,7 @@ wreportApp.controller("wreportDailyCtrl", function(
 		    wreportService.daily_bill(
 			search
 		    ).then(function(result){
-			console.log(result);
+			// console.log(result);
 			if (result.ecode === 0){
 			    $scope.old_bill.t_bill = 0;
 			    $scope.old_bill.cash   = 0;
@@ -164,8 +164,8 @@ wreportApp.controller("wreportDailyCtrl", function(
 
 			    diablo_order($scope.new_bill.bill);
 			    diablo_order($scope.old_bill.bill);
-			    console.log($scope.new_bill);
-			    console.log($scope.old_bill);
+			    // console.log($scope.new_bill);
+			    // console.log($scope.old_bill);
 			}
 		    })
 		});
@@ -265,7 +265,7 @@ wreportApp.controller("dailyByRetailer", function(
 	    wreportService.daily_report(
 		"by_retailer", search, $scope.r_pagination.items_perpage, page
 	    ).then(function(result){
-		console.log(result); 
+		// console.log(result); 
 		// var report_data = angular.copy(result.data);
 
 		if (page === 1){
