@@ -25,7 +25,7 @@
 -export([server/1,
 	 title/4, address/5, head/8,  body_head/6,
 	 row/2, body_foot/7, body_foot/8, detail/2, detail/3,
-	 start_print/8, start_print/5,
+	 start_print/8, start_print/6,
 	 multi_print/1, get_printer_state/4, multi_send/5]).
 
 -import(?f_print,
@@ -400,8 +400,9 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 					  rcloud, Brand, Model, Height,
 					  SN, Key, Path, DBody);
 				   () when Server =:= fcloud ->
+					PNum = ?to_i(?v(<<"pum">>, Setting, 1)),
 					start_print(
-					  fcloud, SN, Key, Path, Content) 
+					  fcloud, SN, Key, Path, PNum, Content) 
 				end}|Acc] 
 		  end, [], VPrinters),
 		%% PrintInfo -> 
@@ -1707,15 +1708,16 @@ combine_with_size([{struct, Inv}|T], Combined) ->
     end.
 	    
 
-start_print(fcloud, SN, Key, Path, Body) ->
-    ?DEBUG("fcloud with sn ~p, key ~p, path ~p, body~n~ts",
-	   [SN, Key, Path, ?to_b(Body)]),
+start_print(fcloud, SN, Key, Path, PNum, Body) ->
+    ?DEBUG("fcloud with sn ~p, key ~p, path ~p, pnum ~p, body~n~ts",
+	   [SN, Key, Path, PNum, ?to_b(Body)]),
     
     UTF8Body = unicode:characters_to_list(?to_s(Body), utf8),
     
     FormatBody = lists:concat(["sn=", ?to_s(SN),
 			       "&key=", ?to_s(Key),
-			       "&printContent=", ?to_s(UTF8Body)]),
+			       "&printContent=", ?to_s(UTF8Body),
+			       "&times=", ?to_s(PNum)]),
 
     %% ?DEBUG("format body ~ts", [?to_b(FormatBody)]),
 
