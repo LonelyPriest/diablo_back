@@ -195,8 +195,9 @@ start(with_new_session, UserDetail) ->
     CookieData = mochiweb_session:generate_session_data(
 		   3600 * 12, SessionId, fun(A) -> A end, ?QZG_DY_SESSION),
 
-    Cookie = mochiweb_cookies:cookie(
-    	       ?QZG_DY_SESSION, CookieData, [{max_age, 3600 * 24 * 2}]),
+    Cookie = mochiweb_cookies:cookie(?QZG_DY_SESSION, CookieData, [{path, "/"}]),
+    %% Cookie = mochiweb_cookies:cookie(
+    %% 	       ?QZG_DY_SESSION, CookieData, [{max_age, 3600 * 24 * 2}]),
 
     %% Cookie = mochiweb_cookies:cookie(
     %% 	       ?QZG_DY_SESSION, CookieData, [{max_age, -1}]),

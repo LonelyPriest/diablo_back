@@ -23,7 +23,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 		      round:diablo_round_record};
 
     $scope.pattern = {reject:diabloPattern.positive_num,
-		      price:diabloPattern.positive_decimal_2};
+		      price:diabloPattern.positive_decimal_2,
+		      decimal_2: diabloPattern.decimal_2};
 
     $scope.sell_styles = diablo_sell_style;
     $scope.disable_refresh = true;
@@ -361,7 +362,8 @@ wsaleApp.controller("wsaleRejectCtrl", function(
     
     $scope.save_inventory = function(){
 	$scope.has_saved = true;
-	console.log($scope.inventories);
+	// console.log($scope.inventories); 
+	$scope.re_calculate();
 	
 	var get_sales = function(amounts){
 	    var sale_amounts = [];
@@ -373,8 +375,7 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 			reject_count: parseInt(amounts[i].reject_count),
 			direct: wsaleService.direct.wreject}); 
 		}
-	    }
-
+	    } 
 	    return sale_amounts;
 	};
 	
