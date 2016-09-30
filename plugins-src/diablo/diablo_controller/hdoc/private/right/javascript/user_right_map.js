@@ -37,5 +37,9 @@ var rightAuthen = {
 
     export_stock: function(userType) {
 	return userType === rightAuthen.account._master ? true:false;
+    },
+
+    master: function(userType) {
+	return userType === rightAuthen.account._master ? true:false;
     }
 };

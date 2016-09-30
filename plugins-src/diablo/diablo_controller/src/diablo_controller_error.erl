@@ -120,6 +120,10 @@ success(update_w_inventory, RSN) ->
     {0, "Success to update purchaser inventory with rsn " ++ ?to_s(RSN)};
 success(check_w_inventory, RSN) ->
     {0, "Success to check purchaser inventory with rsn " ++ ?to_s(RSN)};
+success(check_w_inventory_all, Merchant) ->
+    {0, "Success to check all purchaser inventory of merchant " ++ ?to_s(Merchant)};
+success(uncheck_w_inventory, RSN) ->
+    {0, "Success to uncheck purchaser inventory with rsn " ++ ?to_s(RSN)};
 success(check_w_inventory_transfer, RSN) ->
     {0, "Success to check transfer inventory with rsn " ++ ?to_s(RSN)};
 success(reject_w_inventory, Total) ->

@@ -95,6 +95,39 @@ action(Session, Req, {"check_w_inventory"}, Payload) ->
     	    ?utils:respond(200, Req, Error)
     end;
 
+action(Session, Req, {"uncheck_w_inventory"}, Payload) ->
+    ?DEBUG("uncheck_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    RSN = ?v(<<"rsn">>, Payload, []),
+
+    case ?w_inventory:purchaser_inventory(uncheck, Merchant, RSN) of
+    	{ok, RSN} -> 
+    	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(uncheck_w_inventory, RSN), {<<"rsn">>, ?to_b(RSN)});
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+
+action(Session, Req, {"check_w_inventory_all"}, Payload) ->
+    ?DEBUG("check_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    Match = ?v(<<"match">>, Payload),
+    {struct, Conditions} = ?v(<<"condition">>, Payload, []),
+
+    case ?w_inventory:purchaser_inventory(check_all, Merchant, {?to_a(Match), Conditions}) of
+    	{ok, Merchant} -> 
+    	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(check_w_inventory_all, Merchant));
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+
 action(Session, Req, {"filter_w_inventory_new"}, Payload) -> 
     ?DEBUG("filter_w_inventory_new with session ~p, paylaod~n~p",
 	   [Session, Payload]),

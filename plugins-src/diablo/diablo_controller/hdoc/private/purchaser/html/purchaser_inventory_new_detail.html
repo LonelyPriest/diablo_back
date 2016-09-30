@@ -23,10 +23,15 @@
 	  	    x-ng-click="inventory_detail()">库存
 	      <i class="glyphicon glyphicon-book"></i></button>
 
-	    <button type="button"
+	    <button x-ng-if="setting.master"
 		    class="btn blue purple-stripe hidden-xs hidden-sm"
-		  x-ng-click="export_to()">导出
-	    <i class="glyphicon glyphicon-export"></i></button> 
+		    x-ng-click="export_to()">导出
+	    <i class="glyphicon glyphicon-export"></i></button>
+
+	    <button x-ng-if="setting.master"
+		    class="btn red purple-stripe hidden-xs hidden-sm"
+		    x-ng-click="check_all_detail()">全审
+	    <i class="glyphicon glyphicon-check"></i></button> 
 	    
 	    <button type="button" class="btn yellow reload purple-stripe"
 		    x-ng-click="do_search(default_page)">刷新
@@ -188,17 +193,18 @@
 			<i class="glyphicon glyphicon-map-marker"></i>
 		      </button>
 		      
-		      <button class="btn diablo-button yellow"
-		      	      x-ng-disabled="r.state===1
-					     || r.type===2
-					     || r.type===3"
+		      <button x-ng-if="r.state==0" class="btn diablo-button yellow"
 		      	      x-ng-click="update_detail(r)">修改
 		      	<i class="glyphicon glyphicon-edit"></i></button>
 		      
-		      <button class="btn diablo-button red"
-			      x-ng-disabled="r.state===1"
+		      <button x-ng-if="setting.master && r.state===0" class="btn diablo-button red"
 		      	      x-ng-click="check_detail(r)">审核
 		      	<i class="glyphicon glyphicon-check"></i></button>
+
+		      <button x-ng-if="setting.master && r.state===1"
+			      class="btn diablo-button purple-plum"
+		      	      x-ng-click="uncheck_detail(r)">反审
+		      	<i class="glyphicon glyphicon-remove-circle"></i></button>
 
 		      <!-- <button class="btn dark btn-xs red-stripe" -->
 		      <!-- 	      x-ng-disabled="true" -->

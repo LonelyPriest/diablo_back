@@ -64,19 +64,24 @@ action(M, Req, Args, Payload) ->
 
 
 get_session(Req) -> 
-    MSession = Req:get_cookie_value(?QZG_DY_SESSION), 
-    case 
-	mochiweb_session:check_session_cookie(
-	  ?to_b(MSession), 3600 * 12, fun(A) -> A end, ?QZG_DY_SESSION) of
-	{true, [_, SessionId]} -> 
-	    %% every request, refresh session
-	    ?session:refresh(SessionId),
-	    {ok, Session} = ?session:lookup(SessionId),
-	    Session;
-	{false, _} ->
-	    ?INFO("request ~p failed to get session", [Req]),
-	    #session{}
-    end.
+    %% MSession = Req:get_cookie_value(?QZG_DY_SESSION), 
+    %% case 
+    %% 	mochiweb_session:check_session_cookie(
+    %% 	  ?to_b(MSession), 3600 * 12, fun(A) -> A end, ?QZG_DY_SESSION) of
+    %% 	{true, [_, SessionId]} -> 
+    %% 	    %% every request, refresh session
+    %% 	    ?session:refresh(SessionId),
+    %% 	    {ok, Session} = ?session:lookup(SessionId),
+    %% 	    Session;
+    %% 	{false, _} ->
+    %% 	    ?INFO("request ~p failed to get session", [Req]),
+    %% 	    #session{}
+    %% end.
+    ESession = Req:get_cookie_value(?QZG_DY_SESSION),
+    DSession = mochiweb_base64url:decode(ESession),
+    ?session:refresh(DSession),
+    {ok, Session} = ?session:lookup(DSession),
+    Session.
 
 authen(Req, Args, Session, ValidFun) ->
     ?DEBUG("session ~p", [Session]),

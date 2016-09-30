@@ -78,7 +78,9 @@ action(Req, login, Force) ->
 	end,
 
     case UserName of
-	[] -> ?utils:respond(200, Req, ?err(login_no_user, none));
+	[] ->
+	    %% ?utils:respond(200, Req, ?err(login_no_user, none));
+	    LoginResponseFun(?WRONG_USER_PASSWD);
 	UserName ->
 	    case Passwd of
 		[] ->
@@ -192,9 +194,10 @@ start(with_new_session, UserDetail) ->
     %% create a new session
     {ok, SessionId} = ?session:new(UserDetail),
 
-    CookieData = mochiweb_session:generate_session_data(
-		   3600 * 12, SessionId, fun(A) -> A end, ?QZG_DY_SESSION),
-
+    %% CookieData = mochiweb_session:generate_session_data(
+    %% 		   3600 * 12, SessionId, fun(A) -> A end, ?QZG_DY_SESSION),
+    %% UUID = knife_uuid:uuid1(),
+    CookieData = mochiweb_base64url:encode(<<SessionId/binary>>),
     Cookie = mochiweb_cookies:cookie(?QZG_DY_SESSION, CookieData, [{path, "/"}]),
     %% Cookie = mochiweb_cookies:cookie(
     %% 	       ?QZG_DY_SESSION, CookieData, [{max_age, 3600 * 24 * 2}]),

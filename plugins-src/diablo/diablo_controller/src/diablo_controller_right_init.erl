@@ -279,7 +279,13 @@ init([]) ->
 	 {?check_w_inventory_transfer,
 	  <<"库存调入确认">>, <<"check_w_inventory_transfer">>, ?right_w_inventory},
 	 {?cancel_w_inventory_transfer,
-	  <<"库存调入取消">>, <<"cancel_w_inventory_transfer">>, ?right_w_inventory}
+	  <<"库存调入取消">>, <<"cancel_w_inventory_transfer">>, ?right_w_inventory},
+
+	 {?uncheck_w_inventory,
+	  <<"库存反核">>, <<"uncheck_w_inventory">>,  ?right_w_inventory},
+	 
+	 {?check_w_inventory_all,
+	  <<"库存全核">>, <<"check_w_inventory_all">>,  ?right_w_inventory}
 	 
 	 %% {?filter_fix_w_inventory,
 	 %%  <<"盘点详情">>, <<"filter_fix_w_inventory">>, ?right_w_inventory}

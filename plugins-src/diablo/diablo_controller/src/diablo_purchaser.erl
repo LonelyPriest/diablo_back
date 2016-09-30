@@ -104,6 +104,14 @@ purchaser_inventory(list, Merchant, Conditions) ->
 purchaser_inventory(check, Merchant, RSN) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {check_inventory, Merchant, RSN});
+purchaser_inventory(check_all, Merchant, {'and', Conditions}) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {check_inventory_all, Merchant, {'and', Conditions}});
+
+purchaser_inventory(uncheck, Merchant, RSN) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {uncheck_inventory, Merchant, RSN});
+
 purchaser_inventory(check_transfer, Merchant, CheckProps) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(
@@ -1035,6 +1043,34 @@ handle_call({check_inventory, Merchant, RSN}, _From, State) ->
 
     Reply = ?sql_utils:execute(write, Sql, RSN),
     {reply, Reply, State};
+
+handle_call({check_inventory_all, Merchant, {'and', Conditions}}, _From, State) ->
+    ?DEBUG("check_inventory_all with merchant ~p, conditions ~p", [Merchant, Conditions]),
+    {_, C} = ?w_good_sql:filter_condition(inventory_new, Conditions, [], []),
+
+    {StartTime, EndTime, NewConditions}
+	= ?sql_utils:cut(fields_no_prifix, C),
+    
+    Sql = "update w_inventory_new set state=" ++ ?to_s(?CHECKED)
+	++ ", check_date=\'" ++ ?utils:current_time(localtime) ++ "\'"
+	++ " where merchant=" ++ ?to_s(Merchant)
+	++ ?sql_utils:condition(proplists, NewConditions)
+	++ ?sql_utils:fix_condition(time, time_no_prfix, StartTime, EndTime),
+
+    Reply = ?sql_utils:execute(write, Sql, Merchant),
+    {reply, Reply, State};
+
+handle_call({uncheck_inventory, Merchant, RSN}, _From, State) ->
+    ?DEBUG("uncheck_inventory with merchant ~p, RSN ~p", [Merchant, RSN]),
+    Sql = "update w_inventory_new set state=" ++ ?to_s(?CHECKING)
+	++ ", check_date=\'" ++ ?utils:current_time(localtime) ++ "\'"
+	++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'"
+	++ " and merchant=" ++ ?to_s(Merchant),
+
+    Reply = ?sql_utils:execute(write, Sql, RSN),
+    {reply, Reply, State};
+
+
 
 %% reject
 handle_call({reject_inventory, Merchant, Inventories, Props}, _From, State) ->

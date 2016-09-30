@@ -286,6 +286,16 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
 	return http.save({operation: "check_w_inventory"},
 			 {rsn: rsn}).$promise;
     };
+
+    this.uncheck_w_inventory_new = function(rsn){
+	return http.save({operation: "uncheck_w_inventory"},
+			 {rsn: rsn}).$promise;
+    };
+
+    this.check_stock_all = function(match, condition){
+	return http.save({operation: "check_w_inventory_all"},
+			 {match: match.op, condition:condition}).$promise;
+    };
     
     this.filter_purchaser_inventory_group = function(
 	mode, match, fields, currentPage, itemsPerpage

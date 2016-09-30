@@ -24,8 +24,10 @@ var diabloAuthenApp = angular.module('diabloAuthenApp', [], function($provide){
 		// 599 is the customer code of HTTP, means invalid session,
 		// so redirect to login
 		if(response.status === 401
-		   || response.status === 599) {
-		    // console.log(response);
+		   || response.status === 599
+		   || response.status === 580
+		   || response.status === 581) {
+		    console.log(response);
 		    diablo_goto_page("/");
 		    return $q.reject(response);
 		}

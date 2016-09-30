@@ -220,7 +220,9 @@ var diablo_format_year = function(objects){
 };
 
 var diablo_goto_page = function(url){
-    window.location = url;
+    // window.location = url;
+    // window.location.reload(true);
+    window.location.replace(url);
     return;
 };
 

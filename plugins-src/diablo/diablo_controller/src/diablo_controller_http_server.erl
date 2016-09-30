@@ -40,25 +40,33 @@ valid_session(Req) ->
     case Req:get_cookie_value(?QZG_DY_SESSION) of
 	undefined -> %% redirect to login page
 	    {error, no_session};
-	MSession ->
-	    ?DEBUG("MSession ~p", [MSession]),
-	    case 
-		mochiweb_session:check_session_cookie(
-		  ?to_b(MSession), 3600 * 12, fun(A) -> A end, ?QZG_DY_SESSION) of
-		{true, [_, SessionId]} -> 
-		    case ?session:lookup(SessionId) of
-			{ok, []} -> %% session time out or lost
-			    %% ?INFO("invalid session ~p", [SessionId]),
-			    {error, {invalid_session, MSession}};
-			{ok, _} -> %% valid session 
-			    {ok, valid_session}
-		    end;
-		{false, []} ->
-		    {error, {no_session}};
-		{false, [_, SessionId]} ->
-		    ?INFO("failed to check session ~p", [SessionId]),
-		    {error, {invalid_session, MSession}}
-	    end
+	ESession ->
+	    ?DEBUG("MSession ~p", [ESession]),
+	    DSession = mochiweb_base64url:decode(ESession),
+            case ?session:lookup(DSession) of
+                {ok, []} -> %% session time out or lost
+                    ?INFO("invalid session ~p", [DSession]),
+                    {error, {invalid_session, DSession}};
+                {ok, _} -> %% valid session
+                    {ok, valid_session}
+            end
+	    %% case 
+	    %% 	mochiweb_session:check_session_cookie(
+	    %% 	  ?to_b(MSession), 3600 * 12, fun(A) -> A end, ?QZG_DY_SESSION) of
+	    %% 	{true, [_, SessionId]} -> 
+	    %% 	    case ?session:lookup(SessionId) of
+	    %% 		{ok, []} -> %% session time out or lost
+	    %% 		    %% ?INFO("invalid session ~p", [SessionId]),
+	    %% 		    {error, {invalid_session, MSession}};
+	    %% 		{ok, _} -> %% valid session 
+	    %% 		    {ok, valid_session}
+	    %% 	    end;
+	    %% 	{false, []} ->
+	    %% 	    {error, no_session};
+	    %% 	{false, [_, SessionId]} ->
+	    %% 	    ?INFO("failed to check session ~p", [SessionId]),
+	    %% 	    {error, {invalid_session, MSession}}
+	    %% end
     end.	    
 
 dispatch(Req, DocRoot) ->
@@ -190,46 +198,34 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 		%%     %% Function({Method, Req, [["login"]]});
 		%%     ?login_request:action(Req, login);
 		{error, _Error} ->
-		    %% ?INFO("failed to check session of url ~p,"
-		    %% 	  "reseaon ~p, redirect to login...", [Path, Error]),
+		    ?INFO("failed to check session of url ~p,"
+		    	  "reseaon ~p, redirect to login...", [Path, _Error]),
 		    %% {ECode, Error} = ?err(operation_invalid_session, Error),
 		    %% Req:respond({599,
 		    %% 		 [{"Content-Type", "application/json"}],
 		    %% 		 ejson:encode({[{<<"ecode">>, ?to_i(ECode)},
 		    %% 				{<<"einfo">>, ?to_b(Error)}]})})
-		    case length(string:tokens(Path, "/")) of
-			1 ->
-			    case _Error of
-                                no_session ->
-                                    Req:respond(
-                                  {301, [{"Location", "/"},
-                                         {"Content-Type", "text/html; charset=UTF-8"}],
-                                   "Redirecting /"});
-                                {invalid_session, SessionId} ->
-                                    Cookie = mochiweb_cookies:cookie(
-                                               ?QZG_DY_SESSION,
-                                               SessionId,
-                                               [{max_age, 0}, {path, "/"}]),
-                                    Req:respond(
-                                      {301, [{"Location", "/"},
-                                             {"Content-Type", "text/html; charset=UTF-8"}, Cookie],
-                                       "Redirecting /"})
-                            end;
-			
-			%% Req:respond(
-			%%       {301, [{"Location", "/"},
-			%%     	     {"Content-Type",
-			%% 	      "text/html; charset=UTF-8"}],
-			%%        "Redirecting /"});
-			_ ->
-			    Req:respond({599, [{"Content-Type", "text/plain"}],
-					 "request failed, invalid session\n"})
+		    %% case length(string:tokens(Path, "/")) of
+		    %% 	1 ->
+		    case _Error of
+			no_session ->
+			    %% Req:respond({580, [{"Content-Type", "text/plain"}],
+			    %% 		 "request failed, no session\n"});
+			    {ok, HTMLOutput} =
+				login:render(
+				  [{show_error, "true"},
+				   {login_error, "用户会话已被删除，请重新登录！！"}]),
+			    Req:respond({200,
+					 [{"Content-Type", "text/html"}],
+					 HTMLOutput}); 
+			{invalid_session, SessionId} ->
+			    ?DEBUG("invalid session ~p", [SessionId]),
+			    login(invalid_session, Req, SessionId)
 		    end
-		    %% Req:respond(
-		    %%   {301, [{"Location", "/"},
-		    %% 	     {"Content-Type", "text/html; charset=UTF-8"}], "Redirecting /"})
-		    %% ?utils:respond(200, object, Req, {[{<<"ecode">>, 301}]})
-		    %% root(Req)
+		    %% _ ->
+		    %%     Req:respond({599, [{"Content-Type", "text/plain"}],
+		    %% "request failed, invalid session\n"})
+		    %% end 
 	    end;
 	{nomatch, _Method,  "login"} ->
 	    ?login_request:action(Req, login);
@@ -245,3 +241,21 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 	    url_dispatch(Req, T)		
     end.
 
+
+login(invalid_session, Req, SessionId) ->
+    {ok, HTMLOutput} =
+	login:render(
+	  [{show_error, "true"},
+	   {login_error, "用户会话非法，请重新登录！！"}]),
+    try
+	Cookie = mochiweb_cookies:cookie(
+		   ?QZG_DY_SESSION,
+		   SessionId,
+		   [{max_age, 0}]), 
+	Req:respond({200,
+		     [{"Content-Type", "text/html"}, Cookie],
+		     HTMLOutput})
+    catch
+	_:_Error ->
+	    Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput})
+    end.

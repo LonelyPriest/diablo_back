@@ -213,12 +213,16 @@
 -define(filter_fix_w_inventory,      ?right_w_inventory + 12).
 -define(check_w_inventory,           ?right_w_inventory + 13).
 
+-define(uncheck_w_inventory,         ?right_w_inventory + 19).
+-define(check_w_inventory_all,       ?right_w_inventory + 20).
+
 %% transfer
 -define(transfer_w_inventory,        ?right_w_inventory + 14).
 -define(filter_transfer_w_inventory, ?right_w_inventory + 15).
 -define(filter_transfer_rsn_w_inventory, ?right_w_inventory + 16).
 -define(check_w_inventory_transfer, ?right_w_inventory + 17).
 -define(cancel_w_inventory_transfer, ?right_w_inventory + 18).
+
 
 
 

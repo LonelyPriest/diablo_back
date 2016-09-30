@@ -1279,6 +1279,8 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	$scope.hidden.comment = !$scope.hidden.comment;
     };
 
+    $scope.setting = {master: rightAuthen.master(user.type)};
+
     var now    = $.now();
     var dialog = diabloUtilsService;
 
@@ -1329,32 +1331,78 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
     
     $scope.check_detail = function(r){
 	console.log(r);
-	var callback = function(){
-	    purchaserService.check_w_inventory_new(
-		r.rsn
-	    ).then(function(state){
-		console.log(state);
+	purchaserService.check_w_inventory_new(
+	    r.rsn
+	).then(function(state){
+	    console.log(state);
+	    if (state.ecode == 0){
+		dialog.response_with_callback(
+		    true,
+		    "入库单审核",
+		    "入库单审核成功！！单号：" + state.rsn,
+		    $scope, function(){r.state = 1})
+	    	return;
+	    } else{
+	    	diabloUtilsService.response(
+	    	    false,
+		    "入库单审核",
+	    	    "入库单审核失败："
+			+ purchaserService.error[state.ecode]);
+	    }
+	})
+	// dialog.request(
+	//     "入库单审核", "审核完成后，入库单将无法修改，确定要审核吗？",
+	//     callback, undefined, $scope);
+	
+    };
+
+    $scope.uncheck_detail = function(r){
+	console.log(r);
+	purchaserService.uncheck_w_inventory_new(
+	    r.rsn
+	).then(function(state){
+	    console.log(state);
+	    if (state.ecode == 0){
+		dialog.response_with_callback(
+		    true,
+		    "入库单反核",
+		    "入库单反核成功！！单号：" + state.rsn,
+		    $scope, function(){r.state = 0})
+	    	return;
+	    } else{
+	    	diabloUtilsService.response(
+	    	    false,
+		    "入库单反核",
+	    	    "入库单反核失败："
+			+ purchaserService.error[state.ecode]);
+	    }
+	})
+	// dialog.request(
+	//     "入库单审核", "审核完成后，入库单将无法修改，确定要审核吗？",
+	//     callback, undefined, $scope);
+	
+    };
+
+    $scope.check_all_detail = function(){
+	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
+	    add_search_condition(search);
+	    purchaserService.check_stock_all($scope.match, search).then(function(state){
 		if (state.ecode == 0){
 		    dialog.response_with_callback(
 			true,
-			"入库单审核",
-			"入库单审核成功！！单号：" + state.rsn,
-			$scope, function(){r.state = 1})
+			"入库单全审",
+			"入库单全部审核成功！！",
+			$scope, function(){$scope.do_search($scope.default_page)})
 	    	    return;
 		} else{
 	    	    diabloUtilsService.response(
 	    		false,
-			"入库单审核",
-	    		"入库单审核失败："
+			"入库单全审",
+	    		"入库单会审失败："
 			    + purchaserService.error[state.ecode]);
 		}
 	    })
-	};
-
-	dialog.request(
-	    "入库单审核", "审核完成后，入库单将无法修改，确定要审核吗？",
-	    callback, undefined, $scope);
-	
+	}) 
     };
 
     // $scope.delete_detail = function(r){

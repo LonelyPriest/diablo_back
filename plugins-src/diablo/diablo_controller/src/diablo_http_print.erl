@@ -23,8 +23,8 @@
 -export([print/4, print/2, call/2, get_printer/2]).
 
 -export([server/1,
-	 title/4, address/5, head/8,  body_head/6,
-	 row/2, body_foot/7, body_foot/8, detail/2, detail/3,
+	 title/4, address/7, head/8,  body_head/6,
+	 row/2, body_foot/8, detail/2, detail/3,
 	 start_print/8, start_print/6,
 	 multi_print/1, get_printer_state/4, multi_send/5]).
 
@@ -330,10 +330,10 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 
 			  %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
 			  %% [PrintRetailer, PrintTable]), 
-			  %% ?DEBUG("column ~p", [Column]),
+			  %% ?DEBUG("column ~p", [Column]), 
 
 			  Head = title(Brand, Model, Column, ShopName)
-			      ++ address(Brand, Model, Column, ShopAddr, Setting)
+			      ++ address(Brand, Model, Column, ShopAddr, Setting, Mobile, Phones)
 			      ++ head(Brand, Model, Column, RSN,
 				      PrintRetailer, Retailer, Employee, Date)
 
@@ -1055,12 +1055,13 @@ title(Brand, Model, Column, Title) ->
 
 %% address
 
-address(<<"feie">> = _Brand, _Model, _Column, Address, _Setting) ->
+address(<<"feie">> = _Brand, _Model, _Column, Address, _Setting, _Mobile, _Phones) ->
     ?DEBUG("address:brand ~p, Model ~p", [_Brand, _Model]),
     "<CB>" ++ ?to_s(Address) ++ "</CB><BR>";
 
-address(Brand, Model, Column, Address, Setting) ->
+address(Brand, Model, Column, Address, Setting, Mobile, Phones) ->
     BlockAddress = ?to_i(?v(<<"baddr">>, Setting, ?NO)),
+    HeadPhone = ?to_i(?v(<<"head_phone">>, Setting, ?NO)),
     
     Start =
 	case BlockAddress of
@@ -1080,8 +1081,33 @@ address(Brand, Model, Column, Address, Setting) ->
 	       ?YES -> decorate_data(cancel_bwh);
 	       ?NO -> decorate_data(cancel_block)
 	   end
-	++ ?f_print:br(Brand).
-
+	++ ?f_print:br(Brand)
+	
+    ++ case HeadPhone of
+	   ?YES ->
+	       {_, SPhone} = 
+		   lists:foldl(
+		     fun({_, Phone, Remark}, {Len, Acc})->
+			     PhoneLen = 2 + length(?to_s(Phone))
+				 +  case Remark of
+					[]   -> 0;
+					<<>> -> 0;
+					_    -> 4 + width(chinese, Remark)
+				    end,
+			     case Len + PhoneLen =< Column of
+				 true ->
+				     {Len + PhoneLen,
+				      Acc ++ pading(2) ++ phone(Phone, Remark)};
+				 false->
+				     {10 + PhoneLen - 2,
+				      Acc ++ br(Brand) ++ pading(10)
+				      ++ left_pading(Brand, Model)
+				      ++ phone(Phone, Remark)}
+			     end
+		     end, {10 + length(?to_s(Mobile)), []}, Phones),
+	       "联系方式：" ++ ?to_s(Mobile) ++ SPhone ++ br(Brand);
+	   ?NO -> []
+       end. 
 
 head(<<"feie">> = Brand, <<"PIN76">> = Model, 33, RSN, _PRetailer, Retailer, Employee, Date) ->
     ?DEBUG("feie head brand ~p", [Brand]),
@@ -1492,14 +1518,16 @@ body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 	       ?v(<<"comment2">>, Setting, []),
 	       ?v(<<"comment3">>, Setting, [])],
 
+    HeadPhone = ?to_i(?v(<<"head_phone">>, Setting, ?NO)),
+
     case ?to_i(?v(<<"pccmix">>, Setting, 0)) of
 	0 ->
 	    body_foot(
-	      format_default, Brand, Model, Column, Banks, Mobile, Phones)
+	      format_default, Brand, Model, Column, Banks, HeadPhone, Mobile, Phones)
 		++ br(Brand);
 	1 ->
 	    body_foot(
-	      format_column, Brand, Model, Column, Banks,
+	      format_column, Brand, Model, Column, HeadPhone, Banks,
 	      [{<<"phone">>, Mobile, []}|Phones], [])
     end
     %% comment
@@ -1514,9 +1542,9 @@ body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
 	     end, [], CT)
 	++ left_pading(Brand, Model)
 	++ pading(Column - 26)
-	++ "打印日期：" ++ ?utils:current_time(format_localtime).
+	++ "打印日期：" ++ ?utils:current_time(format_localtime);
 
-body_foot(format_default, Brand, Model, Column, Banks, Mobile, Phones) ->
+body_foot(format_default, Brand, Model, Column, Banks, HeadPhone, Mobile, Phones) ->
     ?DEBUG("banks ~p", [Banks]),
     {SBank, _} = 
 	lists:foldl(
@@ -1553,36 +1581,39 @@ body_foot(format_default, Brand, Model, Column, Banks, Mobile, Phones) ->
 
 	  end, {[], 0}, Banks),
 
-    %% Phone
-    {_, SPhone} = 
-	lists:foldl(
-	  fun({_, Phone, Remark}, {Len, Acc})->
-		  PhoneLen = 2 + length(?to_s(Phone))
-		      +  case Remark of
-			     []   -> 0;
-			     <<>> -> 0;
-			     _    -> 4 + width(chinese, Remark)
-			 end,
-		  case Len + PhoneLen =< Column of
-		      true ->
-			  {Len + PhoneLen,
-			   Acc ++ pading(2) ++ phone(Phone, Remark)};
-		      false->
-			  {10 + PhoneLen - 2,
-			   Acc ++ br(Brand) ++ pading(10)
-			   ++ left_pading(Brand, Mobile)
-			   ++ phone(Phone, Remark)}
-		  end
-	  end, {10 + length(?to_s(Mobile)), []}, Phones),
-
     %% mobile
     SBank ++ br(Brand)
 	++ left_pading(Brand, Model)
-	++ "联系方式：" ++ ?to_s(Mobile) ++ SPhone;
+	++ case HeadPhone of
+	       ?YES -> [];
+	       ?NO ->
+		   %% Phone
+		   {_, SPhone} = 
+		       lists:foldl(
+			 fun({_, Phone, Remark}, {Len, Acc})->
+				 PhoneLen = 2 + length(?to_s(Phone))
+				     +  case Remark of
+					    []   -> 0;
+					    <<>> -> 0;
+					    _    -> 4 + width(chinese, Remark)
+					end,
+				 case Len + PhoneLen =< Column of
+				     true ->
+					 {Len + PhoneLen,
+					  Acc ++ pading(2) ++ phone(Phone, Remark)};
+				     false->
+					 {10 + PhoneLen - 2,
+					  Acc ++ br(Brand) ++ pading(10)
+					  ++ left_pading(Brand, Model)
+					  ++ phone(Phone, Remark)}
+				 end
+			 end, {10 + length(?to_s(Mobile)), []}, Phones),
+		   "联系方式：" ++ ?to_s(Mobile) ++ SPhone
+	   end;
 
-body_foot(format_column, _Brand, _Model, _Column, [], [], Acc) ->
+body_foot(format_column, _Brand, _Model, _Column, _HeadPhone, [], [], Acc) ->
     Acc;
-body_foot(format_column, Brand, Model, Column, Banks, [], Acc) ->
+body_foot(format_column, Brand, Model, Column, HeadPhone, Banks, [], Acc) ->
     [{Bank}|TBanks] = Banks,
     
     Name     = ?v(<<"name">>, Bank),
@@ -1592,9 +1623,9 @@ body_foot(format_column, Brand, Model, Column, Banks, [], Acc) ->
 	++ ?to_s(Name) ++ pading(2)
 	++ ?to_s(BankName) ++ pading(2) ++ ?to_s(No) ++ br(Brand),
     
-    body_foot(format_column, Brand, Model, Column, TBanks, [], Acc ++ S1);
+    body_foot(format_column, Brand, Model, Column, HeadPhone, TBanks, [], Acc ++ S1);
 
-body_foot(format_column, Brand, Model, Column, [], Phones, Acc) ->
+body_foot(format_column, Brand, Model, Column, HeadPhone, [], Phones, Acc) ->
     [Phone|TPhones]   = Phones, 
     {_, PhoneNo, PhoneRemark} = Phone,
     %% PhoneLength = 2 + length(?to_s(PhoneNo))
@@ -1609,9 +1640,9 @@ body_foot(format_column, Brand, Model, Column, [], Phones, Acc) ->
 	left_pading(Brand, Model) ++  pading(70)
 	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
     
-    body_foot(format_column, Brand, Model, Column, [], TPhones, Acc ++ S1);
+    body_foot(format_column, Brand, Model, Column, HeadPhone, [], TPhones, Acc ++ S1);
     
-body_foot(format_column, Brand, Model, Column, Banks, Phones, Acc) ->
+body_foot(format_column, Brand, Model, Column, HeadPhone, Banks, Phones, Acc) ->
     [{Bank}|TBanks] = Banks, 
     Name     = ?v(<<"name">>, Bank),
     BankName = ?v(<<"bank">>, Bank),
@@ -1640,7 +1671,7 @@ body_foot(format_column, Brand, Model, Column, Banks, Phones, Acc) ->
 	++ pading(70 - BankLength)
 	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
     body_foot(
-      format_column, Brand, Model, Column, TBanks, TPhones, Acc ++ S1). 
+      format_column, Brand, Model, Column, HeadPhone, TBanks, TPhones, Acc ++ S1). 
 
 row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
     [H|T] = FlatternAmounts,
@@ -1759,8 +1790,7 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
 	      ?DEBUG("====== page content ====== ~n~ts", [?to_b(B)])
       end, Body),
     
-    CureentTimeTicks = (?SECONDS_BEFOR_1970
-			+ ?utils:current_time(timestamp)) * 10000,
+    CureentTimeTicks = (?SECONDS_BEFOR_1970 + ?utils:current_time(timestamp)) * 10000,
 
     
     Head = ?f_print:decorate_data(head, ?to_a(Brand), ?to_a(Model), Height * 10), 
@@ -1861,19 +1891,20 @@ multi_send(SignHead, Path, Device, [H|T], _Result) ->
     	   post, {?to_s(Path) ++ "?" ++ SignHead ++ "sign=" ++ ?to_s(Sign),
     		  [], "application/x-www-form-urlencoded", H}, [], []) of 
     	{ok, {{"HTTP/1.1", 200, "OK"}, _Head, Reply}} ->
-    	    ?DEBUG("Reply ~ts", [Reply]),
+    	    ?DEBUG("Reply ~p", [Reply]),
 	    case Reply of
 		"!device not found." ->
 		    Error = {error, ?err(printer_conn_not_found, Device)},
 		    multi_send(SignHead, Path, Device, [], Error);
 		_ ->
+		    %% multi_send(SignHead, Path, Device, T, {})
 		    {struct, Status} = mochijson2:decode(Reply), 
 		    case ?v(<<"state">>, Status) of
-			<<"ok">> ->
-			    multi_send(SignHead, Path, Device, T, {});
-			<<"100">> ->
-			    Error = {error, ?err(print_content_error, Device)}, 
-			    multi_send(SignHead, Path, Device, [], Error)
+		    	<<"ok">> ->
+		    	    multi_send(SignHead, Path, Device, T, {});
+		    	<<"100">> ->
+		    	    Error = {error, ?err(print_content_error, Device)}, 
+		    	    multi_send(SignHead, Path, Device, [], Error)
 		    end
     	    end;
     	{error, Reason} ->
@@ -1892,8 +1923,9 @@ get_printer_state(Path, DeviceId, Key, TimeTicks) ->
 	   post, {?to_s(Path), [], "application/x-www-form-urlencoded",
 		  State ++ "&sign=" ++ Sign}, [], []) of
 	{ok, {{"HTTP/1.1", 200, "OK"}, _Head, Reply}} ->
-	    ?DEBUG("reply ~p", [Reply]),
-	    try 
+	    ?DEBUG("Reply ~p", [Reply]), 
+	    try
+		%%	{ok, DeviceId}
 		case mochijson2:decode(Reply) of
 		    1 -> {ok, DeviceId};
 		    %% 1 -> throw({printer_unconnect, DeviceId});
@@ -1905,6 +1937,9 @@ get_printer_state(Path, DeviceId, Key, TimeTicks) ->
 		_:{case_clause, <<"!device not found.">>} ->
 		    throw({printer_conn_not_found, DeviceId});
 		<<"!", _/binary>> ->
+		    throw({printer_unkown_state, DeviceId});
+		_:Error ->
+		    ?DEBUG("decode error ~p", [Error]),
 		    throw({printer_unkown_state, DeviceId})
 	    end;
 	{error, Error} ->

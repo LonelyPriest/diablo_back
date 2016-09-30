@@ -80,8 +80,11 @@ navbar(Titles) ->
 		  ++ string:strip(Href, both, $/)
 		  ++ " class=\""
 		  ++ hidden(sm, SM) ++ hidden(xs, XS) ++ hidden(xxs, XXS)
-		  ++ active(Active) ++ "\">" 
-		  ++ "<a href=\""++ Href ++ "\">" ++ Title
+		  ++ active(Active) ++ "\">"
+		  ++ "<a href=\"javascript:;\""
+		  "onclick=\"diablo_goto_page("
+		  ++ "\'" ++ Href ++ "\')\">\n" ++ Title
+		  %% ++ "<a href=\""++ Href ++ "\">" ++ Title
 		  ++ "<span class=\"selected\"></span>"
 		  ++ "</a>"
 		  ++ "</li>\n" ++ Acc
