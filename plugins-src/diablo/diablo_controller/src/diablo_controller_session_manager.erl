@@ -100,9 +100,10 @@ handle_call({new, User}, _From, State) ->
 
     %% SessionId = ?to_b(knife_uuid:v5(string, ?to_s(UserId))),
     UUID = knife_uuid:uuid1(),
-    P1 = ?to_b(?to_s(Merchant)
-                      ++ "-" ++ ?to_s(UserId) ++ "-" ++ ?to_s(UserName)),
-    SessionId = <<P1/binary, UUID/binary>>,
+    SessionId = ?to_b(
+	    ?to_s(Merchant)
+	    ++ "-" ++ ?to_s(UserId) ++ "-" ++ ?to_s(UserName)
+	    ++ "-" ++ knife_uuid:to_string(UUID)),
     true = ets:insert(?SESSION,
 		      {SessionId,
 		       #session{
