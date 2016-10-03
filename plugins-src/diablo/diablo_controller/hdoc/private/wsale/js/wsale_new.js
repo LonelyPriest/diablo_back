@@ -1509,7 +1509,8 @@ wsaleApp.controller("wsaleNewCtrl", function(
     $scope.auto_save_free = function(inv){
 	if (angular.isUndefined(inv.sell)
 	    || !inv.sell
-	    || parseInt(inv.sell) === 0){
+	    || parseInt(inv.sell) === 0
+	    || angular.isUndefined(inv.style_number)){
 	    return;
 	} 
 
