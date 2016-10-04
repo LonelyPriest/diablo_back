@@ -4359,6 +4359,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
 
       var focusFirst = originalScope.$eval(attrs.typeaheadFocusFirst) !== false;
 
+      var isExactMatch = angular.isDefined(attrs.typeaheadExactMatch) ? originalScope.$eval(attrs.typeaheadExactMatch) : false;
+	
       //INTERNAL VARIABLES
 
       //model setter executed upon match selection
@@ -4434,7 +4436,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
           //it might happen that several async queries were in progress if a user were typing fast
           //but we are interested only in responses that correspond to the current view value
           var onCurrentRequest = (inputValue === modelCtrl.$viewValue);
-          if (onCurrentRequest && hasFocus) {
+            if (onCurrentRequest && hasFocus) {
             if (matches && matches.length > 0) {
 
               scope.activeIdx = focusFirst ? 0 : -1;
@@ -4457,7 +4459,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
               recalculatePosition();
 
               element.attr('aria-expanded', true);
-	      if (scope.matches.length===1) scope.select(0);
+	      if (isExactMatch && scope.matches.length===1) scope.select(0);
             } else {
               resetMatches();
             }
@@ -4509,9 +4511,10 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       // recalculate actual position and set new values to scope
       // after digest loop is popup in right position
       function recalculatePosition() {
-        scope.position = appendToBody ? $position.offset(element) : $position.position(element);
+	scope.position = appendToBody ? $position.offset(element) : $position.position(element);
 	if (scope.matches.length > 10) scope.position.top=0;
 	else scope.position.top += element.prop('offsetHeight') - element.prop('clientHeight');
+	// scope.position.top += element.prop('offsetHeight');
       }
 
       resetMatches();

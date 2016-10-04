@@ -301,6 +301,7 @@
 				 x-ng-model="inv.style_number"
 				 placeholder="货号"
 				 typeahead-editable="false"
+				 typeahead-exact-match="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)" 
 				 typeahead="g as g.name for g in
 					    all_w_goods|filter:{prompt:$viewValue}|limitTo:20"/>
@@ -322,6 +323,7 @@
 				 x-ng-model="inv.style_number"
 				 placeholder="货号"
 				 typeahead-editable="false"
+				 typeahead-exact-match="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
