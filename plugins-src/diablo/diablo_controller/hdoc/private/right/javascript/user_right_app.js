@@ -1,7 +1,6 @@
-var userApp = angular.module("userApp", ['ngResource']); 
+var userApp = angular.module("userApp", ['ngResource', 'ngCookies']); 
 
-
-userApp.factory("userService", function($resource, $q){
+userApp.factory("userService", function($resource, $q, $cookies){
     var _user = $resource("/right/:operation", {operation: '@operation'}); 
     var _shops         = [];
     var _rights        = [];
@@ -205,16 +204,22 @@ userApp.factory("userService", function($resource, $q){
 	//     var rights    = data[0];
 	//     var shops     = data[1];
 	//     console.log(shops);
-	if (_shops.length !== 0
-	    && _rights !== 0
-	    && angular.isDefined(_loginType)){
-	    return sort();
+	
+	// if (_shops.length !== 0
+	//     && _rights !== 0
+	//     && angular.isDefined(_loginType)){
+	//     return sort();
 	    
-	} else {
+	// } 
+	var cookie  = 'login-' + $cookies.qzg_dyty_session;
+        var storage = localStorage.getItem(cookie);
+        if (angular.isDefined(storage) && storage !== null) {
+            return JSON.parse(storage);
+        } else {
 	    return _user.get(
 		{operation: "get_login_user_info"}
 	    ).$promise.then(function(result){
-		// console.log(result);
+		console.log(result);
 		_shops         = result.shop;
 		_rights        = result.right;
 		_loginType     = result.type;
@@ -222,7 +227,15 @@ userApp.factory("userService", function($resource, $q){
 		_loginFirm     = result.login_firm;
 		_employee      = result.login_employee;
 		_loginRetailer = result.login_retailer;
-		return sort();
+
+		var cache = sort(); 
+                var re  = /^login-.*$/;
+                for (var key in localStorage){
+                    console.log(key);
+                    if (re.test(key)) localStorage.removeItem(key);
+                } 
+                localStorage.setItem(cookie, JSON.stringify(cache));
+                return cache; 
     	    });
 	}
 	

@@ -4360,6 +4360,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       var focusFirst = originalScope.$eval(attrs.typeaheadFocusFirst) !== false;
 
       var isExactMatch = angular.isDefined(attrs.typeaheadExactMatch) ? originalScope.$eval(attrs.typeaheadExactMatch) : false;
+
+	var offsetRight = angular.isDefined(attrs.typeaheadOffsetRight) ? originalScope.$eval(attrs.typeaheadOffsetRight) : false;
 	
       //INTERNAL VARIABLES
 
@@ -4512,9 +4514,14 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       // after digest loop is popup in right position
       function recalculatePosition() {
 	scope.position = appendToBody ? $position.offset(element) : $position.position(element);
-	if (scope.matches.length > 10) scope.position.top=0;
-	else scope.position.top += element.prop('offsetHeight') - element.prop('clientHeight');
-	// scope.position.top += element.prop('offsetHeight');
+	if (offsetRight) {
+	    scope.position.left += element.prop('clientWidth'); 
+	    if (scope.matches.length > 10) scope.position.top=0;
+	    else {
+		scope.position.top += element.prop('offsetHeight') - element.prop('clientHeight');
+	    }; 
+	} else 
+	    scope.position.top += element.prop('offsetHeight');
       }
 
       resetMatches();
@@ -5140,7 +5147,7 @@ angular.module("template/typeahead/typeahead-match.html", []).run(["$templateCac
 
 angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/typeahead/typeahead-popup.html",
-    "<ul class=\"dropdown-menu\" ng-show=\"isOpen() && !moveInProgress\" ng-style=\"{top: position().top+'px', left: position().left+position().width+'px'}\" style=\"display: block;\" role=\"listbox\" aria-hidden=\"{{!isOpen()}}\">\n" +
+    "<ul class=\"dropdown-menu\" ng-show=\"isOpen() && !moveInProgress\" ng-style=\"{top: position().top+'px', left: position().left+'px'}\" style=\"display: block;\" role=\"listbox\" aria-hidden=\"{{!isOpen()}}\">\n" +
     "    <li ng-repeat=\"match in matches track by $index\" ng-class=\"{active: isActive($index) }\" ng-mouseenter=\"selectActive($index)\" ng-click=\"selectMatch($index)\" role=\"option\" id=\"{{::match.id}}\">\n" +
     "        <div typeahead-match index=\"$index\" match=\"match\" query=\"query\" template-url=\"templateUrl\"></div>\n" +
     "    </li>\n" +

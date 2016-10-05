@@ -46,7 +46,8 @@
 		       type="text"
 		       name="retailer"
 	  	       x-ng-model="select.retailer"
-	  	       placeholder="请选择客户" 
+	  	       placeholder="请选择客户"
+		       ng-edit
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_retailer()"
 	  	       typeahead="r as r.name for r in
@@ -56,12 +57,12 @@
 	  		  x-ng-click="add_retailer()">
 		    <i class="glyphicon glyphicon-plus"></i></button> 
 	  	</span>
-		<span class="input-group-btn">
-		  <button class="btn default fg-red"
-			  x-ng-disabled="!select.retailer"
-	  		  x-ng-click="select.retailer=undefined">
-		    <i class="glyphicon glyphicon-pushpin"></i></button>
-		</span>
+		<!-- <span class="input-group-btn"> -->
+		<!--   <button class="btn default fg-red" -->
+		<!-- 	  x-ng-disabled="!select.retailer" -->
+	  	<!-- 	  x-ng-click="select.retailer=undefined"> -->
+		<!--     <i class="glyphicon glyphicon-pushpin"></i></button> -->
+		<!-- </span> -->
 	      </div>
 	    </div>
 
@@ -89,6 +90,7 @@
 		<input type="text" class="form-control"
 		       placeholder="年/月/日"
 		       datepicker-popup="yyyy/MM/dd"
+		       x-ng-readonly=true
 		       is-open="isOpened"
 		       close-text="关闭"
 		       clear-text="清除"
@@ -148,8 +150,9 @@
 				 && !select.form.cashForm.$pristine}">
 	  	    <input class="form-control"
 			   type="number" step="0.01"
-			   x-ng-pattern=pattern.money
+			   x-ng-pattern="pattern.money"
 	  		   x-ng-model="select.cash"
+			   ng-edit
 			   placeholder="现金"/>
 		  </div> 
 		</form> 
@@ -219,6 +222,7 @@
 	  	    <input class="form-control"
 			   type="number" step="0.01"
 			   x-ng-pattern=pattern.money
+			   ng-edit
 	  		   x-ng-model="select.verificate"
 			   placeholder="核销" />
 		  </div>
@@ -276,6 +280,7 @@
 			   type="number" step="0.01"
 			   placeholder="关联费用"
 			   x-ng-pattern="/^\d+(.\d{1,2})?$/"
+			   ng-edit
 	  		   x-ng-model="select.extra_pay" />
 		  </div>
 		</form> 
@@ -311,9 +316,8 @@
 			<!-- <th class="text-center">厂商</th> -->
 			<!-- <th class="text-center">季节</th> --> 
 			<!-- <th class="text-center warning">上次价格</th> -->
-			<!-- <th class="text-center warning">上次折扣</th> -->
-			
-			<th class="text-center">单价类型</th>
+			<!-- <th class="text-center warning">上次折扣</th> --> 
+			<th x-ng-if="false" class="text-center">单价类型</th>
 			<th class="text-center">单价</th>
 			<!-- <th class="text-center">折扣</th> -->
 			
@@ -340,8 +344,10 @@
 				     required
 				     x-ng-model="inv.style_number"
 				     placeholder="货号"
+				     ng-edit
 				     typeahead-editable="false"
 				     typeahead-exact-match="true"
+				     typeahead-offset-right="true"
 				     typeahead-on-select="on_select_good($item, $model, $label)"
 				     typeahead="g as g.name for g in
 						all_w_inventory|filter:{prompt:$viewValue}|limitTo:20"/>
@@ -360,8 +366,10 @@
 				     required
 				     x-ng-model="inv.style_number"
 				     placeholder="货号"
+				     ng-edit
 				     typeahead-editable="false"
 				     typeahead-exact-match="true"
+				     typeahead-offset-right="true"
 				     typeahead-on-select="on_select_good($item, $model, $label)"
 				     typeahead-wait-ms="500"
 				     typeahead-loading="loading"
@@ -389,7 +397,7 @@
 			<!-- <td class="vert-align">{{inv.last_discount}}</td>  -->
 
 			<!-- price style-->
-			<td class="vert-align">
+			<td x-ng-if="false" class="vert-align">
 			  <div ng-if="!inv.$new && !inv.free_update">
 			    {{inv.sell_style.name}}
 			  </div> 
@@ -398,6 +406,7 @@
 					&& inv.sell_style
 					|| !inv.$new && inv.free_update">
 			    <select class="form-control table-select"
+				    ng-edit
 				    x-ng-model="inv.sell_style"
 				    x-ng-change="inv.fprice=inv[inv.sell_style.f]"
 				    x-ng-init="inv.sell_style=recover_sell_style(inv)"
@@ -410,9 +419,7 @@
 
 			<td class="col-md-1 vert-align">
 			  <span x-ng-if="!inv.$new || inv.free_color_size">
-			    <div>{{inv[inv.sell_style.f]}}</div>
-			    <!-- {{inv.fprice}} -->
-			    <!-- <div class="fg-red">上次：{{inv.last_fprice}}</div> -->
+			    <div>{{inv[inv.sell_style.f]}}</div> 
 			  </span>
 			</td>
 
@@ -429,6 +436,7 @@
 			      <input class="form-control"
 				     type="number" step="1"
 				     required
+				     ng-edit
 				     x-ng-model="inv.fdiscount"
 				     x-ng-pattern="/^\d{2}$|100$/" />
 			    </div>
@@ -452,6 +460,7 @@
 			      <input class="form-control"
 				     type="number" step="0.01"
 				     required
+				     ng-edit
 				     x-ng-pattern="/^\d+(.\d{1,2})?$/"
 				     x-ng-model="inv.fprice"
 				     x-ng-change="auto_save_free_of_price(inv)"
@@ -476,6 +485,7 @@
 				     class="form-control"
 				     placeholder="数量"
 				     required
+				     ng-edit
 				     x-ng-pattern="pattern.sell"
 				     x-ng-model="inv.sell"
 				     x-ng-change="auto_save_free(inv)" />
@@ -528,6 +538,7 @@
 			      <input class="form-control input-xs"
 				     type="text"
 				     placeholder="备注"
+				     ng-edit
 				     x-ng-model="inv.comment"/>
 			    </div>
 			  </form>
@@ -730,6 +741,7 @@
 					 name="style_number"
 					 required
 					 capitalize
+					 ng-edit
 					 placeholder="请输入2-10位款号" 
 					 x-ng-model="good.style_number"
 					 x-ng-pattern="pattern.style_number" 
@@ -759,6 +771,7 @@
 					 class="form-control"
 					 name="brand"
 					 required
+					 ng-edit
 					 placeholder="请输入品牌" 
 					 x-ng-model="good.brand"
 					 x-ng-pattern="pattern.brand"
@@ -792,6 +805,7 @@
 					 class="form-control"
 					 name="type"
 					 required
+					 ng-edit
 					 placeholder="豹纹马甲等"
 					 x-ng-model="good.type"
 					 x-ng-pattern="pattern.type"
@@ -819,6 +833,7 @@
 				       class="form-control"
 				       name="firm"
 				       required
+				       ng-edit
 				       placeholder="请输入厂商"
 				       x-ng-model="good.firm"
 				       x-ng-enter=""
@@ -878,6 +893,7 @@
 				       type="number" step="0.01" 
 				       name="tag_price"
 				       required
+				       ng-edit
 				       placeholder="吊牌价，支持二位小数"
 				       x-ng-pattern="/^\d+(.\d{1,2})?$/"
 				       x-ng-enter=""
@@ -898,6 +914,7 @@
 				       type="number" step="0.01" 
 				       name="pkg_price"
 				       required
+				       ng-edit
 				       placeholder="打包价，支持二位小数"
 				       x-ng-enter=""
 				       x-ng-pattern="/^\d+(.\d{1,2})?$/"
@@ -920,6 +937,7 @@
 					 type="number" step="1" 
 					 name="discount"
 					 required
+					 ng-edit
 					 placeholder="两位整数，无折扣请输入100"
 					 x-ng-pattern="/^\d{2}$|100$/"
 					 x-ng-model="good.discount"/>
@@ -1025,6 +1043,7 @@
 	      <input class="form-control text-center"
 		     type="number" step="1"
 		     required
+		     ng-edit
 		     x-ng-model="params.fdiscount"
 		     placeholder="两位整数"
 		     x-ng-pattern="/^\d{2}$|100$/" />
@@ -1038,6 +1057,7 @@
 	      <input class="form-control text-center" 
 		     type="number" step="0.01"
 		     required
+		     ng-edit
 		     x-ng-pattern="/^\d+(.\d{1,2})?$/"
 		     x-ng-model="params.fprice" />
 	    </div> 
@@ -1088,6 +1108,7 @@
 		      <input x-ng-if="amount"
 			     class="form-control modal-input text-center"
 			     type="number" step="1"
+			     ng-edit
 			     x-ng-model="amount.sell_count"/>
 		    </div>
 		  </form>

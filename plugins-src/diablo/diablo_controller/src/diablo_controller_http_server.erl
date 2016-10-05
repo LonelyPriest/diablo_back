@@ -41,12 +41,12 @@ valid_session(Req) ->
 	undefined -> %% redirect to login page
 	    {error, no_session};
 	ESession ->
-	    ?DEBUG("MSession ~p", [ESession]),
+	    %% ?DEBUG("MSession ~p", [ESession]),
 	    DSession = mochiweb_base64url:decode(ESession),
             case ?session:lookup(DSession) of
                 {ok, []} -> %% session time out or lost
-                    ?INFO("invalid session ~p", [DSession]),
-                    {error, {invalid_session, DSession}};
+                    %% ?INFO("invalid session ~p", [DSession]),
+                    {error, {invalid_session, {DSession, ESession}}};
                 {ok, _} -> %% valid session
                     {ok, valid_session}
             end
@@ -208,24 +208,25 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 		    %% case length(string:tokens(Path, "/")) of
 		    %% 	1 ->
 		    case _Error of
-			no_session ->
-			    %% Req:respond({580, [{"Content-Type", "text/plain"}],
-			    %% 		 "request failed, no session\n"});
-			    {ok, HTMLOutput} =
-				login:render(
-				  [{show_error, "true"},
-				   {login_error, "用户会话已被删除，请重新登录！！"}]),
-			    Req:respond({200,
-					 [{"Content-Type", "text/html"}],
-					 HTMLOutput}); 
-			{invalid_session, SessionId} ->
-			    ?DEBUG("invalid session ~p", [SessionId]),
-			    login(invalid_session, Req, SessionId)
-		    end
-		    %% _ ->
-		    %%     Req:respond({599, [{"Content-Type", "text/plain"}],
-		    %% "request failed, invalid session\n"})
-		    %% end 
+			no_session -> 
+			    Req:respond({302, [{"Location", "/"},
+					       {"Content-Type", "text/html; charset=UTF-8"}],
+					 "Redirecting /"});
+			{invalid_session, {DSession, ESession}} -> 
+			    ?DEBUG("invalid session ~p", [ESession]),
+			    Cookie = mochiweb_cookies:cookie(
+                                       ?QZG_DY_SESSION,
+                                       DSession,
+                                       [{max_age, 0}, {path, "/"}]),
+			    Req:respond({302,
+					 [{"Location", "/"},
+					  {"Content-Type", "text/html; charset=UTF-8"}, Cookie],
+					 "Redirecting /"})
+			    %% login(invalid_session, Req, SessionId)
+		    end;
+		_ ->
+		    Req:respond({599, [{"Content-Type", "text/plain"}],
+				 "请求失败，非法访问\n"})
 	    end;
 	{nomatch, _Method,  "login"} ->
 	    ?login_request:action(Req, login);
@@ -242,20 +243,20 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
     end.
 
 
-login(invalid_session, Req, SessionId) ->
-    {ok, HTMLOutput} =
-	login:render(
-	  [{show_error, "true"},
-	   {login_error, "用户会话非法，请重新登录！！"}]),
-    try
-	Cookie = mochiweb_cookies:cookie(
-		   ?QZG_DY_SESSION,
-		   SessionId,
-		   [{max_age, 0}]), 
-	Req:respond({200,
-		     [{"Content-Type", "text/html"}, Cookie],
-		     HTMLOutput})
-    catch
-	_:_Error ->
-	    Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput})
-    end.
+%% login(invalid_session, Req, SessionId) ->
+%%     {ok, HTMLOutput} =
+%% 	login:render(
+%% 	  [{show_error, "true"},
+%% 	   {login_error, "用户会话非法，请重新登录！！"}]),
+%%     try
+%% 	Cookie = mochiweb_cookies:cookie(
+%% 		   ?QZG_DY_SESSION,
+%% 		   SessionId,
+%% 		   [{max_age, 0}]), 
+%% 	Req:respond({200,
+%% 		     [{"Content-Type", "text/html"}, Cookie],
+%% 		     HTMLOutput})
+%%     catch
+%% 	_:_Error ->
+%% 	    Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput})
+%%     end.

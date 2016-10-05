@@ -4,7 +4,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     diabloPattern, wgoodService, purchaserService, 
     wretailerService, wsaleService, wsaleGoodService,
     user, filterFirm, filterRetailer, filterEmployee,
-    filterSizeGroup, filterBrand, filterType, filterColor, base){
+    filterSizeGroup, filterBrand, filterType, filterColor, filterColorType, base){
 
     // console.log(filterEmployee);
     $scope.pattern  = {money: diabloPattern.decimal_2,
@@ -43,6 +43,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     wsaleGoodService.set_size_group(angular.copy(filterSizeGroup));
     wsaleGoodService.set_firm(angular.copy(filterFirm));
     wsaleGoodService.set_color(angular.copy(filterColor));
+    wsaleGoodService.set_color_type(angular.copy(filterColorType));
 
     // base setting
     $scope.trace_price = function(shopId){
@@ -351,7 +352,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	"r_snumber", $scope.select.shop.id, base, parseInt, diablo_no);
 
     $scope.stastic_colspan = function(){
-	var all_colspan = 8;
+	var all_colspan = 7;
 	if (!$scope.setting.show_discount){
 	    all_colspan -= 1;
 	}

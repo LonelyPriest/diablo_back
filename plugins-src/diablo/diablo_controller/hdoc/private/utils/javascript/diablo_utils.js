@@ -15,6 +15,14 @@ var diabloUtils = angular.module("diabloUtils", []);
 //     }
 // ]);
 
+diabloUtils.directive('ngEdit', function () {
+    return function (scope, element, attrs) {
+        element.bind("focus", function (event) {
+            element[0].select();
+        });
+    };
+});
+
 diabloUtils.directive('ngEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {

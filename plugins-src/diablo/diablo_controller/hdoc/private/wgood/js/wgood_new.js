@@ -1,13 +1,14 @@
 wgoodApp.controller("wgoodNewCtrl", function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, user, filterBrand, filterFirm, filterType,
-    filterSizeGroup, base){
+    filterSizeGroup, filterColorType, base){
     
     $scope.seasons = diablo_season2objects;
     $scope.sexs    = diablo_sex2object;
     $scope.pattern = {style_number: diabloPattern.style_number,
 		      brand: diabloPattern.ch_en_num,
 		      type:  diabloPattern.head_ch_en_num};
+    $scope.colorTypes = filterColorType;
 
     $scope.base_setting = {};
 
@@ -287,10 +288,10 @@ wgoodApp.controller("wgoodNewCtrl", function(
 
     
 
-    wgoodService.list_color_type().then(function(data){
-	// console.log(data);
-	$scope.colorTypes = data;
-    });
+    // wgoodService.list_color_type().then(function(data){
+    // 	// console.log(data);
+    // 	$scope.colorTypes = data;
+    // });
     
     $scope.new_color = function(){
 	var callback = function(params){
@@ -481,6 +482,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
     /*
      * new good
      */
+    var current_month = new Date().getMonth(); 
     $scope.good = {
 	org_price : 0,
 	tag_price : 0,
@@ -491,7 +493,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	discount  : 100,
 	alarm_day : 7,
 	year      : diablo_now_year(),
-	season    : $scope.seasons[0]
+	season    : $scope.seasons[diablo_valid_season(current_month)]
     };
 
     if (user.loginFirm !== -1) {
@@ -561,8 +563,8 @@ wgoodApp.controller("wgoodNewCtrl", function(
 		    true, "新增货品", "新增货品资料成功！！", $scope,
 		    function(){
 			diabloFilter.reset_firm();
-                        diabloFilter.reset_brand();
-                        diabloFilter.reset_type();
+                        // diabloFilter.reset_brand();
+                        // diabloFilter.reset_type();
 
 			// console.log("callback");
 			// reset size 
@@ -616,6 +618,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 				id   :state.brand,
 				name :good.brand,
 				py   :diablo_pinyin(good.brand)});
+			    diabloFilter.reset_brand($scope.brands);
 			}; 
 			// console.log($scope.brands);
 
@@ -626,6 +629,8 @@ wgoodApp.controller("wgoodNewCtrl", function(
 				id   :state.type,
 				name :good.type,
 				py   :diablo_pinyin(good.type)});
+			    
+			    diabloFilter.reset_type($scope.types);
 			};
 			// console.log($scope.types);
 		    });
@@ -646,7 +651,7 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	    // type:      $scope.good.type,
 	    sex:       $scope.good.sex,
 	    year:      $scope.good.year,
-	    season:    $scope.good.season,
+	    season:    $scope.seasons[diablo_valid_season(current_month)],
 	    org_price: $scope.good.org_price,
 	    tag_price: $scope.good.tag_price,
 	    pkg_price: $scope.good.pkg_price,

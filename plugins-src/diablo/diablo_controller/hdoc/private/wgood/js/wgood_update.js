@@ -2,7 +2,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope, $location, $routeParams, $q, $timeout, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
     filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
-    user, base){
+    filterColorType, user, base){
     // console.log(filterSizeGroup); 
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
@@ -10,9 +10,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 
     $scope.pattern = {style_number: diabloPattern.style_number,
 		      brand: diabloPattern.ch_en_num,
-		      type:  diabloPattern.head_ch_en_num
-		     };
-
+		      type:  diabloPattern.head_ch_en_num}; 
     //
     $scope.base_setting = {};
     $scope.base_setting.hidden_p3_5 = function(){
@@ -30,6 +28,9 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope.types  = filterType;
     $scope.brands = filterBrand;
     $scope.groups = filterSizeGroup;
+    $scope.filterColors = angular.copy(filterColor);
+    $scope.colorTypes = filterColorType;
+
     $scope.colors = [];
 
     // [{type:"红色", tid:1
@@ -52,7 +53,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     };
 
     // colors
-    angular.forEach(filterColor, function(color){
+    angular.forEach($scope.filterColors, function(color){
 	if (!in_sys_color($scope.colors, color)){
 	    $scope.colors.push(
 		{type:color.type, tid:color.tid,
@@ -272,10 +273,10 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 	
     }); 
 
-    wgoodService.list_color_type().then(function(data){
-	// console.log(data);
-	$scope.colorTypes = data;
-    }); 
+    // wgoodService.list_color_type().then(function(data){
+    // 	// console.log(data);
+    // 	$scope.colorTypes = data;
+    // }); 
     
     $scope.new_color = function(){
 	var callback = function(params){
@@ -291,15 +292,16 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
 			    id:      newColorId,
 			    name:    params.color.name,
 			    tid:     params.color.type.id,
-			    type:    params.color.type.name, 
-			    remark:  params.color.remark};
+			    type:    params.color.type.name};
 			
 			if (!in_sys_color($scope.colors, newColor)){
 			    $scope.colors.push(
 				{type: newColor.type,
 				 tid:  newColor.tid,
 				 colors:[{name:newColor.name, id:newColor.id}]})
-			} 
+			}
+
+			diabloFilter.reset_color($scope.filterColors.push(newColor));
 			console.log($scope.colors); 
 		    };
 		    

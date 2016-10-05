@@ -54,6 +54,9 @@ wsaleApp.config(['$routeProvider', function($routeProvider){
 
     var color = {"filterColor": function(diabloFilter){
 	return diabloFilter.get_color()}};
+
+    var color_type = {"filterColorType": function(diabloFilter){
+	return diabloFilter.get_color_type()}};
     
     var s_group = {"filterSizeGroup": function(diabloFilter){
 	return diabloFilter.get_size_group()}};
@@ -66,7 +69,7 @@ wsaleApp.config(['$routeProvider', function($routeProvider){
 	    templateUrl: '/private/wsale/html/new_wsale.html',
 	    controller: 'wsaleNewCtrl',
 	    resolve: angular.extend(
-	    	{}, user, firm, retailer, employee, s_group, brand, type, color, base)
+	    	{}, user, firm, retailer, employee, s_group, brand, type, color, color_type, base)
 	}).
 	when('/new_ssale', {
 	    templateUrl: '/private/wsale/html/new_ssale.html',

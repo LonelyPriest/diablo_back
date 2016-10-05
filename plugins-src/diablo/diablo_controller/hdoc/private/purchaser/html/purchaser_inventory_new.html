@@ -38,21 +38,22 @@
 	  <div class="row diablo-form-group">
 	    <div class="col-xs-3 col-md-3">
 	      <div class="input-group">
-		<!-- <span class="input-group-addon"> -->
-		<!--   <i class="glyphicon glyphicon-knight fg-red"></i>厂商</span> -->
+		<span class="input-group-addon">
+		  <i class="glyphicon glyphicon-knight fg-red"></i>厂商</span>
 	  	<input class="form-control" type="text"
+		       ng-edit
 	  	       x-ng-model="select.firm" 
 	  	       placeholder="请选择厂商"
 	  	       typeahead-editable="false"
 		       typeahead-on-select="change_firm()"
 	  	       typeahead="f as f.name for f in
 	  			  firms|filter:$viewValue|limitTo:8"/>
-		<span class="input-group-btn">
-		  <button class="btn default fg-red"
-			  x-ng-disabled="!select.firm"
-			  x-ng-click="select.firm=undefined"> 
-		    <i class="glyphicon glyphicon-pushpin"></i></button>
-	  	</span>
+		<!-- <span class="input-group-btn"> -->
+		<!--   <button class="btn default fg-red" -->
+		<!-- 	  x-ng-disabled="!select.firm" -->
+		<!-- 	  x-ng-click="select.firm=undefined">  -->
+		<!--     <i class="glyphicon glyphicon-pushpin"></i></button> -->
+	  	<!-- </span> -->
 	      </div>
 	    </div>
 
@@ -302,6 +303,7 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)" 
 				 typeahead="g as g.name for g in
 					    all_w_goods|filter:{prompt:$viewValue}|limitTo:20"/>
@@ -324,11 +326,12 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
 				 typeahead="g as g.name for g in
-					    match_prompt_good($viewValue)"></input>
+					    match_prompt_good($viewValue)"/>
 			  <span x-ng-show="loading">
 			    <i class="glyphicon glyphicon-refresh"></i>
 			  </span>

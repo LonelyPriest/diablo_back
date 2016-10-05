@@ -37,6 +37,7 @@
 			   name="style_number"
 			   required
 			   capitalize
+			   ng-edit
 			   placeholder="请输入2-10位款号" 
 			   x-ng-model="good.style_number"
 			   x-ng-pattern="pattern.style_number" 
@@ -66,6 +67,7 @@
 			   class="form-control"
 			   name="brand"
 			   required
+			   ng-edit
 			   placeholder="请输入品牌" 
 			   x-ng-model="good.brand"
 			   x-ng-pattern="pattern.brand"
@@ -99,6 +101,7 @@
 			   class="form-control"
 			   name="type"
 			   required
+			   ng-edit
 			   placeholder="豹纹马甲等"
 			   x-ng-model="good.type"
 			   x-ng-pattern="pattern.type"
@@ -126,6 +129,7 @@
 			 class="form-control"
 			 name="firm"
 			 required
+			 ng-edit
 			 placeholder="请输入厂商"
 			 x-ng-model="good.firm"
 			 x-ng-enter=""
@@ -186,6 +190,7 @@
 			 type="number" step="0.01" 
 			 name="org_price"
 			 required
+			 ng-edit
 			 placeholder="进货价，支持二位小数"
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
@@ -206,6 +211,7 @@
 			 type="number" step="0.01" 
 			 name="tag_price"
 			 required
+			 ng-edit
 			 placeholder="吊牌价，支持二位小数"
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
@@ -226,6 +232,7 @@
 			 type="number" step="0.01"
 			 name="pkg_price"
 			 required
+			 ng-edit
 			 placeholder="打包价，支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
@@ -247,6 +254,7 @@
 			 type="number" step="0.01"
 			 name="pkg_price"
 			 required
+			 ng-edit
 			 placeholder="打包价，支持二位小数"
 			 x-ng-enter=""
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
@@ -267,6 +275,7 @@
 			 type="number" step="0.01" 
 			 name="tag_price"
 			 required
+			 ng-edit
 			 placeholder="吊牌价，支持二位小数"
 			 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 			 x-ng-enter=""
@@ -352,6 +361,7 @@
 			   type="number" step="1" 
 			   name="discount"
 			   required
+			   ng-edit
 			   placeholder="两位整数，无折扣请输入100"
 			   x-ng-pattern="/^\d{2}$|100$/"
 			   x-ng-model="good.discount"/>
@@ -365,7 +375,7 @@
 	    </div>
 
 	    <!-- alarm day-->
-	    <div class="form-group diablo-good-form-group">
+	    <div x-ng-if="false" class="form-group diablo-good-form-group">
 	      <label class="col-sm-3 col-md-3 control-label">预警天数</label>
 	      <div class="col-sm-6 col-md-6"> 
 		<div class="input-group">
@@ -375,6 +385,7 @@
 			   type="number" step="1" 
 			   name="alarm"
 			   required
+			   ng-edit
 			   placeholder="请输入1到2位数字"
 			   x-ng-pattern="/^\d{1,2}$/"
 			   x-ng-model="good.alarm_day"/>

@@ -5,6 +5,7 @@ wsaleApp.factory("wsaleGoodService", function(){
     var _types      = [];
     var _sizeGroups = [];
     var _colors     = [];
+    var _colorTyes  = [];
 
     var _shop = -1; 
 
@@ -60,6 +61,14 @@ wsaleApp.factory("wsaleGoodService", function(){
     };
     service.get_color = function(){
 	return _colors;
+    };
+
+    service.set_color_type = function(colorTypes){
+	_colorTyes = colorTypes;
+    };
+    
+    service.get_color_type = function(){
+	return _colorTyes;
     };
 
     service.set_shop = function(shop){
@@ -261,6 +270,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
     /*
      * new good
      */
+    var current_month = new Date().getMonth(); 
     $scope.good = {
 	org_price : 0,
 	tag_price : 0,
@@ -271,7 +281,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 	discount  : 100,
 	alarm_day : 7,
 	year      : diablo_now_year(),
-	season    : $scope.seasons[0]
+	season    : $scope.seasons[diablo_valid_season(current_month)]
     };
 
     var get_brand = function(brand_name){
@@ -417,11 +427,11 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
     // });
 
     
-
-    wgoodService.list_color_type().then(function(data){
-	// console.log(data);
-	$scope.colorTypes = data;
-    });
+    $scope.colorTypes = wsaleGoodService.get_color_type();
+    // wgoodService.list_color_type().then(function(data){
+    // 	// console.log(data);
+    // 	$scope.colorTypes = data;
+    // });
 
     $scope.select_color = function(){
 	var callback = function(params){
@@ -598,7 +608,8 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 				id   :state.brand,
 				name :good.brand,
 				py   :diablo_pinyin(good.brand)});
-			    
+
+			    diabloFilter.reset_brand($scope.brands); 
 			    wsaleGoodService.set_brand($scope.brands);
 			};
 			good.brand_id = state.brand;
@@ -612,6 +623,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 				name :good.type,
 				py   :diablo_pinyin(good.type)});
 
+			    diabloFilter.reset_type($scope.types);
 			    wsaleGoodService.set_type($scope.types);
 			};
 			good.type_id = state.type;
@@ -666,7 +678,7 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 	$scope.good = {
 	    sex:       $scope.good.sex,
 	    year:      $scope.good.year,
-	    season:    $scope.good.season,
+	    season    : $scope.seasons[diablo_valid_season(current_month)],
 	    org_price: $scope.good.org_price,
 	    tag_price: $scope.good.tag_price,
 	    pkg_price: $scope.good.pkg_price,

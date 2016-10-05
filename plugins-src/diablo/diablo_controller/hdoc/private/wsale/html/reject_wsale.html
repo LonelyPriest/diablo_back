@@ -203,10 +203,10 @@
 		    <th class="text-center">序号</th>
 		    <th class="text-center">货号</th>
 		    <th class="text-center">品名</th>
-		    <th class="text-center">类别</th>
+		    <!-- <th class="text-center">类别</th> -->
 		    <!-- <th class="text-center">性别</th> -->
 		    <!-- <th class="text-center">厂商</th> -->
-		    <th class="text-center">季节</th>
+		    <!-- <th class="text-center">季节</th> -->
 		    <!-- <th class="text-center">单价类型</th> -->
 		    <th class="text-center">单价</th> 
 		    <th x-ng-if="setting.show_discount"
@@ -233,6 +233,7 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead="g as g.name for g in
 					    all_w_inventory|filter:{prompt:$viewValue}|limitTo:20"/>
@@ -251,6 +252,7 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
@@ -265,10 +267,10 @@
 		    
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand}}</td>
-		    <td class="vert-align">{{inv.type}}</td>
+		    <!-- <td class="vert-align">{{inv.type}}</td> -->
 		    <!-- <td class="vert-align">{{sexs[inv.sex]}}</td> -->
 		    <!-- <td>{{inv.firm}}</td> -->
-		    <td class="vert-align">{{seasons[inv.season]}}</td>
+		    <!-- <td class="vert-align">{{seasons[inv.season]}}</td> -->
 		    
 		    
 
@@ -418,8 +420,8 @@
 		  <!--stastic-->
 		  <tr x-ng-if="select.total && select.total !== 0"
 		      class="bg-white">
-		    <td x-ng-if="setting.show_discount" colspan="8"></td>
-		    <td x-ng-if="!setting.show_discount" colspan="7"></td>
+		    <td x-ng-if="setting.show_discount" colspan="6"></td>
+		    <td x-ng-if="!setting.show_discount" colspan="5"></td>
 		    <td class="danger text-center">{{select.should_pay}}</td>
 		    <td></td>
 		  </tr>

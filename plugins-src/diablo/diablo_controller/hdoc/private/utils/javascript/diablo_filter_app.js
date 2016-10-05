@@ -3,6 +3,45 @@ var diabloFilterApp = angular.module("diabloFilterApp", [], function($provide){
 });
 
 
+var user_set_storage = function(key, name, value){
+    var storage = localStorage.getItem(key);
+    if (angular.isDefined(storage) && storage !== null) {
+        var caches = JSON.parse(storage);
+        caches[name] = value;
+        // console.log(caches);
+        localStorage.setItem(key, JSON.stringify(caches));
+    } else {
+        var obj = {};
+        obj[name] = value;
+        localStorage.setItem(key, JSON.stringify(obj));
+    }
+};
+
+var user_get_from_storage = function(key, name){
+    var storage = localStorage.getItem(key);
+    if (angular.isDefined(storage) && storage !== null) {
+        var caches = JSON.parse(storage);
+        // console.log(caches);
+        // console.log(caches[name]);
+        return angular.isDefined(caches[name]) ? caches[name] : [];
+    }
+
+    return [];
+};
+
+var user_clear_from_storage = function(key, name){
+    var storage = localStorage.getItem(key);
+    if (angular.isDefined(storage) && storage !== null) {
+        var caches = JSON.parse(storage);
+        for (o in caches){
+            if (o === name) delete caches[o];
+        }
+
+        localStorage.setItem(key, JSON.stringify(caches));
+    }
+
+};
+
 function filterProvider(){
     // one filter include many fileds that used to filter
     var _filter = {fields: []}; 
@@ -17,11 +56,12 @@ function filterProvider(){
     var _colors    = [];
     var _employees = [];
     
-    
-    this.$get = function($resource, dateFilter, wgoodService){
+    this.$get = function($resource, $cookies, dateFilter, wgoodService){
 	var resource = $resource(
 	    "/purchaser/:operation", {operation: '@operation'},
 	    {query_by_post: {method: 'POST', isArray:true}});
+
+	var cookie = 'filter-' + $cookies.qzg_dyty_session;
 
 	return{
 	    default_time: function(start){
@@ -263,15 +303,22 @@ function filterProvider(){
 		}
 	    },
 
-	    reset_brand: function(){
-		_brands = [];
+	    reset_brand: function(brands){
+		if (angular.isUndefined(brands)) user_clear_from_storage(cookie, "brand");
+		else {
+		    user_set_storage(cookie, "brand", brands); 
+		} 
+		// _brands = [];
 	    },
 	    
 	    get_brand: function(){
-		if (_brands.length != 0 ){
-		    // console.log("cache brands");
-		    return _brands;
-		} else {
+		// if (_brands.length != 0 ){
+		//     // console.log("cache brands");
+		//     return _brands;
+		// }
+		var cached = user_get_from_storage(cookie, "brand");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
 		    return wgoodService.list_purchaser_brand(
 		    ).then(function(brands){
 			// console.log(brands);
@@ -279,21 +326,29 @@ function filterProvider(){
 			    return {id: b.id,
 				    name:b.name, py:diablo_pinyin(b.name)};
 			})
-
+			user_set_storage(cookie, "brand", _brands); 
 			return _brands;
 		    });    
 		}
 		
 	    },
 
-	    reset_type: function(){
-		_types = [];
+	    reset_type: function(types){
+		if (angular.isUndefined(types)) user_clear_from_storage(cookie, "type");
+		else {
+		    user_set_storage(cookie, "type", types); 
+		}
+		// user_clear_from_storage(cookie, "type");
+		// _types = [];
 	    },
 	    
 	    get_type: function(){
-		if (_types.length !== 0){
-		    return _types;
-		} else {
+		// if (_types.length !== 0){
+		//     return _types;
+		// }
+		var cached = user_get_from_storage(cookie, "type");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
 		    return wgoodService.list_purchaser_type(
 		    ).then(function(types){
 			// console.log(types);
@@ -301,17 +356,29 @@ function filterProvider(){
 			    return {id: t.id,
 				    name:t.name, py:diablo_pinyin(t.name)};
 			})
-
+			user_set_storage(cookie, "type", _types); 
 			return _types;
 		    });
 		} 
 	    },
 
+	    reset_color: function(colors){
+		if (angular.isUndefined(colors)) user_clear_from_storage(cookie, "color");
+		else {
+		    user_set_storage(cookie, "color", colors); 
+		}
+		// user_clear_from_storage(cookie, "type");
+		// _types = [];
+	    },
+	    
 	    get_color: function(){
-		if (_colors.length !== 0){
-		    // console.log("cache color");
-		    return _colors;
-		} else {
+		// if (_colors.length !== 0){
+		//     // console.log("cache color");
+		//     return _colors;
+		// }
+		var cached = user_get_from_storage(cookie, "color");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
 		    return wgoodService.list_purchaser_color(
 		    ).then(function(colors){
 			// console.log(colors);
@@ -321,34 +388,49 @@ function filterProvider(){
 				    tid:c.tid,
 				    type:c.type}
 			});
-
+			user_set_storage(cookie, "color", _colors); 
 			return _colors;
 		    })   
 		} 
 	    },
 
 	    get_color_type: function(){
-		return wgoodService.list_color_type().then(function(types){
-		   return types;
-		}); 
+		var cached = user_get_from_storage(cookie, "color_type");
+                if (cached.length !== 0){
+                    return cached;
+                } else {
+                    return wgoodService.list_color_type().then(function(types){
+			console.log(types);
+                        user_set_storage(cookie, "color_type", types);
+                        return types;
+                    });
+                } 
 	    },
 
 	    get_size_group: function(){
-		return wgoodService.list_purchaser_size().then(function(sizes){
-		    // console.log(sizes);
-		    return sizes.map(function(s){
-			return diablo_obj_strip(s);
-		    })
-		});
+		var cached = user_get_from_storage(cookie, "size_group");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
+		    wgoodService.list_purchaser_size().then(function(sizes){
+			// console.log(sizes);
+			var sgroups = sizes.map(function(s){
+			    return diablo_obj_strip(s);
+			});
+
+			user_set_storage(cookie, "size_group", sgroups); 
+		    });
+		} 
 	    },
 
 	    get_employee: function(){
-		if (_employees.length !== 0){
-		    return _employees;
-		} else {
+		// if (_employees.length !== 0){
+		//     return _employees;
+		// }
+		var cached = user_get_from_storage(cookie, "employee");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
 		    var http = $resource(
-			"/employ/:operation", {operation: '@operation'});
-		    
+			"/employ/:operation", {operation: '@operation'}); 
 		    return http.query(
 			{operation: 'list_employe'}
 		    ).$promise.then(function(employees){
@@ -358,8 +440,8 @@ function filterProvider(){
 				    id  :e.number,
 				    eid :e.id,
 				    py  :diablo_pinyin(e.name)}
-			});
-
+			}); 
+			user_set_storage(cookie, "employee", _employees); 
 			return _employees;
 		    });
 		} 
@@ -413,7 +495,7 @@ function normalFilterProvider(){
     var _baseSettings  = [];
     var _shops         = [];
     
-    this.$get = function($resource){
+    this.$get = function($resource, $cookies){
 	var _employeeHttp = $resource("/employ/:operation",    {operation: '@operation'});
 	var _retailerHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _provinceHttp = $resource("/wretailer/:operation", {operation: '@operation'});
@@ -423,7 +505,8 @@ function normalFilterProvider(){
 				  {
 				      post_get: {method: 'POST', isArray: true}
 				  });
-	
+
+	var cookie = 'filter-' + $cookies.qzg_dyty_session; 
 	var _shopHttp = $resource("/shop/:operation/:id",
     				  {operation: '@operation', id: '@id'});
 	
@@ -433,9 +516,12 @@ function normalFilterProvider(){
 	    }, 
 	    
 	    get_employee: function(){
-		if (_employees.length !== 0){
-		    return _employees;
-		} else {
+		// if (_employees.length !== 0){
+		//     return _employees;
+		// }
+		var cached = user_get_from_storage(cookie, "employee");
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		else {
 		    return _employeeHttp.query(
 			{operation: 'list_employe'}
 		    ).$promise.then(function(employees){
@@ -446,7 +532,7 @@ function normalFilterProvider(){
 				    eid  :e.id,
 				    py   :diablo_pinyin(e.name)}
 			});
-
+			user_set_storage(cookie, "employee", _employees); 
 			return _employees;
 		    });   
 		} 
@@ -513,19 +599,31 @@ function normalFilterProvider(){
 	    },
 
 	    get_base_setting: function(){
-		if (_baseSettings.length !== 0 ){
-		    return _baseSettings;
-		} else {
+		var cached = user_get_from_storage(cookie, "base_setting");
+		if (cached.length !== 0) return cached;
+		else {
 		    return _baseHttp.query(
 			{operation: "list_base_setting"}
 		    ).$promise.then(function(ss){
 			_baseSettings = ss.map(function(s){
 			    return {name:s.ename, value:s.value, shop:s.shop}; 
 			});
+			user_set_storage(cookie, "base_setting", _baseSettings);
 			return _baseSettings;
-		    })    
+		    })
 		}
-		
+		// if (_baseSettings.length !== 0 ){
+		//     return _baseSettings;
+		// } else {
+		//     return _baseHttp.query(
+		// 	{operation: "list_base_setting"}
+		//     ).$promise.then(function(ss){
+		// 	_baseSettings = ss.map(function(s){
+		// 	    return {name:s.ename, value:s.value, shop:s.shop}; 
+		// 	});
+		// 	return _baseSettings;
+		//     })    
+		// } 
 	    },
 
 	    get_shop: function(){

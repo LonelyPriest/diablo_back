@@ -308,7 +308,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    // console.log($scope.setting);
 
 	    $scope.stastic_colspan = function(){
-		var all_colspan = 8;
+		var all_colspan = 7;
 		if (!$scope.setting.show_discount){
 		    all_colspan -= 1;
 		}

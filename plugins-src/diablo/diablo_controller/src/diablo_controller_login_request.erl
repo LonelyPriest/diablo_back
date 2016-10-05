@@ -132,7 +132,7 @@ response_with_cookie(Req, Cookie, Path, _UserName) ->
     %% 	 {[{<<"ecode">>, ?SUCCESS},
     %% 	   {<<"path">>,  ?to_b(Path)},
     %% 	   {<<"user">>,  UserName}]})}).
-    Req:respond({301, [{"Location", Path},
+    Req:respond({302, [{"Location", Path},
 		       {"Content-Type", "text/html; charset=UTF-8"},
 		       Cookie],
 		 "Redirecting " ++ Path}).

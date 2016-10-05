@@ -287,7 +287,7 @@
 		    <!-- <th class="text-center warning">上次价格</th> -->
 		    <!-- <th class="text-center warning">上次折扣</th> -->
 		    
-		    <th class="text-center">单价类型</th>
+		    <th x-ng-if="false" class="text-center">单价类型</th>
 		    <th class="text-center">单价</th>
 		    <th x-ng-if="setting.show_discount"
 			class="text-center">折扣</th>
@@ -316,6 +316,7 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead="g as g.name for g in
 					    all_w_inventory|filter:{prompt:$viewValue}|limitTo:20"/>
@@ -335,6 +336,7 @@
 				 placeholder="货号"
 				 typeahead-editable="false"
 				 typeahead-exact-match="true"
+				 typeahead-offset-right="true"
 				 typeahead-on-select="on_select_good($item, $model, $label)"
 				 typeahead-wait-ms="500"
 				 typeahead-loading="loading"
@@ -353,7 +355,7 @@
 			class="vert-align">{{inv.total}}
 		    </td> 
 
-		    <td class="vert-align">
+		    <td x-ng-if="false" class="vert-align">
 		      <div>{{inv.sell_style.name}}</div> 
 		    </td>
 
