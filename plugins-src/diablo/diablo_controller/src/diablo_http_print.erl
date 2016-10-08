@@ -553,6 +553,13 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     {IsHand, _}      = field(hand, Fields),
     {IsSizeName, _}  = field(size_name, Fields),
     %% {IsSize, _}      = field(size, Fields),
+
+    FreeMode = case lists:filter(fun({F, _, _})->
+					 <<"color">> =:= F
+					     andalso <<"size">> =:= F
+					     andalso <<"size_name">> =:= F
+				 end, Fields) of
+		   [] -> true; _ -> false end, 
     
     {ok, SizeGroups} = 
 	case IsHand orelse IsSizeName orelse PrintModel =:= ?ROW of
@@ -575,7 +582,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		%% ?DEBUG("row content ~ts", [RowContent]),
 		left_pading(PBrand, Model) ++ 
 		    format_row_content(
-		      PrintTable, PrintModel, IsHand,
+		      PrintTable, PrintModel, {IsHand, FreeMode},
 		      Fields, SizeGroups, Inv, A, RowNo) ++  br(PBrand)
 		    
 		    ++ case PrintTable of
@@ -654,7 +661,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		BodyContent = 
 		    lists:foldr(
 		      fun({struct, Inv}, Acc0)->
-			      Amounts = ?v(<<"amounts">>, Inv), 
+			      Amounts = ?v(<<"amounts">>, Inv),
 			      {RT, RH} = lists:foldr(HandFun, {0, 0}, Amounts),
 			      RowFun([{<<"total">>, RT},
 				      {<<"hand">>, RH}|Inv], []) ++ Acc0 
@@ -672,7 +679,12 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		{BodyContent, _TotalRowNo} = 
 		    lists:foldr(
 		      fun({struct, Inv}, {Acc0, No})->
-			      Amounts = ?v(<<"amounts">>, Inv),
+			      ?DEBUG("Inv ~p", [Inv]),
+			      Amounts =
+				  case FreeMode of
+				      true -> [{struct, Inv}];
+				      false -> ?v(<<"amounts">>, Inv)
+				  end,
 			      {ColumnRow, RowNo} =
 				  lists:foldr(
 				    fun({struct, A}, {Acc1, No1}) -> 
@@ -903,7 +915,7 @@ format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount,
 	      end ++ Acc 
       end, [], Fields);
 
-format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, RowNo) ->
+format_row_content(?TABLE, PrintModel, {IsHand, FreeMode}, Fields, SizeGroups, Inv, Amount, RowNo) ->
     %% ?DEBUG("format_row_content with Fields ~p, rowno ~p", [Fields, RowNo]),
     Brand       = ?v(<<"brand_name">>, Inv),
     StyleNumber = ?v(<<"style_number">>, Inv),
@@ -915,7 +927,7 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
     FPrice      = Price * Discount / 100,
 
     %% ?DEBUG("amount ~p", [Amount]),
-    Count = case IsHand of
+    Count = case IsHand orelse FreeMode =:= true of
 		true -> ?v(<<"total">>, Inv);
 		false ->
 		    case ?w_sale:direct(?v(<<"direct">>, Amount)) of
@@ -956,7 +968,7 @@ format_row_content(?TABLE, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount, 
 		  <<"type">>         ->
 		      TypeLen = width(chinese, Type),
 		      %% ?DEBUG("StyleNumber ~p, TypeLen ~p",
-		      %% 	     [StyleNumber, TypeLen]),
+		      %% 	     [StyleNumber, TypeLen]), 
 		      ?to_s(Type)
 			  ++ pading(Width - TypeLen -1) ++ phd("|");
 		  <<"color">>        ->
@@ -1105,7 +1117,10 @@ address(Brand, Model, Column, Address, Setting, Mobile, Phones) ->
 				      ++ phone(Phone, Remark)}
 			     end
 		     end, {10 + length(?to_s(Mobile)), []}, Phones),
-	       "联系方式：" ++ ?to_s(Mobile) ++ SPhone ++ br(Brand);
+	       case Mobile =:= [] orelse SPhone =:=[] of
+		   true -> "联系方式：" ++ ?to_s(Mobile) ++ SPhone ++ br(Brand);
+		   false -> []
+	       end;
 	   ?NO -> []
        end. 
 
@@ -1361,8 +1376,8 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
     Wire         = ?v(<<"wire">>, Attrs, 0),
     VerifyPay    = ?v(<<"verificate">>, Attrs, 0),
     ShouldPay    = ?v(<<"should_pay">>, Attrs, 0),
-    Total        = ?v(<<"total">>, Attrs, 0),
-    Comment      = ?v(<<"comment">>, Attrs, []),
+    %% Total        = ?v(<<"total">>, Attrs, 0),
+    %% Comment      = ?v(<<"comment">>, Attrs, []),
     EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     EPay         = ?v(<<"e_pay">>, Attrs, 0),
     Direct       = ?v(<<"direct">>, Attrs),
@@ -1383,27 +1398,30 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
 
     IsRound = ?to_i(?v(<<"pround">>, Setting, ?NO)),
     
-    left_pading(Brand, Model) ++ "总计：" ++ ?to_s(Total) 
-	++ case RTotal =/= 0 of
-	       true ->
-		   "（售：" ++ ?to_s(STotal) ++ pading(1)
-		       ++ "退：" ++ ?to_s(erlang:abs(RTotal)) ++ "）" 
-		       ++ br(Brand)
-		       ++ left_pading(Brand, Model); 
-	       false ->
-		   pading(2)
+    %% left_pading(Brand, Model) ++ "合计：" ++ ?to_s(Total)
+    left_pading(Brand, Model)
+	++ decorate_data(bw)
+	++ "销售:" ++ ?to_s(STotal) ++ pading(1)
+	++ case RTotal =:= 0 of
+	       true -> [];
+	       _ -> "退货:" ++ ?to_s(erlang:abs(RTotal)) ++ pading(1)
 	   end
-	++ "总金额：" ++ round(IsRound, TotalSPay) 
-	++ pading(2) ++ "备注：" ++ ?to_s(Comment) 
+	
+	++ "金额:" ++ round(IsRound, TotalSPay)
+	++ decorate_data(cancel_bw)
+	
+	%% ++ pading(2) ++ "备注：" ++ ?to_s(Comment) 
 	++ br(Brand)
 
 	++ left_pading(Brand, Model) 
-	++ "本次应付：" ++ round(IsRound, ShouldPay)
-	++ extra_pay(EPayType, EPay) 
-	++ br(Brand)
-	
+	++ "应付：" ++ decorate_data(block)
+	++ round(IsRound, ShouldPay) ++ decorate_data(cancel_block)
+	++ case extra_pay(EPayType, EPay) of
+	       [] -> pading(2);
+	       _V -> _V ++ br(Brand)
+	   end 
 	++ left_pading(Brand, Model)
-	++ "本次实付：" ++ decorate_data(block)
+	++ "实付：" ++ decorate_data(block)
 	++ round(IsRound, HasPay) ++ decorate_data(cancel_block)
 	++ pay(Cash, Card, Wire, VerifyPay)
 	++ br(Brand)
@@ -1643,6 +1661,7 @@ body_foot(format_column, Brand, Model, Column, HeadPhone, [], Phones, Acc) ->
     body_foot(format_column, Brand, Model, Column, HeadPhone, [], TPhones, Acc ++ S1);
     
 body_foot(format_column, Brand, Model, Column, HeadPhone, Banks, Phones, Acc) ->
+    ?DEBUG("banks ~p", [Banks]),
     [{Bank}|TBanks] = Banks, 
     Name     = ?v(<<"name">>, Bank),
     BankName = ?v(<<"bank">>, Bank),
@@ -2222,7 +2241,7 @@ pay(wire, Wire)                 -> "汇款：" ++ ?to_s(Wire);
 pay(veri, Veri) when Veri == 0  -> [];
 pay(veri, Veri)                 -> "核销：" ++ ?to_s(Veri).
 
-extra_pay_type(0) -> "运费代付";
+extra_pay_type(0) -> "代付运费";
 extra_pay_type(1) -> "样衣";
 extra_pay_type(2) -> "少配饰";
 extra_pay_type(3) -> "代付现金";

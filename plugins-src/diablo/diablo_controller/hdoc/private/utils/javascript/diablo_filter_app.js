@@ -22,11 +22,11 @@ var user_get_from_storage = function(key, name){
     if (angular.isDefined(storage) && storage !== null) {
         var caches = JSON.parse(storage);
         // console.log(caches);
-        // console.log(caches[name]);
-        return angular.isDefined(caches[name]) ? caches[name] : [];
+        // console.log(name, console.log(caches[name]));
+        return angular.isDefined(caches[name]) && angular.isArray(caches[name]) ? caches[name] : undefined;
     }
 
-    return [];
+    return undefined;
 };
 
 var user_clear_from_storage = function(key, name){
@@ -377,7 +377,8 @@ function filterProvider(){
 		//     return _colors;
 		// }
 		var cached = user_get_from_storage(cookie, "color");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (angular.isDefined(cached) && angular.isArray(cached))
+		    return cached;
 		else {
 		    return wgoodService.list_purchaser_color(
 		    ).then(function(colors){
@@ -396,7 +397,7 @@ function filterProvider(){
 
 	    get_color_type: function(){
 		var cached = user_get_from_storage(cookie, "color_type");
-                if (cached.length !== 0){
+                if (angular.isDefined(cached) && cached.length !== 0){
                     return cached;
                 } else {
                     return wgoodService.list_color_type().then(function(types){
@@ -409,15 +410,16 @@ function filterProvider(){
 
 	    get_size_group: function(){
 		var cached = user_get_from_storage(cookie, "size_group");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (angular.isDefined(cached) && angular.isArray(cached)) return cached;
 		else {
-		    wgoodService.list_purchaser_size().then(function(sizes){
-			// console.log(sizes);
+		    return wgoodService.list_purchaser_size().then(function(sizes){
+			console.log(sizes);
 			var sgroups = sizes.map(function(s){
 			    return diablo_obj_strip(s);
 			});
 
-			user_set_storage(cookie, "size_group", sgroups); 
+			user_set_storage(cookie, "size_group", sgroups);
+			return sgroups;
 		    });
 		} 
 	    },
@@ -600,7 +602,7 @@ function normalFilterProvider(){
 
 	    get_base_setting: function(){
 		var cached = user_get_from_storage(cookie, "base_setting");
-		if (cached.length !== 0) return cached;
+		if (angular.isArray(cached) && cached.length !== 0) return cached;
 		else {
 		    return _baseHttp.query(
 			{operation: "list_base_setting"}

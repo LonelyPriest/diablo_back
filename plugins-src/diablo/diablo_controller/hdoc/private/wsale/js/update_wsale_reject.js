@@ -234,7 +234,12 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 		
 		tag.order_id = order_length;
 		if (tag.sizes.length !== 1 || tag.sizes[0] !=="0" ){
-		    tag.sizes = wgoodService.get_size_group(tag.s_group, filterSizeGroup); 
+		    if (in_array(tag.sizes, "0")){
+			tag.sizes = ["0"].concat(wgoodService.get_size_group(
+			    tag.s_group, filterSizeGroup));
+		    } else {
+			tag.sizes = wgoodService.get_size_group(tag.s_group, filterSizeGroup); 
+		    }
 		}
 		$scope.inventories.push(tag);
 		order_length--;

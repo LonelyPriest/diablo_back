@@ -1183,9 +1183,7 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 			   get_amount: get_amount 
 			  };
 	    
-	    dialog.edit_with_modal(
-		"inventory-detail.html",
-		undefined, undefined, $scope, payload);
+	    dialog.edit_with_modal("inventory-detail.html", undefined, undefined, $scope, payload);
 	} else{
 	    purchaserService.list_purchaser_inventory(
 		{style_number: inv.style_number,

@@ -216,7 +216,7 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
 	    if (!in_array(used_sizes, inv.size)){
 		used_sizes.push(inv.size);
 	    };
-
+	    // console.log(used_sizes);
 	    // console.log(inv.color_id);
 	    // console.log(allColors);
 	    // console.log(colors);
@@ -243,6 +243,9 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
 	} else{
 	    order_used_sizes = used_sizes;
 	};
+
+	if (in_array(used_sizes, "0") && !in_array(order_used_sizes, "0"))
+	    order_used_sizes = ["0"].concat(order_used_sizes);
 	
 
 	// console.log(order_used_sizes);

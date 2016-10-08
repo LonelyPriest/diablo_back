@@ -57,12 +57,12 @@
 	  		  x-ng-click="add_retailer()">
 		    <i class="glyphicon glyphicon-plus"></i></button> 
 	  	</span>
-		<!-- <span class="input-group-btn"> -->
-		<!--   <button class="btn default fg-red" -->
-		<!-- 	  x-ng-disabled="!select.retailer" -->
-	  	<!-- 	  x-ng-click="select.retailer=undefined"> -->
-		<!--     <i class="glyphicon glyphicon-pushpin"></i></button> -->
-		<!-- </span> -->
+		<span class="input-group-btn">
+		  <button class="btn default fg-red"
+			  x-ng-disabled="!select.retailer"
+	  		  x-ng-click="select.retailer=undefined">
+		    <i class="glyphicon glyphicon-pushpin"></i></button>
+		</span>
 	      </div>
 	    </div>
 
@@ -1019,7 +1019,7 @@
 <script type="text/ng-template" id="wsale-new.html">
   <div class="modal-body"> 
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-sm-5 col-md-5">
 	<div class="input-group">
 	  <span class="input-group-addon"><i class="glyphicon glyphicon-scale fg-red"></i></span>
 	  <select class="form-control text-center"
@@ -1034,7 +1034,7 @@
 	</div>
       </div>
 
-      <div class="col-md-7">
+      <div class="col-sm-7 col-md-7">
 	<div class="input-group">
 	  <span class="input-group-addon"><i class="glyphicon glyphicon-scissors fg-red"></i></span>
 	  <form name="fdiscount">
@@ -1081,19 +1081,19 @@
 	    <td class="col-md-1">批量</td>
 	  </tr>
 	  <tr x-ng-repeat="c in params.colors">
-	    <td x-ng-show="params.large_size" x-ng-switch on="c.cid">
-	      <span x-ng-switch-when="0">均色</span>
-	      <span x-ng-switch-default>{{c.cname}}</span>
-	    </td>
-
-	    <td class="col-md-1" x-ng-show="!params.large_size" x-ng-switch on="c.cid">
-	      <span x-ng-switch-when="0">均色</span>
-	      <span x-ng-switch-default>{{c.cname}}</span>
-	    </td>
-	    <!-- <td class="col-md-1" x-ng-switch on="c.cid"> -->
+	    <!-- <td x-ng-show="params.large_size" x-ng-switch on="c.cid"> -->
 	    <!--   <span x-ng-switch-when="0">均色</span> -->
 	    <!--   <span x-ng-switch-default>{{c.cname}}</span> -->
 	    <!-- </td> -->
+
+	    <!-- <td class="col-md-1" x-ng-show="!params.large_size" x-ng-switch on="c.cid"> -->
+	    <!--   <span x-ng-switch-when="0">均色</span> -->
+	    <!--   <span x-ng-switch-default>{{c.cname}}</span> -->
+	    <!-- </td> -->
+	    <td class="col-md-1" x-ng-switch on="c.cid">
+	      <span x-ng-switch-when="0">均色</span>
+	      <span x-ng-switch-default>{{c.cname}}</span>
+	    </td>
 	    
 	    <td x-ng-repeat="s in params.sizes">
 	      <div x-ng-if="(amount=params.get_amount(c.cid, s, params.amounts))?true:false">
@@ -1103,8 +1103,7 @@
 		    {{amount.count}}
 		  </span>
 		  <form name="aform">
-		    <div ng-class="{'has-error':aform.$invalid
-				   || !params.valid_sell(amount)}">
+		    <div ng-class="{'has-error':aform.$invalid || !params.valid_sell(amount)}">
 		      <input x-ng-if="amount"
 			     class="form-control modal-input text-center"
 			     type="number" step="1"

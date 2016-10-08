@@ -4378,6 +4378,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //Issue #3699
       var selected;
 
+      var current_keydown_code;
+
       //create a child scope for the typeahead directive so we are not polluting original scope
       //with typeahead-specific data (matches, query etc.)
       var scope = originalScope.$new();
@@ -4461,7 +4463,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
               recalculatePosition();
 
               element.attr('aria-expanded', true);
-	      if (isExactMatch && scope.matches.length===1) scope.select(0);
+	     if (current_keydown_code !== 8 && isExactMatch && scope.matches.length===1) scope.select(0);
             } else {
               resetMatches();
             }
@@ -4634,7 +4636,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
 
       //bind keyboard events: arrows up(38) / down(40), enter(13) and tab(9), esc(27)
       element.bind('keydown', function (evt) {
-
+	current_keydown_code = evt.which;
         //typeahead is open and an "interesting" key was pressed
         if (scope.matches.length === 0 || HOT_KEYS.indexOf(evt.which) === -1) {
           return;
@@ -4651,7 +4653,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
           scope.$digest();
           return;
         }
-
+	
         evt.preventDefault();
 
         if (evt.which === 40) {

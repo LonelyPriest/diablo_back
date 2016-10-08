@@ -37,7 +37,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
     //  var filterEmployee = wsaleGoodService.get_employee();
     //  var filterSizeGroup = wsaleGoodService.get_size_group();
     //  var base = wsaleGoodService.get_base(); 
-
+    // console.log(filterSizeGroup);
     wsaleGoodService.set_brand(angular.copy(filterBrand));
     wsaleGoodService.set_type(angular.copy(filterType));
     wsaleGoodService.set_size_group(angular.copy(filterSizeGroup));
@@ -1269,8 +1269,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 		// data[0] is the inventory belong to the shop
 		// data[1] is the last sale of the shop
 
-		if ($scope.setting.check_sale === diablo_yes
-		    || inv.free !== 0){
+		if ($scope.setting.check_sale === diablo_yes || inv.free !== 0){
 		    var shop_now_inv = data[0];
 		    
 		    var order_sizes =

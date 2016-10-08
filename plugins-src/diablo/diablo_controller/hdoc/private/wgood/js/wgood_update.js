@@ -3,7 +3,9 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
     filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
     filterColorType, user, base){
-    // console.log(filterSizeGroup); 
+    // console.log(filterSizeGroup);
+    // console.log(filterType);
+    console.log(filterBrand);
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
     $scope.full_years = diablo_full_year;
@@ -28,6 +30,7 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope.types  = filterType;
     $scope.brands = filterBrand;
     $scope.groups = filterSizeGroup;
+    console.log($scope.groups);
     $scope.filterColors = angular.copy(filterColor);
     $scope.colorTypes = filterColorType;
 

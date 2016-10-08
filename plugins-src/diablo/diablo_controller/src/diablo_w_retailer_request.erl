@@ -9,9 +9,9 @@
 
 
 -import(?f_print,
-	[width/2, middle/3, middle/4,
+	[width/2,
 	 pading/1, clean_zero/1, br/1,
-	 line/2, phd/1, line_space/1]).
+	 line/2, phd/1]).
 
 %%--------------------------------------------------------------------
 %% @desc: GET action
@@ -166,6 +166,7 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 	    {ok, MerchantInfo} = ?wifi_print:detail(merchant, Merchant), 
 	    {ok, Banks}        = ?wifi_print:detail(bank, Merchant), 
 	    {Setting, Phones}  = ?wifi_print:detail(base_setting, Merchant, ShopId),
+	    HeadPhone          = ?to_i(?v(<<"head_phone">>, Setting, ?NO)),
 
 	    ShopAddr = ?v(<<"address">>, ShopInfo), 
 	    Mobile   = ?v(<<"mobile">>, MerchantInfo),
@@ -195,7 +196,7 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 
 				  Title = ?wifi_print:title(Brand, Model, Column, Head)
 				      ++ ?wifi_print:address(
-					    Brand, Model, Column, ShopAddr, Setting)
+					    Brand, Model, Column, ShopAddr, Setting, Mobile, Phones)
 				      ++ br(Brand) ++ line(minus, 99) ++ br(Brand), 
 
 				  TableHead = phd(c) ++ "序号" ++ phd(c)
@@ -232,6 +233,7 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 						    Brand,
 						    Model,
 						    Column,
+						    HeadPhone,
 						    Banks,
 						    Mobile,
 						    Phones);
@@ -241,6 +243,7 @@ action(Session, Req, {"print_w_retailer_trans"}, Payload) ->
 						 Brand,
 						 Model,
 						 Column,
+						 HeadPhone,
 						 Banks,
 						 [{<<"phone">>, Mobile, []}|Phones],
 						 [])
