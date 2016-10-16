@@ -1,6 +1,6 @@
 var purchaserApp = angular.module(
     'purchaserApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource',
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies',
      'LocalStorageModule', 'fsm',
      'diabloPattern', 'diabloNormalFilterApp', 'diabloUtils',
      'userApp', 'employApp', 'wgoodApp'])

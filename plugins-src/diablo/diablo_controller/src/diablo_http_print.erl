@@ -356,7 +356,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 					 line_space('1/6');
 				     ?STRING ->
 					 []
-				 end,
+				 end ++ br(Brand),
 			  %% ?DEBUG("body ~ts", [?to_b(Body)]),
 
 			  Stastic = body_stastic(
@@ -555,11 +555,13 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     %% {IsSize, _}      = field(size, Fields),
 
     FreeMode = case lists:filter(fun({F, _, _})->
+					 ?DEBUG("F ~p", [F]),
 					 <<"color">> =:= F
-					     andalso <<"size">> =:= F
-					     andalso <<"size_name">> =:= F
+					     orelse <<"size">> =:= F
+					     orelse <<"size_name">> =:= F
 				 end, Fields) of
-		   [] -> true; _ -> false end, 
+		   [] -> true; _ -> false end,
+    ?DEBUG("free mode ~p", [FreeMode]),
     
     {ok, SizeGroups} = 
 	case IsHand orelse IsSizeName orelse PrintModel =:= ?ROW of
@@ -1117,7 +1119,8 @@ address(Brand, Model, Column, Address, Setting, Mobile, Phones) ->
 				      ++ phone(Phone, Remark)}
 			     end
 		     end, {10 + length(?to_s(Mobile)), []}, Phones),
-	       case Mobile =:= [] orelse SPhone =:=[] of
+	       ?DEBUG("Mobile ~p, SPhone ~p", [Mobile, SPhone]),
+	       case Mobile =/= [] orelse SPhone =/=[] of
 		   true -> "联系方式：" ++ ?to_s(Mobile) ++ SPhone ++ br(Brand);
 		   false -> []
 	       end;
@@ -1194,10 +1197,14 @@ head(Brand, Model, Column, RSN, PRetailer, Retailer, Employee, Date) ->
 	++ "店员：" ++ ?to_s(Employee) ++ ?f_print:br(Brand)
 	++ case PRetailer of
 	       ?YES ->
-		   pading(6)
-		       ++ ?to_s(?v(<<"mobile">>, Retailer)) ++ br(Brand)
-		       ++ pading(6)
-		       ++ ?to_s(?v(<<"address">>, Retailer)) ++ br(Brand);
+		   case ?to_s(?v(<<"mobile">>, Retailer)) of
+		       [] -> [];
+		       SR ->  pading(6) ++ SR ++ br(Brand)
+		   end ++
+		       case ?to_s(?v(<<"address">>, Retailer)) of
+			   [] -> [];
+			   SA -> pading(6) ++ SA ++ br(Brand)
+		       end;
 	       ?NO ->
 		   []
 	   end.
@@ -1439,7 +1446,7 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
 	
 	%% ++ pading(2) ++ "累计欠款：" ++ decorate_data(block) 
 	%% ++ round(IsRound, AccDet)  ++ decorate_data(cancel_block)
-	++ br(Brand);
+	++ br(Brand) ++ br(Brand);
 
 body_stastic(Brand, Model, Column, Setting, Attrs) ->
     LastBalance  = ?v(<<"balance">>, Attrs, 0), 
@@ -1525,8 +1532,7 @@ body_stastic(Brand, Model, Column, Setting, Attrs) ->
 	%% ++ round(IsRound, AccDet) ++ decorate_data(cancel_block);
 	++ debt(print_format, Setting, LastBalance, DebtName, Debt, AccDet)
 	
-	++ br(Brand) ++ ?f_print:line(minus, Column)
-	++ br(Brand).
+	++ br(Brand) ++ ?f_print:line(minus, Column) ++ br(Brand).
 
 body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
     ?DEBUG("start to build body_foot banks ~p~nmobile ~p~nsetting ~p~n",

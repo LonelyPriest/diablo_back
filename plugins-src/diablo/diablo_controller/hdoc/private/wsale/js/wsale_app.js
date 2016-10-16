@@ -1,7 +1,7 @@
 "use strict";
 var wsaleApp = angular.module(
     'wsaleApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource',
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies',
      'diabloAuthenApp', 'diabloPattern', 'diabloUtils',
      'userApp', 'employApp', 'wretailerApp', 'purchaserApp'])
     .config(function(localStorageServiceProvider){

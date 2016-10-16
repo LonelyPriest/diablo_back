@@ -1,6 +1,6 @@
 var wretailerApp = angular.module(
     'wretailerApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource', 'LocalStorageModule',
+    ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies', 'LocalStorageModule',
      'wgoodApp', 'diabloAuthenApp', 'diabloFilterApp',
      'diabloNormalFilterApp', 'diabloPattern', 'diabloUtils', 'userApp'])
     .config(function(localStorageServiceProvider){

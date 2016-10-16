@@ -1,5 +1,5 @@
 var wgoodApp = angular.module(
-    "wgoodApp", ['ngRoute', 'ngResource',
+    "wgoodApp", ['ngRoute', 'ngResource', 'ngCookies',
 		 'diabloUtils', 'diabloFilterApp', 'diabloNormalFilterApp',
 		 'diabloPattern', 'diabloAuthenApp', 'ui.bootstrap',
 		 'userApp'])

@@ -1,5 +1,5 @@
 var firmApp = angular.module(
-    'firmApp', ['ui.bootstrap', 'ngRoute', 'ngResource',
+    'firmApp', ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies',
 		'LocalStorageModule', 'diabloAuthenApp',
 		'diabloFilterApp', 'diabloNormalFilterApp',
 		'diabloPattern', 'diabloUtils', 'userApp', 'wgoodApp'])
