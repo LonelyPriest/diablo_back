@@ -614,12 +614,14 @@ print(RSN, Merchant, ResponseFun) ->
 	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
 		     || {DeviceId, ECode} <- Failed],
 	    ResponseFun(1, PInfo); 
+	{error, {ECode, _EInfo}} ->
+	    ?DEBUG("error, ecode ~p, einfo ~p", [ECode, _EInfo]),
+	    ResponseFun(ECode, []);
 	{_Success, Failed} when is_list(Failed)->
+	    ?DEBUG("Success ~p, Failed ~p", [_Success, Failed]),
 	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
 		     || {DeviceId, ECode} <- Failed],
-	    ResponseFun(2, PInfo);
-	{error, {ECode, _EInfo}} ->
-	    ResponseFun(ECode, [])
+	    ResponseFun(2, PInfo)
     end.
     %% catch
     %% 	EType:What ->

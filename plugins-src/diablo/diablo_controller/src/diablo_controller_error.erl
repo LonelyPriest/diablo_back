@@ -335,10 +335,10 @@ error(wprinter_exist, PId) ->
     {2301, "wprinter " ++ ?to_s(PId) ++ " is been exist."};
 
 error(wprinter_conn_exist, CId) ->
-    {2301, "wprinter connection " ++ ?to_s(CId) ++ " is been exist."};
+    {2302, "wprinter connection " ++ ?to_s(CId) ++ " is been exist."};
 
 error(wprinter_conn_used, CId) ->
-    {2302, "wprinter connection " ++ ?to_s(CId) ++ " has been used."};
+    {2303, "wprinter connection " ++ ?to_s(CId) ++ " has been used."};
 
 %% wsale
 error(shop_not_printer, Shop) ->
@@ -383,6 +383,10 @@ error(printer_conn_not_found, Printer) ->
     {2422, "printer device " ++ ?to_s(Printer) ++ " not found."};
 error(print_size_not_include, Shop) ->
     {2423, "print field size must be include of shop " ++ ?to_s(Shop)};
+error(total_not_equal_between_trans_and_note, RSN) ->
+    {2424, "total not equal of rsn " ++ ?to_s(RSN)};
+error(pay_not_equal_between_trans_and_note, RSN) ->
+    {2425, "should pay not equal of rsn " ++ ?to_s(RSN)};
 
 %% w_inventory
 error(stock_sn_not_exist, SN) ->

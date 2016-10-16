@@ -1,5 +1,5 @@
 wsaleApp.controller("wsaleUpdateDetailCtrl", function(
-    $scope, $routeParams, $q, dateFilter, diabloUtilsService,
+    $scope, $routeParams, $q, $timeout,dateFilter, diabloUtilsService,
     diabloPromise, diabloFilter, diabloPattern, diabloNormalFilter,
     wgoodService, purchaserService, wretailerService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
@@ -641,7 +641,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    return;
 	};
 
-	$scope.re_calculate();
+	// $scope.re_calculate();
 
 	var updates = get_update_inventory();
 	// console.log(updates);
@@ -926,7 +926,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
     };
 
     $scope.add_free_inventory = function(inv){
-	// console.log(inv);
+	// console.log(inv); 
 	inv.$edit = true;
 	inv.$new  = false;
 	inv.amounts[0].sell_count = inv.sell;
@@ -1148,19 +1148,81 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	    callback, $scope, payload)
     };
 
+
+    $scope.timeout_auto_save = undefined;
     $scope.save_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save); 
 	inv.free_update = false; 
 	inv.amounts[0].sell_count = inv.sell;
 	$scope.re_calculate(); 
     }
 
     $scope.cancel_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
 	inv.free_update = false;
 	inv.sell = inv.amounts[0].sell_count;
 	$scope.re_calculate(); 
     }
 
     $scope.reset_inventory = function(inv){
+	$timeout.cancel($scope.timeout_auto_save);
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
+
+
+    $scope.auto_save_free = function(inv){
+	if (angular.isUndefined(inv.sell)
+	    || !inv.sell
+	    || parseInt(inv.sell) === 0
+	    || angular.isUndefined(inv.style_number)){
+	    return;
+	} 
+
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    // console.log(inv); 
+	    if (angular.isUndefined(inv.sell)
+		|| !inv.sell
+		|| parseInt(inv.sell) === 0
+		|| angular.isUndefined(inv.style_number)){
+		$timeout.cancel($scope.timeout_auto_save);
+		return;
+	    } 
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    }; 
+
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
+	}, 1000); 
+    };
+
+
+    $scope.auto_save_free_of_price = function(inv){
+	if (inv.$new && inv.free_color_size){
+	    return;
+	};
+
+	if (angular.isUndefined(inv.fprice) || inv.fprice === 0){
+	    return;
+	}
+
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    // console.log(inv); 
+	    // if (inv.$new && inv.free_color_size){
+	    // 	$scope.add_free_inventory(inv);
+	    // };
+	    if (angular.isUndefined(inv.fprice) || inv.fprice === 0){
+		$timeout.cancel($scope.timeout_auto_save);
+		return;
+	    } 
+
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
+	}, 1000); 
+    };
+    
 })

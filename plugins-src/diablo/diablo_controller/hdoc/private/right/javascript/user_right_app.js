@@ -1,6 +1,6 @@
-var userApp = angular.module("userApp", ['ngResource', 'ngCookies']); 
+var userApp = angular.module("userApp", ['ngResource']); 
 
-userApp.factory("userService", function($resource, $q, $cookies){
+userApp.factory("userService", function($resource, $q){
     var _user = $resource("/right/:operation", {operation: '@operation'}); 
     var _shops         = [];
     var _rights        = [];
@@ -211,7 +211,8 @@ userApp.factory("userService", function($resource, $q, $cookies){
 	//     return sort();
 	    
 	// } 
-	var cookie  = 'login-' + $cookies.qzg_dyty_session;
+	var cookie  = 'login-' + diablo_get_cookie("qzg_dyty_session");
+	// console.log(cookie);
         var storage = localStorage.getItem(cookie);
         if (angular.isDefined(storage) && storage !== null) {
             return JSON.parse(storage);

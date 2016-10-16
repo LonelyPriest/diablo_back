@@ -163,8 +163,7 @@ call(Parent, {print, RSN, Merchant}) ->
     try 
 	{ok, Sale} = ?w_sale:sale(get_new, Merchant, RSN),
 	?DEBUG("sale ~p", [Sale]),
-	{ok, Details} =
-	    ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
+	{ok, Details} = ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
 	%% ?DEBUG("details ~p", [Details]),
 
 	NewDetails = [ {D1} || {D1} <- Details, ?v(<<"total">>, D1) < 0 ]  ++
@@ -185,10 +184,22 @@ call(Parent, {print, RSN, Merchant}) ->
 		    end
 	    end,
 	
-	{SortInvs, STotal, RTotal} = sort_inventory(
-					Merchant, GetBrand, NewDetails, [], 0, 0),
+	{SortInvs, STotal, RTotal, Pay} =
+	    sort_inventory(Merchant, GetBrand, NewDetails, [], 0, 0, 0),
+	?DEBUG("spay ~p, total ~p, stotal ~p, rtotal ~p, Pay ~p",
+	       [?to_f(?v(<<"should_pay">>, Sale)), ?v(<<"total">>, Sale), STotal, RTotal, Pay]), 
+
+	case STotal + RTotal =/= ?v(<<"total">>, Sale) of
+	    true -> throw(total_not_equal_between_trans_and_note);
+	    false -> ok
+	end,
+
+	case ?to_f(Pay / 100) /= ?to_f(?v(<<"should_pay">>, Sale)) of 
+	    true -> throw(pay_not_equal_between_trans_and_note);
+	    false -> ok
+	end,
+	
 	%% ?DEBUG("sorts ~p", [SortInvs]),
-	?DEBUG("stotal ~p, rtotal ~p", [STotal, RTotal]),
 	RSNAttrs = [{<<"shop">>,       ?v(<<"shop_id">>, Sale)},
 		    {<<"datetime">>,   ?v(<<"entry_date">>, Sale)},
 		    {<<"balance">>,    ?v(<<"balance">>, Sale)},
@@ -204,8 +215,7 @@ call(Parent, {print, RSN, Merchant}) ->
 		    {<<"e_pay">>,      ?v(<<"e_pay">>, Sale)},
 		    {<<"direct">>,     ?v(<<"type">>, Sale)},
 		    {<<"stotal">>,     STotal},
-		    {<<"rtotal">>,     RTotal}],
-
+		    {<<"rtotal">>,     RTotal}], 
 
 	%% ?DEBUG("retailer ~p", [Retailer]),
 	%% ?DEBUG("employee ~p", [Employee]),
@@ -219,8 +229,12 @@ call(Parent, {print, RSN, Merchant}) ->
 	_:{badmatch, Error} ->
 	    ?WARN("print failed:~n~p", [erlang:get_stacktrace()]),
 	    Parent ! {Parent, Error};
-	size_not_include -> 
-	    {error, ?err(print_size_not_include, Merchant)}
+	size_not_include ->
+	    {error, ?err(print_size_not_include, Merchant)};
+	total_not_equal_between_trans_and_note ->
+	    Parent ! {Parent, {error, ?err(total_not_equal_between_trans_and_note, RSN)}};
+	pay_not_equal_between_trans_and_note ->
+	    Parent ! {Parent, {error, ?err(pay_not_equal_between_trans_and_note, RSN)}}
     end.
 
 call1(print, RSN, Merchant, Invs, Attrs, Print) ->
@@ -2262,9 +2276,9 @@ round(?NO, Money)  ->
 %%
 %% use to print
 %%
-sort_inventory(_Merchant, _GetBrand, [], Sorts, STotal, RTotal) ->
-    {lists:reverse(Sorts), STotal, RTotal};
-sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
+sort_inventory(_Merchant, _GetBrand, [], Sorts, STotal, RTotal, Pay) ->
+    {lists:reverse(Sorts), STotal, RTotal, Pay};
+sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal, Pay) ->
     %% ?DEBUG("sort_inventory ~p, ~p", [Inv, Sorts]),
     case in_sort(Inv, Sorts) of
 	false  ->
@@ -2282,6 +2296,8 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
 	    %% ?DEBUG("count ~p", [Count]),
 	    Hand        = ?v(<<"hand">>, Inv),
 	    Total       = ?v(<<"total">>, Inv),
+	    FDiscount   = ?v(<<"fdiscount">>, Inv),
+	    FPrice      = ?v(<<"fprice">>, Inv),
 	    
 	    Type        = find_type(Merchant, ?v(<<"type_id">>, Inv)),
 	    
@@ -2299,8 +2315,8 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
 			       {<<"brand_name">>, GetBrand(Brand)},
 			       {<<"type_name">>,  Type},
 			       {<<"comment">>,    ?v(<<"comment">>, Inv)},
-			       {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
-			       {<<"fprice">>,     ?v(<<"fprice">>, Inv)}, 
+			       {<<"fdiscount">>,  FDiscount},
+			       {<<"fprice">>,     FPrice}, 
 			       {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
 			       {<<"total">>,      Total},
 			       {<<"amounts">>,    Amounts},
@@ -2311,11 +2327,12 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal) ->
 		    true -> {STotal + Count, RTotal};
 		    false -> {STotal, RTotal + Count}
 		end,
-	    sort_inventory(Merchant, GetBrand, T, [NewInv|Sorts], NewSTotal, NewRTotal);
+	    sort_inventory(Merchant, GetBrand, T, [NewInv|Sorts],
+			   NewSTotal, NewRTotal, Pay + Count * FPrice * FDiscount);
 	true ->
-	    {NewSort, NewSTotal, NewRTotal} =
-		combine_inventory(Merchant, GetBrand, Inv, Sorts, [], STotal, RTotal),
-	    sort_inventory(Merchant, GetBrand, T, NewSort, NewSTotal, NewRTotal)
+	    {NewSort, NewSTotal, NewRTotal, NewPay} =
+		combine_inventory(Merchant, GetBrand, Inv, Sorts, [], STotal, RTotal, Pay),
+	    sort_inventory(Merchant, GetBrand, T, NewSort, NewSTotal, NewRTotal, NewPay)
     end.
 
 in_sort(_Inv, []) ->
@@ -2331,10 +2348,10 @@ in_sort(Inv, [{struct, H}|T]) ->
 	    in_sort(Inv, T)
     end.
 
-combine_inventory(_Merchant, _GetBrand, _Inv, [], Combines, STotal, RTotal) ->
-    {Combines, STotal, RTotal};
+combine_inventory(_Merchant, _GetBrand, _Inv, [], Combines, STotal, RTotal, Pay) ->
+    {Combines, STotal, RTotal, Pay};
 combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
-		  Combines, STotal, RTotal) ->
+		  Combines, STotal, RTotal, Pay) ->
     %% ?DEBUG("combine inv ~p", [Inv]),
     StyleNumber = ?v(<<"style_number">>, H),
     BrandId     = ?v(<<"brand_id">>, H),
@@ -2354,7 +2371,9 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
 	    Hand        = ?v(<<"hand">>, Inv),
 
 	    Amounts = ?v(<<"amounts">>, H),
-	    Colors  = ?v(<<"colors">>, H), 
+	    Colors  = ?v(<<"colors">>, H),
+	    FDiscount   = ?v(<<"fdiscount">>, Inv),
+	    FPrice      = ?v(<<"fprice">>, Inv),
 	    Type    = find_type(Merchant, ?v(<<"type_id">>, Inv)),
 
 	    NewColors = case get_color(ColorId, Colors) of
@@ -2384,15 +2403,15 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
 			 {<<"type_name">>,  Type},
 			 {<<"comment">>,    ?v(<<"comment">>, Inv)},
 			 {<<"fdiscount">>,  ?v(<<"fdiscount">>, Inv)},
-			 {<<"fprice">>,     ?v(<<"fprice">>, Inv)},
-			 {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
+			 {<<"fprice">>,     FDiscount},
+			 {<<"s_group">>,    FPrice},
 			 {<<"total">>,      ?v(<<"total">>, Inv)},
 			 {<<"colors">>, NewColors},
 			 {<<"amounts">> ,NewAmounts}]}|Combines],
-	     NewSTotal, NewRTotal);
+	     NewSTotal, NewRTotal, Pay + Count * FDiscount * FPrice);
 	false ->
 	    combine_inventory(
-	      Merchant, GetBrand, Inv, T, [{struct, H}|Combines], STotal, RTotal)
+	      Merchant, GetBrand, Inv, T, [{struct, H}|Combines], STotal, RTotal, Pay)
     end.
 
 find_type(Merchant, TypeId) ->

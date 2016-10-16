@@ -56,13 +56,12 @@ function filterProvider(){
     var _colors    = [];
     var _employees = [];
     
-    this.$get = function($resource, $cookies, dateFilter, wgoodService){
+    this.$get = function($resource, dateFilter, wgoodService){
 	var resource = $resource(
 	    "/purchaser/:operation", {operation: '@operation'},
 	    {query_by_post: {method: 'POST', isArray:true}});
 
-	var cookie = 'filter-' + $cookies.qzg_dyty_session;
-
+	var cookie  = 'filter-' + diablo_get_cookie("qzg_dyty_session"); 
 	return{
 	    default_time: function(start){
 		var now = $.now();
@@ -497,7 +496,7 @@ function normalFilterProvider(){
     var _baseSettings  = [];
     var _shops         = [];
     
-    this.$get = function($resource, $cookies){
+    this.$get = function($resource){
 	var _employeeHttp = $resource("/employ/:operation",    {operation: '@operation'});
 	var _retailerHttp = $resource("/wretailer/:operation", {operation: '@operation'});
 	var _provinceHttp = $resource("/wretailer/:operation", {operation: '@operation'});
@@ -508,7 +507,7 @@ function normalFilterProvider(){
 				      post_get: {method: 'POST', isArray: true}
 				  });
 
-	var cookie = 'filter-' + $cookies.qzg_dyty_session; 
+	var cookie  = 'filter-' + diablo_get_cookie("qzg_dyty_session"); 
 	var _shopHttp = $resource("/shop/:operation/:id",
     				  {operation: '@operation', id: '@id'});
 	

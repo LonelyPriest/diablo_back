@@ -1,6 +1,6 @@
 var purchaserApp = angular.module(
     'purchaserApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies',
+    ['ui.bootstrap', 'ngRoute', 'ngResource',
      'LocalStorageModule', 'fsm',
      'diabloPattern', 'diabloNormalFilterApp', 'diabloUtils',
      'userApp', 'employApp', 'wgoodApp'])
@@ -167,7 +167,7 @@ purchaserApp.service("purchaserService", function($resource, dateFilter){
 	2501: "该单号不存在，请检查移仓记录",
 	2502: "该移仓记录已确认，请选择另外的移仓记录！！",
 	2701: "文件导出失败，请重试或联系服务人员查找原因！！",
-	2702: "文件导出失败，没有任何数据需要导出，请重新设置查询条件！！",
+	2702: "文件导出失败，没有任何数据需要导出，请重新设置查询条件！！", 
 	9001: "数据库操作失败，请联系服务人员！！"};
 
     this.purchaser_type =  [{name:"采购开单", id:0, py:diablo_pinyin("采购开单")},

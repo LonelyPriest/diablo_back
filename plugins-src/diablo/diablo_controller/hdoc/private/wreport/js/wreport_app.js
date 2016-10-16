@@ -1,5 +1,5 @@
 var wreportApp = angular.module(
-    "wreportApp", ['ngRoute', 'ngResource', 'diabloPattern', 'ngCookies',
+    "wreportApp", ['ngRoute', 'ngResource', 'diabloPattern',
 		   'diabloUtils', 'userApp', 'diabloFilterApp',
 		   'diabloNormalFilterApp', 'diabloAuthenApp', 'fsm',
 		   'ui.bootstrap', 'wgoodApp'])

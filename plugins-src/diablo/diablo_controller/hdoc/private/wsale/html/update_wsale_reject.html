@@ -174,10 +174,7 @@
 	      <table id="u_wreject" class="table table-bordered
 					   table-striped table-hover
 					   table-condensed table-advanced">
-		<thead class="stick-thead"
-		       fsm-sticky-header
-		       scroll-body="'#u_wreject'"
-		       scroll-stop="50">
+		<thead>
 		  <tr>
 		    <th class="text-center">序号</th>
 		    <th class="text-center">货号</th>
@@ -243,9 +240,7 @@
 				 required
 				 x-ng-pattern="/^\d+(.\d{1,2})?$/"
 				 x-ng-model="inv.fprice"
-				 popover-placement="top"
-		      		 popover-trigger="focus"
-		      		 popover="默认上次拿货价"/>
+				 x-ng-change="auto_save_free_of_price(inv)" />
 			</div>
 		      </form>
 		    </td>
@@ -268,9 +263,7 @@
 				   required
 				   x-ng-pattern="/^[1-9][0-9]*$/"
 				   x-ng-model="inv.sell"
-				   popover-placement="top"
-				   popover-trigger="focus"
-				   popover="均色均码直接输入数量"></input>
+				   x-ng-change="inv.sell && auto_save_free(inv)"/>
 		      </form>
 		    </td>
 

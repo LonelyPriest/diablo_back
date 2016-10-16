@@ -1,5 +1,5 @@
 wsaleApp.controller("wsaleUpdateRejectCtrl", function(
-    $scope, $q, $routeParams, dateFilter, diabloUtilsService, diabloPromise,
+    $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
     diabloFilter, wgoodService, purchaserService, wsaleService,
     user, filterRetailer, filterEmployee, filterSizeGroup,
     filterBrand, filterColor, filterType, base){
@@ -926,7 +926,9 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    "wsale-reject.html", modal_size, callback, $scope, payload)
     };
 
+    $scope.timeout_auto_save = undefined;
     $scope.save_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save); 
 	inv.free_update = false;
 	// console.log(inv);
 	inv.amounts[0].sell_count = inv.sell;
@@ -934,6 +936,7 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     }
 
     $scope.cancel_free_update = function(inv){
+	$timeout.cancel($scope.timeout_auto_save); 
 	inv.free_update = false;
 	inv.fdiscount = inv.o_fdiscount;
 	inv.fprice    = inv.o_fprice;
@@ -943,6 +946,62 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
     }
 
     $scope.reset_inventory = function(inv){
+	$timeout.cancel($scope.timeout_auto_save); 
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
+
+
+    var valid_free_stock = function(inv){
+	if (angular.isUndefined(inv.sell)
+	    || !inv.sell
+	    || parseInt(inv.sell) === 0
+	    || angular.isUndefined(inv.style_number)
+	    || angular.isUndefined(inv.fprice)
+	    || parseFloat(inv.fprice) === 0){
+	    $timeout.cancel($scope.timeout_auto_save);
+	    return false;
+	}
+
+	return true;
+    };
+    
+    $scope.auto_save_free = function(inv){
+	if (!valid_free_stock(inv)) return;
+
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    // console.log(inv); 
+	    if (!valid_free_stock(inv)) return;
+	    
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    }; 
+
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
+	}, 1000); 
+    };
+
+
+    $scope.auto_save_free_of_price = function(inv){
+	if (inv.$new && inv.free_color_size){
+	    return;
+	};
+
+	if (!valid_free_stock(inv)) return;
+	
+	$timeout.cancel($scope.timeout_auto_save);
+	$scope.timeout_auto_save = $timeout(function(){
+	    // console.log(inv); 
+	    // if (inv.$new && inv.free_color_size){
+	    // 	$scope.add_free_inventory(inv);
+	    // }; 
+	    if (!valid_free_stock(inv)) return;
+
+	    if (!inv.$new && inv.free_update){
+		$scope.save_free_update(inv); 
+	    }
+	}, 1000); 
+    };
 });

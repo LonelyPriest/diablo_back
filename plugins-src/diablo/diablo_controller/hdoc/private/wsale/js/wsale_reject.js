@@ -874,15 +874,32 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	$scope.inventories[0] = {$edit:false, $new:true};;
     };
 
-    $scope.auto_save_free = function(inv){
+    var valid_free_stock = function(inv){
 	if (angular.isUndefined(inv.reject)
 	    || !inv.reject
-	    || parseInt(inv.reject) === 0){
-	    return;
-	} 
+	    || parseInt(inv.reject) === 0
+	    || angular.isUndefined(inv.style_number)
+	    || angular.isUndefined(inv.fprice)
+	    || parseFloat(inv.fprice) === 0){
+	    $timeout.cancel($scope.timeout_auto_save);
+	    return false;
+	}
+
+	return true;
+    };
+    
+    $scope.auto_save_free = function(inv){
+	// if (angular.isUndefined(inv.reject)
+	//     || !inv.reject
+	//     || parseInt(inv.reject) === 0){
+	//     return;
+	// }
+	if (!valid_free_stock(inv)) return;
 	
 	$timeout.cancel($scope.timeout_auto_save);
 	$scope.timeout_auto_save = $timeout(function(){
+	    if (!valid_free_stock(inv)) return;
+	    
 	    if (inv.$new && inv.free_color_size){
 		$scope.add_free_inventory(inv);
 	    }

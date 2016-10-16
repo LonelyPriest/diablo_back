@@ -1,7 +1,7 @@
 "use strict";
 var wsaleApp = angular.module(
     'wsaleApp',
-    ['ui.bootstrap', 'ngRoute', 'ngResource', 'ngCookies',
+    ['ui.bootstrap', 'ngRoute', 'ngResource',
      'diabloAuthenApp', 'diabloPattern', 'diabloUtils',
      'userApp', 'employApp', 'wretailerApp', 'purchaserApp'])
     .config(function(localStorageServiceProvider){
@@ -154,7 +154,9 @@ wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
 	2704: "应付款项与开单项计算有不符！！", 
 	2699: "修改前后信息一致，请重新编辑修改项！！",
 	2799: "该款号为补单，无法退货，请重新选择款号！！",
-	9001: "数据库操作失败，请联系服务人员！！"};
+	9001: "数据库操作失败，请联系服务人员！！",
+	2424: "销售总数与销售明细数不符，请检查该单据后再打印！！",
+	2425: "销售总数应付款项与实际明细应付款项不符，请检查该单据后再打印！！"};
 
     this.rsn_title = ["开单明细", "退货明细", "销售明细"];
 
@@ -547,7 +549,7 @@ wsaleApp.controller("wsaleNewDetailCtrl", function(
     $scope.print = function(r){
 	// $scope.disable_print = true;
 	wsaleService.print_w_sale(r.rsn).then(function(result){
-	    // console.log(result);
+	    console.log(result);
 	    // $scope.disable_print = false; 
 	    if (result.ecode == 0){
 		var msg = "";

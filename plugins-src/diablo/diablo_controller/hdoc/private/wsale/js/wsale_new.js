@@ -1516,7 +1516,14 @@ wsaleApp.controller("wsaleNewCtrl", function(
 
 	$timeout.cancel($scope.timeout_auto_save);
 	$scope.timeout_auto_save = $timeout(function(){
-	    // console.log(inv); 
+	    // console.log(inv);
+	    if (angular.isUndefined(inv.sell)
+		|| !inv.sell
+		|| parseInt(inv.sell) === 0
+		|| angular.isUndefined(inv.style_number)){
+		return;
+	    }
+	    
 	    if (inv.$new && inv.free_color_size){
 		$scope.add_free_inventory(inv);
 	    }; 
