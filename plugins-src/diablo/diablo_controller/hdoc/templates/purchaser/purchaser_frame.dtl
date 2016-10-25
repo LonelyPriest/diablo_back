@@ -18,8 +18,7 @@
 
 <script src="/public/assets/chart/Chart.min.js"    type="text/javascript"></script>
 
-<script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script>
-
+<!-- <script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script> --> 
 <!-- <script src="/public/assets/floatThead/jquery.floatThead.min.js" type="text/javascript"></script> -->
 
 <script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>

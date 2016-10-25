@@ -652,8 +652,7 @@ wsaleApp.controller("wsaleGuideCtrl", function($scope){
     }
 })
 
-wsaleApp.controller("wsaleCtrl", function(
-    $scope, localStorageService){
+wsaleApp.controller("wsaleCtrl", function($scope, localStorageService){
     diablo_remove_local_storage(localStorageService); 
 });
 

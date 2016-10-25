@@ -22,7 +22,7 @@
 <!-- pinyin--> 
 <script src="/public/assets/pinyin/pinyin.js" type="text/javascript"></script>
 
-<script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script>
+<!-- <script src="/public/assets/sticky-theader/fsm-sticky-header.js" type="text/javascript"></script> -->
 
 <!-- <script src="/public/assets/hammer/hammer.js" type="text/javascript"></script> -->
 <!-- <script src="/public/assets/hammer/angular.hammer.js"  type="text/javascript"></script> -->
@@ -37,17 +37,14 @@
 <!-- <script src="/private/utils/javascript/diablo_authen_app.js"  type="text/javascript"></script> -->
 <script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
 
-<!-- right app -->
 <script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script>
 <script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
 
-<!-- employ -->
 <script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script>
 <script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script>
-<!-- purchaser-->
 <script src="/private/purchaser/js/purchaser_app.js"       type="text/javascript"></script>
-<!-- retailer -->
-<script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script> 
+<script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script>
+
 <!-- self -->
 <script src="/private/wsale/js/wsale_utils.js"             type="text/javascript"></script>
 <script src="/private/wsale/js/wsale_app.js"               type="text/javascript"></script>

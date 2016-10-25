@@ -20,10 +20,10 @@ function diablo_login_out($resource){
         // login user
         var re_login  = /^login-.*$/;
         var re_filter = /^filter-.*$/;
-        for (var key in localStorage){
+        for (var key in window.localStorage){
             console.log(key);
-            if (re_login.test(key)) localStorage.removeItem(key);
-            if (re_filter.test(key)) localStorage.removeItem(key);
+            if (re_login.test(key)) window.localStorage.removeItem(key);
+            if (re_filter.test(key)) window.localStorage.removeItem(key);
         }
 	
 	diablo_goto_page("/");

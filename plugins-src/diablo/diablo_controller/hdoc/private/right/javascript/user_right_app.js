@@ -213,7 +213,7 @@ userApp.factory("userService", function($resource, $q){
 	// } 
 	var cookie  = 'login-' + diablo_get_cookie("qzg_dyty_session");
 	// console.log(cookie);
-        var storage = localStorage.getItem(cookie);
+        var storage = window.localStorage.getItem(cookie);
         if (angular.isDefined(storage) && storage !== null) {
             return JSON.parse(storage);
         } else {
@@ -231,11 +231,11 @@ userApp.factory("userService", function($resource, $q){
 
 		var cache = sort(); 
                 var re  = /^login-.*$/;
-                for (var key in localStorage){
+                for (var key in window.localStorage){
                     console.log(key);
-                    if (re.test(key)) localStorage.removeItem(key);
+                    if (re.test(key)) window.localStorage.removeItem(key);
                 } 
-                localStorage.setItem(cookie, JSON.stringify(cache));
+                window.localStorage.setItem(cookie, JSON.stringify(cache));
                 return cache; 
     	    });
 	}

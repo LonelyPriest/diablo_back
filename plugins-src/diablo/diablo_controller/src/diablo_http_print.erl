@@ -194,7 +194,7 @@ call(Parent, {print, RSN, Merchant}) ->
 	    false -> ok
 	end,
 
-	case ?to_f(Pay / 100) /= ?to_f(?v(<<"should_pay">>, Sale)) of 
+	case erlang:round(Pay / 100) /= erlang:round(?v(<<"should_pay">>, Sale)) of 
 	    true -> throw(pay_not_equal_between_trans_and_note);
 	    false -> ok
 	end,

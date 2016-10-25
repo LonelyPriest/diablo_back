@@ -1,24 +1,19 @@
-var diabloFilterApp = angular.module("diabloFilterApp", [], function($provide){
-    $provide.provider('diabloFilter', filterProvider)
-});
-
-
 var user_set_storage = function(key, name, value){
-    var storage = localStorage.getItem(key);
+    var storage = window.localStorage.getItem(key);
     if (angular.isDefined(storage) && storage !== null) {
         var caches = JSON.parse(storage);
         caches[name] = value;
         // console.log(caches);
-        localStorage.setItem(key, JSON.stringify(caches));
+        window.localStorage.setItem(key, JSON.stringify(caches));
     } else {
         var obj = {};
         obj[name] = value;
-        localStorage.setItem(key, JSON.stringify(obj));
+        window.localStorage.setItem(key, JSON.stringify(obj));
     }
 };
 
 var user_get_from_storage = function(key, name){
-    var storage = localStorage.getItem(key);
+    var storage = window.localStorage.getItem(key);
     if (angular.isDefined(storage) && storage !== null) {
         var caches = JSON.parse(storage);
         // console.log(caches);
@@ -30,17 +25,21 @@ var user_get_from_storage = function(key, name){
 };
 
 var user_clear_from_storage = function(key, name){
-    var storage = localStorage.getItem(key);
+    var storage = window.localStorage.getItem(key);
     if (angular.isDefined(storage) && storage !== null) {
         var caches = JSON.parse(storage);
         for (o in caches){
             if (o === name) delete caches[o];
         }
 
-        localStorage.setItem(key, JSON.stringify(caches));
+        window.localStorage.setItem(key, JSON.stringify(caches));
     }
 
 };
+
+var diabloFilterApp = angular.module("diabloFilterApp", [], function($provide){
+    $provide.provider('diabloFilter', filterProvider)
+});
 
 function filterProvider(){
     // one filter include many fileds that used to filter
