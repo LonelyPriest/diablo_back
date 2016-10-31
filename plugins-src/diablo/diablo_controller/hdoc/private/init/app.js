@@ -2,7 +2,7 @@
 Core script to handle the entire theme and core functions
 **/
 var App = function () {
-
+    
     // IE mode
     var isRTL = false;
     var isIE8 = false;
@@ -661,7 +661,8 @@ var App = function () {
 
     // Handles Bootstrap Tooltips.
     var handleTooltips = function () {
-       jQuery('.tooltips').tooltip();
+	// console.log(jQuery('.tooltips'));
+	jQuery('.tooltips').tooltip();
     }
 
     // Handles Bootstrap Dropdowns
@@ -702,6 +703,7 @@ var App = function () {
     var lastPopedPopover;
 
     var handlePopovers = function () {
+	// console.log(jQuery);
         jQuery('.popovers').popover();
 
         // close last poped popover
@@ -817,7 +819,7 @@ var App = function () {
     }
 
     var handleFastJs = function(){
-	FastClick.attach(document.body);  
+	// FastClick.attach(document.body);  
     } 
 
     // var handleStickNavbar = function(){

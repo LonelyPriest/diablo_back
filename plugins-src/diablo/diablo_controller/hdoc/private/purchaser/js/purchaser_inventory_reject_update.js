@@ -1,4 +1,10 @@
-purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
+// purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
+//     $scope, $q, $routeParams, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloPromise, diabloFilter, wgoodService, purchaserService,
+//     user, filterBrand, filterFirm, filterType, filterEmployee,
+//     filterSizeGroup, filterColor, base){
+
+var stockRejectUpdateProvide = function(
     $scope, $q, $routeParams, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterBrand, filterFirm, filterType, filterEmployee,
@@ -844,6 +850,6 @@ purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", function(
     $scope.reset_inventory = function(inv){
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
-});
+};
 
 

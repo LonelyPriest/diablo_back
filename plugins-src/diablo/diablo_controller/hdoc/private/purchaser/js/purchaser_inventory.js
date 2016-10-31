@@ -1,4 +1,11 @@
-purchaserApp.controller("purchaserInventoryNewCtrl", function(
+
+// purchaserApp.controller("purchaserInventoryNewCtrl", function(
+//     $scope, $timeout, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloFilter, wgoodService, purchaserService,
+//     localStorageService, user, filterFirm,
+//     filterEmployee, filterColor, base){
+
+var stockNewProvide = function(
     $scope, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, wgoodService, purchaserService,
     localStorageService, user, filterFirm,
@@ -925,9 +932,15 @@ purchaserApp.controller("purchaserInventoryNewCtrl", function(
 	    }
 	}, 1000); 
     };
-});
+};
 
-purchaserApp.controller("purchaserInventoryDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryDetailCtrl", function(
+//     $scope, $routeParams, $q, dateFilter, diabloPattern, diabloFilter,
+//     diabloUtilsService, diabloPromise, purchaserService, wgoodService,
+//     localStorageService, user, filterBrand, filterFirm, filterType,
+//     filterSizeGroup, filterColor, base){
+
+var stockDetailProvide =  function(
     $scope, $routeParams, $q, dateFilter, diabloPattern, diabloFilter,
     diabloUtilsService, diabloPromise, purchaserService, wgoodService,
     localStorageService, user, filterBrand, filterFirm, filterType,
@@ -1246,10 +1259,15 @@ purchaserApp.controller("purchaserInventoryDetailCtrl", function(
 	dialog.response(
 	    false, "库存批量改价", "系统暂不支持些操作！！", undefined);
     };
-});
+};
 
 
-purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
+//     $scope, $routeParams, $location, dateFilter, diabloPattern,
+//     diabloUtilsService, localStorageService, diabloFilter, purchaserService,
+//     user, filterFirm, filterEmployee, base){
+
+var stockNewDetailProvide = function(
     $scope, $routeParams, $location, dateFilter, diabloPattern,
     diabloUtilsService, localStorageService, diabloFilter, purchaserService,
     user, filterFirm, filterEmployee, base){
@@ -1580,4 +1598,4 @@ purchaserApp.controller("purchaserInventoryNewDetailCtrl", function(
 	}) 
     };
     
-});
+};

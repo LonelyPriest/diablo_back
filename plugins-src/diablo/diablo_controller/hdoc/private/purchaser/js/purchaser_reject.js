@@ -1,4 +1,9 @@
-purchaserApp.controller("purchaserInventoryRejectCtrl", function(
+// purchaserApp.controller("purchaserInventoryRejectCtrl", function(
+//     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloPromise, diabloFilter, wgoodService, purchaserService,
+//     user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
+
+var stockRejectProvide = function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,
     user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
@@ -591,4 +596,4 @@ purchaserApp.controller("purchaserInventoryRejectCtrl", function(
 	}, 1000); 
     };
     
-});
+};

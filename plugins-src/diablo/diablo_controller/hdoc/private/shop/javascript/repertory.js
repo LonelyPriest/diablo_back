@@ -1,4 +1,6 @@
-shopApp.controller("repoNewCtrl", function(
+// shopApp.controller("repoNewCtrl", function(
+//     $scope, shopService, diabloPattern, diabloUtilsService){
+var repoNewProvide = function(
     $scope, shopService, diabloPattern, diabloUtilsService){
     $scope.pattern = {repo_name: diabloPattern.ch_name_address,
 		      repo_addr: diabloPattern.ch_name_address};
@@ -23,9 +25,11 @@ shopApp.controller("repoNewCtrl", function(
     $scope.cancel = function(){
 	diablo_goto_page("#/repo/repo_detail");
     };	
-});
+};
 
-shopApp.controller("repoDetailCtrl", function(
+// shopApp.controller("repoDetailCtrl", function(
+//     $scope, shopService, diabloPattern, diabloUtilsService){
+var repoDetailProvide = function(
     $scope, shopService, diabloPattern, diabloUtilsService){
     $scope.goto_page = diablo_goto_page;
     var dialog = diabloUtilsService;
@@ -39,11 +43,11 @@ shopApp.controller("repoDetailCtrl", function(
     // $scope.bind_print = function(r){
 	
     // }
-});
+};
 
-
-
-shopApp.controller("badRepoNewCtrl", function(
+// shopApp.controller("badRepoNewCtrl", function(
+//     $scope, shopService, diabloPattern, diabloUtilsService, user){
+var badRepoNewProvide = function(
     $scope, shopService, diabloPattern, diabloUtilsService, user){
     $scope.pattern = {repo_name: diabloPattern.ch_name_address,
 		      repo_addr: diabloPattern.ch_name_address};
@@ -72,9 +76,11 @@ shopApp.controller("badRepoNewCtrl", function(
     $scope.cancel = function(){
 	diablo_goto_page("#/repo/badrepo_detail");
     };	
-});
+};
 
-shopApp.controller("badRepoDetailCtrl", function(
+// shopApp.controller("badRepoDetailCtrl", function(
+//     $scope, shopService, diabloPattern, diabloUtilsService, user){
+var badRepoDetailCtrl = function(
     $scope, shopService, diabloPattern, diabloUtilsService, user){
     $scope.goto_page = diablo_goto_page;
     var dialog = diabloUtilsService;
@@ -95,4 +101,4 @@ shopApp.controller("badRepoDetailCtrl", function(
     // $scope.bind_print = function(r){
     
     // }
-});
+};

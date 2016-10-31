@@ -1,4 +1,15 @@
-wsaleApp.controller("wsaleNewCtrl", function(
+// wsaleApp.controller("wsaleNewCtrl", function(
+//     $scope, $q, $timeout, dateFilter, localStorageService,
+//     diabloUtilsService, diabloPromise, diabloFilter, diabloNormalFilter,
+//     diabloPattern, wgoodService, purchaserService, 
+//     wretailerService, wsaleService, wsaleGoodService,
+//     user, filterFirm, filterRetailer, filterEmployee,
+//     filterSizeGroup, filterBrand, filterType, filterColor, filterColorType, base){
+// function wsaleNewProvide1(){
+//     console.log(abc);
+// };
+"use strict"
+function wsaleNewProvide(
     $scope, $q, $timeout, dateFilter, localStorageService,
     diabloUtilsService, diabloPromise, diabloFilter, diabloNormalFilter,
     diabloPattern, wgoodService, purchaserService, 
@@ -352,7 +363,7 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	"r_snumber", $scope.select.shop.id, base, parseInt, diablo_no);
 
     $scope.stastic_colspan = function(){
-	var all_colspan = 7;
+	var all_colspan = 8;
 	if (!$scope.setting.show_discount){
 	    all_colspan -= 1;
 	}
@@ -1561,4 +1572,5 @@ wsaleApp.controller("wsaleNewCtrl", function(
 	    }
 	}, 1000); 
     };
-});
+};
+// );

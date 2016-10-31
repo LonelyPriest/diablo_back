@@ -37,6 +37,13 @@ var user_clear_from_storage = function(key, name){
 
 };
 
+// define(["angular"], function(angular, $provide){
+//     var diabloFilterApp = angular.module("diabloFilterApp", [], function($provide){
+// 	$provide.provider('diabloFilter', filterProvider)
+//     });
+//     return diabloFilterApp;
+// });
+
 var diabloFilterApp = angular.module("diabloFilterApp", [], function($provide){
     $provide.provider('diabloFilter', filterProvider)
 });
@@ -54,8 +61,11 @@ function filterProvider(){
     var _types     = [];
     var _colors    = [];
     var _employees = [];
+    var _colorTyes = [];
+    var _sizeGroups = [];
     
     this.$get = function($resource, dateFilter, wgoodService){
+	
 	var resource = $resource(
 	    "/purchaser/:operation", {operation: '@operation'},
 	    {query_by_post: {method: 'POST', isArray:true}});
@@ -302,20 +312,20 @@ function filterProvider(){
 	    },
 
 	    reset_brand: function(brands){
-		if (angular.isUndefined(brands)) user_clear_from_storage(cookie, "brand");
-		else {
-		    user_set_storage(cookie, "brand", brands); 
-		} 
-		// _brands = [];
+		// if (angular.isUndefined(brands)) user_clear_from_storage(cookie, "brand");
+		// else {
+		//     user_set_storage(cookie, "brand", brands); 
+		// } 
+		_brands = [];
 	    },
 	    
 	    get_brand: function(){
-		// if (_brands.length != 0 ){
-		//     // console.log("cache brands");
-		//     return _brands;
-		// }
-		var cached = user_get_from_storage(cookie, "brand");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (_brands.length != 0 ){
+		    // console.log("cache brands");
+		    return _brands;
+		}
+		// var cached = user_get_from_storage(cookie, "brand");
+		// if (angular.isArray(cached) && cached.length !== 0) return cached;
 		else {
 		    return wgoodService.list_purchaser_brand(
 		    ).then(function(brands){
@@ -324,7 +334,7 @@ function filterProvider(){
 			    return {id: b.id,
 				    name:b.name, py:diablo_pinyin(b.name)};
 			})
-			user_set_storage(cookie, "brand", _brands); 
+			// user_set_storage(cookie, "brand", _brands); 
 			return _brands;
 		    });    
 		}
@@ -332,20 +342,20 @@ function filterProvider(){
 	    },
 
 	    reset_type: function(types){
-		if (angular.isUndefined(types)) user_clear_from_storage(cookie, "type");
-		else {
-		    user_set_storage(cookie, "type", types); 
-		}
-		// user_clear_from_storage(cookie, "type");
-		// _types = [];
+		// if (angular.isUndefined(types)) user_clear_from_storage(cookie, "type");
+		// else {
+		//     user_set_storage(cookie, "type", types); 
+		// }
+		// // user_clear_from_storage(cookie, "type");
+		_types = [];
 	    },
 	    
 	    get_type: function(){
-		// if (_types.length !== 0){
-		//     return _types;
-		// }
-		var cached = user_get_from_storage(cookie, "type");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (_types.length !== 0){
+		    return _types;
+		}
+		// var cached = user_get_from_storage(cookie, "type");
+		// if (angular.isArray(cached) && cached.length !== 0) return cached;
 		else {
 		    return wgoodService.list_purchaser_type(
 		    ).then(function(types){
@@ -354,29 +364,29 @@ function filterProvider(){
 			    return {id: t.id,
 				    name:t.name, py:diablo_pinyin(t.name)};
 			})
-			user_set_storage(cookie, "type", _types); 
+			// user_set_storage(cookie, "type", _types); 
 			return _types;
 		    });
 		} 
 	    },
 
 	    reset_color: function(colors){
-		if (angular.isUndefined(colors)) user_clear_from_storage(cookie, "color");
-		else {
-		    user_set_storage(cookie, "color", colors); 
-		}
+		// if (angular.isUndefined(colors)) user_clear_from_storage(cookie, "color");
+		// else {
+		//     user_set_storage(cookie, "color", colors); 
+		// }
 		// user_clear_from_storage(cookie, "type");
-		// _types = [];
+		_types = [];
 	    },
 	    
 	    get_color: function(){
-		// if (_colors.length !== 0){
-		//     // console.log("cache color");
-		//     return _colors;
-		// }
-		var cached = user_get_from_storage(cookie, "color");
-		if (angular.isDefined(cached) && angular.isArray(cached))
-		    return cached;
+		if (_colors.length !== 0){
+		    // console.log("cache color");
+		    return _colors;
+		}
+		// var cached = user_get_from_storage(cookie, "color");
+		// if (angular.isDefined(cached) && angular.isArray(cached))
+		//     return cached;
 		else {
 		    return wgoodService.list_purchaser_color(
 		    ).then(function(colors){
@@ -387,37 +397,41 @@ function filterProvider(){
 				    tid:c.tid,
 				    type:c.type}
 			});
-			user_set_storage(cookie, "color", _colors); 
+			// user_set_storage(cookie, "color", _colors); 
 			return _colors;
 		    })   
 		} 
 	    },
 
 	    get_color_type: function(){
-		var cached = user_get_from_storage(cookie, "color_type");
-                if (angular.isDefined(cached) && cached.length !== 0){
-                    return cached;
-                } else {
+		// var cached = user_get_from_storage(cookie, "color_type");
+                // if (angular.isDefined(cached) && cached.length !== 0){
+                //     return cached;
+                // }
+		if (_colorTyes.length !== 0) return _colorTyes;
+		else {
                     return wgoodService.list_color_type().then(function(types){
-			console.log(types);
-                        user_set_storage(cookie, "color_type", types);
+			// console.log(types);
+                        // user_set_storage(cookie, "color_type", types);
+			_colorTyes = types;
                         return types;
                     });
                 } 
 	    },
 
 	    get_size_group: function(){
-		var cached = user_get_from_storage(cookie, "size_group");
-		if (angular.isDefined(cached) && angular.isArray(cached)) return cached;
+		// var cached = user_get_from_storage(cookie, "size_group");
+		// if (angular.isDefined(cached) && angular.isArray(cached)) return cached;
+		if (_sizeGroups.length !== 0) return _sizeGroups;
 		else {
 		    return wgoodService.list_purchaser_size().then(function(sizes){
-			console.log(sizes);
-			var sgroups = sizes.map(function(s){
+			// console.log(sizes);
+			_sizeGroups = sizes.map(function(s){
 			    return diablo_obj_strip(s);
 			});
 
-			user_set_storage(cookie, "size_group", sgroups);
-			return sgroups;
+			// user_set_storage(cookie, "size_group", sgroups);
+			return _sizeGroups;
 		    });
 		} 
 	    },
@@ -447,6 +461,10 @@ function filterProvider(){
 		} 
 	    },
 
+	    reset_retailer: function(){
+		_retailers = [];
+	    },
+	    
 	    get_wretailer: function(){
 		if (_retailers.length !== 0 ){
 		    return _retailers;
@@ -516,11 +534,11 @@ function normalFilterProvider(){
 	    }, 
 	    
 	    get_employee: function(){
-		// if (_employees.length !== 0){
-		//     return _employees;
-		// }
-		var cached = user_get_from_storage(cookie, "employee");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (_employees.length !== 0){
+		    return _employees;
+		}
+		// var cached = user_get_from_storage(cookie, "employee");
+		// if (angular.isArray(cached) && cached.length !== 0) return cached;
 		else {
 		    return _employeeHttp.query(
 			{operation: 'list_employe'}
@@ -532,12 +550,16 @@ function normalFilterProvider(){
 				    eid  :e.id,
 				    py   :diablo_pinyin(e.name)}
 			});
-			user_set_storage(cookie, "employee", _employees); 
+			// user_set_storage(cookie, "employee", _employees); 
 			return _employees;
 		    });   
 		} 
 	    },
 
+	    reset_retailer: function(){
+		_retailers = [];
+	    },
+	    
 	    get_wretailer: function(){
 		if (_retailers.length !== 0){
 		    return _retailers;
@@ -599,8 +621,9 @@ function normalFilterProvider(){
 	    },
 
 	    get_base_setting: function(){
-		var cached = user_get_from_storage(cookie, "base_setting");
-		if (angular.isArray(cached) && cached.length !== 0) return cached;
+		// var cached = user_get_from_storage(cookie, "base_setting");
+		// if (angular.isArray(cached) && cached.length !== 0) return cached;
+		if (_baseSettings.length !== 0) return _baseSettings;
 		else {
 		    return _baseHttp.query(
 			{operation: "list_base_setting"}
@@ -608,7 +631,7 @@ function normalFilterProvider(){
 			_baseSettings = ss.map(function(s){
 			    return {name:s.ename, value:s.value, shop:s.shop}; 
 			});
-			user_set_storage(cookie, "base_setting", _baseSettings);
+			// user_set_storage(cookie, "base_setting", _baseSettings);
 			return _baseSettings;
 		    })
 		}

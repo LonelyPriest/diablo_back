@@ -208,15 +208,15 @@ userApp.factory("userService", function($resource, $q){
 	// if (_shops.length !== 0
 	//     && _rights !== 0
 	//     && angular.isDefined(_loginType)){
-	//     return sort();
-	    
+	//     return sort(); 
 	// } 
 	var cookie  = 'login-' + diablo_get_cookie("qzg_dyty_session");
 	// console.log(cookie);
         var storage = window.localStorage.getItem(cookie);
         if (angular.isDefined(storage) && storage !== null) {
             return JSON.parse(storage);
-        } else {
+        }
+	else {
 	    return _user.get(
 		{operation: "get_login_user_info"}
 	    ).$promise.then(function(result){
@@ -236,7 +236,8 @@ userApp.factory("userService", function($resource, $q){
                     if (re.test(key)) window.localStorage.removeItem(key);
                 } 
                 window.localStorage.setItem(cookie, JSON.stringify(cache));
-                return cache; 
+                return cache;
+		// return sort();
     	    });
 	}
 	

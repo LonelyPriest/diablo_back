@@ -1,6 +1,11 @@
-wretailerApp.controller("wretailerNewCtrl", function(
+// wretailerApp.controller("wretailerNewCtrl", function(
+//     $scope, wretailerService, diabloPattern, diabloUtilsService,
+//     filterProvince, filterCity){
+
+var wretailerNewProvide = function(
     $scope, wretailerService, diabloPattern, diabloUtilsService,
     filterProvince, filterCity){
+
     // console.log(filterProvince);
     // console.log(filterCity);
     $scope.provinces = filterProvince;
@@ -67,13 +72,19 @@ wretailerApp.controller("wretailerNewCtrl", function(
     $scope.cancel = function(){
 	diablo_goto_page("#/wretailer_detail");
     };
-});
+};
 
 
-wretailerApp.controller("wretailerDetailCtrl", function(
+// wretailerApp.controller("wretailerDetailCtrl", function(
+//     $scope, $location, diabloPattern, diabloUtilsService,
+//     diabloPagination, localStorageService, wretailerService,
+//     filterProvince, filterCity){
+
+var wretailerDetailProvide = function(
     $scope, $location, diabloPattern, diabloUtilsService,
     diabloPagination, localStorageService, wretailerService,
     filterProvince, filterCity){
+
     $scope.provinces  = angular.copy(filterProvince);
     $scope.cities     = angular.copy(filterCity);
     $scope.round      = diablo_round;
@@ -425,4 +436,4 @@ wretailerApp.controller("wretailerDetailCtrl", function(
 	    "删除零售商", "确定要删除该零售商吗？",
 	    callback, undefined, $scope);
     }
-});
+};

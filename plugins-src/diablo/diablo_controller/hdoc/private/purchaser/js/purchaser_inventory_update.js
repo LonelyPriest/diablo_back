@@ -1,8 +1,14 @@
-purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
-    $scope, $q, $routeParams, diabloPromise, dateFilter, diabloPattern,
-    diabloUtilsService, diabloFilter, wgoodService, purchaserService,
-    user, filterBrand, filterFirm, filterType, filterEmployee,
-    filterSizeGroup, filterColor, base){
+// purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
+//     $scope, $q, $routeParams, diabloPromise, dateFilter, diabloPattern,
+//     diabloUtilsService, diabloFilter, wgoodService, purchaserService,
+//     user, filterBrand, filterFirm, filterType, filterEmployee,
+//     filterSizeGroup, filterColor, base){
+
+var stockNewUpdateProvide = function(
+	$scope, $q, $routeParams, diabloPromise, dateFilter, diabloPattern,
+	diabloUtilsService, diabloFilter, wgoodService, purchaserService,
+	user, filterBrand, filterFirm, filterType, filterEmployee,
+	filterSizeGroup, filterColor, base){
 
     $scope.shops       = user.sortShops;
     $scope.brands      = filterBrand;
@@ -822,4 +828,4 @@ purchaserApp.controller("purchaserInventoryNewUpdateCtrl", function(
 	// $scope.current_page_index = $scope.get_page($scope.current_page);
     } 
     
-});
+};

@@ -1,7 +1,12 @@
-wgoodApp.controller("wgoodNewCtrl", function(
+// wgoodApp.controller("wgoodNewCtrl", function(
+//     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
+//     wgoodService, user, filterBrand, filterFirm, filterType,
+//     filterSizeGroup, filterColorType, base){
+var wgoodNewProvide = function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, user, filterBrand, filterFirm, filterType,
     filterSizeGroup, filterColorType, base){
+    
     
     $scope.seasons = diablo_season2objects;
     $scope.sexs    = diablo_sex2object;
@@ -680,10 +685,14 @@ wgoodApp.controller("wgoodNewCtrl", function(
 	$scope.goodForm.alarm.$pristine = true;
 	$scope.image = undefined;
     };
-});
+};
 
 
-wgoodApp.controller("wgoodDetailCtrl", function(
+// wgoodApp.controller("wgoodDetailCtrl", function(
+//     $scope, $location, dateFilter, diabloUtilsService,
+//     diabloPagination, wgoodService, user, diabloFilter,
+//     filterBrand, filterFirm, filterType, filterColor, base){
+var wgoodDetailProvide = function(
     $scope, $location, dateFilter, diabloUtilsService,
     diabloPagination, wgoodService, user, diabloFilter,
     filterBrand, filterFirm, filterType, filterColor, base){
@@ -953,4 +962,4 @@ wgoodApp.controller("wgoodDetailCtrl", function(
     // 	    sure_delete, undefined, undefined); 
     // };
     
-});
+};

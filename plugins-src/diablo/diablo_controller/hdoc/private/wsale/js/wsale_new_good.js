@@ -1,4 +1,5 @@
-wsaleApp.factory("wsaleGoodService", function(){
+// wsaleApp.factory("wsaleGoodService", function(){
+var wsaleGoodServiceProvide = function(){
     
     var _brands     = [];
     var _firms      = [];
@@ -218,9 +219,13 @@ wsaleApp.factory("wsaleGoodService", function(){
     };
 
     return service;
-});
+};
 
-wsaleApp.controller("wsaleGoodNewCtrl", function(
+// wsaleApp.controller("wsaleGoodNewCtrl", function(
+//     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
+//     wgoodService, wsaleGoodService){
+
+var wsaleGoodNewCtrlProvide = function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, wsaleGoodService){
 
@@ -703,4 +708,4 @@ wsaleApp.controller("wsaleGoodNewCtrl", function(
 	// $scope.goodForm.alarm.$pristine = true;
 	// $scope.image = undefined;
     };
-})
+};

@@ -1,8 +1,13 @@
-wsaleApp.controller("wsaleUpdateRejectCtrl", function(
-    $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
-    diabloFilter, wgoodService, purchaserService, wsaleService,
-    user, filterRetailer, filterEmployee, filterSizeGroup,
-    filterBrand, filterColor, filterType, base){
+// wsaleApp.controller("wsaleUpdateRejectCtrl", function(
+//     $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
+//     diabloFilter, wgoodService, purchaserService, wsaleService,
+//     user, filterRetailer, filterEmployee, filterSizeGroup,
+//     filterBrand, filterColor, filterType, base){
+var wsaleRejectUpdateCtrlProvide = function(
+        $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
+        diabloFilter, wgoodService, purchaserService, wsaleService,
+        user, filterRetailer, filterEmployee, filterSizeGroup,
+        filterBrand, filterColor, filterType, base){
     // console.log(base);
     // console.log(user); 
     $scope.shops           = user.sortBadRepoes.concat(user.sortShops);
@@ -584,7 +589,10 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 		msg = "退货单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "退货单编辑", msg, $scope,
-	    	    function(){$scope.go_back()})
+	    	    function(){
+			diabloFilter.reset_retailer();
+			$scope.go_back();
+		    })
 	    } else{
 	    	diabloUtilsService.response_with_callback(
 	    	    false, "退货单编辑", "退货单编辑失败：" + wsaleService.error[result.ecode],
@@ -1004,4 +1012,4 @@ wsaleApp.controller("wsaleUpdateRejectCtrl", function(
 	    }
 	}, 1000); 
     };
-});
+};

@@ -1,4 +1,9 @@
-firmApp.controller('firmTransCtrl', function(
+// firmApp.controller('firmTransCtrl', function(
+//     $scope, $routeParams, $location, localStorageService,
+//     diabloFilter, firmService, diabloUtilsService,
+//     filterFirm, filterEmployee, user, base){
+
+var firmTransProvide = function(
     $scope, $routeParams, $location, localStorageService,
     diabloFilter, firmService, diabloUtilsService,
     filterFirm, filterEmployee, user, base){
@@ -243,10 +248,16 @@ firmApp.controller('firmTransCtrl', function(
     $scope.print = function(r){
 	
     }; 
-})
+};
 
 
-firmApp.controller("firmTransRsnDetailCtrl", function(
+// firmApp.controller("firmTransRsnDetailCtrl", function(
+//     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
+//     wgoodService, firmService,
+//     filterBrand, filterFirm, filterEmployee, filterSizeGroup,
+//     filterType, user, base){
+
+var firmTransRsnDetailProvide = function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     wgoodService, firmService,
     filterBrand, filterFirm, filterEmployee, filterSizeGroup,
@@ -414,4 +425,4 @@ firmApp.controller("firmTransRsnDetailCtrl", function(
 		 get_amount: get_amount});
 	}); 
     }; 
-});
+};

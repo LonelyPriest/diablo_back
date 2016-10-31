@@ -18,25 +18,27 @@
 <!-- <script src="/private/utils/javascript/diablo_authen_app.js" type="text/javascript"></script>  -->
 
 <!-- right app -->
-<script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script>
-<script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
+<!-- <script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script> -->
+<!-- <script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script> -->
 
 
 
 <!-- good -->
-<script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script>
+<!-- <script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script> -->
 
 <!-- filter -->
-<script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
+<!-- <script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script> -->
 
 <!-- employ -->
 <!-- <script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script> -->
 
 <!-- self -->
-<script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script>
-<script src="/private/wretailer/js/wretailer.js"           type="text/javascript"></script>
-<script src="/private/wretailer/js/wretailer_bill.js"      type="text/javascript"></script>
-<script src="/private/wretailer/js/wretailer_trans.js"     type="text/javascript"></script> 
+<!-- <script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script> -->
+<!-- <script src="/private/wretailer/js/wretailer.js"           type="text/javascript"></script> -->
+<!-- <script src="/private/wretailer/js/wretailer_bill.js"      type="text/javascript"></script> -->
+<!-- <script src="/private/wretailer/js/wretailer_trans.js"     type="text/javascript"></script>  -->
+
+<script data-main="/private/wretailer/js/wretailer_main" src="/public/assets/require.js" type="text/javascript"></script>
 
 {% endblock %}
 
@@ -44,9 +46,8 @@
 
 {% block script_init %} 
 <script>
-    jQuery(document).ready(function() {
-	App.init(); // initlayout and core plugins 
-    });
-    
+    // jQuery(document).ready(function() {
+    //	App.init(); // initlayout and core plugins 
+    // }); 
 </script>
 {% endblock %}

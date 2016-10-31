@@ -1,4 +1,9 @@
-purchaserApp.controller("purchaserInventoryTransferCtrl", function(
+// purchaserApp.controller("purchaserInventoryTransferCtrl", function(
+//     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,
+//     purchaserService, user, filterShop, filterFirm, filterEmployee,
+//     filterSizeGroup, filterColor, base){
+var stockTransferProvide = function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,
     purchaserService, user, filterShop, filterFirm, filterEmployee,
@@ -572,10 +577,14 @@ purchaserApp.controller("purchaserInventoryTransferCtrl", function(
 	}, 1000); 
     };
     
-});
+};
 
 
-purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
+//     $scope, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloFilter, purchaserService, wgoodService,
+//     user, filterShop, filterEmployee, base){
+var stockTransferFromDetailProvide = function(
     $scope, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, purchaserService, wgoodService,
     user, filterShop, filterEmployee, base){
@@ -731,10 +740,14 @@ purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", function(
     $scope.cancel_transfer = function(r){
 	dialog.response(false, "移仓取消", "系统暂不支持此操作！！", undefined);
     };
-});
+};
 
 
-purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
+//     $scope, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloFilter, purchaserService, wgoodService,
+//     user, filterShop, filterEmployee, base){
+var stockTransferToDetailProvide = function(
     $scope, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, purchaserService, wgoodService,
     user, filterShop, filterEmployee, base){
@@ -888,5 +901,5 @@ purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", function(
     $scope.cancel_transfer = function(r){
 	dialog.response(false, "移仓取消", "系统暂不支持此操作！！", undefined);
     };
-});
+};
 

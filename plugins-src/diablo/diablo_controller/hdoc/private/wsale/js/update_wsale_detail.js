@@ -1,4 +1,12 @@
-wsaleApp.controller("wsaleUpdateDetailCtrl", function(
+// wsaleApp.controller("wsaleUpdateDetailCtrl", function(
+//     $scope, $routeParams, $q, $timeout,dateFilter, diabloUtilsService,
+//     diabloPromise, diabloFilter, diabloPattern, diabloNormalFilter,
+//     wgoodService, purchaserService, wretailerService, wsaleService,
+//     user, filterRetailer, filterEmployee, filterSizeGroup,
+//     filterBrand, filterColor, filterType, base){
+//     // console.log(user);
+
+var wsaleUpdateDetailProvide = function(
     $scope, $routeParams, $q, $timeout,dateFilter, diabloUtilsService,
     diabloPromise, diabloFilter, diabloPattern, diabloNormalFilter,
     wgoodService, purchaserService, wretailerService, wsaleService,
@@ -760,6 +768,7 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 			// $scope.select.retailer.balance = $scope.select.left_balance;
 			// $scope.select.surplus = $scope.select.retailer.balance;
 			// diablo_goto_page("#/wsale/new_wsale_detail");
+			diabloFilter.reset_retailer();
 			$scope.go_back();
 		    })
 	    } else{
@@ -1225,4 +1234,4 @@ wsaleApp.controller("wsaleUpdateDetailCtrl", function(
 	}, 1000); 
     };
     
-})
+};

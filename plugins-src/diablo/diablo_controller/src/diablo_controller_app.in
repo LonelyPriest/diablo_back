@@ -57,8 +57,8 @@
      diablo_wuser_profile, 
      
      %% template
-     base_frame, employ_frame,
-     inventory_frame,
+     base_frame, base_frame_no_require,
+     employ_frame, inventory_frame,
      login, login_force,
      member_frame, merchant_frame,
      right_frame, sale_frame,

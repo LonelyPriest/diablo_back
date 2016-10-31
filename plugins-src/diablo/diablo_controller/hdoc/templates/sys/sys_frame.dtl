@@ -1,4 +1,4 @@
-{% extends "../base_frame.dtl" %}
+{% extends "../base_frame_no_require.dtl" %}
 
 {% block self_reference_css %}
 <!-- <link href="/public/assets/font-awesome/css/awesome-bootstrap-checkbox.css" -->

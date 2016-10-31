@@ -1,4 +1,9 @@
-wretailerApp.controller('wretailerTransCtrl', function(
+// wretailerApp.controller('wretailerTransCtrl', function(
+//     $scope, $routeParams, $location, diabloFilter, wretailerService,
+//     localStorageService, diabloUtilsService,
+//     filterRetailer, filterEmployee, user, base){
+
+var wretailerTransProvide = function(
     $scope, $routeParams, $location, diabloFilter, wretailerService,
     localStorageService, diabloUtilsService,
     filterRetailer, filterEmployee, user, base){
@@ -256,10 +261,14 @@ wretailerApp.controller('wretailerTransCtrl', function(
 	    "对帐单打印", "确定要打印客户对帐单吗？",
 	    callback, undefined, $scope); 
     };
-})
+};
 
 
-wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
+// wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
+//     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
+//     wgoodService, wretailerService, filterBrand, filterFirm, filterColor,
+//     filterRetailer, filterEmployee, filterSizeGroup, filterType, user, base){
+var wretailerTransRsnDetailProvide = function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     wgoodService, wretailerService, filterBrand, filterFirm, filterColor,
     filterRetailer, filterEmployee, filterSizeGroup, filterType, user, base){
@@ -460,4 +469,4 @@ wretailerApp.controller("wretailerTransRsnDetailCtrl", function(
 		});
 	});
     }; 
-});
+};

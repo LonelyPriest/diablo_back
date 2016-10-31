@@ -1,19 +1,11 @@
-var diabloUtils = angular.module("diabloUtils", []);
+// console.log("abvbadf");
+// define(["angular"], function(angular){
+//     var diabloUtils = angular.module("diabloUtils", []);    
+//     return diabloUtils;
+// });
 
-// diabloUtils.directive('input', [
-//     function(){
-// 	return {
-// 	    restrict: 'E',
-//             link: function(scope, element, attrs){
-// 		element.bind("blur", function(event){
-// 		    console.log("blur");
-// 		    // event.preventDefault();
-// 		    // event.stopPropagation();
-// 		})
-// 	    }
-// 	}
-//     }
-// ]);
+
+var diabloUtils = angular.module("diabloUtils", []);
 
 diabloUtils.directive('ngEdit', function () {
     return function (scope, element, attrs) {
@@ -1193,3 +1185,22 @@ diabloUtils.directive('imageUpload', function ($q) {
 	}
     }
 });
+
+
+// diabloUtils.directive('input', [
+//     function(){
+// 	return {
+// 	    restrict: 'E',
+//             link: function(scope, element, attrs){
+// 		element.bind("blur", function(event){
+// 		    console.log("blur");
+// 		    // event.preventDefault();
+// 		    // event.stopPropagation();
+// 		})
+// 	    }
+// 	}
+//     }
+// ]);
+
+// var diabloUtils = require('diabloUtils');
+

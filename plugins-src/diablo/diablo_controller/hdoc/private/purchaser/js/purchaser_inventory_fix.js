@@ -1,7 +1,12 @@
-purchaserApp.controller("purchaserInventoryFixCtrl", function(
-    $scope, $q, dateFilter, localStorageService, diabloPattern,
-    diabloUtilsService, diabloPromise, diabloFilter, purchaserService,
-    wgoodService, user, filterEmployee, filterSizeGroup, filterColor){
+// purchaserApp.controller("purchaserInventoryFixCtrl", function(
+//     $scope, $q, dateFilter, localStorageService, diabloPattern,
+//     diabloUtilsService, diabloPromise, diabloFilter, purchaserService,
+//     wgoodService, user, filterEmployee, filterSizeGroup, filterColor){
+
+var stockFixProvide = function(
+	$scope, $q, dateFilter, localStorageService, diabloPattern,
+	diabloUtilsService, diabloPromise, diabloFilter, purchaserService,
+	wgoodService, user, filterEmployee, filterSizeGroup, filterColor){
     console.log(user);
 
     // var allowedshops = rightAction.get_w_shops(user.sortShops, "fix_w_inventory");
@@ -652,11 +657,15 @@ purchaserApp.controller("purchaserInventoryFixCtrl", function(
     $scope.reset_inventory = function(inv){
 	$scope.inventories[0] = {$edit:false, $new:true};;
     }
-});
+};
 
 
 
-purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
+//     $scope, dateFilter, diabloPattern, diabloUtilsService,
+//     diabloFilter, purchaserService, wgoodService,
+//     user, filterEmployee, base){
+var stockFixDetailProvide = function(
     $scope, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, purchaserService, wgoodService,
     user, filterEmployee, base){
@@ -750,4 +759,4 @@ purchaserApp.controller("purchaserInventoryFixDetailCtrl", function(
 	diablo_goto_page("#/inventory/inventory_rsn_detail/fix/" + r.rsn);
     }
     
-});
+};

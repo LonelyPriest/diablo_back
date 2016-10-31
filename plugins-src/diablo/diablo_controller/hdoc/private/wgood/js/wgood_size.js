@@ -1,4 +1,7 @@
-wgoodApp.controller("wgoodSizeDetailCtrl", function(
+// wgoodApp.controller("wgoodSizeDetailCtrl", function(
+//     $scope, diabloPattern, diabloUtilsService, diabloFilter,
+//     wgoodService, filterSizeGroup){
+var wgoodSizeDetailProvide = function(
     $scope, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, filterSizeGroup){
     $scope.size_group = angular.copy(filterSizeGroup); 
@@ -128,4 +131,4 @@ wgoodApp.controller("wgoodSizeDetailCtrl", function(
 	diabloUtilsService.response(false, "删除尺码组", "暂不支持此操作！！", $scope);
     }
     
-});
+};

@@ -1,4 +1,11 @@
-wsaleApp.controller("wsaleRejectCtrl", function(
+// wsaleApp.controller("wsaleRejectCtrl", function(
+//     $scope, $q, $timeout, localStorageService, dateFilter,
+//     diabloUtilsService, diabloPromise, diabloPattern,
+//     diabloFilter, diabloNormalFilter, wgoodService,
+//     purchaserService, wsaleService, user, filterRetailer, filterEmployee,
+//     filterSizeGroup, filterColor, base){
+
+var wsaleRejectCtrlProvide = function(
     $scope, $q, $timeout, localStorageService, dateFilter,
     diabloUtilsService, diabloPromise, diabloPattern,
     diabloFilter, diabloNormalFilter, wgoodService,
@@ -909,83 +916,83 @@ wsaleApp.controller("wsaleRejectCtrl", function(
 	    }
 	}, 1000); 
     };
-}); 
+}; 
 
 
-wsaleApp.controller("wsaleRejectDetailCtrl", function(
-    $scope, diabloUtilsService, diabloFilter,
-    wretailerService, wsaleService,
-    user, filterRetailer, filterEmployee){
+// wsaleApp.controller("wsaleRejectDetailCtrl", function(
+//     $scope, diabloUtilsService, diabloFilter,
+//     wretailerService, wsaleService,
+//     user, filterRetailer, filterEmployee){
 
-    $scope.goto_page = diablo_goto_page; 
-    $scope.float_add = diablo_float_add;
+//     $scope.goto_page = diablo_goto_page; 
+//     $scope.float_add = diablo_float_add;
 
     
-    // console.log(user.sortShops);
-    // console.log(filterRetailer);
-    // console.log(filterEmployee);
+//     // console.log(user.sortShops);
+//     // console.log(filterRetailer);
+//     // console.log(filterEmployee);
 
-    /* 
-     * filter operation
-     */ 
-    // initial
-    $scope.filters = [];
-    diabloFilter.reset_field();
-    diabloFilter.add_field("rsn", []);
-    diabloFilter.add_field("shop",     user.sortShops);
-    diabloFilter.add_field("retailer", filterRetailer);
-    diabloFilter.add_field("employee", filterEmployee);
+//     /* 
+//      * filter operation
+//      */ 
+//     // initial
+//     $scope.filters = [];
+//     diabloFilter.reset_field();
+//     diabloFilter.add_field("rsn", []);
+//     diabloFilter.add_field("shop",     user.sortShops);
+//     diabloFilter.add_field("retailer", filterRetailer);
+//     diabloFilter.add_field("employee", filterEmployee);
 
-    $scope.filter = diabloFilter.get_filter();
-    $scope.prompt = diabloFilter.get_prompt();
-    $scope.time   = diabloFilter.default_time(); 
+//     $scope.filter = diabloFilter.get_filter();
+//     $scope.prompt = diabloFilter.get_prompt();
+//     $scope.time   = diabloFilter.default_time(); 
 
 
-    /*
-     * pagination 
-     */
-    $scope.colspan = 17;
-    $scope.items_perpage = 10;
-    $scope.default_page = 1;
+//     /*
+//      * pagination 
+//      */
+//     $scope.colspan = 17;
+//     $scope.items_perpage = 10;
+//     $scope.default_page = 1;
 
-    $scope.do_search = function(page){
-	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if (angular.isUndefined(search.shop)
-		|| !search.shop || search.shop.length === 0){
-		search.shop = user.shopIds.length === 0 ? undefined : user.shopIds; 
-	    }
+//     $scope.do_search = function(page){
+// 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
+// 	    if (angular.isUndefined(search.shop)
+// 		|| !search.shop || search.shop.length === 0){
+// 		search.shop = user.shopIds.length === 0 ? undefined : user.shopIds; 
+// 	    }
 
-	    console.log(search);
+// 	    console.log(search);
 
-	    wsaleService.filter_w_sale_reject(
-		$scope.match, search, page, $scope.items_perpage
-	    ).then(function(result){
-		console.log(result);
-		if (page === 1){
-		    $scope.total_items = result.total;
-		    $scope.total_amounts = result.t_amount;
-		    $scope.total_balance = result.t_spay;
-		}
-		$scope.records = result.data;
-		diablo_order_page(page, $scope.items_perpage, $scope.records);
-	    })
-	})
-    }
+// 	    wsaleService.filter_w_sale_reject(
+// 		$scope.match, search, page, $scope.items_perpage
+// 	    ).then(function(result){
+// 		console.log(result);
+// 		if (page === 1){
+// 		    $scope.total_items = result.total;
+// 		    $scope.total_amounts = result.t_amount;
+// 		    $scope.total_balance = result.t_spay;
+// 		}
+// 		$scope.records = result.data;
+// 		diablo_order_page(page, $scope.items_perpage, $scope.records);
+// 	    })
+// 	})
+//     }
 
-    $scope.page_changed = function(){
-	// console.log($scope.current_page);
-	$scope.do_search($scope.current_page);
-    }
+//     $scope.page_changed = function(){
+// 	// console.log($scope.current_page);
+// 	$scope.do_search($scope.current_page);
+//     }
     
-    // default the first page
-    $scope.do_search($scope.default_page);
+//     // default the first page
+//     $scope.do_search($scope.default_page);
 
 
-    // details
-    $scope.rsn_detail = function(r){
-	console.log(r);
-	// $location.url("#/wsale_detail/" + r.rsn);
-	diablo_goto_page("#/wsale_rsn_detail/1/" + r.rsn);
-    }
+//     // details
+//     $scope.rsn_detail = function(r){
+// 	console.log(r);
+// 	// $location.url("#/wsale_detail/" + r.rsn);
+// 	diablo_goto_page("#/wsale_rsn_detail/1/" + r.rsn);
+//     }
     
-});
+// });

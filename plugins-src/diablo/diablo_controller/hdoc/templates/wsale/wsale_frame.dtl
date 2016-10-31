@@ -35,26 +35,29 @@
 
 <!-- <script src="/private/utils/javascript/diablo_utils.js"    type="text/javascript"></script> -->
 <!-- <script src="/private/utils/javascript/diablo_authen_app.js"  type="text/javascript"></script> -->
-<script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script>
+<!-- <script src="/private/utils/javascript/diablo_filter_app.js"  type="text/javascript"></script> -->
 
-<script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script>
-<script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script>
+<!-- <script src="/private/right/javascript/user_right_app.js"  type="text/javascript"></script> -->
+<!-- <script src="/private/right/javascript/user_right_map.js"  type="text/javascript"></script> -->
 
-<script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script>
-<script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script>
-<script src="/private/purchaser/js/purchaser_app.js"       type="text/javascript"></script>
-<script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script>
+<!-- <script src="/private/employ/javascript/employ_app.js"     type="text/javascript"></script> -->
+<!-- <script src="/private/wgood/js/wgood_app.js"               type="text/javascript"></script> -->
+<!-- <script src="/private/purchaser/js/purchaser_app.js"       type="text/javascript"></script> -->
+<!-- <script src="/private/wretailer/js/wretailer_app.js"       type="text/javascript"></script> -->
 
 <!-- self -->
-<script src="/private/wsale/js/wsale_utils.js"             type="text/javascript"></script>
-<script src="/private/wsale/js/wsale_app.js"               type="text/javascript"></script>
-<script src="/private/wsale/js/wsale_new.js"               type="text/javascript"></script>
-<script src="/private/wsale/js/ssale_new.js"               type="text/javascript"></script>
-<script src="/private/wsale/js/wsale_new_good.js"          type="text/javascript"></script>
-<script src="/private/wsale/js/wsale_reject.js"            type="text/javascript"></script>
-<script src="/private/wsale/js/wsale_rsn.js"               type="text/javascript"></script>
-<script src="/private/wsale/js/update_wsale_detail.js"     type="text/javascript"></script>
-<script src="/private/wsale/js/update_wsale_reject.js"     type="text/javascript"></script>
+<!-- <script src="/private/wsale/js/wsale_utils.js"             type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/wsale_app.js"               type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/wsale_new.js"               type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/ssale_new.js"               type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/wsale_new_good.js"          type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/wsale_reject.js"            type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/wsale_rsn.js"               type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/update_wsale_detail.js"     type="text/javascript"></script> -->
+<!-- <script src="/private/wsale/js/update_wsale_reject.js"     type="text/javascript"></script> -->
+
+
+<script data-main="/private/wsale/wsale_main" src="/public/assets/require.js" type="text/javascript"></script>
 
 
 {% endblock %}
@@ -63,14 +66,14 @@
 
 {% block script_init %} 
 <script>
-    jQuery(function($){
-	jQuery(document).ready(function() {
-            // FastClick.attach(document.body);
-	    App.init(); // initlayout and core plugins
-	    // $('.navwrapper').stickUp({
-	    // 	marginTop: 'auto'
-	    // });
-	});
-    }) 
+    // jQuery(function($){
+    // 	jQuery(document).ready(function() {
+    //         // FastClick.attach(document.body);
+    // 	    App.init(); // initlayout and core plugins
+    // 	    // $('.navwrapper').stickUp({
+    // 	    // 	marginTop: 'auto'
+    // 	    // });
+    // 	});
+    // }) 
 </script>
 {% endblock %}

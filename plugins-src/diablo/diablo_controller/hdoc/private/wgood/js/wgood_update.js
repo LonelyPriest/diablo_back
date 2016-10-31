@@ -1,11 +1,16 @@
-wgoodApp.controller("wgoodUpdateCtrl", function(
+// wgoodApp.controller("wgoodUpdateCtrl", function(
+//     $scope, $location, $routeParams, $q, $timeout, diabloPattern,
+//     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
+//     filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
+//     filterColorType, user, base){
+var wgoodUpdateProvide = function(
     $scope, $location, $routeParams, $q, $timeout, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
     filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
     filterColorType, user, base){
     // console.log(filterSizeGroup);
     // console.log(filterType);
-    console.log(filterBrand);
+    // console.log(filterBrand);
     $scope.seasons    = diablo_season2objects;
     $scope.sexs       = diablo_sex2object;
     $scope.full_years = diablo_full_year;
@@ -530,4 +535,4 @@ wgoodApp.controller("wgoodUpdateCtrl", function(
     $scope.cancel = function(){
 	diablo_goto_page("#/wgood_detail");
     }
-});
+};

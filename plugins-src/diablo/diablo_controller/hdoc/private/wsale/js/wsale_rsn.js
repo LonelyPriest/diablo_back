@@ -1,8 +1,15 @@
-wsaleApp.controller("wsaleRsnDetailCtrl", function(
+// wsaleApp.controller("wsaleRsnDetailCtrl", function(
+//     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
+//     purchaserService, wgoodService, wsaleService, localStorageService,
+//     user, filterBrand, filterRetailer, filterEmployee,
+//     filterFirm, filterSizeGroup, filterType, filterColor, base){
+
+var wsaleRsnDetailCtrlProvide = function(
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService, wsaleService, localStorageService,
     user, filterBrand, filterRetailer, filterEmployee,
     filterFirm, filterSizeGroup, filterType, filterColor, base){
+
     // console.log($routeParams);
     // console.log(filterEmployee);
     $scope.shops    = user.sortShops.concat(user.sortBadRepoes);
@@ -310,4 +317,4 @@ wsaleApp.controller("wsaleRsnDetailCtrl", function(
 	    });
 	}) 
     };
-});
+};

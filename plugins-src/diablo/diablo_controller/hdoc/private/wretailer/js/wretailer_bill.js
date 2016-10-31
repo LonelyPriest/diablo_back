@@ -1,6 +1,10 @@
-wretailerApp.controller("wretailerBillCheckCtrl", function(
-    $scope, diabloPattern, diabloUtilsService,
-    wretailerService, filterEmployee, user){
+// wretailerApp.controller("wretailerBillCheckCtrl", function(
+//     $scope, diabloPattern, diabloUtilsService,
+//     wretailerService, filterEmployee, user){
+
+var wretailerBillCheckProvide = function(
+	$scope, diabloPattern, diabloUtilsService,
+	wretailerService, filterEmployee, user){
     // $scope.retailer = {};
     $scope.pattern = {
 	decimal_2:    diabloPattern.decimal_2
@@ -65,4 +69,4 @@ wretailerApp.controller("wretailerBillCheckCtrl", function(
 	    }
 	})
     }; 
-});
+};

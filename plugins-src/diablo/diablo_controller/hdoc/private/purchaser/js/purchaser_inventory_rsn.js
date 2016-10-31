@@ -138,7 +138,13 @@
 // });
 
 
-purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
+//     $scope, $routeParams, $location, dateFilter,
+//     diabloPattern, diabloUtilsService, diabloFilter,
+//     purchaserService, wgoodService,
+//     user, filterBrand, filterFirm, filterSizeGroup, filterColor, base){
+
+var stockFixRsnDetailProvide = function(
     $scope, $routeParams, $location, dateFilter,
     diabloPattern, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService,
@@ -309,10 +315,15 @@ purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", function(
 	}); 
     }
     
-});
+};
 
 
-purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
+//     $scope, $routeParams, $location, diabloUtilsService, diabloFilter,
+//     wgoodService, purchaserService, localStorageService,
+//     user, filterBrand, filterFirm, filterType,
+//     filterEmployee, filterSizeGroup, filterColor, base){
+var stockNewRsnDetailProvide = function(
     $scope, $routeParams, $location, diabloUtilsService, diabloFilter,
     wgoodService, purchaserService, localStorageService,
     user, filterBrand, filterFirm, filterType,
@@ -554,10 +565,16 @@ purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", function(
 		}); 
 	}) 
     };
-});
+};
 
 
-purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
+//     $scope, $routeParams, $location, dateFilter,
+//     diabloPattern, diabloUtilsService, diabloFilter,
+//     purchaserService, wgoodService,
+//     user, filterShop, filterBrand, filterType, filterFirm,
+//     filterSizeGroup, filterColor, base){
+var stockTransferFromRsnDetailProvide = function(
     $scope, $routeParams, $location, dateFilter,
     diabloPattern, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService,
@@ -730,9 +747,16 @@ purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", function(
 	}); 
     }
     
-});
+};
 
-purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
+// purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
+//     $scope, $routeParams, $location, dateFilter,
+//     diabloPattern, diabloUtilsService, diabloFilter,
+//     purchaserService, wgoodService,
+//     user, filterShop, filterBrand, filterType, filterFirm,
+//     filterSizeGroup, filterColor, base){
+
+var stockTransferToRsnDetailProvide = function(
     $scope, $routeParams, $location, dateFilter,
     diabloPattern, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService,
@@ -906,4 +930,4 @@ purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", function(
 	}); 
     }
     
-});
+};

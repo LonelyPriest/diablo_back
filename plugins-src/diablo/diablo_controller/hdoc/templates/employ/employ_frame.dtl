@@ -6,15 +6,18 @@
 
 <!-- <script src="/private/utils/javascript/diablo_utils.js"   type="text/javascript"></script> -->
 <!-- <script src="/private/utils/javascript/diablo_authen_app.js" type="text/javascript"></script> -->
-<script src="/private/employ/javascript/employ_app.js"       type="text/javascript"></script>
+<!-- <script src="/private/employ/javascript/employ_app.js"       type="text/javascript"></script> -->
+
+<script data-main="/private/employ/javascript/employee_main" src="/public/assets/require.js" type="text/javascript"></script>
+
 {% endblock %}
 
 
 
 {% block script_init %} 
 <script>
-    jQuery(document).ready(function() {
-	App.init(); // initlayout and core plugins
-    });
+    // jQuery(document).ready(function() {
+    // App.init(); // initlayout and core plugins
+    // });
 </script>
 {% endblock %}

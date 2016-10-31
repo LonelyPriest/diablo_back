@@ -20,9 +20,9 @@ action(Session, Req) ->
 			 [
 			  {navbar, ?menu:navbars(?MODULE, Session)},
 			  {basebar, ?menu:w_basebar(Session)},
-			  {sidebar, sidebar(Session)},
-			  {ngapp, "wsaleApp"},
-			  {ngcontroller, "wsaleCtrl"}
+			  {sidebar, sidebar(Session)}
+			  %% {ngapp, "wsaleApp1"},
+			  %% {ngcontroller, "ng-controller=wsaleCtrl"}
 			  %% {baseapp, "baseApp"},
 			  %% {basectrl, "baseCtrl"}
 			 ]),
