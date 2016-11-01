@@ -2,6 +2,10 @@
 //     $scope, diabloPattern, diabloUtilsService,
 //     wretailerService, filterEmployee, user){
 
+define(["wretailerApp"], function(app){
+    app.controller("wretailerBillCheckCtrl", wretailerBillCheckProvide);
+});
+
 var wretailerBillCheckProvide = function(
 	$scope, diabloPattern, diabloUtilsService,
 	wretailerService, filterEmployee, user){

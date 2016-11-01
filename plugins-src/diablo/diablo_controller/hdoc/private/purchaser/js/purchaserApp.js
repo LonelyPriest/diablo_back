@@ -3,8 +3,7 @@
 define(["angular", "angular-router", "angular-resource", "angular-local-storage",
 	"angular-ui-bootstrap", "diablo-authen", "diablo-pattern", "diablo-user-right",
 	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good",
-	"diablo-employee"
-       ], purchaserConfig);
+	"diablo-employee"], purchaserConfig);
 
 
 function purchaserConfig (angular){
@@ -479,32 +478,32 @@ function purchaserConfig (angular){
 	};
     });
 
-    purchaserApp.controller("purchaserInventoryNewCtrl", stockNewProvide);
-    purchaserApp.controller("purchaserInventoryNewUpdateCtrl", stockNewUpdateProvide); 
-    purchaserApp.controller("purchaserInventoryNewDetailCtrl", stockNewDetailProvide);
+    // purchaserApp.controller("purchaserInventoryNewCtrl", stockNewProvide);
+    // purchaserApp.controller("purchaserInventoryNewUpdateCtrl", stockNewUpdateProvide); 
+    // purchaserApp.controller("purchaserInventoryNewDetailCtrl", stockNewDetailProvide);
 
 
-    purchaserApp.controller("purchaserInventoryRejectCtrl", stockRejectProvide);
-    purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", stockRejectUpdateProvide);
+    // purchaserApp.controller("purchaserInventoryRejectCtrl", stockRejectProvide);
+    // purchaserApp.controller("purchaserInventoryRejectUpdateCtrl", stockRejectUpdateProvide);
 
-    purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", stockNewRsnDetailProvide);
+    // purchaserApp.controller("purchaserInventoryNewRsnDetailCtrl", stockNewRsnDetailProvide);
     
 
-    purchaserApp.controller("purchaserInventoryFixCtrl", stockFixProvide);
-    purchaserApp.controller("purchaserInventoryFixDetailCtrl", stockFixDetailProvide);
-    purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", stockFixRsnDetailProvide);
+    // purchaserApp.controller("purchaserInventoryFixCtrl", stockFixProvide);
+    // purchaserApp.controller("purchaserInventoryFixDetailCtrl", stockFixDetailProvide);
+    // purchaserApp.controller("purchaserInventoryFixRsnDetailCtrl", stockFixRsnDetailProvide);
     
 
-    purchaserApp.controller("purchaserInventoryTransferCtrl", stockTransferProvide);
-    purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", stockTransferFromDetailProvide);
-    purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", stockTransferToDetailProvide);
-    purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", stockTransferFromRsnDetailProvide);
+    // purchaserApp.controller("purchaserInventoryTransferCtrl", stockTransferProvide);
+    // purchaserApp.controller("purchaserInventoryTransferFromDetailCtrl", stockTransferFromDetailProvide);
+    // purchaserApp.controller("purchaserInventoryTransferToDetailCtrl", stockTransferToDetailProvide);
+    // purchaserApp.controller("purchaserInventoryTransferFromRsnDetailCtrl", stockTransferFromRsnDetailProvide);
 
-    purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", stockTransferToRsnDetailProvide);
+    // purchaserApp.controller("purchaserInventoryTransferToRsnDetailCtrl", stockTransferToRsnDetailProvide);
     
 
 
-    purchaserApp.controller("purchaserInventoryDetailCtrl", stockDetailProvide);
+    // purchaserApp.controller("purchaserInventoryDetailCtrl", stockDetailProvide);
 
     return purchaserApp;
 };

@@ -3,6 +3,11 @@
 //     localStorageService, diabloUtilsService,
 //     filterRetailer, filterEmployee, user, base){
 
+define(["wretailerApp"], function(app){
+    app.controller("wretailerTransCtrl", wretailerTransProvide);
+    app.controller("wretailerTransRsnDetailCtrl", wretailerTransRsnDetailProvide);
+});
+
 var wretailerTransProvide = function(
     $scope, $routeParams, $location, diabloFilter, wretailerService,
     localStorageService, diabloUtilsService,

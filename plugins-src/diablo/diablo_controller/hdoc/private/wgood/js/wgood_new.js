@@ -2,6 +2,11 @@
 //     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
 //     wgoodService, user, filterBrand, filterFirm, filterType,
 //     filterSizeGroup, filterColorType, base){
+define(["wgoodApp"], function(app){
+    app.controller("wgoodNewCtrl", wgoodNewProvide);
+    app.controller("wgoodDetailCtrl", wgoodDetailProvide);
+});
+
 var wgoodNewProvide = function(
     $scope, $timeout, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, user, filterBrand, filterFirm, filterType,

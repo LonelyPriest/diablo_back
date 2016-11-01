@@ -3,6 +3,11 @@
 //     diabloPromise, diabloFilter, wgoodService, purchaserService,
 //     user, filterFirm, filterEmployee, filterSizeGroup, filterColor, base){
 
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryRejectCtrl", stockRejectProvide); 
+    // return {wsaleNewPr:wsaleNewProvide};
+});
+
 var stockRejectProvide = function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,

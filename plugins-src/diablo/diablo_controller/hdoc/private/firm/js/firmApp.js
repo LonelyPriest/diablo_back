@@ -2,7 +2,7 @@
 
 define(["angular", "angular-router", "angular-resource", "angular-local-storage",
 	"angular-ui-bootstrap", "diablo-authen", "diablo-pattern", "diablo-user-right",
-	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good",
+	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good",  "firm-trans"
        ], firmAppConfig);
 
 function firmAppConfig (angular){

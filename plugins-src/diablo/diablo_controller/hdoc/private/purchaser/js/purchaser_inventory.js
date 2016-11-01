@@ -5,6 +5,13 @@
 //     localStorageService, user, filterFirm,
 //     filterEmployee, filterColor, base){
 
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryNewCtrl", stockNewProvide);
+    app.controller("purchaserInventoryNewDetailCtrl", stockNewDetailProvide);
+    app.controller("purchaserInventoryDetailCtrl", stockDetailProvide);
+    // return {wsaleNewPr:wsaleNewProvide};
+});
+
 var stockNewProvide = function(
     $scope, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloFilter, wgoodService, purchaserService,

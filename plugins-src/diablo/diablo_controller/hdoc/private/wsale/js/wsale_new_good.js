@@ -1,4 +1,18 @@
 // wsaleApp.factory("wsaleGoodService", function(){
+"use strict"
+
+// define(function(){
+//     return {
+// 	wsaleGoodServiceProvide: wsaleGoodServiceProvide,
+// 	wsaleGoodNewCtrlProvide: wsaleGoodNewCtrlProvide
+//     } 
+// });
+
+define (["wsaleApp"], function(app){
+    app.factory("wsaleGoodService", wsaleGoodServiceProvide);
+    app.controller("wsaleGoodNewCtrl", wsaleGoodNewCtrlProvide); 
+});
+
 var wsaleGoodServiceProvide = function(){
     
     var _brands     = [];

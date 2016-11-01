@@ -137,7 +137,20 @@ require.config({
 	}, 
 
 	"firm-trans": {
-            deps: ["angular", "jquery"]
+	    exports: "firm-trans",
+            deps: ["jquery",
+		   
+		   "angular", "angular-router", "angular-resource", "angular-zh",
+		   "angular-ui-bootstrap",
+		   "angular-local-storage",
+		   
+		   "jquery-custom", "jquery-cookie", "jquery-migrate", "jquery-block",
+		   "bootstrap", "fastclick",
+		   
+		   "diablo-init", "diablo-function", "diablo-authen",
+		   "diablo-pattern", "diablo-user-right",
+		   "diablo-authen-right", "diablo-login-out", "diablo-utils", "diablo-filter",
+		   "diablo-good"]
 	}
     }
 });

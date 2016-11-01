@@ -33,9 +33,9 @@ require.config({
 	// "diablo-employee": "/private/employ/javascript/employ_app", 
 	"diablo-good": "/private/wgood/js/wgood_app",
 
-	"wretailer" : "/private/wretailer/js/wretailer",
-	"wretailer-bill": "/private/wretailer/js/wretailer_bill",
-	"wretailer-trans": "/private/wretailer/js/wretailer_trans" 
+	// "wretailer" : "/private/wretailer/js/wretailer",
+	// "wretailer-bill": "/private/wretailer/js/wretailer_bill",
+	// "wretailer-trans": "/private/wretailer/js/wretailer_trans" 
     },
     
     shim: {
@@ -140,7 +140,7 @@ require.config({
 	},
 
 	"diablo-init":{
-	    deps:["jquery"]
+	    deps:["jquery", "jquery-custom", "jquery-cookie", "jquery-block", "jquery-migrate", "fastclick"]
 	},
 	
 	// "diablo-employee": {
@@ -148,17 +148,18 @@ require.config({
         //     deps: ["angular"]
 	// },
 	
-	"wretailer": {
-            deps: ["angular"]
-	},
+	// "wretailer": {
+        //     deps: ["angular"]
+	// },
 
-	"wretailer-bill": {
-            deps: ["angular"]
-	},
+	// "wretailer-bill": {
+        //     deps: ["angular"]
+	// },
 
-	"wretailer-trans": {
-            deps: ["angular"]
-	} 
+	// "wretailer-trans": {
+	//     exports: "wretailer-trans",
+        //     deps: ["angular"]
+	// } 
     }
 });
 
@@ -176,18 +177,17 @@ require(["jquery",
 
 	 "diablo-good",
 
-	 "wretailer", "wretailer-bill", "wretailer-trans",
+	 // "wretailer", "wretailer-bill", "wretailer-trans",
 	 
-	 "wretailerApp"], function($, angular)
+	 "wretailerApp", "load_wretailer"], function($, angular)
 	{
-	    // $.noConflict();
-	    // console.log(window);
-	    // console.log(angular);
-	    // console.log(FastClick);
-	    var attachFastClick = require('fastclick');
-	    attachFastClick(document.body); 
-	    App.init(); 
 	    $(function() {
 		angular.bootstrap(document, ["wretailerApp"]);
 	    });
+
+	    var app = require("diablo-init");
+	    if (app !== undefined) app.init();
+	    
+	    var attachFastClick = require('fastclick');
+	    if (typeof(attachFastClick) === 'function') attachFastClick(document.body);
 	});

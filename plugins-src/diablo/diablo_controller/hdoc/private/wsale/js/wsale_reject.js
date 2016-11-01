@@ -5,7 +5,20 @@
 //     purchaserService, wsaleService, user, filterRetailer, filterEmployee,
 //     filterSizeGroup, filterColor, base){
 
-var wsaleRejectCtrlProvide = function(
+"use strict"
+
+// define (function(){
+//     return {
+// 	wsaleRejectCtrlProvide: wsaleRejectCtrlProvide
+//     }
+// });
+
+
+define (["wsaleApp"], function(app){
+    app.controller("wsaleRejectCtrl", wsaleRejectCtrlProvide);
+});
+
+function wsaleRejectCtrlProvide (
     $scope, $q, $timeout, localStorageService, dateFilter,
     diabloUtilsService, diabloPromise, diabloPattern,
     diabloFilter, diabloNormalFilter, wgoodService,

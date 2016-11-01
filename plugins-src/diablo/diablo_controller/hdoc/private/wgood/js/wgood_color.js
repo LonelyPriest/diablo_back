@@ -1,5 +1,9 @@
 // wgoodApp.controller("wgoodColorDetailCtrl", function(
 //     $scope, diabloUtilsService, wgoodService, filterColorType, filterColor){
+define(["wgoodApp"], function(app){
+    app.controller("wgoodColorDetailCtrl", wgoodColorDetailProvide);
+});
+
 var wgoodColorDetailProvide = function(
     $scope, diabloUtilsService, wgoodService, filterColorType, filterColor){
     // console.log(filterColorType);

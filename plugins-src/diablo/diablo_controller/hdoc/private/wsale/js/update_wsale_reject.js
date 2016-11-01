@@ -3,11 +3,25 @@
 //     diabloFilter, wgoodService, purchaserService, wsaleService,
 //     user, filterRetailer, filterEmployee, filterSizeGroup,
 //     filterBrand, filterColor, filterType, base){
-var wsaleRejectUpdateCtrlProvide = function(
-        $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
-        diabloFilter, wgoodService, purchaserService, wsaleService,
-        user, filterRetailer, filterEmployee, filterSizeGroup,
-        filterBrand, filterColor, filterType, base){
+
+"use strict"
+
+// define (function(){
+//     return {
+// 	wsaleRejectUpdateCtrlProvide: wsaleRejectUpdateCtrlProvide
+//     }
+// });
+
+
+define (["wsaleApp"], function(app){
+    app.controller("wsaleRejectUpdateCtrl", wsaleRejectUpdateCtrlProvide);
+});
+
+function wsaleRejectUpdateCtrlProvide (
+    $scope, $q, $routeParams, $timeout, dateFilter, diabloUtilsService, diabloPromise,
+    diabloFilter, wgoodService, purchaserService, wsaleService,
+    user, filterRetailer, filterEmployee, filterSizeGroup,
+    filterBrand, filterColor, filterType, base){
     // console.log(base);
     // console.log(user); 
     $scope.shops           = user.sortBadRepoes.concat(user.sortShops);

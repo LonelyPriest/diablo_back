@@ -3,6 +3,11 @@
 //     diabloUtilsService, diabloPromise, diabloFilter, purchaserService,
 //     wgoodService, user, filterEmployee, filterSizeGroup, filterColor){
 
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryFixCtrl", stockFixProvide);
+    app.controller("purchaserInventoryFixDetailCtrl", stockFixDetailProvide);
+});
+
 var stockFixProvide = function(
 	$scope, $q, dateFilter, localStorageService, diabloPattern,
 	diabloUtilsService, diabloPromise, diabloFilter, purchaserService,

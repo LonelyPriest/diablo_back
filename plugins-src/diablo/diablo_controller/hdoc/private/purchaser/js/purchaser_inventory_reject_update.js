@@ -4,6 +4,10 @@
 //     user, filterBrand, filterFirm, filterType, filterEmployee,
 //     filterSizeGroup, filterColor, base){
 
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryRejectUpdateCtrl", stockRejectUpdateProvide);
+});
+
 var stockRejectUpdateProvide = function(
     $scope, $q, $routeParams, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, wgoodService, purchaserService,

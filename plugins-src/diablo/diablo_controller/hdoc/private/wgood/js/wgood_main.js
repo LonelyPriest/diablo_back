@@ -15,9 +15,7 @@ require.config({
 	"jquery-block": "/public/assets/metronic/plugins/jquery.blockui.min",
 	"bootstrap": "/public/assets/bootstrap/js/bootstrap.min",
 
-	"fastclick": "/public/assets/fastclick/fastclick.min",
-
-
+	"fastclick": "/public/assets/fastclick/fastclick.min", 
 	"diablo-function": "/private/utils/javascript/diablo_function",
 	
 	"diablo-authen": "/private/utils/javascript/diablo_authen_app",
@@ -30,10 +28,10 @@ require.config({
 
 	"diablo-init": "/private/init/app",
 
-	"wgood-new": "/private/wgood/js/wgood_new",
-	"wgood-update": "/private/wgood/js/wgood_update",
-	"wgood-size": "/private/wgood/js/wgood_size",
-	"wgood-color": "/private/wgood/js/wgood_color"
+	// "wgood-new": "/private/wgood/js/wgood_new",
+	// "wgood-update": "/private/wgood/js/wgood_update",
+	// "wgood-size": "/private/wgood/js/wgood_size",
+	// "wgood-color": "/private/wgood/js/wgood_color"
     },
     
     shim: {
@@ -137,24 +135,25 @@ require.config({
 	},
 
 	"diablo-init":{
-	    deps:["jquery"]
+	    deps:["jquery", "jquery-custom", "jquery-cookie", "jquery-block", "jquery-migrate", "fastclick"]
 	},
 
-	"wgood-new":{
-	    deps:["jquery"]
-	},
+	// "wgood-update":{
+	//     deps:["jquery"]
+	// },
 
-	"wgood-update":{
-	    deps:["jquery"]
-	},
+	// "wgood-size":{
+	//     deps:["jquery"]
+	// },
 
-	"wgood-size":{
-	    deps:["jquery"]
-	},
+	// "wgood-color":{
+	//     deps:["jquery"]
+	// },
 
-	"wgood-color":{
-	    deps:["jquery"]
-	}
+	// "wgood-new":{
+	//     exports: "wgood-new",
+	//     deps:["jquery"]
+	// }
     }
 });
 
@@ -170,18 +169,18 @@ require(["jquery",
 	 "diablo-pattern", "diablo-user-right",
 	 "diablo-authen-right", "diablo-login-out", "diablo-utils", "diablo-filter",
 
-	 "wgood-new", "wgood-update", "wgood-size", "wgood-color",
+	 // "wgood-new", "wgood-update", "wgood-size", "wgood-color",
 	 
-	 "wgoodApp"], function($, angular)
+	 "wgoodApp", "load_wgood"], function($, angular)
 	{
-	    // $.noConflict();
-	    // console.log(window);
-	    // console.log(angular);
-	    // console.log(FastClick);
-	    var attachFastClick = require('fastclick');
-	    attachFastClick(document.body); 
-	    App.init(); 
 	    $(function() {
 		angular.bootstrap(document, ["wgoodApp"]);
 	    });
+
+	    var app = require("diablo-init");
+	    if (app !== undefined) app.init();
+	    
+	    var attachFastClick = require('fastclick');
+	    if (typeof(attachFastClick) === 'function') attachFastClick(document.body);
+	    
 	});

@@ -5,8 +5,20 @@
 //     user, filterRetailer, filterEmployee, filterSizeGroup,
 //     filterBrand, filterColor, filterType, base){
 //     // console.log(user);
+"use strict"
 
-var wsaleUpdateDetailProvide = function(
+// define (function(){
+//     return {
+// 	wsaleUpdateDetailProvide: wsaleUpdateDetailProvide
+//     }
+// });
+
+define (["wsaleApp"], function(app){
+    app.controller("wsaleUpdateDetailCtrl", wsaleUpdateDetailProvide);
+    // return {wsaleNewPr:wsaleNewProvide};
+});
+
+function wsaleUpdateDetailProvide(
     $scope, $routeParams, $q, $timeout,dateFilter, diabloUtilsService,
     diabloPromise, diabloFilter, diabloPattern, diabloNormalFilter,
     wgoodService, purchaserService, wretailerService, wsaleService,

@@ -1,6 +1,10 @@
 /**
 Core script to handle the entire theme and core functions
 **/
+define (function(){
+    return App;
+});
+
 var App = function () {
     
     // IE mode

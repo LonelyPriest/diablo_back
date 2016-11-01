@@ -144,6 +144,17 @@
 //     purchaserService, wgoodService,
 //     user, filterBrand, filterFirm, filterSizeGroup, filterColor, base){
 
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryNewRsnDetailCtrl", stockNewRsnDetailProvide); 
+    app.controller("purchaserInventoryFixRsnDetailCtrl", stockFixRsnDetailProvide);
+
+    app.controller("purchaserInventoryTransferFromRsnDetailCtrl",
+		   stockTransferFromRsnDetailProvide);
+
+    app.controller("purchaserInventoryTransferToRsnDetailCtrl",
+		   stockTransferToRsnDetailProvide);
+});
+
 var stockFixRsnDetailProvide = function(
     $scope, $routeParams, $location, dateFilter,
     diabloPattern, diabloUtilsService, diabloFilter,

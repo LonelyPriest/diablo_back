@@ -1,8 +1,7 @@
 
 define(["angular", "angular-router", "angular-resource", "angular-local-storage",
 	"angular-ui-bootstrap", "diablo-authen", "diablo-pattern", "diablo-user-right",
-	"diablo-authen-right", "diablo-utils", "diablo-filter"
-       ], wgoodConfig);
+	"diablo-authen-right", "diablo-utils", "diablo-filter"], wgoodConfig);
 
 function wgoodConfig (angular){
     var wgoodApp = angular.module(
@@ -280,12 +279,12 @@ function wgoodConfig (angular){
 	$scope.home = function () {diablo_login_out($resource)};
     });
 
-    wgoodApp.controller("wgoodNewCtrl", wgoodNewProvide);
-    wgoodApp.controller("wgoodDetailCtrl", wgoodDetailProvide);
-    wgoodApp.controller("wgoodUpdateCtrl", wgoodUpdateProvide);
+    // wgoodApp.controller("wgoodNewCtrl", wgoodNewProvide);
+    // wgoodApp.controller("wgoodDetailCtrl", wgoodDetailProvide);
+    // wgoodApp.controller("wgoodUpdateCtrl", wgoodUpdateProvide);
 
-    wgoodApp.controller("wgoodSizeDetailCtrl", wgoodSizeDetailProvide);
-    wgoodApp.controller("wgoodColorDetailCtrl", wgoodColorDetailProvide);
+    // wgoodApp.controller("wgoodSizeDetailCtrl", wgoodSizeDetailProvide);
+    // wgoodApp.controller("wgoodColorDetailCtrl", wgoodColorDetailProvide);
 
     return wgoodApp;
 };

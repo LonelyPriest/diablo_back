@@ -3,8 +3,7 @@
 define(["angular", "angular-router", "angular-resource", "angular-local-storage",
 	"angular-ui-bootstrap", "diablo-authen", "diablo-pattern", "diablo-user-right",
 	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good",
-	"diablo-employee", "diablo-stock", "diablo-retailer"
-       ], wsaleConfg);
+	"diablo-employee", "diablo-stock", "diablo-retailer"], wsaleConfg);
 
 function wsaleConfg (angular) {
     var wsaleApp = angular.module(
@@ -297,27 +296,15 @@ function wsaleConfg (angular) {
 	
     });
 
-    wsaleApp.factory("wsaleGoodService", wsaleGoodServiceProvide);
-    wsaleApp.controller("wsaleGoodNewCtrl", wsaleGoodNewCtrlProvide);
-
     wsaleApp.controller("wsaleCtrl", function(localStorageService){
 	diablo_remove_local_storage(localStorageService);
     });
+    
+    wsaleApp.controller("wsaleNewDetailCtrl", wsaleNewDetailProvide);
 
     wsaleApp.controller("loginOutCtrl", function($scope, $resource){
-	$scope.home = function () {
-	    diablo_login_out($resource)
-	};
-    });
-
-    wsaleApp.controller("wsaleNewCtrl", wsaleNewProvide);
-    wsaleApp.controller("wsaleNewDetailCtrl", wsaleNewDetailProvide); 
-    wsaleApp.controller("wsaleUpdateDetailCtrl", wsaleUpdateDetailProvide);
-
-    wsaleApp.controller("wsaleRejectCtrl", wsaleRejectCtrlProvide);
-    wsaleApp.controller("wsaleRejectUpdateCtrl", wsaleRejectUpdateCtrlProvide);
-
-    wsaleApp.controller("wsaleRsnDetailCtrl", wsaleRsnDetailCtrlProvide);
+    	$scope.home = function () {diablo_login_out($resource)};
+    }); 
     
     return wsaleApp;
 };
@@ -984,24 +971,20 @@ function wsaleNewDetailProvide(
 // })
 
 
-// wsaleApp.controller("wsaleCtrl", function($scope, localStorageService){
-//     diablo_remove_local_storage(localStorageService); 
-// });
+// require(["wsaleApp", "wsale-good", "wsale-new", "wsale-update", "wsale-reject",
+// 	 "wsale-update-reject", "wsale-rsn", "diablo-login-out"],
+// 	function(app, wg, wn, wu, wr, wur, ws, loginout){
+// 	    app.factory("wsaleGoodService", wg.wsaleGoodServiceProvide);
+// 	    app.controller("wsaleGoodNewCtrl", wg.wsaleGoodNewCtrlProvide);
+// 	    app.controller("wsaleNewCtrl", wn.wsaleNewProvide);
+// 	    app.controller("wsaleNewDetailCtrl", wsaleNewDetailProvide);
 
-// define(['wsaleApp'], function(wsaleApp){
-//     return wsaleApp.controller("wsaleCtrl", function(localStorageService){
-// 	diablo_remove_local_storage(localStorageService);
-//     });
-// });
+// 	    app.controller("loginOutCtrl", function($scope, $resource){
+// 		$scope.home = function () {loginout($resource)};
+// 	    });
 
-// wsaleApp.controller("loginOutCtrl", function($scope, $resource){
-//     $scope.home = function () {
-// 	diablo_login_out($resource)
-//     };
-// });
-
-// define(['wsaleApp'], function(wsaleApp){
-//     return wsaleApp.controller("loginOutCtrl", function(localStorageService){
-// 	diablo_remove_local_storage(localStorageService);
-//     });
-// });
+// 	    app.controller("wsaleUpdateDetailCtrl", wu.wsaleUpdateDetailProvide);
+// 	    app.controller("wsaleRejectCtrl", wr.wsaleRejectCtrlProvide); 
+// 	    app.controller("wsaleRejectUpdateCtrl", wur.wsaleRejectUpdateCtrlProvide); 
+// 	    app.controller("wsaleRsnDetailCtrl", ws.wsaleRsnDetailCtrlProvide);
+// 	});

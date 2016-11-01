@@ -33,13 +33,13 @@ require.config({
 	"diablo-employee": "/private/employ/javascript/employ_app", 
 	"diablo-good": "/private/wgood/js/wgood_app",
 
-	"stock" : "/private/purchaser/js/purchaser_inventory",
-	"stock-reject": "/private/purchaser/js/purchaser_reject",
-	"stock-fix": "/private/purchaser/js/purchaser_inventory_fix",
-	"stock-rsn":"/private/purchaser/js/purchaser_inventory_rsn",
-	"stock-update": "/private/purchaser/js/purchaser_inventory_update",
-	"stock-reject-update": "/private/purchaser/js/purchaser_inventory_reject_update",
-	"stock-transfer": "/private/purchaser/js/purchaser_inventory_transfer" 
+	// "stock" : "/private/purchaser/js/purchaser_inventory",
+	// "stock-reject": "/private/purchaser/js/purchaser_reject",
+	// "stock-fix": "/private/purchaser/js/purchaser_inventory_fix",
+	// "stock-rsn":"/private/purchaser/js/purchaser_inventory_rsn",
+	// "stock-update": "/private/purchaser/js/purchaser_inventory_update",
+	// "stock-reject-update": "/private/purchaser/js/purchaser_inventory_reject_update",
+	// "stock-transfer": "/private/purchaser/js/purchaser_inventory_transfer" 
     },
     
     shim: {
@@ -143,41 +143,42 @@ require.config({
 	},
 
 	"diablo-init":{
-	    deps:["jquery"]
+	    deps:["jquery", "jquery-custom", "jquery-cookie", "jquery-block", "jquery-migrate", "fastclick"]
 	},
 	
 	"diablo-employee": {
             exports: "diablo-employee",
             deps: ["angular"]
 	},
-	
-	"stock": {
-            deps: ["angular"]
-	},
 
-	"stock-reject": {
-            deps: ["angular"]
-	},
+	// "stock-reject": {
+        //     deps: ["angular"]
+	// },
 
-	"stock-fix": {
-            deps: ["angular"]
-	},
+	// "stock-fix": {
+        //     deps: ["angular"]
+	// },
 
-	"stock-rsn": {
-            deps: ["angular"]
-	},
+	// "stock-rsn": {
+        //     deps: ["angular"]
+	// },
 
-	"stock-update": {
-            deps: ["angular"]
-	},
+	// "stock-update": {
+        //     deps: ["angular"]
+	// },
 
-	"stock-reject-update": {
-            deps: ["angular"]
-	},
+	// "stock-reject-update": {
+        //     deps: ["angular"]
+	// },
 
-	"stock-transfer": {
-            deps: ["angular"]
-	}
+	// "stock-transfer": {
+        //     deps: ["angular"]
+	// },
+
+	// "stock": {
+	//     exports: "stock",
+        //     deps: ["jquery", "angular"]
+	// }
     }
 });
 
@@ -195,19 +196,17 @@ require(["jquery",
 
 	 "diablo-employee",
 
-	 "stock", "stock-reject", "stock-fix", "stock-rsn", "stock-update",
-	 "stock-reject-update", "stock-transfer",
+	 // "stock-reject", "stock-fix", "stock-rsn", "stock-update",
+	 // "stock-reject-update", "stock-transfer", "stock",
 	 
-	 "purchaserApp"], function($, angular)
-	{
-	    // $.noConflict();
-	    // console.log(window);
-	    // console.log(angular);
-	    // console.log(FastClick);
-	    var attachFastClick = require('fastclick');
-	    attachFastClick(document.body); 
-	    App.init(); 
-	    $(function() {
-		angular.bootstrap(document, ["purchaserApp"]);
-	    });
+	 "purchaserApp", "load_stock"], function($, angular) {
+	     $(function() {
+		 angular.bootstrap(document, ["purchaserApp"]);
+	     });
+
+	     var app = require("diablo-init");
+	     if (app !== undefined) app.init();
+	     
+	     var attachFastClick = require('fastclick');
+	     if (typeof(attachFastClick) === 'function') attachFastClick(document.body); 
 	});

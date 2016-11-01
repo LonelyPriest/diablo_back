@@ -4,7 +4,19 @@
 //     user, filterBrand, filterRetailer, filterEmployee,
 //     filterFirm, filterSizeGroup, filterType, filterColor, base){
 
-var wsaleRsnDetailCtrlProvide = function(
+"use strict"
+
+// define (function(){
+//     return {
+// 	wsaleRsnDetailCtrlProvide: wsaleRsnDetailCtrlProvide
+//     }
+// });
+
+define (["wsaleApp"], function(app){
+    app.controller("wsaleRsnDetailCtrl", wsaleRsnDetailCtrlProvide);
+});
+
+function wsaleRsnDetailCtrlProvide (
     $scope, $routeParams, dateFilter, diabloUtilsService, diabloFilter,
     purchaserService, wgoodService, wsaleService, localStorageService,
     user, filterBrand, filterRetailer, filterEmployee,

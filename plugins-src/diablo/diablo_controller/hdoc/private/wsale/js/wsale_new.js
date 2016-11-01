@@ -9,6 +9,22 @@
 //     console.log(abc);
 // };
 "use strict"
+
+// define (function(require){
+//     var app = require("wsaleApp");
+//     var good = require("wsale-good");
+//     app.factory("wsaleGoodService", good.wsaleGoodServiceProvide);
+//     app.controller("wsaleGoodNewCtrl", good.wsaleGoodNewCtrlProvide);
+//     app.controller("wsaleNewCtrl", wsaleNewProvide);
+
+//     return app;
+// });
+
+define (["wsaleApp"], function(app){
+    app.controller("wsaleNewCtrl", wsaleNewProvide);
+    // return {wsaleNewPr:wsaleNewProvide};
+});
+
 function wsaleNewProvide(
     $scope, $q, $timeout, dateFilter, localStorageService,
     diabloUtilsService, diabloPromise, diabloFilter, diabloNormalFilter,

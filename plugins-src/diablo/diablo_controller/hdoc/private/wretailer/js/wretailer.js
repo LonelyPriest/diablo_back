@@ -2,6 +2,11 @@
 //     $scope, wretailerService, diabloPattern, diabloUtilsService,
 //     filterProvince, filterCity){
 
+define(["wretailerApp"], function(app){
+    app.controller("wretailerNewCtrl", wretailerNewProvide);
+    app.controller("wretailerDetailCtrl", wretailerDetailProvide);
+});
+
 var wretailerNewProvide = function(
     $scope, wretailerService, diabloPattern, diabloUtilsService,
     filterProvince, filterCity){

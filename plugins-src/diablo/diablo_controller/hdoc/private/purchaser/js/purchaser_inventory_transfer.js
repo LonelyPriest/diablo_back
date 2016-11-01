@@ -3,6 +3,13 @@
 //     diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,
 //     purchaserService, user, filterShop, filterFirm, filterEmployee,
 //     filterSizeGroup, filterColor, base){
+
+define (["purchaserApp"], function(app){
+    app.controller("purchaserInventoryTransferCtrl", stockTransferProvide);
+    app.controller("purchaserInventoryTransferFromDetailCtrl", stockTransferFromDetailProvide);
+    app.controller("purchaserInventoryTransferToDetailCtrl", stockTransferToDetailProvide);
+});
+
 var stockTransferProvide = function(
     $scope, $q, $timeout, dateFilter, diabloPattern, diabloUtilsService,
     diabloPromise, diabloFilter, diabloNormalFilter, wgoodService,

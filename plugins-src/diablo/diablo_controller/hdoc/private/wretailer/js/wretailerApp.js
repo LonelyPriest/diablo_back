@@ -2,7 +2,7 @@
 
 define(["angular", "angular-router", "angular-resource", "angular-local-storage",
 	"angular-ui-bootstrap", "diablo-authen", "diablo-pattern", "diablo-user-right",
-	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good",
+	"diablo-authen-right", "diablo-utils", "diablo-filter", "diablo-good"
        ], wretailerAppConfig);
 
 function wretailerAppConfig(angular){
@@ -298,13 +298,13 @@ function wretailerAppConfig(angular){
 	};
     });
 
-    wretailerApp.controller("wretailerNewCtrl", wretailerNewProvide);
-    wretailerApp.controller("wretailerDetailCtrl", wretailerDetailProvide);
+    // wretailerApp.controller("wretailerNewCtrl", wretailerNewProvide);
+    // wretailerApp.controller("wretailerDetailCtrl", wretailerDetailProvide);
 
-    wretailerApp.controller("wretailerTransCtrl", wretailerTransProvide);
-    wretailerApp.controller("wretailerTransRsnDetailCtrl", wretailerTransRsnDetailProvide);
+    // wretailerApp.controller("wretailerTransCtrl", wretailerTransProvide);
+    // wretailerApp.controller("wretailerTransRsnDetailCtrl", wretailerTransRsnDetailProvide);
 
-    wretailerApp.controller("wretailerBillCheckCtrl", wretailerBillCheckProvide);
+    // wretailerApp.controller("wretailerBillCheckCtrl", wretailerBillCheckProvide);
 
     return wretailerApp;
 };

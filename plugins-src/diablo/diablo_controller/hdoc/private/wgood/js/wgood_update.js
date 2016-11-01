@@ -3,6 +3,11 @@
 //     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,
 //     filterBrand, filterFirm, filterType, filterColor, filterSizeGroup,
 //     filterColorType, user, base){
+
+define(["wgoodApp"], function(app){
+    app.controller("wgoodUpdateCtrl", wgoodUpdateProvide);
+});
+
 var wgoodUpdateProvide = function(
     $scope, $location, $routeParams, $q, $timeout, diabloPattern,
     diabloUtilsService, diabloPromise, diabloFilter, wgoodService,

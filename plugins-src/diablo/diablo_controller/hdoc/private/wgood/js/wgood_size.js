@@ -1,6 +1,11 @@
 // wgoodApp.controller("wgoodSizeDetailCtrl", function(
 //     $scope, diabloPattern, diabloUtilsService, diabloFilter,
 //     wgoodService, filterSizeGroup){
+
+define(["wgoodApp"], function(app){
+    app.controller("wgoodSizeDetailCtrl", wgoodSizeDetailProvide);
+});
+
 var wgoodSizeDetailProvide = function(
     $scope, diabloPattern, diabloUtilsService, diabloFilter,
     wgoodService, filterSizeGroup){
