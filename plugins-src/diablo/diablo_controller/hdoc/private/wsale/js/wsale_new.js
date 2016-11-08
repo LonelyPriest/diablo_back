@@ -963,7 +963,14 @@ function wsaleNewProvide(
 			+ "序号[" + result.order_id.toString()
 			+ "，款号"  + result.style_number + "] "
 			+ wsaleService.error[2703],
-		    $scope, function(){$scope.has_saved = false});
+		    $scope, function(){$scope.has_saved = false}); 
+	    } else if (result.ecode === 2705){
+		dialog.response_with_callback(
+	    	    false, "销售开单", "开单失败：" 
+			+ wsaleService.error[2705]
+			+ "[ 应欠款=" + result.lbalance
+			+ " 实际欠款=" + result.cbalance + " ]",
+		    undefined, function(){$scope.has_saved = false}); 
 	    } else {
 	    	dialog.response_with_callback(
 	    	    false, "销售开单", "开单失败：" + wsaleService.error[result.ecode],

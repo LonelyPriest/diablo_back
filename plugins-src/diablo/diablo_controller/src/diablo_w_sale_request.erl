@@ -245,6 +245,12 @@ action(Session, Req, {"new_w_sale"}, Payload) ->
 		    end;
 		    %% delete draft
 		%% ?w_sale_draft:delete(wsale_draft, Merchant, Base);
+		{invalid_balance, {Retailer, CurrentBalance, LastBalance}} ->
+		    ?utils:respond(200,
+				   Req,
+				   ?err(wsale_invalid_retailer_balance, Retailer),
+				   [{<<"cbalance">>, CurrentBalance},
+				    {<<"lbalance">>, LastBalance}]);
 		{error, Error} ->
 		    ?utils:respond(200, Req, Error)
 	    end;

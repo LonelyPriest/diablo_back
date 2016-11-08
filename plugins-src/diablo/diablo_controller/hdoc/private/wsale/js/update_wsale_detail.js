@@ -770,6 +770,7 @@ function wsaleUpdateDetailProvide(
 	    inventory:added.length === 0 ? undefined : added, base:base
 	}).then(function(result){
 	    // console.log(result);
+	    var msg = "";
 	    if (result.ecode == 0){
 		msg = "销售单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(

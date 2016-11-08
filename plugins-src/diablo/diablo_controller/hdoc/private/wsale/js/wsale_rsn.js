@@ -248,6 +248,7 @@ function wsaleRsnDetailCtrlProvide (
     
     $scope.rsn_detail = function(inv){
 	console.log(inv);
+	var color_sorts = [];
 	if (angular.isDefined(inv.amounts)
 	    && angular.isDefined(inv.colors)
 	    && angular.isDefined(inv.order_sizes)){

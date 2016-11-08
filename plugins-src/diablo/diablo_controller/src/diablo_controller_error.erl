@@ -355,6 +355,8 @@ error(wsale_invalid_inv, StyleNumber) ->
     {2703, "error style number " ++ ?to_s(StyleNumber) ++ "."};
 error(wsale_invalid_pay, Pay) ->
     {2704, "error should pay " ++ ?to_s(Pay) ++ "."};
+error(wsale_invalid_retailer_balance, Retailer) ->
+    {2705, "error balance of retailer " ++ ?to_s(Retailer) ++ "."};
 
 %% about print
 error(invalid_sn, PrintSN) ->

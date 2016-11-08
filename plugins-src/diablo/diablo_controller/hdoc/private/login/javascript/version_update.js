@@ -1,6 +1,12 @@
 var version_update = function(){
     
     var updates = [
+	{date: "2016-11-07",
+	 content: [
+	     "增加零售商开单时，欠款验证"
+	    ]
+	},
+	
 	{date: "2016-11-01",
 	 content: [
 	     "修改文件加载机制，提高处理性能",

@@ -141,79 +141,108 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
     SellMode   = ?v(<<"mode">>, Props, ?WHOLESALER),
     SysCustomer = ?v(<<"sys_customer">>, Props, false),
 
-    Sql0 = "select id, name, balance from w_retailer"
-	" where id=" ++ ?to_s(Retailer)
-	++ " and merchant=" ++ ?to_s(Merchant)
-	++ " and deleted=" ++ ?to_s(?NO) ++ ";",
+    FF = fun (V) when V =:= <<>> -> 0;
+             (Any)  -> ?to_f(Any)
+         end,
+
+    Sql0 = "select a.id, a.merchant, a.balance"
+	", b.balance as lbalance, b.should_pay, b.has_pay, b.verificate, b.e_pay"
+	" from w_retailer a"
+	" left join"
+	
+	"(select id, merchant, retailer, balance, should_pay"
+        ", has_pay, verificate, e_pay from w_sale"
+        " where merchant=" ++ ?to_s(Merchant)
+        ++ " and retailer=" ++ ?to_s(Retailer)
+        ++ " order by id desc limit 1) b on a.merchant=b.merchant and a.id=b.retailer"
+	
+	" where a.id=" ++ ?to_s(Retailer)
+	++ " and a.merchant=" ++ ?to_s(Merchant)
+	++ " and a.deleted=" ++ ?to_s(?NO) ++ ";",
 
     case ?sql_utils:execute(s_read, Sql0) of 
-	{ok, Account} -> 
-	    SaleSn = lists:concat(
-		       ["M-", ?to_i(Merchant),
-			"-S-", ?to_i(Shop), "-",
-			?inventory_sn:sn(w_sale_new_sn, Merchant)]),
-	    
-	    RealyShop = realy_shop(Merchant, Shop, SellMode),
-	    Sql1 = 
-		lists:foldr(
-		  fun({struct, Inv}, Acc0)->
-			  case ?v(<<"style_number">>, Inv) of
-			      undefined -> Acc0;
-			      _ ->
-				  Amounts = ?v(<<"amounts">>, Inv), 
-				  wsale(new, SaleSn, DateTime,
-					Merchant, RealyShop, Inv, Amounts)
-				      ++ Acc0
-			  end
-		  end, [], Inventories), 
+	{ok, Account} ->
+	    LastBalance = FF(?v(<<"lbalance">>, Account, 0))
+                + FF(?v(<<"should_pay">>, Account, 0))
+                + FF(?v(<<"e_pay">>, Account, 0))
+                - FF(?v(<<"has_pay">>, Account, 0))
+                - FF(?v(<<"verificate">>, Account, 0)),
+            CurrentBalance = ?v(<<"balance">>, Account, 0),
+            ?DEBUG("current balance ~p, last balance ~p",
+                   [?to_f(CurrentBalance), ?to_f(LastBalance)]),
 
-	    TrueBalance = ?v(<<"balance">>, Account),
-	    CurrentBalance = 
-		case SysCustomer orelse TrueBalance =:= <<>> of
-		    true -> 0;
-		    false -> TrueBalance
-		end,
+	    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
+                orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>) of
+		true -> 
+		    SaleSn = lists:concat(
+			       ["M-", ?to_i(Merchant),
+				"-S-", ?to_i(Shop), "-",
+				?inventory_sn:sn(w_sale_new_sn, Merchant)]),
 
-	    Sql2 = "insert into w_sale(rsn"
-		", employ, retailer, shop, merchant, balance"
-		", should_pay, has_pay, cash, card, wire"
-		", verificate, total, comment, e_pay_type"
-		", e_pay, type, entry_date) values("
-		++ "\"" ++ ?to_s(SaleSn) ++ "\","
-		++ "\"" ++ ?to_s(Employe) ++ "\","
-		++ ?to_s(Retailer) ++ ","
-		++ ?to_s(Shop) ++ ","
-		++ ?to_s(Merchant) ++ ","
-		++ ?to_s(CurrentBalance) ++ ","
-	    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-	    %%        true  -> ?to_s(Balance) ++ ",";
-	    %%        false -> ?to_s(CurrentBalance) ++ ","
-	    %%    end
-		++ ?to_s(ShouldPay) ++ ","
-		++ ?to_s(HasPay) ++ ","
-		++ ?to_s(Cash) ++ ","
-		++ ?to_s(Card) ++ ","
-		++ ?to_s(Wire) ++ ","
-		++ ?to_s(VerifyPay) ++ ","
-		++ ?to_s(Total) ++ ","
-		++ "\"" ++ ?to_s(Comment) ++ "\","
-		++ ?to_s(EPayType) ++ ","
-		++ ?to_s(EPay) ++ ","
-		++ ?to_s(case SellMode of
-			     ?SALER -> type(snew);
-			     _      -> type(new)
-			 end) ++ ","
-		++ "\"" ++ ?to_s(DateTime) ++ "\");",
+		    RealyShop = realy_shop(Merchant, Shop, SellMode),
+		    Sql1 = 
+			lists:foldr(
+			  fun({struct, Inv}, Acc0)->
+				  case ?v(<<"style_number">>, Inv) of
+				      undefined -> Acc0;
+				      _ ->
+					  Amounts = ?v(<<"amounts">>, Inv), 
+					  wsale(new, SaleSn, DateTime,
+						Merchant, RealyShop, Inv, Amounts)
+					      ++ Acc0
+				  end
+			  end, [], Inventories), 
 
-	    Sql3 = "update w_retailer set balance=balance+"
-		++ ?to_s(?to_f(ShouldPay + EPay) -
-			     ?to_f(Cash) - ?to_f(Card) - ?to_f(Wire) - ?to_f(VerifyPay))
-		++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+		    %% TrueBalance = ?v(<<"balance">>, Account),
+		    TrueBalance = 
+			case SysCustomer orelse CurrentBalance =:= <<>> of
+			    true -> 0;
+			    false -> CurrentBalance
+			end,
 
-	    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
-	    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
-	    ?w_user_profile:update(retailer, Merchant),
-	    {reply, Reply, State}; 
+		    Sql2 = "insert into w_sale(rsn"
+			", employ, retailer, shop, merchant, balance"
+			", should_pay, has_pay, cash, card, wire"
+			", verificate, total, comment, e_pay_type"
+			", e_pay, type, entry_date) values("
+			++ "\"" ++ ?to_s(SaleSn) ++ "\","
+			++ "\"" ++ ?to_s(Employe) ++ "\","
+			++ ?to_s(Retailer) ++ ","
+			++ ?to_s(Shop) ++ ","
+			++ ?to_s(Merchant) ++ ","
+			++ ?to_s(TrueBalance) ++ ","
+		    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		    %%        true  -> ?to_s(Balance) ++ ",";
+		    %%        false -> ?to_s(CurrentBalance) ++ ","
+		    %%    end
+			++ ?to_s(ShouldPay) ++ ","
+			++ ?to_s(HasPay) ++ ","
+			++ ?to_s(Cash) ++ ","
+			++ ?to_s(Card) ++ ","
+			++ ?to_s(Wire) ++ ","
+			++ ?to_s(VerifyPay) ++ ","
+			++ ?to_s(Total) ++ ","
+			++ "\"" ++ ?to_s(Comment) ++ "\","
+			++ ?to_s(EPayType) ++ ","
+			++ ?to_s(EPay) ++ ","
+			++ ?to_s(case SellMode of
+				     ?SALER -> type(snew);
+				     _      -> type(new)
+				 end) ++ ","
+			++ "\"" ++ ?to_s(DateTime) ++ "\");",
+
+		    Sql3 = "update w_retailer set balance=balance+"
+			++ ?to_s(?to_f(ShouldPay + EPay) -
+				     ?to_f(Cash) - ?to_f(Card) - ?to_f(Wire) - ?to_f(VerifyPay))
+			++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+
+		    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
+		    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
+		    ?w_user_profile:update(retailer, Merchant),
+		    {reply, Reply, State};
+		false ->
+		    {reply, {invalid_balance, {Retailer, CurrentBalance, LastBalance}}, State}
+	    end;
 	Error ->
 	    {reply, Error, State}
     end;
