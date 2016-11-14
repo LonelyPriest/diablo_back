@@ -147,7 +147,7 @@ handle_call({update_retailer, Merchant, RetailerId, Attrs}, _From, State) ->
 
     NameExist =
 	case Name of
-	    undefined -> {ok, []} ;
+	    undefined -> {ok, []};
 	    Name ->
 		Sql = "select id, name from w_retailer"
 		    " where name=" ++ "\'" ++ ?to_s(Name) ++ "\'"
@@ -169,14 +169,43 @@ handle_call({update_retailer, Merchant, RetailerId, Attrs}, _From, State) ->
 		++ ?utils:v(province, integer, Province)
 		++ ?utils:v(city, integer, City), 
 
-	    Sql1 = "update w_retailer set "
-		++ ?utils:to_sqls(proplists, comma, Updates)
-		++ " where id=" ++ ?to_s(RetailerId)
+	    Sql1 = "select id, balance, merchant from w_retailer"
+		" where id=" ++ ?to_s(RetailerId)
 		++ " and merchant=" ++ ?to_s(Merchant),
 
-	    Reply = ?sql_utils:execute(write, Sql1, RetailerId),
-	    ?w_user_profile:update(retailer, Merchant),
-	    {reply, Reply, State}; 
+	    case ?sql_utils:execute(s_read, Sql1) of
+		{ok, []} -> {reply, {error, ?err(retailer_not_exist, RetailerId)}, State};
+		{ok, R1} ->
+		    CurrentBalance = ?v(<<"balance">>, R1),
+		    Sql2 = "update w_retailer set "
+			++ ?utils:to_sqls(proplists, comma, Updates)
+			++ " where id=" ++ ?to_s(RetailerId)
+			++ " and merchant=" ++ ?to_s(Merchant),
+	    
+		    case ?utils:v(balance, float, Balance) of
+			[] -> 
+			    Reply = ?sql_utils:execute(write, Sql2, RetailerId),
+			    ?w_user_profile:update(retailer, Merchant),
+			    {reply, Reply, State};
+			_ ->
+			    Sqls = [Sql2,
+				    "insert into trace_retailer_balance("
+				    "rsn, retailer, cur_balance, ch_balance"
+				    ", action, merchant, entry_date) values("
+				    ++ "\'" ++ ?to_s(-1) ++ "\',"
+				    ++ ?to_s(RetailerId) ++ ","
+				    ++ ?to_s(CurrentBalance) ++ ","
+				    ++ ?to_s(Balance) ++ ","
+				    ++ ?to_s(0) ++ ","
+				    ++ ?to_s(Merchant) ++ ","
+				    ++ "\'" ++ ?utils:current_time(format_localtime) ++ "\')"],
+			    Reply = ?sql_utils:execute(transaction, Sqls, RetailerId),
+			    ?w_user_profile:update(retailer, Merchant),
+			    {reply, Reply, State}
+		    end;
+		{error, Error1} ->
+		    {reply, {error, Error1}, State}
+	    end;
 	{error, Error} ->
 	    {reply, {error, Error}, State}
     end;
@@ -199,7 +228,6 @@ handle_call({delete_retailer, Merchant, RetailerId}, _From, State) ->
     Reply = ?sql_utils:execute(write, Sql, RetailerId),
     ?w_user_profile:update(retailer, Merchant),
     {reply, Reply, State};
-    
 
 handle_call({list_retailer, Merchant}, _From, State) ->
     ?DEBUG("lookup retail with merchant ~p", [Merchant]),

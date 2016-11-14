@@ -600,7 +600,7 @@ function wsaleRejectUpdateCtrlProvide (
 	}).then(function(result){
 	    console.log(result);
 	    if (result.ecode == 0){
-		msg = "退货单编辑成功！！单号：" + result.rsn; 
+		var msg = "退货单编辑成功！！单号：" + result.rsn; 
 	    	diabloUtilsService.response_with_callback(
 	    	    true, "退货单编辑", msg, $scope,
 	    	    function(){

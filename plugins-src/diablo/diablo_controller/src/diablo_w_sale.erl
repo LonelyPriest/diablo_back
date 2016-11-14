@@ -273,7 +273,7 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     HasPay     = ?v(<<"has_pay">>, Props, 0),
 
     OldRetailer  = ?v(<<"old_retailer">>, Props),
-    OldBalance   = ?v(<<"old_balance">>, Props),
+    %% OldBalance   = ?v(<<"old_balance">>, Props),
     OldVerifyPay = ?v(<<"old_verify_pay">>, Props, 0),
     OldShouldPay = ?v(<<"old_should_pay">>, Props, 0),
     OldHasPay    = ?v(<<"old_has_pay">>, Props, 0),
@@ -308,9 +308,10 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     case Retailer =:= OldRetailer of
 	true ->
 	    Sql2 = "update w_sale set "
-		++ ?utils:to_sqls(
-		      proplists, comma,
-		      ?utils:v(balance, float, OldBalance) ++ Updates)
+		%% ++ ?utils:to_sqls(
+		%%       proplists, comma,
+		%%       ?utils:v(balance, float, OldBalance) ++ Updates)
+		++ ?utils:to_sqls(proplists, comma, Updates)
 		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
 
 	    case  (ShouldPay - HasPay - VerifyPay)
@@ -657,72 +658,108 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),
     EPay       = ?v(<<"e_pay">>, Props, 0),
 
-    Sql0 = "select id, name, balance from w_retailer"
-	" where id=" ++ ?to_s(Retailer)
-	++ " and merchant=" ++ ?to_s(Merchant)
-	++ " and deleted=" ++ ?to_s(?NO) ++ ";",
+    %% Sql0 = "select id, name, balance from w_retailer"
+    %% 	" where id=" ++ ?to_s(Retailer)
+    %% 	++ " and merchant=" ++ ?to_s(Merchant)
+    %% 	++ " and deleted=" ++ ?to_s(?NO) ++ ";",
+
+    Sql0 = "select a.id, a.merchant, a.balance"
+	", b.balance as lbalance, b.should_pay, b.has_pay, b.verificate, b.e_pay"
+	" from w_retailer a"
+	" left join"
+
+	"(select id, merchant, retailer, balance, should_pay"
+        ", has_pay, verificate, e_pay from w_sale"
+        " where merchant=" ++ ?to_s(Merchant)
+        ++ " and retailer=" ++ ?to_s(Retailer)
+        ++ " order by id desc limit 1) b on a.merchant=b.merchant and a.id=b.retailer"
+
+	" where a.id=" ++ ?to_s(Retailer)
+	++ " and a.merchant=" ++ ?to_s(Merchant)
+	++ " and a.deleted=" ++ ?to_s(?NO) ++ ";",
 
     case ?sql_utils:execute(s_read, Sql0) of 
-	{ok, Account} -> 
-	    Sn = lists:concat(["M-", ?to_i(Merchant),
-			       "-S-", ?to_i(Shop), "-R-",
-			       ?inventory_sn:sn(w_sale_reject_sn, Merchant)]),
-	    {ShopType, RealyShop} = realy_shop(reject, Merchant, Shop, SellMode),
+	{ok, Account} ->
 
-	    Sql1 =
-		case ShopType of
-		    ?BAD_REPERTORY ->
-			lists:foldr(
-			  fun({struct, Inv}, Acc0)->
-				  Amounts = ?v(<<"amounts">>, Inv),
-				  wsale(reject_badrepo, Sn, DateTime,
-					Merchant, {Shop, RealyShop}, Inv, Amounts) ++ Acc0
-			  end, [], Inventories);
-		    _ ->
-			lists:foldr(
-			  fun({struct, Inv}, Acc0)->
-				  Amounts = ?v(<<"amounts">>, Inv),
-				  wsale(reject, Sn, DateTime,
-					Merchant, RealyShop, Inv, Amounts) ++ Acc0
-			  end, [], Inventories)
-		end,
+	    FF = fun (V) when V =:= <<>> -> 0;
+		     (Any)  -> ?to_f(Any)
+		 end,
+	    
+	    LastBalance = FF(?v(<<"lbalance">>, Account, 0))
+                + FF(?v(<<"should_pay">>, Account, 0))
+                + FF(?v(<<"e_pay">>, Account, 0))
+                - FF(?v(<<"has_pay">>, Account, 0))
+                - FF(?v(<<"verificate">>, Account, 0)),
+            CurrentBalance = ?v(<<"balance">>, Account, 0),
 
-	    CurrentBalance = ?v(<<"balance">>, Account),
+	    ?DEBUG("current balance ~p, last balance ~p",
+                   [?to_f(CurrentBalance), ?to_f(LastBalance)]),
 
-	    Sql2 = "insert into w_sale(rsn"
-		", employ, retailer, shop, merchant, balance"
-		", should_pay, total, comment, e_pay_type"
-		", e_pay, type, entry_date) values("
-		++ "\"" ++ ?to_s(Sn) ++ "\","
-		++ "\"" ++ ?to_s(Employe) ++ "\","
-		++ ?to_s(Retailer) ++ ","
-		++ ?to_s(Shop) ++ ","
-		++ ?to_s(Merchant) ++ ","
-		++ ?to_s(CurrentBalance) ++ ","
-		%% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		%%        true -> ?to_s(Balance) ++ ",";
-		%%        false -> ?to_s(CurrentBalance) ++ ","
-		%%    end
-		++ ?to_s(-ShouldPay) ++ "," 
-		++ ?to_s(-Total) ++ ","
-		++ "\"" ++ ?to_s(Comment) ++ "\","
-		++ ?to_s(EPayType) ++ ","
-		++ ?to_s(-EPay) ++ ","
-		++ ?to_s(type(reject)) ++ ","
-		++ "\"" ++ ?to_s(DateTime) ++ "\");",
+	    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
+                orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>) of
+		true -> 
+		    Sn = lists:concat(["M-", ?to_i(Merchant),
+				       "-S-", ?to_i(Shop), "-R-",
+				       ?inventory_sn:sn(w_sale_reject_sn, Merchant)]),
+		    {ShopType, RealyShop} = realy_shop(reject, Merchant, Shop, SellMode),
 
-	    Sql3 = "update w_retailer set balance=balance-"
-		++ ?to_s(?to_f(ShouldPay + EPay))
-		++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+		    Sql1 =
+			case ShopType of
+			    ?BAD_REPERTORY ->
+				lists:foldr(
+				  fun({struct, Inv}, Acc0)->
+					  Amounts = ?v(<<"amounts">>, Inv),
+					  wsale(reject_badrepo, Sn, DateTime,
+						Merchant, {Shop, RealyShop}, Inv, Amounts) ++ Acc0
+				  end, [], Inventories);
+			    _ ->
+				lists:foldr(
+				  fun({struct, Inv}, Acc0)->
+					  Amounts = ?v(<<"amounts">>, Inv),
+					  wsale(reject, Sn, DateTime,
+						Merchant, RealyShop, Inv, Amounts) ++ Acc0
+				  end, [], Inventories)
+			end,
 
-	    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
+		    %% CurrentBalance = ?v(<<"balance">>, Account),
 
-	    case ?sql_utils:execute(transaction, AllSql, Sn) of
-		{error, _} = Error ->
-		    {reply, Error, State};
-		OK -> 
-		    ?w_user_profile:update(retailer, Merchant),
-		    {reply, OK, State}
+		    Sql2 = "insert into w_sale(rsn"
+			", employ, retailer, shop, merchant, balance"
+			", should_pay, total, comment, e_pay_type"
+			", e_pay, type, entry_date) values("
+			++ "\"" ++ ?to_s(Sn) ++ "\","
+			++ "\"" ++ ?to_s(Employe) ++ "\","
+			++ ?to_s(Retailer) ++ ","
+			++ ?to_s(Shop) ++ ","
+			++ ?to_s(Merchant) ++ ","
+			++ ?to_s(CurrentBalance) ++ ","
+		    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		    %%        true -> ?to_s(Balance) ++ ",";
+		    %%        false -> ?to_s(CurrentBalance) ++ ","
+		    %%    end
+			++ ?to_s(-ShouldPay) ++ "," 
+			++ ?to_s(-Total) ++ ","
+			++ "\"" ++ ?to_s(Comment) ++ "\","
+			++ ?to_s(EPayType) ++ ","
+			++ ?to_s(-EPay) ++ ","
+			++ ?to_s(type(reject)) ++ ","
+			++ "\"" ++ ?to_s(DateTime) ++ "\");",
+
+		    Sql3 = "update w_retailer set balance=balance-"
+			++ ?to_s(?to_f(ShouldPay + EPay))
+			++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+
+		    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
+
+		    case ?sql_utils:execute(transaction, AllSql, Sn) of
+			{error, _} = Error ->
+			    {reply, Error, State};
+			OK -> 
+			    ?w_user_profile:update(retailer, Merchant),
+			    {reply, OK, State}
+		    end;
+		false ->
+		    {reply, {invalid_balance, {Retailer, CurrentBalance, LastBalance}}, State}
 	    end; 
 	Error ->
 	    {reply, Error, State}

@@ -113,6 +113,16 @@ function wsaleRejectCtrlProvide (
     $scope.retailers = filterRetailer;
     if ($scope.retailers.length !== 0){
 	$scope.select.retailer = $scope.retailers[0];
+
+	if (user.loginRetailer !== -1){
+	    for (var i=0, l=$scope.retailers.length; i<l; i++){
+		if (user.loginRetailer === $scope.retailers[i].id){
+		    $scope.select.retailer = $scope.retailers[i]
+		    break;
+		} 
+	    }
+	}
+	
 	$scope.select.surplus = $scope.round($scope.select.retailer.balance);
 	$scope.select.left_balance = $scope.select.surplus;
     }
@@ -526,6 +536,13 @@ function wsaleRejectCtrlProvide (
 			"退货单打印", "退货成功，是否打印退货单？",
 			yes_callback, undefined, $scope)
 		} 
+	    } else if (result.ecode === 2705){
+		dialog.response_with_callback(
+	    	    false, "销售退货", "退货失败：" 
+			+ wsaleService.error[2705]
+			+ "[计算欠款=" + result.lbalance
+			+ " 实际欠款=" + result.cbalance + " ]",
+		    undefined, function(){$scope.has_saved = false}); 
 	    } else{
 	    	dialog.response_with_callback(
 	    	    false, "销售退货", "退货失败：" + wsaleService.error[result.ecode],

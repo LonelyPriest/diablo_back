@@ -461,6 +461,12 @@ action(Session, Req, {"reject_w_sale"}, Payload) ->
 		    ?utils:respond(200, Req, ?succ(reject_w_sale, RSN),
 				   [{<<"rsn">>, ?to_b(RSN)}])
 	    end;
+	{invalid_balance, {Retailer, CurrentBalance, LastBalance}} ->
+	    ?utils:respond(200,
+			   Req,
+			   ?err(wsale_invalid_retailer_balance, Retailer),
+			   [{<<"cbalance">>, CurrentBalance},
+			    {<<"lbalance">>, LastBalance}]);
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;

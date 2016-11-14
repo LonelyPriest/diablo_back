@@ -790,3 +790,19 @@ create table w_sale_detail_amount(
     unique  key    index_rsbcz (rsn, style_number, brand, color, size),
     primary key    (id)
 )default charset=utf8;
+
+
+create table trace_retailer_balance(
+    id             INTEGER AUTO_INCREMENT,
+    rsn            VARCHAR(32) default -1,
+    retailer       INTEGER default -1,
+    cur_balance    DECIMAL(10, 2) default 0, -- max: 99999999.99
+    ch_balance     DECIMAL(10, 2) default 0, -- max: 99999999.99
+    action         TINYINT default -1,
+    merchant        INTEGER default -1,
+    entry_date      DATETIME,
+    key         dk (merchant, retailer),
+    primary key    (id)
+)default charset=utf8;
+
+

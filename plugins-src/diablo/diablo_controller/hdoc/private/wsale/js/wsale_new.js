@@ -939,7 +939,7 @@ function wsaleNewProvide(
 		} else {
 		    $scope.select.retailer.balance = $scope.select.left_balance;
 		    $scope.select.surplus = $scope.select.retailer.balance;
-		} 
+		}
 		
 		if (im_print === diablo_yes){
 		    var show_message = "开单" + print(result);
@@ -968,7 +968,7 @@ function wsaleNewProvide(
 		dialog.response_with_callback(
 	    	    false, "销售开单", "开单失败：" 
 			+ wsaleService.error[2705]
-			+ "[ 应欠款=" + result.lbalance
+			+ "[计算欠款=" + result.lbalance
 			+ " 实际欠款=" + result.cbalance + " ]",
 		    undefined, function(){$scope.has_saved = false}); 
 	    } else {
