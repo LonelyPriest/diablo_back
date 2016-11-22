@@ -902,6 +902,7 @@ sort_amount(onsale, Amount, [{struct, Sorted}|T], Acc) ->
 	    sort_amount(onsale, Amount, T, [{struct, Sorted}|Acc])
     end.
 
+    
 check_inventory(oncheck, _Round, Moneny, ShouldPay, []) ->
     ?DEBUG("Moneny ~p, ShouldPay, ~p", [Moneny, ShouldPay]),
     case round(Moneny) == ShouldPay of
@@ -914,7 +915,10 @@ check_inventory(oncheck, Round, Money, ShouldPay, [{struct, Inv}|T]) ->
     StyleNumber = ?v(<<"style_number">>, Inv),
     DCount = lists:foldr(
 	      fun({struct, A}, Acc)->
-		      ?v(<<"sell_count">>, A) + Acc
+		      case ?w_sale:direct(?v(<<"direct">>, A)) of
+			  wreject ->  ?v(<<"reject_count">>, A) + Acc;
+			  _ -> ?v(<<"sell_count">>, A) + Acc
+		     end
 	      end, 0, Amounts),
     
     FDiscount = ?v(<<"fdiscount">>, Inv),

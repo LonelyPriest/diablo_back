@@ -677,7 +677,7 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),
     EPay       = ?v(<<"e_pay">>, Props, 0),
     
-    Settings  = ?wifi_print:detail(base_setting, Merchant, Shop),
+    {Settings, _}  = ?wifi_print:detail(base_setting, Merchant, Shop),
     CheckLast = ?to_i(?v(<<"check_debt">>, Settings, 0)),
 
     GetSqls =
