@@ -412,6 +412,25 @@ function wsaleRejectCtrlProvide (
 	var added = [];
 	for(var i=1, l=$scope.inventories.length; i<l; i++){
 	    var add = $scope.inventories[i];
+
+	    if (angular.isUndefined(add.style_number)){
+		diabloUtilsService.response(
+		    false, "销售开单", "开单失败：序号["
+			+ add.order_id.toString() + "]"
+			+ wsaleService.error[2193]);
+		return;
+	    };
+
+	    var amount_info = get_sales(add.amounts); 
+	    if (amount_info.length === 0){
+	    	diabloUtilsService.response(
+	    	    false, "销售开单", "开单失败：序号["
+	    		+ add.order_id.toString()
+	    		+ "，款号" + add.style_number + "] "
+	    		+ wsaleService.error[2703]);
+	    	return;
+	    }
+	    
 	    added.push({
 		style_number: add.style_number,
 		brand       : add.brand_id,
@@ -434,7 +453,7 @@ function wsaleRejectCtrlProvide (
 		discount    : add.discount,
 		alarm_day   : add.alarm_day,
 		
-		amounts     : get_sales(add.amounts),
+		amounts     : amount_info,
 		sell_total  : parseInt(add.reject),
 		fdiscount   : parseInt(add.fdiscount),
 		fprice      : parseFloat(add.fprice),

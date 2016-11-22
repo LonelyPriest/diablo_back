@@ -6,6 +6,8 @@
 %%% @end
 %%% Created : 11 Feb 2015 by buxianhui <buxianhui@myowner.com>
 %%%-------------------------------------------------------------------
+
+%% codeing: utf-8
 -module(diablo_w_sale).
 
 -include("../../../../include/knife.hrl").
@@ -141,6 +143,9 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
     SellMode   = ?v(<<"mode">>, Props, ?WHOLESALER),
     SysCustomer = ?v(<<"sys_customer">>, Props, false),
 
+    {Settings, _}  = ?wifi_print:detail(base_setting, Merchant, Shop),
+    CheckLast = ?to_i(?v(<<"check_debt">>, Settings, 0)),
+
     FF = fun (V) when V =:= <<>> -> 0;
              (Any)  -> ?to_f(Any)
          end,
@@ -160,6 +165,72 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
 	++ " and a.merchant=" ++ ?to_s(Merchant)
 	++ " and a.deleted=" ++ ?to_s(?NO) ++ ";",
 
+    GetSqls =
+	fun(CurrentBalance, RetailerId) ->
+		SaleSn = lists:concat(
+			   ["M-", ?to_i(Merchant),
+			    "-S-", ?to_i(Shop), "-",
+			    ?inventory_sn:sn(w_sale_new_sn, Merchant)]),
+
+		RealyShop = realy_shop(Merchant, Shop, SellMode),
+		Sql1 = 
+		    lists:foldr(
+		      fun({struct, Inv}, Acc0)->
+			      case ?v(<<"style_number">>, Inv) of
+				  undefined -> Acc0;
+				  _ ->
+				      Amounts = ?v(<<"amounts">>, Inv), 
+				      wsale(new, SaleSn, DateTime,
+					    Merchant, RealyShop, Inv, Amounts)
+					  ++ Acc0
+			      end
+		      end, [], Inventories), 
+
+		%% TrueBalance = ?v(<<"balance">>, Account),
+		TrueBalance = 
+		    case SysCustomer orelse CurrentBalance =:= <<>> of
+			true -> 0;
+			false -> CurrentBalance
+		    end,
+
+		Sql2 = "insert into w_sale(rsn"
+		    ", employ, retailer, shop, merchant, balance"
+		    ", should_pay, has_pay, cash, card, wire"
+		    ", verificate, total, comment, e_pay_type"
+		    ", e_pay, type, entry_date) values("
+		    ++ "\"" ++ ?to_s(SaleSn) ++ "\","
+		    ++ "\"" ++ ?to_s(Employe) ++ "\","
+		    ++ ?to_s(Retailer) ++ ","
+		    ++ ?to_s(Shop) ++ ","
+		    ++ ?to_s(Merchant) ++ ","
+		    ++ ?to_s(TrueBalance) ++ ","
+		%% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		%%        true  -> ?to_s(Balance) ++ ",";
+		%%        false -> ?to_s(CurrentBalance) ++ ","
+		%%    end
+		    ++ ?to_s(ShouldPay) ++ ","
+		    ++ ?to_s(HasPay) ++ ","
+		    ++ ?to_s(Cash) ++ ","
+		    ++ ?to_s(Card) ++ ","
+		    ++ ?to_s(Wire) ++ ","
+		    ++ ?to_s(VerifyPay) ++ ","
+		    ++ ?to_s(Total) ++ ","
+		    ++ "\"" ++ ?to_s(Comment) ++ "\","
+		    ++ ?to_s(EPayType) ++ ","
+		    ++ ?to_s(EPay) ++ ","
+		    ++ ?to_s(case SellMode of
+				 ?SALER -> type(snew);
+				 _      -> type(new)
+			     end) ++ ","
+		    ++ "\"" ++ ?to_s(DateTime) ++ "\");",
+
+		Sql3 = "update w_retailer set balance=balance+"
+		    ++ ?to_s(?to_f(ShouldPay + EPay) -
+				 ?to_f(Cash) - ?to_f(Card) - ?to_f(Wire) - ?to_f(VerifyPay))
+		    ++ " where id=" ++ ?to_s(RetailerId),
+
+		{Sql1 ++ [Sql2] ++ [Sql3], SaleSn}
+	end,
     case ?sql_utils:execute(s_read, Sql0) of 
 	{ok, Account} ->
 	    LastBalance = FF(?v(<<"lbalance">>, Account, 0))
@@ -169,79 +240,27 @@ handle_call({new_sale, Merchant, Inventories, Props}, _From, State) ->
                 - FF(?v(<<"verificate">>, Account, 0)),
             CurrentBalance = ?v(<<"balance">>, Account, 0),
             ?DEBUG("current balance ~p, last balance ~p",
-                   [?to_f(CurrentBalance), ?to_f(LastBalance)]),
+		   [?to_f(CurrentBalance), ?to_f(LastBalance)]),
 
-	    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
-                orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>) of
-		true -> 
-		    SaleSn = lists:concat(
-			       ["M-", ?to_i(Merchant),
-				"-S-", ?to_i(Shop), "-",
-				?inventory_sn:sn(w_sale_new_sn, Merchant)]),
-
-		    RealyShop = realy_shop(Merchant, Shop, SellMode),
-		    Sql1 = 
-			lists:foldr(
-			  fun({struct, Inv}, Acc0)->
-				  case ?v(<<"style_number">>, Inv) of
-				      undefined -> Acc0;
-				      _ ->
-					  Amounts = ?v(<<"amounts">>, Inv), 
-					  wsale(new, SaleSn, DateTime,
-						Merchant, RealyShop, Inv, Amounts)
-					      ++ Acc0
-				  end
-			  end, [], Inventories), 
-
-		    %% TrueBalance = ?v(<<"balance">>, Account),
-		    TrueBalance = 
-			case SysCustomer orelse CurrentBalance =:= <<>> of
-			    true -> 0;
-			    false -> CurrentBalance
-			end,
-
-		    Sql2 = "insert into w_sale(rsn"
-			", employ, retailer, shop, merchant, balance"
-			", should_pay, has_pay, cash, card, wire"
-			", verificate, total, comment, e_pay_type"
-			", e_pay, type, entry_date) values("
-			++ "\"" ++ ?to_s(SaleSn) ++ "\","
-			++ "\"" ++ ?to_s(Employe) ++ "\","
-			++ ?to_s(Retailer) ++ ","
-			++ ?to_s(Shop) ++ ","
-			++ ?to_s(Merchant) ++ ","
-			++ ?to_s(TrueBalance) ++ ","
-		    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		    %%        true  -> ?to_s(Balance) ++ ",";
-		    %%        false -> ?to_s(CurrentBalance) ++ ","
-		    %%    end
-			++ ?to_s(ShouldPay) ++ ","
-			++ ?to_s(HasPay) ++ ","
-			++ ?to_s(Cash) ++ ","
-			++ ?to_s(Card) ++ ","
-			++ ?to_s(Wire) ++ ","
-			++ ?to_s(VerifyPay) ++ ","
-			++ ?to_s(Total) ++ ","
-			++ "\"" ++ ?to_s(Comment) ++ "\","
-			++ ?to_s(EPayType) ++ ","
-			++ ?to_s(EPay) ++ ","
-			++ ?to_s(case SellMode of
-				     ?SALER -> type(snew);
-				     _      -> type(new)
-				 end) ++ ","
-			++ "\"" ++ ?to_s(DateTime) ++ "\");",
-
-		    Sql3 = "update w_retailer set balance=balance+"
-			++ ?to_s(?to_f(ShouldPay + EPay) -
-				     ?to_f(Cash) - ?to_f(Card) - ?to_f(Wire) - ?to_f(VerifyPay))
-			++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
-
-		    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
+	    case CheckLast of
+		1 ->
+		    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
+			orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>)
+		    of
+			true ->
+			    {AllSql, SaleSn} = GetSqls(CurrentBalance, ?v(<<"id">>, Account)),
+			    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
+			    ?w_user_profile:update(retailer, Merchant),
+			    {reply, Reply, State};
+			false ->
+			    {reply, {invalid_balance,
+				     {Retailer, CurrentBalance, LastBalance}}, State}
+		    end;
+		0 ->
+		    {AllSql, SaleSn} = GetSqls(CurrentBalance, ?v(<<"id">>, Account)),
 		    Reply = ?sql_utils:execute(transaction, AllSql, SaleSn),
 		    ?w_user_profile:update(retailer, Merchant),
-		    {reply, Reply, State};
-		false ->
-		    {reply, {invalid_balance, {Retailer, CurrentBalance, LastBalance}}, State}
+		    {reply, Reply, State}
 	    end;
 	Error ->
 	    {reply, Error, State}
@@ -602,14 +621,14 @@ handle_call({trans_detail, Merchant, Conditions}, _From, State) ->
     Sql =
 	" select a.id, a.rsn, a.style_number, a.brand_id, a.type_id"
 	", a.s_group, a.free, a.season, a.firm_id, a.hand, a.total"
-	", a.sell_style, a.fdiscount, a.fprice, a.path, a.comment"
+	", a.sell_style, a.second, a.fdiscount, a.fprice, a.path, a.comment"
 
 	", b.color as color_id, b.size, b.total as amount"
 	" from "
 
 	"(select id, rsn, style_number, brand as brand_id, type as type_id"
 	", s_group, free, season, firm as firm_id, hand, total, sell_style"
-	", fdiscount, fprice, path, comment"
+	", second, fdiscount, fprice, path, comment"
 	" from w_sale_detail"
 	" where " ++ ?utils:to_sqls(proplists, Conditions) ++ ") a"
 
@@ -657,12 +676,67 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
 
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),
     EPay       = ?v(<<"e_pay">>, Props, 0),
+    
+    Settings  = ?wifi_print:detail(base_setting, Merchant, Shop),
+    CheckLast = ?to_i(?v(<<"check_debt">>, Settings, 0)),
 
-    %% Sql0 = "select id, name, balance from w_retailer"
-    %% 	" where id=" ++ ?to_s(Retailer)
-    %% 	++ " and merchant=" ++ ?to_s(Merchant)
-    %% 	++ " and deleted=" ++ ?to_s(?NO) ++ ";",
+    GetSqls =
+	fun(CurrentBalance, RetailerId) ->
+		Sn = lists:concat(["M-", ?to_i(Merchant),
+				   "-S-", ?to_i(Shop), "-R-",
+				   ?inventory_sn:sn(w_sale_reject_sn, Merchant)]),
+		{ShopType, RealyShop} = realy_shop(reject, Merchant, Shop, SellMode),
 
+		Sql1 =
+		    case ShopType of
+			?BAD_REPERTORY ->
+			    lists:foldr(
+			      fun({struct, Inv}, Acc0)->
+				      Amounts = ?v(<<"amounts">>, Inv),
+				      wsale(reject_badrepo, Sn, DateTime,
+					    Merchant, {Shop, RealyShop}, Inv, Amounts) ++ Acc0
+			      end, [], Inventories);
+			_ ->
+			    lists:foldr(
+			      fun({struct, Inv}, Acc0)->
+				      Amounts = ?v(<<"amounts">>, Inv),
+				      wsale(reject, Sn, DateTime,
+					    Merchant, RealyShop, Inv, Amounts) ++ Acc0
+			      end, [], Inventories)
+		    end,
+
+		%% CurrentBalance = ?v(<<"balance">>, Account),
+
+		Sql2 = "insert into w_sale(rsn"
+		    ", employ, retailer, shop, merchant, balance"
+		    ", should_pay, total, comment, e_pay_type"
+		    ", e_pay, type, entry_date) values("
+		    ++ "\"" ++ ?to_s(Sn) ++ "\","
+		    ++ "\"" ++ ?to_s(Employe) ++ "\","
+		    ++ ?to_s(Retailer) ++ ","
+		    ++ ?to_s(Shop) ++ ","
+		    ++ ?to_s(Merchant) ++ ","
+		    ++ ?to_s(CurrentBalance) ++ ","
+		%% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		%%        true -> ?to_s(Balance) ++ ",";
+		%%        false -> ?to_s(CurrentBalance) ++ ","
+		%%    end
+		    ++ ?to_s(-ShouldPay) ++ "," 
+		    ++ ?to_s(-Total) ++ ","
+		    ++ "\"" ++ ?to_s(Comment) ++ "\","
+		    ++ ?to_s(EPayType) ++ ","
+		    ++ ?to_s(-EPay) ++ ","
+		    ++ ?to_s(type(reject)) ++ ","
+		    ++ "\"" ++ ?to_s(DateTime) ++ "\");",
+
+		Sql3 = "update w_retailer set balance=balance-"
+		    ++ ?to_s(?to_f(ShouldPay + EPay))
+		%% ++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
+		    ++ " where id=" ++ ?to_s(RetailerId),
+
+	       {Sql1 ++ [Sql2] ++ [Sql3], Sn}
+	end,
+    
     Sql0 = "select a.id, a.merchant, a.balance"
 	", b.balance as lbalance, b.should_pay, b.has_pay, b.verificate, b.e_pay"
 	" from w_retailer a"
@@ -694,73 +768,32 @@ handle_call({reject_sale, Merchant, Inventories, Props}, _From, State) ->
 
 	    ?DEBUG("current balance ~p, last balance ~p",
                    [?to_f(CurrentBalance), ?to_f(LastBalance)]),
-
-	    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
-                orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>) of
-		true -> 
-		    Sn = lists:concat(["M-", ?to_i(Merchant),
-				       "-S-", ?to_i(Shop), "-R-",
-				       ?inventory_sn:sn(w_sale_reject_sn, Merchant)]),
-		    {ShopType, RealyShop} = realy_shop(reject, Merchant, Shop, SellMode),
-
-		    Sql1 =
-			case ShopType of
-			    ?BAD_REPERTORY ->
-				lists:foldr(
-				  fun({struct, Inv}, Acc0)->
-					  Amounts = ?v(<<"amounts">>, Inv),
-					  wsale(reject_badrepo, Sn, DateTime,
-						Merchant, {Shop, RealyShop}, Inv, Amounts) ++ Acc0
-				  end, [], Inventories);
-			    _ ->
-				lists:foldr(
-				  fun({struct, Inv}, Acc0)->
-					  Amounts = ?v(<<"amounts">>, Inv),
-					  wsale(reject, Sn, DateTime,
-						Merchant, RealyShop, Inv, Amounts) ++ Acc0
-				  end, [], Inventories)
-			end,
-
-		    %% CurrentBalance = ?v(<<"balance">>, Account),
-
-		    Sql2 = "insert into w_sale(rsn"
-			", employ, retailer, shop, merchant, balance"
-			", should_pay, total, comment, e_pay_type"
-			", e_pay, type, entry_date) values("
-			++ "\"" ++ ?to_s(Sn) ++ "\","
-			++ "\"" ++ ?to_s(Employe) ++ "\","
-			++ ?to_s(Retailer) ++ ","
-			++ ?to_s(Shop) ++ ","
-			++ ?to_s(Merchant) ++ ","
-			++ ?to_s(CurrentBalance) ++ ","
-		    %% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		    %%        true -> ?to_s(Balance) ++ ",";
-		    %%        false -> ?to_s(CurrentBalance) ++ ","
-		    %%    end
-			++ ?to_s(-ShouldPay) ++ "," 
-			++ ?to_s(-Total) ++ ","
-			++ "\"" ++ ?to_s(Comment) ++ "\","
-			++ ?to_s(EPayType) ++ ","
-			++ ?to_s(-EPay) ++ ","
-			++ ?to_s(type(reject)) ++ ","
-			++ "\"" ++ ?to_s(DateTime) ++ "\");",
-
-		    Sql3 = "update w_retailer set balance=balance-"
-			++ ?to_s(?to_f(ShouldPay + EPay))
-			++ " where id=" ++ ?to_s(?v(<<"id">>, Account)),
-
-		    AllSql = Sql1 ++ [Sql2] ++ [Sql3],
-
+	    case CheckLast of
+		1 ->
+		    case ?to_f(LastBalance) =:= ?to_f(CurrentBalance)
+			orelse (CurrentBalance /= 0 andalso ?v(<<"lbalance">>, Account) =:= <<>>) of
+			true -> 
+			    {AllSql, Sn} = GetSqls(CurrentBalance, ?v(<<"id">>, Account)), 
+			    case ?sql_utils:execute(transaction, AllSql, Sn) of
+				{error, _} = Error ->
+				    {reply, Error, State};
+				OK -> 
+				    ?w_user_profile:update(retailer, Merchant),
+				    {reply, OK, State}
+			    end;
+			false ->
+			    {reply, {invalid_balance, {Retailer, CurrentBalance, LastBalance}}, State}
+		    end;
+		0 ->
+		    {AllSql, Sn} = GetSqls(CurrentBalance, ?v(<<"id">>, Account)), 
 		    case ?sql_utils:execute(transaction, AllSql, Sn) of
 			{error, _} = Error ->
 			    {reply, Error, State};
 			OK -> 
 			    ?w_user_profile:update(retailer, Merchant),
 			    {reply, OK, State}
-		    end;
-		false ->
-		    {reply, {invalid_balance, {Retailer, CurrentBalance, LastBalance}}, State}
-	    end; 
+		    end
+	    end;
 	Error ->
 	    {reply, Error, State}
     end;
@@ -1387,6 +1420,7 @@ wsale(reject_badrepo, RSN, DateTime, Merchant, {Shop, RealyShop}, Inventory, Amo
 
 wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) -> 
     StyleNumber = ?v(<<"style_number">>, Inventory),
+    Second      = ?v(<<"second">>, Inventory, 0),
     Brand       = ?v(<<"brand">>, Inventory),
     Type        = ?v(<<"type">>, Inventory),
     FDiscount   = ?v(<<"fdiscount">>, Inventory, 100), 
@@ -1442,7 +1476,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 	 {ok, []} ->
 	     "insert into w_sale_detail("
 		 "rsn, style_number, brand, type, s_group, free"
-		 ", season, firm, year, hand, total, sell_style, fdiscount"
+		 ", season, firm, year, hand, total, sell_style, second, fdiscount"
 		 ", fprice, path, comment, entry_date)"
 		 " values("
 		 ++ "\"" ++ ?to_s(RSN) ++ "\","
@@ -1459,6 +1493,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 		 ++ ?to_s(Hand) ++ ","
 		 ++ ?to_s(Total) ++ ","
 		 ++ ?to_s(SellStyle) ++ ","
+		 ++ ?to_s(Second) ++ ","
 		 ++ ?to_s(FDiscount) ++ ","
 		 ++ ?to_s(FPrice) ++ ","
 		 ++ "\"" ++ ?to_s(Path) ++ "\","
@@ -1658,7 +1693,4 @@ filter_condition(wsale, [{<<"sell_type">>, ST}|T], Acc1, Acc2) ->
     filter_condition(wsale, T, Acc1, [{<<"type">>, ST}|Acc2]);
 filter_condition(wsale, [O|T], Acc1, Acc2) ->
     filter_condition(wsale, T, Acc1, [O|Acc2]).
-
-
-
     

@@ -170,10 +170,8 @@ call(Parent, {print, RSN, Merchant}) ->
 	    [ {D2} || D2 <- Details, ?v(<<"total">>, D2) >= 0 ],
 	%% ?DEBUG("newdetails ~p", [NewDetails]),
 
-	{ok, Retailer} = ?w_user_profile:get(
-			    retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
-	{ok, Employee} = ?w_user_profile:get(
-			    employee, Merchant, ?v(<<"employ_id">>, Sale)),
+	{ok, Retailer} = ?w_user_profile:get(retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
+	{ok, Employee} = ?w_user_profile:get(employee, Merchant, ?v(<<"employ_id">>, Sale)),
 	{ok, Brands}   = ?w_user_profile:get(brand, Merchant),
 
 	GetBrand =
@@ -333,12 +331,9 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 			  %% ?DEBUG("P ~p", [P]),
 			  Server = server(?v(<<"server_id">>, P)),
 
-			  {Setting, Phones}
-			      = detail(base_setting, Merchant, PShop),
-			  PrintRetailer
-			      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
-			  PrintTable
-			      = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
+			  {Setting, Phones} = detail(base_setting, Merchant, PShop),
+			  PrintRetailer = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
+			  PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)), 
 			  %% IsRound
 			  %%     = ?to_i(?v(<<"pround">>, Setting, ?NO)),
 
@@ -360,10 +355,14 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 					 line(equal, Column) ++ br(Brand)
 				 end,
 
+			  ShouldPay = ?v(<<"should_pay">>, Attrs, 0),
+			  IsVip     = ?v(<<"s_customer">>, Setting, 0) =/= RetailerId,
+			  PSecond   = ?to_i(?v(<<"pseconed_good">>, Setting, 0)) =:= 1,
+			  
 			  Body = print_content(
 				   PShop, Brand, Model, Column,
 				   Merchant, Setting, Invs, Total,
-				   ?v(<<"should_pay">>, Attrs, 0))
+				   ShouldPay, {IsVip, PSecond})
 			      ++ case PrintTable of
 				     ?TABLE  ->
 					 %% line_space(default);
@@ -427,7 +426,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 	    %% end
     end.
 
-print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S) ->
+print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S, {_IsVip, _PSecond}) ->
     %% DateTime     = ?v(<<"datetime">>, Attrs), 
     %% Retailer     = ?v(<<"retailer">>, Print),
     %% Employee     = ?v(<<"employ">>, Print),
@@ -500,7 +499,11 @@ print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S) ->
     Content;
 
 
-print_content(_ShopId, <<"feie">>=PBrand, <<"HOT80">>=Model, 48, Merchant, _Setting, Invs, _T, _S) ->
+print_content(_ShopId,
+	      <<"feie">>=PBrand,
+	      <<"HOT80">>=Model, 48,
+	      Merchant,
+	      _Setting, Invs, _T, _S, {_IsVip, _PSecond}) ->
     ?DEBUG("==== invs ~p", [Invs]), 
     TFun = fun(Amounts) ->
 		   lists:foldr(
@@ -548,10 +551,12 @@ print_content(_ShopId, <<"feie">>=PBrand, <<"HOT80">>=Model, 48, Merchant, _Sett
     ?DEBUG("content ~p", [Content]),
     body_head(Merchant, PBrand, Model, 48) ++ Content;
     
-print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay) -> 
+print_content(
+  Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay, {IsVip, PSecond}) -> 
     Fields     = detail(print_format, Merchant, Shop),
     PrintModel = ?to_i(?v(<<"pformat">>, Setting, ?COLUMN)),
     PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
+    
 
     %% ?DEBUG("PrintModel ~p, PrintTable ~p", [PrintModel, PrintTable]),
 
@@ -569,7 +574,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
     %% {IsSize, _}      = field(size, Fields),
 
     FreeMode = case lists:filter(fun({F, _, _})->
-					 ?DEBUG("F ~p", [F]),
+					 %% ?DEBUG("F ~p", [F]),
 					 <<"color">> =:= F
 					     orelse <<"size">> =:= F
 					     orelse <<"size_name">> =:= F
@@ -598,7 +603,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		%% ?DEBUG("row content ~ts", [RowContent]),
 		left_pading(PBrand, Model) ++ 
 		    format_row_content(
-		      PrintTable, PrintModel, {IsHand, FreeMode},
+		      PrintTable, PrintModel, {IsHand, FreeMode, IsVip, PSecond},
 		      Fields, SizeGroups, Inv, A, RowNo) ++  br(PBrand)
 		    
 		    ++ case PrintTable of
@@ -688,8 +693,7 @@ print_content(Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, Shoul
 		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
 		BodyHead ++ BodyContent;
 	   (no_hand, ?COLUMN) -> 
-		BodyHead = body_head(
-			     PrintTable, ?COLUMN, PBrand, Model, Fields), 
+		BodyHead = body_head(PrintTable, ?COLUMN, PBrand, Model, Fields), 
 		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
 		
 		{BodyContent, _TotalRowNo} = 
@@ -931,10 +935,12 @@ format_row_content(?STRING, PrintModel, IsHand, Fields, SizeGroups, Inv, Amount,
 	      end ++ Acc 
       end, [], Fields);
 
-format_row_content(?TABLE, PrintModel, {IsHand, FreeMode}, Fields, SizeGroups, Inv, Amount, RowNo) ->
+format_row_content(
+  ?TABLE, PrintModel, {IsHand, FreeMode, IsVip, PSecond}, Fields, SizeGroups, Inv, Amount, RowNo) ->
     %% ?DEBUG("format_row_content with Fields ~p, rowno ~p", [Fields, RowNo]),
     Brand       = ?v(<<"brand_name">>, Inv),
     StyleNumber = ?v(<<"style_number">>, Inv),
+    Second      = ?to_i(?v(<<"second">>, Inv, 0)),
     Type        = ?v(<<"type_name">>, Inv),
     Price       = ?v(<<"fprice">>, Inv),
     Discount    = ?v(<<"fdiscount">>, Inv, 100),
@@ -977,16 +983,29 @@ format_row_content(?TABLE, PrintModel, {IsHand, FreeMode}, Fields, SizeGroups, I
 		  %% 	  ++ pading(Width - width(latin1, StyleNumber) -2)
 		  %% 	  ++ phd("|");
 		  <<"style_number">> ->
-		      ?to_s(StyleNumber)
-			  ++ pading(Width - width(latin1, StyleNumber) -1)
+		      NewStyleNumber = case IsVip andalso PSecond andalso Second =:= 1 of
+					   true -> ?to_s(StyleNumber) ++ "补";
+					   false -> StyleNumber
+				       end,
+		      ?to_s(NewStyleNumber)
+			  ++ pading(Width - width(latin1, StyleNumber) -
+					case IsVip andalso PSecond andalso Second =:=1 of
+					    true -> 2;
+					    false -> 0
+					end -1)
 			  ++ phd("|");
 		  
 		  <<"type">>         ->
 		      TypeLen = width(chinese, Type),
 		      %% ?DEBUG("StyleNumber ~p, TypeLen ~p",
-		      %% 	     [StyleNumber, TypeLen]), 
-		      ?to_s(Type)
-			  ++ pading(Width - TypeLen -1) ++ phd("|");
+		      %% 	     [StyleNumber, TypeLen]),
+		      case Width > TypeLen + 1 of
+			  true-> ?to_s(Type)
+				     ++ pading(Width - TypeLen -1) ++ phd("|");
+			  false ->
+			      {L, S} = ?f_print:s(len, Type, Width - 2),
+			      S ++ pading(Width - L -1) ++ phd("|")
+		      end;
 		  <<"color">>        ->
 		      CId = 
 			  case IsHand of
@@ -1244,14 +1263,14 @@ body_head(?TABLE, ?COLUMN, Brand, Model, Fields) ->
     ?f_print:left_pading(Brand, Model)
 	++ lists:foldr(
 	     fun({Name, CName, Width}, Acc) when Name =:= FName ->
-		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width - 1), 
+		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width - 1), 
 		     phd("|")
 			 ++ pading(Mh) ++ CName ++ pading(Ml)
 			 %% ++ CName
 			 %% ++ pading(Width - width(chinese, CName) - 2)
 			 ++ phd("|") ++ Acc;
 		({_Name, CName, Width}, Acc) ->
-		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width),
+		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width),
 		     pading(Mh) ++ CName ++ pading(Ml)
 		     %% CName ++ pading(Width - width(chinese, CName) - 1)
 			 ++ phd("|") ++ Acc 
@@ -1264,7 +1283,7 @@ body_head(?STRING, ?COLUMN, Brand, Model, Fields) ->
     ?f_print:left_pading(Brand, Model)
 	++ lists:foldr(
 	     fun({_Name, CName, Width}, Acc) ->
-		     Len = width(chinese, CName), 
+		     Len = width(chinese, ?to_b(CName)), 
 		     CName ++ pading(Width - Len) ++ Acc
 	     end, [], Fields)
 	++ ?f_print:br(Brand).
@@ -1277,14 +1296,14 @@ body_head(?TABLE, ?ROW, Brand, Model, Fields, SizeString) ->
 	     fun({<<"size">>, _, _}, Acc) -> 
 		     SizeString ++ Acc;
 		({Name, CName, Width}, Acc) when Name =:= FName ->
-		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width - 1),
+		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width - 1),
 		     phd("|")
 			 ++ pading(Mh) ++ CName ++ pading(Ml)
 			 %% ++ CName
 			 %% ++ pading(Width - width(chinese, CName) - 2)
 			 ++ phd("|") ++ Acc;
 		({_Name, CName, Width}, Acc) ->
-		     {Mh, Ml} = middle(?TABLE, chinese, CName, Width),
+		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width),
 		     pading(Mh) ++ CName ++ pading(Ml)
 			 %% CName ++ pading(Width - width(chinese, CName) - 1)
 			 ++ phd("|") ++ Acc 
@@ -1297,7 +1316,7 @@ body_head(?STRING, ?ROW, Brand, Model, Fields, SizeString) ->
 	     fun({<<"size">>, _, _}, Acc) -> 
 		     SizeString ++ Acc;
 		({_Name, CName, Width}, Acc) -> 
-		     CName ++ pading(Width - width(chinese, CName)) ++ Acc
+		     CName ++ pading(Width - width(chinese, ?to_b(CName))) ++ Acc
 	     end, [], Fields)
 	++ ?f_print:br(Brand).
     
@@ -1398,7 +1417,7 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
     VerifyPay    = ?v(<<"verificate">>, Attrs, 0),
     ShouldPay    = ?v(<<"should_pay">>, Attrs, 0),
     %% Total        = ?v(<<"total">>, Attrs, 0),
-    %% Comment      = ?v(<<"comment">>, Attrs, []),
+    Comment      = ?v(<<"comment">>, Attrs, []),
     EPayType     = ?v(<<"e_pay_type">>, Attrs, -1),
     EPay         = ?v(<<"e_pay">>, Attrs, 0),
     Direct       = ?v(<<"direct">>, Attrs),
@@ -1421,30 +1440,40 @@ body_stastic(Brand, Model, 50, Setting, Attrs) ->
     
     %% left_pading(Brand, Model) ++ "合计：" ++ ?to_s(Total)
     left_pading(Brand, Model)
-	++ decorate_data(bw)
-	++ "销售:" ++ ?to_s(STotal) ++ pading(1)
+	++ "售:" ++ decorate_data(bw) ++ ?to_s(STotal) ++ decorate_data(cancel_bw)
+	++ pading(1)
 	++ case RTotal =:= 0 of
 	       true -> [];
-	       _ -> "退货:" ++ ?to_s(erlang:abs(RTotal)) ++ pading(1)
+	       _ -> "退:" ++ decorate_data(bw)
+			++ ?to_s(erlang:abs(RTotal))
+			++ decorate_data(cancel_bw) ++ pading(1)
 	   end
 	
-	++ "金额:" ++ round(IsRound, TotalSPay)
-	++ decorate_data(cancel_bw)
-	
-	%% ++ pading(2) ++ "备注：" ++ ?to_s(Comment) 
+	++ "应付:" ++ decorate_data(bw) ++ round(IsRound, TotalSPay) ++ decorate_data(cancel_bw)
+	++ pading(1) 
+	++ "实付:" ++ decorate_data(bw) ++ round(IsRound, HasPay) ++ decorate_data(cancel_bw) 
 	++ br(Brand)
+	
+	++ line(minus, 50) ++ br(Brand)
 
-	++ left_pading(Brand, Model) 
-	++ "应付：" ++ decorate_data(block)
-	++ round(IsRound, ShouldPay) ++ decorate_data(cancel_block)
+    %% ++ left_pading(Brand, Model) 
+    %% ++ "应付：" ++ decorate_data(block)
+    %% ++ round(IsRound, ShouldPay) ++ decorate_data(cancel_block)
+    %% ++ case extra_pay(EPayType, EPay) of
+    %%        [] -> pading(2);
+    %%        _V -> _V ++ br(Brand)
+    %%    end 
+    %% ++ left_pading(Brand, Model)
+    %% ++ "实付：" ++ decorate_data(block)
+    %% ++ round(IsRound, HasPay) ++ decorate_data(cancel_block)
+	++ pay(Cash, Card, Wire, VerifyPay) 
 	++ case extra_pay(EPayType, EPay) of
 	       [] -> pading(2);
 	       _V -> _V ++ br(Brand)
 	   end 
 	++ left_pading(Brand, Model)
-	++ "实付：" ++ decorate_data(block)
-	++ round(IsRound, HasPay) ++ decorate_data(cancel_block)
-	++ pay(Cash, Card, Wire, VerifyPay)
+	
+	++ pading(1) ++ "备注：" ++ ?to_s(Comment) 
 	++ br(Brand)
 	
     %% ++ left_pading(Brand, Model)
@@ -2253,13 +2282,13 @@ pay(Cash, Card, Wire, Veri) ->
 		end, [], Pays).
 
 pay(card, Card) when Card == 0  -> []; 
-pay(card, Card)                 -> "刷卡：" ++ ?to_s(Card);
+pay(card, Card)                 -> "刷卡：" ++ ?to_s(clean_zero(Card));
 pay(cash, Cash)  when Cash == 0 -> [];
-pay(cash, Cash)                 -> "现金：" ++ ?to_s(Cash);
+pay(cash, Cash)                 -> "现金：" ++ ?to_s(clean_zero(Cash));
 pay(wire, Wire) when Wire == 0  -> [];
-pay(wire, Wire)                 -> "汇款：" ++ ?to_s(Wire);
+pay(wire, Wire)                 -> "汇款：" ++ ?to_s(clean_zero(Wire));
 pay(veri, Veri) when Veri == 0  -> [];
-pay(veri, Veri)                 -> "核销：" ++ ?to_s(Veri).
+pay(veri, Veri)                 -> "核销：" ++ ?to_s(clean_zero(Veri)).
 
 extra_pay_type(0) -> "代付运费";
 extra_pay_type(1) -> "样衣";
@@ -2317,7 +2346,8 @@ sort_inventory(Merchant, GetBrand, [{Inv}|T], Sorts, STotal, RTotal, Pay) ->
 			       {<<"comment">>,    ?v(<<"comment">>, Inv)},
 			       {<<"fdiscount">>,  FDiscount},
 			       {<<"fprice">>,     FPrice}, 
-			       {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
+			       {<<"s_group">>,   ?v(<<"s_group">>, Inv)},
+			       {<<"second">>,    ?v(<<"second">>, Inv)},
 			       {<<"total">>,      Total},
 			       {<<"amounts">>,    Amounts},
 			       {<<"colors">>,     Colors}]},
@@ -2405,6 +2435,7 @@ combine_inventory(Merchant, GetBrand, Inv, [{struct, H}|T],
 			 {<<"fdiscount">>,  FDiscount},
 			 {<<"fprice">>,     FPrice},
 			 {<<"s_group">>,    ?v(<<"s_group">>, Inv)},
+			 {<<"second">>,    ?v(<<"second">>, Inv)},
 			 {<<"total">>,      ?v(<<"total">>, Inv)},
 			 {<<"colors">>, NewColors},
 			 {<<"amounts">> ,NewAmounts}]}|Combines],

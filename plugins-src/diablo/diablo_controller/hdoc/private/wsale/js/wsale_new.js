@@ -563,9 +563,9 @@ function wsaleNewProvide(
 	
 	add.s_group      = src.s_group;
 	add.free         = src.free; 
-	add.sell_style   = $scope.sell_styles[$scope.price_type - 1]; 
-	return add;
-	
+	add.sell_style   = $scope.sell_styles[$scope.price_type - 1];
+	add.second       = false;
+	return add; 
     };
     
     $scope.on_select_good = function(item, model, label){
@@ -845,6 +845,7 @@ function wsaleNewProvide(
 		fdiscount   : seti(add.fdiscount),
 		fprice      : setv(add.fprice),
 		path        : sets(add.path),
+		second      : add.second ? 1 : 0,
 
 		sizes       : add.sizes,
 		s_group     : add.s_group,
@@ -1306,12 +1307,10 @@ function wsaleNewProvide(
 		if ($scope.setting.check_sale === diablo_yes || inv.free !== 0){
 		    var shop_now_inv = data[0];
 		    
-		    var order_sizes =
-			wgoodService.format_size_group(
-			    inv.s_group, filterSizeGroup);
-		    var sort =
-			purchaserService.sort_inventory(
-			    shop_now_inv, order_sizes, filterColor);
+		    var order_sizes = wgoodService.format_size_group(
+			inv.s_group, filterSizeGroup);
+		    var sort = purchaserService.sort_inventory(
+			shop_now_inv, order_sizes, filterColor);
 		    
 		    inv.total   = sort.total;
 		    inv.sizes   = sort.size;
@@ -1329,36 +1328,26 @@ function wsaleNewProvide(
 		if ($scope.setting.trace_price === diablo_yes){
 		    // last sale info
 		    var shop_last_inv = function(){
-			if ($scope.setting.check_sale === diablo_yes
-			    || inv.free !== 0){
+			if ($scope.setting.check_sale === diablo_yes || inv.free !== 0)
 			    return data[1];
-			} else {
-			    return data[0];
-			}
+			 else
+			     return data[0]; 
 		    }();
 		    
-		    inv.lprice      = shop_last_inv.length === 0
-			? undefined:shop_last_inv[0].fprice;
-		    
-		    inv.ldiscount   = shop_last_inv.length === 0
-			? undefined:shop_last_inv[0].fdiscount;
-		    
-		    inv.lsell_style = shop_last_inv.length === 0
-			? undefined:shop_last_inv[0].sell_style;
+		    inv.lprice = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].fprice; 
+		    inv.ldiscount = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].fdiscount; 
+		    inv.lsell_style = shop_last_inv.length === 0 ? undefined:shop_last_inv[0].sell_style;
+		    inv.second = shop_last_inv.length === 0 ? false : true;
 
-		    if (angular.isDefined(inv.lsell_style)
-			&& inv.lsell_style !== -1){
-			inv.sell_style
-			    = $scope.get_sell_style(inv.lsell_style);
-		    } 
-
-		    inv.fdiscount   = inv.ldiscount
-			? inv.ldiscount : inv.discount;
-		    inv.fprice      = inv.lprice
-			? inv.lprice : inv[inv.sell_style.f];
+		    if (angular.isDefined(inv.lsell_style) && inv.lsell_style !== -1)
+			inv.sell_style = $scope.get_sell_style(inv.lsell_style);
+		    
+		    inv.fdiscount = inv.ldiscount ? inv.ldiscount : inv.discount;
+		    inv.fprice  = inv.lprice ? inv.lprice : inv[inv.sell_style.f];
 		} else{
 		    inv.fdiscount   = inv.discount;
 		    inv.fprice      = inv[inv.sell_style.f];
+		    inv.second   = false;
 		}
 
 		if(inv.free === 0){

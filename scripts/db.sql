@@ -763,6 +763,7 @@ create table w_sale_detail(
     hand           INTEGER default -1, 
     total          INTEGER default 0,
     sell_style     TINYINT default -1,
+    second         TINYINT default 0,
     fdiscount      DECIMAL(3, 0), -- max: 100
     fprice         DECIMAL(10, 2) default 0, -- max: 99999999.99, left blance 
     path           VARCHAR(255) default null, -- the image path

@@ -445,30 +445,50 @@ action(Session, Req, {"reject_w_sale"}, Payload) ->
     {struct, Base}   = ?v(<<"base">>, Payload),
     {struct, Print}  = ?v(<<"print">>, Payload),
     ImmediatelyPrint = ?v(<<"im_print">>, Print, ?YES),
-    case ?w_sale:sale(reject, Merchant, lists:reverse(Invs), Base) of 
-    	{ok, RSN} ->
-	    case ImmediatelyPrint of
-		?YES ->
-		    SuccessRespone =
-			fun(PCode, PInfo) ->
-				?utils:respond(200, Req, ?succ(reject_w_sale, RSN),
-					       [{<<"rsn">>, ?to_b(RSN)},
-						{<<"pcode">>, PCode},
-						{<<"pinfo">>, PInfo}])
-			end,
-		    print(RSN, Merchant, SuccessRespone);
-		?NO ->
-		    ?utils:respond(200, Req, ?succ(reject_w_sale, RSN),
-				   [{<<"rsn">>, ?to_b(RSN)}])
+    
+    ShouldPay = ?v(<<"should_pay">>, Base),
+    Round = ?v(<<"round">>, Base),
+
+    case check_inventory(oncheck, Round, 0, ShouldPay, Invs) of
+	{ok, _} -> 
+	    case ?w_sale:sale(reject, Merchant, lists:reverse(Invs), Base) of 
+		{ok, RSN} ->
+		    case ImmediatelyPrint of
+			?YES ->
+			    SuccessRespone =
+				fun(PCode, PInfo) ->
+					?utils:respond(200, Req, ?succ(reject_w_sale, RSN),
+						       [{<<"rsn">>, ?to_b(RSN)},
+							{<<"pcode">>, PCode},
+							{<<"pinfo">>, PInfo}])
+				end,
+			    print(RSN, Merchant, SuccessRespone);
+			?NO ->
+			    ?utils:respond(200, Req, ?succ(reject_w_sale, RSN),
+					   [{<<"rsn">>, ?to_b(RSN)}])
+		    end;
+		{invalid_balance, {Retailer, CurrentBalance, LastBalance}} ->
+		    ?utils:respond(200,
+				   Req,
+				   ?err(wsale_invalid_retailer_balance, Retailer),
+				   [{<<"cbalance">>, CurrentBalance},
+				    {<<"lbalance">>, LastBalance}]);
+		{error, Error} ->
+		    ?utils:respond(200, Req, Error)
 	    end;
-	{invalid_balance, {Retailer, CurrentBalance, LastBalance}} ->
-	    ?utils:respond(200,
-			   Req,
-			   ?err(wsale_invalid_retailer_balance, Retailer),
-			   [{<<"cbalance">>, CurrentBalance},
-			    {<<"lbalance">>, LastBalance}]);
-    	{error, Error} ->
-    	    ?utils:respond(200, Req, Error)
+	{error, EInv} ->
+	    StyleNumber = ?v(<<"style_number">>, EInv),
+	    ?utils:respond(
+	       200,
+	       Req,
+	       ?err(wsale_invalid_inv, StyleNumber),
+	       [{<<"style_number">>, StyleNumber},
+		{<<"order_id">>, ?v(<<"order_id">>, EInv)}]);
+	{error, Moneny, ShouldPay} ->
+	    ?utils:respond(
+	       200,
+	       Req,
+	       ?err(wsale_invalid_pay, Moneny))
     end;
 
 action(Session, Req, {"filter_w_sale_rsn_group"}, Payload) ->
@@ -891,6 +911,7 @@ check_inventory(oncheck, _Round, Moneny, ShouldPay, []) ->
 check_inventory(oncheck, Round, Money, ShouldPay, [{struct, Inv}|T]) ->
     Amounts = ?v(<<"amounts">>, Inv), 
     Count = ?v(<<"sell_total">>, Inv),
+    StyleNumber = ?v(<<"style_number">>, Inv),
     DCount = lists:foldr(
 	      fun({struct, A}, Acc)->
 		      ?v(<<"sell_count">>, A) + Acc
@@ -904,11 +925,10 @@ check_inventory(oncheck, Round, Money, ShouldPay, [{struct, Inv}|T]) ->
 	       undefined -> FDiscount * FPrice * Count / 100
 	   end,
     
-    case Count =:= DCount of
+    case Count =:= DCount andalso StyleNumber =/= undefined of
 	true -> check_inventory(oncheck, Round, Money + Calc, ShouldPay, T); 
 	false -> {error, Inv}
-    end.
-	    
+    end.	    
 	    
 
     

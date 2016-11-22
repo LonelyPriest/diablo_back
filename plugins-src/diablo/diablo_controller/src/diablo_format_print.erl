@@ -1,10 +1,11 @@
+%% coding: utf-8
 -module(diablo_format_print).
 
 -include("../../../../include/knife.hrl").
 -include("diablo_controller.hrl").
 
 -export([br/1, br/3, line/2, line/4, line/5,
-	 width/2, middle/3, middle/4, line_space/1]).
+	 width/2, middle/3, middle/4, line_space/1, s/3]).
 -export([sort_amount/3, left_pading/2,
 	 pading/1, size_pading/3, clean_zero/1, f_round/1]).
 -export([pagination/2, pagination/3,
@@ -187,13 +188,21 @@ line(add_minus, ?TABLE, ?ROW, SizeNum, Fields) ->
 
 width(latin1, English) ->
     length(?to_s(English));
+width(chinese, Chinese) when is_list(Chinese)->
+    width(chinese, list_to_binary(Chinese));
 width(chinese, Chinese) ->
-    %% ?DEBUG("Chinese ~p", [Chinese]),
-    U16 = unicode:characters_to_binary(?to_b(Chinese), utf8, utf16),
-    %% ?DEBUG("U16 ~p", [U16]),
-    U = [ <<U>> || <<U>> <= U16, U =/= 0],
-    %% ?DEBUG("lenght of chinese ~ts is ~p", [?to_b(Chinese), length(U)]),
-    length(U).
+    ?DEBUG("Chinese ~p", [Chinese]),
+    UCode = unicode:characters_to_list(Chinese, unicode),
+    %% U16 = unicode:characters_to_binary(?to_b(Chinese), utf8, utf16),
+    ?DEBUG("UCode ~p", [UCode]),
+    LenU = 
+	lists:foldr(fun(U, Len) when U > 128 ->
+			    Len + 2;
+		       (_U, Len) ->
+			    Len +1
+		    end, 0, UCode),
+    ?DEBUG("lenght of chinese ~ts is ~p", [?to_b(Chinese), LenU]),
+    LenU.
 
 middle(?TABLE, TotalWidth, Number) ->
     Width = width(latin1, Number),
@@ -691,9 +700,22 @@ printer(_Brand, _Model) ->
     flat.
 
 
+s(len, String, Len) ->
+    ?DEBUG("string ~p, Len ~p", [String, Len]),
+    UCode = unicode:characters_to_list(String, unicode),
+    %% U16 = unicode:characters_to_binary(?to_b(Chinese), utf8, utf16),
+    ?DEBUG("UCode ~p", [UCode]),
+    {L, RU} = 
+	lists:foldl(fun(U, {ULen, Acc}) when ULen < Len  ->
+			    case U > 128 of
+				true -> {ULen + 2, [U|Acc]};
+				false -> {ULen + 1, [U|Acc]}
+			    end;
+		       (_U, {ULen, Acc}) ->
+			    {ULen, Acc}
+		    end, {0, []}, UCode),
 
-
-
-    
-
-    
+    ?DEBUG("RU ~p", [RU]),
+    RBinary = unicode:characters_to_binary(lists:reverse(RU), unicode),
+    ?DEBUG("string ~ts, strip ~ts", [?to_b(String), RBinary]),
+    {L, ?to_s(RBinary)}.
