@@ -133,7 +133,9 @@ function wsaleConfg (angular) {
 	    })
     }]);
 
-    wsaleApp.service("wsaleService", function($http, $resource, dateFilter){
+    wsaleApp.service("wsaleService", function($http, $resource, dateFilter, localStorageService){
+	diablo_remove_local_storage(localStorageService); 
+	
     	this.error = {
     	    2190: "该款号库存不存在！！请确认本店是否进货该款号！！",
     	    2191: "该货号已存在，请选择新的货号！！",
@@ -294,11 +296,6 @@ function wsaleConfg (angular) {
     	    return http.save({operation: "w_sale_export"},
     			     {condition: condition, e_type:e_type}).$promise;
     	};
-	
-    });
-
-    wsaleApp.controller("wsaleCtrl", function(localStorageService){
-	diablo_remove_local_storage(localStorageService);
     });
     
     wsaleApp.controller("wsaleNewDetailCtrl", wsaleNewDetailProvide);

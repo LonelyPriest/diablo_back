@@ -204,6 +204,7 @@ var diablo_remove_local_storage = function(l){
     // console.log(keys);
     var now = $.now();
     angular.forEach(keys, function(k){
+	// console.log(l.get(k));
 	if (now > l.get(k).t + diablo_day_millisecond){
 	    l.remove(k);
 	}

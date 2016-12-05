@@ -160,7 +160,9 @@ function purchaserConfig (angular){
     }]);
 
 
-    purchaserApp.service("purchaserService", function($resource, dateFilter){
+    purchaserApp.service("purchaserService", function($resource, dateFilter, localStorageService){
+	diablo_remove_local_storage(localStorageService);
+	
 	// error information
 	this.error = {
 	    2001: "货品资料已存在！！",
@@ -465,12 +467,13 @@ function purchaserConfig (angular){
 	    return http.save({operation: "w_inventory_export"},
 			     {condition: condition, e_type:e_type}).$promise;
 	};
+
 	
     }); 
 
-    purchaserApp.controller("purchaserCtrl", function($scope, localStorageService){
-	diablo_remove_local_storage(localStorageService);
-    });
+    // purchaserApp.controller("purchaserCtrl", function($scope, localStorageService){
+    // 	diablo_remove_local_storage(localStorageService);
+    // });
 
     purchaserApp.controller("loginOutCtrl", function($scope, $resource){
 	$scope.home = function () {
