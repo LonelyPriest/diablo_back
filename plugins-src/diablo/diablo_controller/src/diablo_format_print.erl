@@ -29,7 +29,7 @@ flattern(size, {_IsTable, _Width}, [], Flattern) ->
 flattern(size, {IsTable, Width}, [Size|T], Flattern) ->
     %% ?DEBUG("Size ~p", [Size]),
     {Name, SizeLen} = case Size =:= <<"0">> of
-			  true -> {"均码", 4};
+			  true -> {[229,157,135,231,160,129], 4};
 			  false -> {?to_s(Size), length(?to_s(Size))}
 		      end,
     flattern(size, {IsTable, Width}, T, Flattern
@@ -191,17 +191,17 @@ width(latin1, English) ->
 width(chinese, Chinese) when is_list(Chinese)->
     width(chinese, list_to_binary(Chinese));
 width(chinese, Chinese) ->
-    ?DEBUG("Chinese ~p", [Chinese]),
+    %% ?DEBUG("Chinese ~ts", [Chinese]),
     UCode = unicode:characters_to_list(Chinese, unicode),
     %% U16 = unicode:characters_to_binary(?to_b(Chinese), utf8, utf16),
-    ?DEBUG("UCode ~p", [UCode]),
+    %% ?DEBUG("UCode ~p", [UCode]),
     LenU = 
 	lists:foldr(fun(U, Len) when U > 128 ->
 			    Len + 2;
 		       (_U, Len) ->
 			    Len +1
 		    end, 0, UCode),
-    ?DEBUG("lenght of chinese ~ts is ~p", [?to_b(Chinese), LenU]),
+    %% ?DEBUG("lenght of chinese ~ts is ~p", [?to_b(Chinese), LenU]),
     LenU.
 
 middle(?TABLE, TotalWidth, Number) ->

@@ -436,7 +436,7 @@ handle_call({get_shop_profile, Merchant, Shop}, _From, State) ->
 		{ok, Shops} = ?shop:lookup(Merchant, {<<"id">>, Shop}),
 		GetShop(Shops);
 	    [Shops] ->
-		?DEBUG("shop ~p of merchant ~p", [Shops, Merchant]),
+		%% ?DEBUG("shop ~p of merchant ~p", [Shops, Merchant]),
 		GetShop(Shops) 
 	end,
    
@@ -532,7 +532,7 @@ handle_call({get_print_profile, Merchant, Shop}, _From, State) ->
 		{ok, Prints} = ?w_print:printer(list_conn, Merchant),
 		GetPrint(Prints);
 	    [Prints] ->
-		?DEBUG("print ~p of merchant ~p", [Prints, Merchant]),
+		%% ?DEBUG("print ~p of merchant ~p", [Prints, Merchant]),
 		GetPrint(Prints) 
 	end, 
     {reply, {ok, NewPrints}, State};

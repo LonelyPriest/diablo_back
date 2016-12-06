@@ -155,14 +155,14 @@ get_printer(Merchant, ShopId) ->
 
     %% ?DEBUG("printers ~p", [Printers]),
     VPrinters = [P || P <- Printers, length(P) =/= 0 ],
-    ?DEBUG("printers ~p", [VPrinters]),
+    %% ?DEBUG("printers ~p", [VPrinters]),
     {VPrinters, ShopInfo}.
 
 call(Parent, {print, RSN, Merchant}) ->
     ?DEBUG("print with rsn ~p, merchant ~p", [RSN, Merchant]), 
     try 
 	{ok, Sale} = ?w_sale:sale(get_new, Merchant, RSN),
-	?DEBUG("sale ~p", [Sale]),
+	%% ?DEBUG("sale ~p", [Sale]),
 	{ok, Details} = ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
 	%% ?DEBUG("details ~p", [Details]),
 
@@ -236,8 +236,8 @@ call(Parent, {print, RSN, Merchant}) ->
     end.
 
 call1(print, RSN, Merchant, Invs, Attrs, Print) ->
-    ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p"
-	   ", Print  ~p", [RSN, Merchant, Invs, Attrs, Print]),
+    %% ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p"
+    %% 	   ", Print  ~p", [RSN, Merchant, Invs, Attrs, Print]),
 
     ShopId = ?v(<<"shop">>, Attrs), 
 
@@ -273,7 +273,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 
     %% ?DEBUG("printers ~p", [Printers]),
     VPrinters = [P || P <- Printers, length(P) =/= 0 ],
-    ?DEBUG("printers ~p", [VPrinters]),
+    %% ?DEBUG("printers ~p", [VPrinters]),
     case VPrinters of
 	[] ->
 	    {error, ?err(shop_not_printer, ShopId)};
@@ -407,7 +407,7 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 
 			  %% page by height
 			  %% DBody = ?f_print:pagination(Height * 10, Content), 
-			  ?DEBUG("server ~p", [Server]),
+			  %% ?DEBUG("server ~p", [Server]),
 			  [{SN, fun() when Server =:= rcloud ->
 					start_print(
 					  rcloud, Brand, Model, Height,
@@ -504,7 +504,7 @@ print_content(_ShopId,
 	      <<"HOT80">>=Model, 48,
 	      Merchant,
 	      _Setting, Invs, _T, _S, {_IsVip, _PSecond}) ->
-    ?DEBUG("==== invs ~p", [Invs]), 
+    %% ?DEBUG("==== invs ~p", [Invs]), 
     TFun = fun(Amounts) ->
 		   lists:foldr(
 		     fun({struct, A}, Acc) ->
@@ -532,7 +532,7 @@ print_content(_ShopId,
 
 			     CleanFPrice = clean_zero(FPrice),
 			     CleanCalc = clean_zero(Calc),
-
+			     
 			     {Seq + 1,
 
 			      Acc0
@@ -548,7 +548,7 @@ print_content(_ShopId,
 
     %% ++ body_stastic(PBrand, Model, 33, Attrs) 
     %% ++ body_foot(PBrand, Model, 33, Banks, Mobile, Setting),
-    ?DEBUG("content ~p", [Content]),
+    %% ?DEBUG("content ~p", [Content]),
     body_head(Merchant, PBrand, Model, 48) ++ Content;
     
 print_content(
@@ -591,7 +591,7 @@ print_content(
     {true, WidthTotal}  = field(<<"count">>, Fields),
     {true, WidthCalc}   = field(<<"calc">>, Fields),
     {IsPrintComment, WidthComment} = field(<<"comment">>, Fields),
-    ?DEBUG("print comment ~p, width comment ~p", [IsPrintComment, WidthComment]),
+    %% ?DEBUG("print comment ~p, width comment ~p", [IsPrintComment, WidthComment]),
     
     %% ColumnModeRowLen =
     %% field_len(Fields, <<"calc">>, PrintModel, 0) + WidthCalc,
@@ -672,12 +672,12 @@ print_content(
 		    end,
 		
 		NewInvs = sort_inv(by_color, Invs, []),
-		?DEBUG("NewInvs ~p", [NewInvs]),
+		%% ?DEBUG("NewInvs ~p", [NewInvs]),
 		
 		%% BodyHead = body_head(PBrand, Model, Fields, Column),
 		BodyHead = body_head(
 			     PrintTable, PrintModel, PBrand, Model, Fields),
-		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
+		%% ?DEBUG("body head ~ts", [?to_b(BodyHead)]),
 		
 		BodyContent = 
 		    lists:foldr(
@@ -690,16 +690,16 @@ print_content(
 		    ++ left_pading(PBrand, Model)
 		    ++ pading(Len2total) ++ ?to_s(Total)
 		    ++ br(PBrand),
-		?DEBUG("body content ~ts", [?to_b(BodyContent)]),
+		%% ?DEBUG("body content ~ts", [?to_b(BodyContent)]),
 		BodyHead ++ BodyContent;
 	   (no_hand, ?COLUMN) -> 
 		BodyHead = body_head(PrintTable, ?COLUMN, PBrand, Model, Fields), 
-		?DEBUG("body head ~ts", [?to_b(BodyHead)]),
+		%% ?DEBUG("body head ~ts", [?to_b(BodyHead)]),
 		
 		{BodyContent, _TotalRowNo} = 
 		    lists:foldr(
 		      fun({struct, Inv}, {Acc0, No})->
-			      ?DEBUG("Inv ~p", [Inv]),
+			      %% ?DEBUG("Inv ~p", [Inv]),
 			      Amounts =
 				  case FreeMode of
 				      true -> [{struct, Inv}];
@@ -719,21 +719,20 @@ print_content(
 		    ++ BodyHead ++ BodyContent ++ StasticFun(PrintTable);
 	   (no_hand, ?ROW) -> 
 		CombinedInvs  = combine_with_size(Invs, []),
-		?DEBUG("combinedInvs~n~p", [CombinedInvs]),
+		%% ?DEBUG("combinedInvs~n~p", [CombinedInvs]),
 		lists:foldr(
 		  fun({SizeGroup, {UsedSizes, Amounts}}, Acc0)->
 			  ?DEBUG("SizeGroup ~p, used sizes ~p",
 				 [SizeGroup, UsedSizes]),
-			  GS = [?to_i(G) ||
-				   G <- string:tokens(?to_s(SizeGroup), ",")],
+			  GS = [?to_i(G) || G <- string:tokens(?to_s(SizeGroup), ",")],
+			  %% ?DEBUG("GS ~p", [GS]),
 			  
 			  AllSize = lists:foldr(
 				      fun(G, Acc) ->
 					      find_size(G, SizeGroups) ++ Acc
 				      end, [], lists:sort(GS)),
 
-			  ?DEBUG("lenght gs ~p, allsize ~p",
-			  	 [length(GS), AllSize]),
+			  ?DEBUG("lenght gs ~p, allsize ~p", [length(GS), AllSize]),
 			  Sizes = 
 			      case length(GS) =:= 2 of
 			      	  true ->
@@ -749,7 +748,7 @@ print_content(
 			      	  false -> AllSize
 			      end,
 
-			  ?DEBUG("sizes ~p", [Sizes]),
+			  %% ?DEBUG("sizes ~p", [Sizes]),
 			  
 			  AFun =
 			      fun(Color, A) ->
@@ -775,22 +774,19 @@ print_content(
 						  [AFun(Color, A)|Acc2] 
 					  end, [], Colors) ++ Acc1
 				end, [], Amounts), 
-			  ?DEBUG("SortAmounts ~p", [SortAmounts]),
+			  %% ?DEBUG("SortAmounts ~p", [SortAmounts]),
 
 			  FlatternAmounts =
 			      flattern(amount, {PrintTable, Column, length(Sizes),
 						Fields}, SortAmounts),
-			  %% ?DEBUG("flattern amounts ~ts",
-			  %% 	 [?to_b(FlatternAmounts)]),
+			  %% ?DEBUG("flattern amounts ~ts", [?to_b(FlatternAmounts)]),
 
 			  {true, SizeWidth} = field(size, Fields), 
-			  FlatternSizes =
-			      flattern(size, {PrintTable, SizeWidth}, Sizes),
+			  FlatternSizes = flattern(size, {PrintTable, SizeWidth}, Sizes),
 			  
-			  ?DEBUG("flattern sizes ~p", [FlatternSizes]),
+			  %% ?DEBUG("flattern sizes ~ts", [FlatternSizes]),
 			  
-			  Head = body_head(PrintTable, ?ROW, PBrand,
-					   Model, Fields, FlatternSizes),
+			  Head = body_head(PrintTable, ?ROW, PBrand, Model, Fields, FlatternSizes),
 			  
 			  %% ?DEBUG("Head ~ts", [?to_b(Head)]),
 			  %% RealyColumn =
@@ -1087,7 +1083,7 @@ title(<<"feie">> = _Brand, _Model, _Column, Title) ->
     "<CB>" ++ ?to_s(Title) ++ "</CB><BR>";
 
 title(Brand, Model, Column, Title) ->
-    ?DEBUG("title ~ts", [?to_b(Title)]),
+    %% ?DEBUG("title ~ts", [?to_b(Title)]),
     Start = (Column - ?f_print:width(chinese, Title) * 2) div 2, 
     T = 
 	?f_print:left_pading(Brand, Model)
@@ -1289,26 +1285,32 @@ body_head(?STRING, ?COLUMN, Brand, Model, Fields) ->
 	++ ?f_print:br(Brand).
 
 body_head(?TABLE, ?ROW, Brand, Model, Fields, SizeString) ->
+    %% ?DEBUG("Fields ~p, sizeString ~p", [Fields, SizeString]),
     %% {LName, _, _} = lists:last(Fields),
     [{FName, _, _}|_T] = Fields,
-    ?f_print:left_pading(Brand, Model)
+    Head = 
+	?f_print:left_pading(Brand, Model)
 	++ lists:foldr(
-	     fun({<<"size">>, _, _}, Acc) -> 
+	     fun({<<"size">>, _, _}, Acc) ->
+		     %% ?DEBUG("Acc ~p", [Acc]),
 		     SizeString ++ Acc;
+		     %% Acc;
 		({Name, CName, Width}, Acc) when Name =:= FName ->
 		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width - 1),
 		     phd("|")
 			 ++ pading(Mh) ++ CName ++ pading(Ml)
-			 %% ++ CName
-			 %% ++ pading(Width - width(chinese, CName) - 2)
+		     %% ++ CName
+		     %% ++ pading(Width - width(chinese, CName) - 2)
 			 ++ phd("|") ++ Acc;
 		({_Name, CName, Width}, Acc) ->
 		     {Mh, Ml} = middle(?TABLE, chinese, ?to_b(CName), Width),
 		     pading(Mh) ++ CName ++ pading(Ml)
-			 %% CName ++ pading(Width - width(chinese, CName) - 1)
+		     %% CName ++ pading(Width - width(chinese, CName) - 1)
 			 ++ phd("|") ++ Acc 
 	     end, [], Fields)
-	++ ?f_print:br(Brand);
+	++ ?f_print:br(Brand),
+    %% ?DEBUG("Head ~ts", [?to_b(Head)]),
+    Head;
 
 body_head(?STRING, ?ROW, Brand, Model, Fields, SizeString) ->
     ?f_print:left_pading(Brand, Model)
@@ -1578,8 +1580,7 @@ body_stastic(Brand, Model, Column, Setting, Attrs) ->
 	++ br(Brand) ++ ?f_print:line(minus, Column) ++ br(Brand).
 
 body_foot(static, Brand, Model, Column, Banks, Mobile, Setting, Phones) ->
-    ?DEBUG("start to build body_foot banks ~p~nmobile ~p~nsetting ~p~n",
-	   [Banks, Mobile, Setting]), 
+    ?DEBUG("start to build body_foot...", []), 
 
     [CH|CT] = [?v(<<"comment1">>, Setting, []),
 	       ?v(<<"comment2">>, Setting, []),
@@ -1679,6 +1680,7 @@ body_foot(format_default, Brand, Model, Column, Banks, HeadPhone, Mobile, Phones
 	   end;
 
 body_foot(format_column, _Brand, _Model, _Column, _HeadPhone, [], [], Acc) ->
+    %% ?DEBUG("format_column Acc ~ts", [?to_b(Acc)]),
     Acc;
 body_foot(format_column, Brand, Model, Column, HeadPhone, Banks, [], Acc) ->
     [{Bank}|TBanks] = Banks,
@@ -1702,8 +1704,7 @@ body_foot(format_column, Brand, Model, Column, HeadPhone, [], Phones, Acc) ->
     %% 	      _    -> 4 + width(chinese, PhoneRemark)
     %% 	  end,
     
-    S1 =
-	%% pading(Column - PhoneLength)
+    S1 = %% pading(Column - PhoneLength)
 	left_pading(Brand, Model) ++  pading(70)
 	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
     
@@ -1738,12 +1739,14 @@ body_foot(format_column, Brand, Model, Column, HeadPhone, Banks, Phones, Acc) ->
 	%% ++ pading(Column - BankLength - PhoneLength)
 	++ pading(70 - BankLength)
 	++ phone(PhoneNo, PhoneRemark) ++ br(Brand),
+    %% ?DEBUG("S1 ~ts", [?to_b(S1)]),
     body_foot(
       format_column, Brand, Model, Column, HeadPhone, TBanks, TPhones, Acc ++ S1). 
 
 row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
     [H|T] = FlatternAmounts,
-    left_pading(Brand, Model)
+    Row = 
+	left_pading(Brand, Model)
 	++ TableLine ++ br(Brand) ++ H ++ br(Brand)
 	++ lists:foldr(
 	     fun(CInfo, Acc) ->
@@ -1751,8 +1754,10 @@ row({?TABLE, Brand, Model, TableLine}, FlatternAmounts) ->
 			 ++ TableLine ++ br(Brand)
 			 ++ CInfo ++ br(Brand) ++ Acc
 	     end, "", T)
-	%% ++ TableLine ++ br(Brand)
-	++ TableLine ++ br(Brand); 
+    %% ++ TableLine ++ br(Brand)
+	++ TableLine ++ br(Brand),
+    ?DEBUG("Row ~n~ts", [?to_b(Row)]),
+    Row;
 
 row({?STRING, Brand, Model, _Column}, FlatternAmounts) ->
     lists:foldr(
