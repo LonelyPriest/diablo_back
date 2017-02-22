@@ -21,6 +21,26 @@ var wsaleUtils = function(){
 		"show_discount", shop, base, parseInt, diablo_yes);
 	},
 
+	hide_sell_style: function(shop, base){
+	    return diablo_base_setting(
+		"h_sell_style", shop, base, parseInt, diablo_no);
+	},
+
+	hide_tagprice: function(shop, base){
+	    return diablo_base_setting(
+		"h_tagprice", shop, base, parseInt, diablo_no);
+	},
+
+	head_amount: function(shop, base){
+	    return diablo_base_setting(
+		"head_amount", shop, base, parseInt, diablo_no);
+	},
+
+	modify_comment: function(shop, base){
+	    return diablo_base_setting(
+		"m_comment", shop, base, parseInt, diablo_no);
+	},
+
 	get_round: function(shop, base){
 	    return diablo_base_setting(
 		"pround", shop, base, parseInt, diablo_round_record);

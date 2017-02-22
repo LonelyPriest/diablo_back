@@ -53,6 +53,14 @@ sale(reject, Merchant, Inventories, Props) ->
 sale(check, Merchant, RSN) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {check_new, Merchant, RSN});
+sale(uncheck, Merchant, RSN) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {uncheck_new, Merchant, RSN});
+
+sale(check_all, Merchant, {'and', Conditions}) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {check_all_new, Merchant, {'and', Conditions}});
+
 sale(list_new, Merchant, Condition) ->
     Name = ?wpool:get(?MODULE, Merchant), 
     gen_server:call(Name, {list_new, Merchant, Condition});
@@ -443,6 +451,31 @@ handle_call({check_new, Merchant, RSN}, _From, State) ->
     Reply = ?sql_utils:execute(write, Sql, RSN),
     {reply, Reply, State};
 
+handle_call({uncheck_new, Merchant, RSN}, _From, State) ->
+    ?DEBUG("uncheck_new with merchant ~p, RSN ~p", [Merchant, RSN]),
+    Sql = "update w_sale set state=" ++ ?to_s(?CHECKING)
+	++ ", check_date=\'" ++ ?utils:current_time(localtime) ++ "\'"
+	++ " where rsn=\'" ++ ?to_s(RSN) ++ "\'"
+	++ " and merchant=" ++ ?to_s(Merchant),
+
+    Reply = ?sql_utils:execute(write, Sql, RSN),
+    {reply, Reply, State};
+
+handle_call({check_all_new, Merchant, {'and', Conditions}}, _From, State) ->
+    ?DEBUG("check_all_new with merchant ~p, conditions ~p", [Merchant, Conditions]),
+    {_, C} = filter_condition(wsale, Conditions, [], []),
+
+    {StartTime, EndTime, NewConditions} = ?sql_utils:cut(fields_no_prifix, C),
+
+    Sql = "update w_sale set state=" ++ ?to_s(?CHECKED)
+	++ ", check_date=\'" ++ ?utils:current_time(localtime) ++ "\'"
+	++ " where merchant=" ++ ?to_s(Merchant)
+	++ ?sql_utils:condition(proplists, NewConditions)
+	++ ?sql_utils:fix_condition(time, time_no_prfix, StartTime, EndTime),
+
+    Reply = ?sql_utils:execute(write, Sql, Merchant),
+    {reply, Reply, State};
+
 handle_call({list_new, Merchant, Conditions}, _From, State) ->
     ?DEBUG("list_new with merchant ~p, condtions ~p", [Conditions, Merchant]),
 
@@ -521,8 +554,7 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
 
 handle_call({get_sale_rsn, Merchant, Conditions}, _From, State) ->
     ?DEBUG("get_sale_rsn with merchant=~p, conditions ~p", [Merchant, Conditions]),
-    {DetailConditions, SaleConditions} = 
-	filter_condition(wsale, Conditions ++ [{<<"merchant">>, Merchant}], [], []),
+    {DetailConditions, SaleConditions} = filter_condition(wsale, Conditions ++ [{<<"merchant">>, Merchant}], [], []),
     ?DEBUG("sale conditions ~p, detail condition ~p", [SaleConditions, DetailConditions]), 
 
     {StartTime, EndTime, CutSaleConditions}
@@ -1043,6 +1075,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
     Brand          = ?v(<<"brand">>, Inventory),
     FPrice         = ?v(<<"fprice">>, Inventory),
     FDiscount      = ?v(<<"fdiscount">>, Inventory),
+    Comment        = ?v(<<"comment">>, Inventory),
     ChangeAmounts  = ?v(<<"changed_amount">>, Inventory, []),
 
     Metric = fun()->
@@ -1083,6 +1116,8 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 	case Metric of
 	    0 -> ["update w_sale_detail set fdiscount=" ++ ?to_s(FDiscount)
 		  ++ ",fprice=" ++ ?to_s(FPrice)
+		  ++ ",comment=\'" ++ ?to_s(Comment) ++ "\'"
+		  ++ ",entry_date=\'" ++ ?to_s(DateTime) ++ "\'" 
 		  ++ " where rsn=\"" ++ ?to_s(RSN) ++ "\""
 		  ++ " and style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
 		  ++ " and brand=" ++ ?to_s(Brand)];
@@ -1090,7 +1125,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 		["update w_inventory set amount=amount-" ++ ?to_s(Metric)
 		 ++ ", sell=sell+" ++ ?to_s(Metric)
 		 ++ " where "
-		 "style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
+		 ++ "style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"
 		 ++ " and brand=" ++ ?to_s(Brand)
 		 ++ " and shop=" ++ ?to_s(Shop)
 		 ++ " and merchant=" ++ ?to_s(Merchant),
@@ -1098,6 +1133,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 		 "update w_sale_detail set total=total+" ++ ?to_s(Metric)
 		 ++ ",fdiscount=" ++ ?to_s(FDiscount)
 		 ++ ",fprice=" ++ ?to_s(FPrice)
+		 ++ ",comment=\'" ++ ?to_s(Comment) ++ "\'"
 		 ++ ",entry_date=\'" ++ ?to_s(DateTime) ++ "\'"
 		 ++ " where rsn=\"" ++ ?to_s(RSN) ++ "\""
 		 ++ " and style_number=\'" ++ ?to_s(StyleNumber) ++ "\'"

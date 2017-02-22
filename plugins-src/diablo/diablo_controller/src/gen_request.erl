@@ -90,7 +90,8 @@ authen(Req, Args, Session, ValidFun) ->
 	?SUPER -> %% super pass directly
 	    ValidFun();
 	_ ->
-	    [Action|_] = erlang:tuple_to_list(Args), 
+	    [Action|_] = erlang:tuple_to_list(Args),
+	    %% ?DEBUG("action ~p, session ~p", [Action, Session]),
 	    case ?right_auth:authen(action, Action, Session) of
 		{error, _Error} ->
 		    User = ?session:get(name, Session),

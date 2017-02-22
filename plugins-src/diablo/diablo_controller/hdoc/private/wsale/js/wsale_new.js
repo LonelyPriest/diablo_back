@@ -148,15 +148,32 @@ function wsaleNewProvide(
     // 	}
     // }
 
+    $scope.reset_base_setting = function(){
+	$scope.select.shop = $scope.shops[0]; 
+	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
+	$scope.setting.check_sale  = $scope.check_sale($scope.select.shop.id);
+	$scope.setting.auto_cash   = $scope.auto_cash($scope.select.shop.id);
+	
+	$scope.setting.round  = $scope.p_round();
+	$scope.price_type  = $scope.get_price_type($scope.select.shop.id, base);
+	
+	$scope.setting.hide_sell_style = wsaleUtils.hide_sell_style($scope.select.shop.id, base);
+	$scope.setting.hide_tagprice   = wsaleUtils.hide_tagprice($scope.select.shop.id, base);
+	$scope.setting.head_amount     = wsaleUtils.head_amount($scope.select.shop.id, base);
+
+	// console.log($scope.setting);
+    };
+
+    
     // shops
     $scope.shops = user.sortShops;
     if ($scope.shops.length !== 0){
 	$scope.select.shop = $scope.shops[0]; 
-	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
-	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
-	$scope.setting.auto_cash = $scope.auto_cash($scope.select.shop.id);
-	$scope.price_type = $scope.get_price_type($scope.select.shop.id, base);
-	
+	// $scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
+	// $scope.setting.check_sale  = $scope.check_sale($scope.select.shop.id);
+	// $scope.setting.auto_cash   = $scope.auto_cash($scope.select.shop.id);
+	// $scope.price_type          = $scope.get_price_type($scope.select.shop.id, base);
+	$scope.reset_base_setting(); 
 	wsaleGoodService.set_shop($scope.select.shop.id);
     }
     
@@ -169,19 +186,37 @@ function wsaleNewProvide(
 
     $scope.change_shop = function(){
 	$scope.local_save();
-	$scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
-	$scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
-	$scope.setting.auto_cash = $scope.auto_cash($scope.select.shop.id);
-	$scope.setting.show_discount = $scope.show_discount();
-	$scope.setting.round         = $scope.p_round();
-	$scope.price_type = $scope.get_price_type($scope.select.shop.id, base);
-	
+	// $scope.setting.trace_price = $scope.trace_price($scope.select.shop.id);
+	// $scope.setting.check_sale = $scope.check_sale($scope.select.shop.id);
+	// $scope.setting.auto_cash = $scope.auto_cash($scope.select.shop.id);
+	// $scope.setting.show_discount = $scope.show_discount();
+	// $scope.setting.round         = $scope.p_round();
+	// $scope.price_type = $scope.get_price_type($scope.select.shop.id, base); 
+	$scope.reset_base_setting();
 	wsaleGoodService.set_shop($scope.select.shop.id);
 
 	if (!$scope.setting.q_backend){
 	    $scope.match_all_w_inventory();
 	}
     };
+
+    $scope.stastic_colspan = function(){
+	var all_colspan = 7;
+	if (!$scope.setting.show_discount){
+	    all_colspan -= 1;
+	}
+	if (!$scope.setting.check_sale){
+	    all_colspan -= 1;
+	}
+	if ($scope.setting.hide_tagprice){
+	    all_colspan -= 1;
+	}
+	if ($scope.setting.hide_sell_style){
+	    all_colspan -= 1;
+	}
+
+	return all_colspan;
+    }();
 
     // employees
     $scope.employees = filterEmployee;
@@ -375,20 +410,8 @@ function wsaleNewProvide(
 	$scope.match_all_w_inventory();
     }
 
-    $scope.setting.r_snumber = diablo_base_setting(
-	"r_snumber", $scope.select.shop.id, base, parseInt, diablo_no);
+    $scope.setting.r_snumber = diablo_base_setting("r_snumber", $scope.select.shop.id, base, parseInt, diablo_no);
 
-    $scope.stastic_colspan = function(){
-	var all_colspan = 8;
-	if (!$scope.setting.show_discount){
-	    all_colspan -= 1;
-	}
-	if (!$scope.setting.check_sale){
-	    all_colspan -= 1;
-	}
-
-	return all_colspan;
-    }();
     // console.log($scope.stastic_colspan);
     // console.log($scope.setting);
     
@@ -1537,6 +1560,10 @@ function wsaleNewProvide(
 	    return;
 	} 
 
+	if ($scope.setting.head_amount && inv.$new){
+	    return;
+	}
+
 	$timeout.cancel($scope.timeout_auto_save);
 	$scope.timeout_auto_save = $timeout(function(){
 	    // console.log(inv);
@@ -1558,12 +1585,11 @@ function wsaleNewProvide(
     };
 
     $scope.auto_save_free_of_price = function(inv){
-	if (inv.$new && inv.free_color_size){
+	if (!$scope.setting.head_amount && inv.$new && inv.free_color_size){
 	    return;
 	};
 
-	if (angular.isUndefined(inv.fprice)
-	    || inv.fprice === 0){
+	if (angular.isUndefined(inv.fprice) || inv.fprice === 0){
 	    return;
 	}
 
@@ -1573,12 +1599,15 @@ function wsaleNewProvide(
 	    // if (inv.$new && inv.free_color_size){
 	    // 	$scope.add_free_inventory(inv);
 	    // };
-	    if (angular.isUndefined(inv.fprice)
-		|| inv.fprice === 0){
+	    if (angular.isUndefined(inv.fprice) || inv.fprice === 0){
 		$timeout.cancel($scope.timeout_auto_save);
 		return;
 	    } 
 
+	    if (inv.$new && inv.free_color_size){
+		$scope.add_free_inventory(inv);
+	    };
+	    
 	    if (!inv.$new && inv.free_update){
 		$scope.save_free_update(inv); 
 	    }

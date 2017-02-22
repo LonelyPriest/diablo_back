@@ -9,28 +9,33 @@
 
 	<div class="actions">
 	  <div class="btn-group btn-group-solid">
-	    <a type="button"
+	    <button type="button"
 	       class="btn green purple-stripe"
 	       x-ng-click="goto_page('#/new_wsale')">开单
-	      <i class="glyphicon glyphicon-plus"></i></a>
+	      <i class="glyphicon glyphicon-plus"></i></button>
 	    
-	    <a type="button"
+	    <button type="button"
 	       class="btn red purple-stripe"
 	       x-ng-click="goto_page('#/reject_wsale')">退货
-	      <i class="glyphicon glyphicon-minus"></i></a>
+	      <i class="glyphicon glyphicon-minus"></i></button>
 
-	    <a type="button" class="btn yellow purple-stripe"
+	    <button type="button" class="btn yellow purple-stripe"
 	       x-ng-click="goto_page('#/wsale_rsn_detail')">明细
-	      <i class="glyphicon glyphicon-map-marker"></i></a>
+	      <i class="glyphicon glyphicon-map-marker"></i></button>
 
-	    <a type="button"
+	    <button type="button"
 	       class="btn blue purple-stripe hidden-xs hidden-sm"
 	       x-ng-click="export_to()">导出
-	      <i class="glyphicon glyphicon-export"></i></a>
+	      <i class="glyphicon glyphicon-export"></i></button>
 
-	    <a type="button" class="btn yellow-crusta reload purple-stripe"
+	    <button x-ng-if="right.master"
+		    class="btn red purple-stripe hidden-xs hidden-sm"
+		    x-ng-click="check_all_detail()">全审
+	    <i class="glyphicon glyphicon-check"></i></button>
+
+	    <button type="button" class="btn yellow-crusta reload purple-stripe"
 	       x-ng-click="do_search(default_page)">刷新
-	      <i class="icon icon-spinner fg-white"></i></a> 
+	      <i class="icon icon-spinner fg-white"></i></button> 
 	  </div>
 	</div> 
       </div>
@@ -194,20 +199,21 @@
 			明细<i class="glyphicon glyphicon-map-marker"></i>
 		      </button>
 
-		      <button class="btn diablo-button yellow-crusta"
+		      <button x-ng-if="r.state===0" class="btn diablo-button yellow-crusta"
 			      x-ng-disabled="r.state===1"
 		      	      x-ng-click="update_detail(r)">修改
 			<i class="glyphicon glyphicon-edit"></i></button>
 		      
-
-		      <!-- <button class="btn diablo-button purple" -->
-		      <!-- 	      x-ng-disabled="disable_print" -->
-		      <!-- 	      x-ng-click="print(r)"> -->
-		      <!-- 	打印<i class="glyphicon glyphicon-print"></i></button> -->
-		      <button class="btn diablo-button btn-danger"
+		      <button x-ng-if="right.master && r.state===0" class="btn diablo-button btn-danger"
 			      x-ng-disabled="r.state===1"
 		      	      x-ng-click="check_detail(r)">审核
-			<i class="glyphicon glyphicon-check"></i></button> 
+			<i class="glyphicon glyphicon-check"></i></button>
+
+		      <button x-ng-if="right.master && r.state===1"
+			      class="btn diablo-button red"
+		      	      x-ng-click="uncheck_detail(r)">反审
+		      	<i class="glyphicon glyphicon-remove-circle"></i></button>
+		      
 		    </td> 
 		  </tr>
 

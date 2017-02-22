@@ -68,6 +68,8 @@
 
 -define(DEFAULT_ALARM_DAY, 7).
 
+-define(TABLET, 1).
+
 %% right module
 -define(right_sale, 10000).
 -define(right_inventory, 20000).
@@ -194,6 +196,8 @@
 -define(update_w_sale,      ?right_w_sale + 5).
 -define(check_w_sale,       ?right_w_sale + 6).
 -define(new_s_sale,         ?right_w_sale + 7).
+-define(check_w_sale_all,   ?right_w_sale + 8).
+-define(uncheck_w_sale,     ?right_w_sale + 9). 
 
 %% inventory
 -define(new_w_order,    ?right_w_inventory + 1).

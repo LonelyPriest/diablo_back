@@ -47,9 +47,25 @@ test_login(UserName, Passwd, Force) ->
     end.
 
 action(Req, login) ->
-    action(Req, login, false);
+    Post = Req:parse_post(),
+    Tablet   = ?to_i(?v("tablet", Post, 0)),
+    ?DEBUG("tablet ~p", [Tablet]),
+    case Tablet of
+	?TABLET ->
+	    tablet_login(Req);
+	_ -> 
+	    action(Req, login, false)
+    end;
 action(Req, login_force) ->
-    action(Req, login, true).
+    Post = Req:parse_post(),
+    Tablet   = ?to_i(?v("tablet", Post, 0)),
+    ?DEBUG("tablet ~p", [Tablet]),
+    case Tablet of
+	?TABLET ->
+	    tablet_login(Req);
+	_ ->
+	    action(Req, login, true)
+    end.
 
 action(Req, login, Force) ->
     %% ?DEBUG("login with client ip:~n ~p", [Req:get(peer)]),
@@ -60,6 +76,7 @@ action(Req, login, Force) ->
     ?DEBUG("post data ~p", [Post]),
     UserName = ?v("username", Post, []),
     Passwd   = ?v("password", Post, []),
+    %% Tablet   = ?to_i(?v(<<"tablet">>, Post, 0)),
     %% Force     = ?to_a(?v("force", Post, false)),
 
     LoginResponseFun =
@@ -100,7 +117,7 @@ action(Req, login, Force) ->
 					{error, {1109, more_session}}
 				end,
 			    case StartInfo of
-				{ok, {Cookie, Path}} ->
+				{ok, {Cookie, _CookieData, Path}} ->
 				    response_with_cookie(Req, Cookie, Path, UserName);
 				{error, {1105, _}} ->
 				    LoginForceFun(?LOGIN_USER_ACTIVE); 
@@ -238,4 +255,45 @@ start(with_new_session, UserDetail) ->
 	    ok
     end,
 
-    {Cookie, Path}. 
+    {Cookie, CookieData, Path}. 
+
+
+tablet_login(Req) ->
+    Post = Req:parse_post(),
+    UserName = ?v("user_name", Post, []),
+    Passwd   = ?v("user_password", Post, []),
+
+    case ?login:login(UserName, Passwd) of 
+	{ok, UserDetail} ->
+	    StartInfo = 
+		case ?session:get_session(by_user, UserName) of
+		    {ok, []} ->
+			start_force(true, new_user, UserDetail); 
+		    {ok, {SessionId, Session}} -> 
+			start_force(true, old_user, SessionId, Session, UserDetail);
+		    {error, more_session} ->
+			{error, {1109, more_session}}
+		end,
+
+	    ?DEBUG("StartInfo ~p", [StartInfo]),
+	    case StartInfo of
+		{ok, {_Cookie, CookieData, _Path}} ->
+		    ?utils:respond(200, object, Req, {[{<<"ecode">>, 0},
+						       {<<"token">>, ?to_b(CookieData)},
+						       {<<"einfo">>, <<>>}]});
+		{error, {ECode, _}} ->
+		    ?utils:respond(200, object, Req, {[{<<"ecode">>, ECode},
+						       {<<"token">>, <<>>},
+						       {<<"einfo">>, <<>>}]}) 
+	    end;
+	{error, {1199, _}} ->
+	    ?utils:respond(200, object, Req, {[{<<"ecode">>, 1199},
+					       {<<"token">>, <<>>},
+					       {<<"einfo">>, <<>>}]});
+	{error, {ECode, _}} = _Error->
+	    ?DEBUG("login error ~p", [_Error]),
+	    ?utils:respond(200, object, Req, {[{<<"ecode">>, ECode},
+					       {<<"token">>, <<>>},
+					       {<<"einfo">>, <<>>}]})
+    end.
+

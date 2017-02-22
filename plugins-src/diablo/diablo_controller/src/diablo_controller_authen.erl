@@ -107,7 +107,10 @@ cache(right, UserId) ->
 lookup(right) ->
     gen_server:call(?SERVER, lookup_right).
 find(right, UserId) ->
-    gen_server:call(?SERVER, {find_right, UserId}).
+    Reply = gen_server:call(?SERVER, {find_right, UserId}),
+    ?DEBUG("reply ~p", [Reply]),
+    Reply.
+
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -351,7 +354,7 @@ handle_call({cache_right, UserId}, _From,
 		  gb_trees:insert(?value(<<"action">>, Child), Child, Acc)
 	  end, gb_trees:empty(), Children),
 
-        
+    
     {reply, ok,  State#func_tree{rights = dict:store(UserId, Right, Rights)}};
 
 

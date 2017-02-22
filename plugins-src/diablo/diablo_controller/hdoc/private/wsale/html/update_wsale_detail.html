@@ -274,25 +274,17 @@
 		    <th class="text-center">序号</th>
 		    <th class="text-center">货号</th>
 		    <th class="text-center">品名</th>
-		    <th x-ng-if="setting.check_sale"
-			class="text-center">库存
-		    </th>
-		    <!-- <th class="text-center">类别</th> -->
-		    <!-- <th class="text-center">性别</th> -->
-		    <!-- <th class="text-center">厂商</th> -->
-		    <!-- <th class="text-center">季节</th> --> 
-		    <!-- <th class="text-center warning">上次价格</th> -->
-		    <!-- <th class="text-center warning">上次折扣</th> -->
+		    <th x-ng-if="setting.check_sale" class="text-center">库存</th>
 		    
 		    <th x-ng-if="false" class="text-center">单价类型</th>
-		    <th class="text-center">单价</th>
-		    <th x-ng-if="setting.show_discount"
-			class="text-center">折扣</th>
-		    <!-- <th class="text-center">折扣</th> -->
+		    <th x-ng-if="!setting.hide_tagprice" class="text-center">单价</th>
+		    <th x-ng-if="setting.show_discount" class="text-center">折扣</th>
 		    
 		    <th class="text-center">折后价</th> 
 		    <th class="text-center">数量</th>
 		    <th class="text-center">合计</th>
+		    <th class="col-md-1 col-sm-1 col-xs-1"
+			x-ng-if="setting.modify_comment" class="text-center">备注</th>
 		    <th class="text-center">操作</th>
 		  </tr>
 		</thead>
@@ -321,8 +313,7 @@
 		      </form>
 		    </td>
 		    
-		    <td x-ng-if="setting.q_backend"
-		       class="col-md-2 text-left vert-align">
+		    <td x-ng-if="setting.q_backend" class="col-md-2 text-left vert-align">
 		      <span ng-if="!inv.$new">{{inv.style_number}}</span>
 		      <form name="inv.form.good" ng-if="inv.$new">
 			<div ng-class="{'has-error':inv.form.good.$invalid
@@ -348,24 +339,17 @@
 		    
 		    <!-- <td>{{inv.style_number}}</td> -->
 		    <td class="vert-align">{{inv.brand.name}}</td>
-		    <td x-ng-if="setting.check_sale"
-			class="vert-align">{{inv.total}}
-		    </td> 
+		    <td x-ng-if="setting.check_sale" class="vert-align">{{inv.total}}</td> 
 
-		    <td x-ng-if="false" class="vert-align">
-		      <div>{{inv.sell_style.name}}</div> 
-		    </td>
+		    <td x-ng-if="false" class="vert-align"><div>{{inv.sell_style.name}}</div></td>
 
-		    <td class="col-md-1 vert-align">
+		    <td x-ng-if="!setting.hide_tagprice" class="col-md-1 vert-align">
 		      <span x-ng-if="!inv.$new || inv.free_color_size">
-			<!-- {{inv.fprice}} -->
 			{{inv[inv.sell_style.f]}}
-			<!-- <div class="fg-red">上次：{{inv.last_fprice}}</div> -->
 		      </span>
 		    </td>
 
-		    <td x-ng-if="setting.show_discount"
-			class="col-md-1 vert-align">
+		    <td x-ng-if="setting.show_discount" class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new && !inv.free_update">{{inv.fdiscount}}</div> 
 		      <form name="inv.form.fdiscount"
 			    ng-if="inv.$new && inv.free_color_size
@@ -381,8 +365,6 @@
 		      </form>
 		    </td> 
 
-		    <!-- <td class="vert-align">{{inv.discount}}</td> -->
-
 		    <td class="col-md-1 vert-align">
 		      <div ng-if="!inv.$new && !inv.free_update">
 			{{f_mul(inv.fprice, f_mul(inv.fdiscount, 0.01))}}
@@ -390,8 +372,7 @@
 		      <form name="inv.form.fprice"
 			    ng-if="inv.$new && inv.free_color_size
 				   || !inv.$new && inv.free_update">
-			<div ng-class="{'has-error':inv.form.fprice.$invalid
-				       && !inv.form.fprice.$pristine}"> 
+			<div ng-class="{'has-error':inv.form.fprice.$invalid && !inv.form.fprice.$pristine}"> 
 			  <input class="form-control"
 				 type="number" step="0.01" 
 				 required
@@ -438,6 +419,18 @@
 			<!-- <span>{{round(inv.sell * inv.fprice * inv.fdiscount * 0.01)}}</span> -->
 		      </div>
 		    </td>
+
+		    <td x-ng-if="setting.modify_comment" class="vert-align">
+			  <form>
+			    <div> 
+			      <input class="form-control input-xs"
+				     type="text"
+				     placeholder="备注"
+				     ng-edit
+				     x-ng-model="inv.comment"/>
+			    </div>
+			  </form>
+			</td>
 		    
 		    <td class="text-left vert-align">
 		      <span x-ng-if="inv.$new">

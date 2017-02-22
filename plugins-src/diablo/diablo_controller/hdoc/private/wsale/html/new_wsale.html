@@ -306,23 +306,18 @@
 			<th class="text-center">序号</th>
 			<th class="text-center">货号</th>
 			<th class="text-center">品名</th>
-			<th x-ng-if="setting.check_sale"
-			    class="text-center">库存</th>
-			<!-- <th class="text-center">类别</th> -->
-			<!-- <th class="text-center">性别</th> -->
-			<!-- <th class="text-center">厂商</th> -->
-			<!-- <th class="text-center">季节</th> --> 
-			<!-- <th class="text-center warning">上次价格</th> -->
-			<!-- <th class="text-center warning">上次折扣</th> --> 
-			<th class="text-center">单价类型</th>
-			<th class="text-center">单价</th>
-			<!-- <th class="text-center">折扣</th> -->
+			<th x-ng-if="setting.check_sale" class="text-center">库存</th> 
+			<th x-ng-if="!setting.hide_sell_style" class="text-center">单价类型</th>
+			<th x-ng-if="!setting.hide_tagprice" class="text-center">单价</th>
 			
-			<th x-ng-if="setting.show_discount"
-			    class="text-center">折扣</th> 
-			<th class="text-center">折后价</th>
-			<!-- <th class="text-center">库存</th> -->
-			<th class="text-center">数量</th>
+			<th x-ng-if="setting.show_discount" class="text-center">折扣</th>
+
+			<th x-ng-if="!setting.head_amount" class="text-center">折后价</th>
+			<th x-ng-if="!setting.head_amount" class="text-center">数量</th>
+			
+			<th x-ng-if="setting.head_amount" class="text-center">数量</th>
+			<th x-ng-if="setting.head_amount" class="text-center">折后价</th>
+			
 			<th class="text-center">合计</th>
 			<th class="col-md-1 col-sm-1 col-xs-1">备注</th>
 			<th class="text-center">操作</th>
@@ -394,7 +389,7 @@
 			<!-- <td class="vert-align">{{inv.last_discount}}</td>  -->
 
 			<!-- price style-->
-			<td class="vert-align">
+			<td x-ng-if="!setting.hide_sell_style" class="vert-align">
 			  <div ng-if="!inv.$new && !inv.free_update">
 			    {{inv.sell_style.name}}
 			  </div> 
@@ -409,20 +404,18 @@
 				    x-ng-init="inv.sell_style=recover_sell_style(inv)"
 				    x-ng-options="s as s.name for s
 						  in sell_styles|filter:$viewValue|limitTo:8">
-			      <!-- <option value="">-- 请选择 --<option> -->
 			    </select>
 			  </div>
 			</td>
 
-			<td class="col-md-1 vert-align">
+			<td x-ng-if="!setting.hide_tagprice" class="col-md-1 vert-align">
 			  <span x-ng-if="!inv.$new || inv.free_color_size">
 			    <div>{{inv[inv.sell_style.f]}}</div> 
 			  </span>
 			</td>
 
 			<!-- <td class="vert-align">{{inv.discount}}</td> -->
-			<td x-ng-if="setting.show_discount"
-			    class="col-md-1 vert-align">
+			<td x-ng-if="setting.show_discount" class="col-md-1 vert-align">
 			<!-- <td class="col-md-1 vert-align">   -->
 			  <div ng-if="!inv.$new && !inv.free_update">{{inv.fdiscount}}</div> 
 			  <form name="inv.form.fdiscount"
@@ -440,7 +433,7 @@
 			  </form>
 			</td> 
 
-			<td class="col-md-1 vert-align">
+			<td x-ng-if="!setting.head_amount" class="col-md-1 vert-align">
 			  <div ng-if="!inv.$new && !inv.free_update">
 			    <div x-ng-if="inv.sell
 					&& inv.fdiscount
@@ -464,12 +457,10 @@
 				     />
 			    </div>
 			  </form>
-			</td> 
-			
-			<!-- <td class="vert-align">{{inv.total}}</td> -->
+			</td>
 
 			<!-- sell count-->
-			<td class="col-md-1 vert-align">
+			<td x-ng-if="!setting.head_amount" class="col-md-1 vert-align">
 			  <div ng-if="!inv.$new && !inv.free_update"> 
 			    {{inv.sell}}
 			  </div> 
@@ -487,24 +478,51 @@
 				     x-ng-model="inv.sell"
 				     x-ng-change="auto_save_free(inv)" />
 			    </div> 
-			  </form>
+			  </form> 
+			</td>
+			
+			<!-- sell count-->
+			<td x-ng-if="setting.head_amount" class="col-md-1 vert-align">
+			  <div ng-if="!inv.$new && !inv.free_update"> 
+			    {{inv.sell}}
+			  </div> 
+			  <form name="inv.form.sell"
+				x-ng-if="inv.$new && inv.free_color_size || !inv.$new && inv.free_update">
+			    <div ng-class="{'has-error':inv.form.sell.$invalid
+					   && !inv.form.sell.$pristine}"> 
+			      <input type="number" step="0.01"
+				     class="form-control"
+				     placeholder="数量"
+				     required
+				     ng-edit
+				     x-ng-pattern="pattern.sell"
+				     x-ng-model="inv.sell"
+				     x-ng-change="auto_save_free(inv)" />
+			    </div> 
+			  </form> 
+			</td>
 
-			  <!-- <form name="inv.form.sell" -->
-			  <!-- 	x-ng-if="!inv.$new && inv.free_update"> -->
-			  <!--   <div ng-class="{'has-error':inv.form.sell.$invalid -->
-			  <!-- 		   && !inv.form.sell.$pristine}">  -->
-			  <!--     <input type="number" step="0.01" -->
-			  <!-- 	     class="form-control" -->
-			  <!-- 	     placeholder="数量" -->
-			  <!-- 	     required -->
-			  <!-- 	     x-ng-pattern="pattern.sell" -->
-			  <!-- 	     x-ng-model="inv.sell" -->
-			  <!-- 	     popover-placement="top" -->
-			  <!-- 	     popover-trigger="focus" -->
-			  <!-- 	     popover="均色均码直接输入数量"/> -->
-			  <!--   </div>  -->
-			  <!-- </form> -->
-			  
+			<td x-ng-if="setting.head_amount" class="col-md-1 vert-align">
+			  <div ng-if="!inv.$new && !inv.free_update">
+			    <div x-ng-if="inv.sell && inv.fdiscount && (inv.fprice === 0 || inv.fprice)">
+			      <span>{{f_mul(inv.fprice, (inv.fdiscount * 0.01))}}
+			      </span>
+			    </div>
+			  </div> 
+			  <form name="inv.form.fprice"
+				ng-if="inv.$new && inv.free_color_size || !inv.$new && inv.free_update">
+			    <div ng-class="{'has-error':inv.form.fprice.$invalid
+					   && !inv.form.fprice.$pristine}"> 
+			      <input class="form-control"
+				     type="number" step="0.01"
+				     required
+				     ng-edit
+				     x-ng-pattern="/^\d+(.\d{1,2})?$/"
+				     x-ng-model="inv.fprice"
+				     x-ng-change="auto_save_free_of_price(inv)"
+				     />
+			    </div>
+			  </form>
 			</td>
 
 			<td class="vert-align">

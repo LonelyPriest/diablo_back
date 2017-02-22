@@ -235,6 +235,10 @@ init([]) ->
 	  <<"销售单编辑">>, <<"update_w_sale">>, ?right_w_sale},
 	 {?check_w_sale,
 	  <<"销售单审核">>, <<"check_w_sale">>, ?right_w_sale},
+	 {?uncheck_w_sale,
+	  <<"销售单反核">>, <<"uncheck_w_sale">>, ?right_w_sale},
+	 {?check_w_sale_all,
+	  <<"销售单批量审核">>, <<"check_w_sale_all">>, ?right_w_sale},
 	 {?new_s_sale,
 	  <<"零售开单">>, <<"new_s_sale">>, ?right_w_sale} 
 	],

@@ -296,6 +296,37 @@ action(Session, Req, {"check_w_sale"}, Payload) ->
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
+
+action(Session, Req, {"uncheck_w_sale"}, Payload) ->
+    ?DEBUG("uncheck_w_inventory with session ~p, paylaod~n~p",
+	   [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    RSN = ?v(<<"rsn">>, Payload, []), 
+    case ?w_sale:sale(uncheck, Merchant, RSN) of
+    	{ok, RSN} -> 
+    	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(uncheck_w_inventory, RSN), {<<"rsn">>, ?to_b(RSN)});
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
+
+action(Session, Req, {"check_w_sale_all"}, Payload) ->
+    ?DEBUG("check_w_wsale_all with session ~p, paylaod~n~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    Match = ?v(<<"match">>, Payload),
+    {struct, Conditions} = ?v(<<"condition">>, Payload, []),
+
+    case ?w_sale:sale(check_all, Merchant, {?to_a(Match), Conditions}) of
+    	{ok, Merchant} -> 
+    	    ?utils:respond(
+	       200,
+	       Req,
+	       ?succ(check_w_sale_all, Merchant));
+    	{error, Error} ->
+    	    ?utils:respond(200, Req, Error)
+    end;
     
     
 action(Session, Req, {"print_w_sale"}, Payload) ->

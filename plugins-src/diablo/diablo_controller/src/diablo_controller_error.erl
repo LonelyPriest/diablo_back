@@ -154,6 +154,8 @@ success(update_w_sale, RSn) ->
     {0, "Success to update sale of rsn " ++ ?to_s(RSn)};
 success(check_w_sale, RSn) ->
     {0, "Success to check sale of rsn " ++ ?to_s(RSn)};
+success(check_w_sale_all, Merchant) ->
+    {0, "Success to check all sales of new " ++ ?to_s(Merchant)};
 success(print_w_sale, RSn) ->
     {0, "Success to print sale with rsn " ++ ?to_s(RSn)};
 success(new_w_sale_draft, Sn) ->

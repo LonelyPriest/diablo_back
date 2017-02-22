@@ -211,6 +211,15 @@ function wsaleConfg (angular) {
     			     {rsn: rsn}).$promise;
     	};
 
+	this.uncheck_w_sale_new = function(rsn){
+	    return http.save({operation: "uncheck_w_sale"}, {rsn: rsn}).$promise;
+	};
+
+	this.check_w_sale_all = function(match, condition){
+	    return http.save({operation: "check_w_sale_all"},
+			     {match: match.op, condition:condition}).$promise;
+	};
+
     	this.new_w_sale_draft = function(inventory){
     	    return http.save({operation: "new_w_sale_draft"}, inventory).$promise;
     	};
@@ -646,7 +655,9 @@ function wsaleNewDetailProvide(
 
     $scope.toggle_comment = function(){
 	$scope.show.comment = !$scope.show.comment;
-    }; 
+    };
+
+    $scope.right = {master: rightAuthen.master(user.type)};
 
     
     /* 
@@ -762,8 +773,7 @@ function wsaleNewDetailProvide(
 	}
 	
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
-	    if (angular.isUndefined(search.shop)
-		|| !search.shop || search.shop.length === 0){
+	    if (angular.isUndefined(search.shop) || !search.shop || search.shop.length === 0){
 		search.shop = $scope.shopIds.length === 0 ? undefined : $scope.shopIds; 
 	    }
 
@@ -926,6 +936,55 @@ function wsaleNewDetailProvide(
 	diabloUtilsService.request(
 	    "销售单审核", "审核完成后，销售单将无法修改，确定要审核吗？",
 	    callback, undefined, $scope);
+    };
+
+    var add_search_condition = function(search){
+	if (angular.isUndefined(search.shop) || !search.shop || search.shop.length === 0){
+	    search.shop = $scope.shopIds === 0 ? undefined : $scope.shopIds; 
+	}
+    };
+    
+    $scope.check_all_detail = function(){
+	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
+	    add_search_condition(search);
+	    wsaleService.check_w_sale_all($scope.match, search).then(function(state){
+		if (state.ecode == 0){
+		    dialog.response_with_callback(
+			true,
+			"销售单全审",
+			"销售单全部审核成功！！",
+			$scope, function(){$scope.do_search($scope.default_page)})
+	    	    return;
+		} else{
+	    	    diabloUtilsService.response(
+	    		false,
+			"销售单全审",
+	    		"销售单全审失败："
+			    + wsaleService.error[state.ecode]);
+		}
+	    })
+	})
+    };
+
+    $scope.uncheck_detail = function(r){
+	console.log(r);
+	wsaleService.uncheck_w_sale_new(r.rsn).then(function(state){
+	    console.log(state);
+	    if (state.ecode == 0){
+		dialog.response_with_callback(
+		    true,
+		    "销售单反核",
+		    "销售单反核成功！！单号：" + state.rsn,
+		    $scope, function(){r.state = 0})
+	    	return;
+	    } else{
+	    	diabloUtilsService.response(
+	    	    false,
+		    "销售单反核",
+	    	    "销售单反核失败："
+			+ wsaleService.error[state.ecode]);
+	    }
+	}) 
     };
 
     $scope.export_to = function(){

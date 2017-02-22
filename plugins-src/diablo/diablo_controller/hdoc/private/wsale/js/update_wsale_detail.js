@@ -38,6 +38,7 @@ function wsaleUpdateDetailProvide(
     $scope.sell_styles = diablo_sell_style;
     $scope.e_pay_types = wsaleService.extra_pay_types;
     $scope.round       = diablo_round;
+    $scope.user_base   = base;
     
     $scope.setting     = {
 	q_backend:true,
@@ -223,6 +224,7 @@ function wsaleUpdateDetailProvide(
 		// tag.sell_style = sells[i].sell_style;
 		tag.fprice     = sells[i].fprice;
 		tag.fdiscount  = sells[i].fdiscount;
+		tag.comment    = sells[i].comment;
 		break;
 	    }
 	}
@@ -274,7 +276,7 @@ function wsaleUpdateDetailProvide(
     var rsn     = $routeParams.rsn
     var promise = diabloPromise.promise;
     wsaleService.get_w_sale_new(rsn).then(function(result){
-	// console.log(result);
+	console.log(result);
 	if (result.ecode === 0){
 	    // result[0] is the record detail
 	    // result[1] are the inventory detail that the record is included
@@ -322,10 +324,16 @@ function wsaleUpdateDetailProvide(
 	    $scope.setting.round         = $scope.p_round();
 	    $scope.price_type            = $scope.get_price_type($scope.select.shop.id);
 
+	    $scope.setting.hide_sell_style = wsaleUtils.hide_sell_style($scope.select.shop.id, $scope.user_base);
+	    $scope.setting.hide_tagprice   = wsaleUtils.hide_tagprice($scope.select.shop.id, $scope.user_base);
+	    $scope.setting.head_amount     = wsaleUtils.head_amount($scope.select.shop.id, $scope.user_base);
+	    $scope.setting.modify_comment  = wsaleUtils.modify_comment($scope.select.shop.id, $scope.user_base);
+
 	    if (!$scope.setting.q_backend){
 		$scope.match_all_w_inventory();
 	    }
-	    // console.log($scope.setting);
+	    
+	    console.log($scope.setting);
 
 	    $scope.stastic_colspan = function(){
 		var all_colspan = 7;
@@ -335,6 +343,16 @@ function wsaleUpdateDetailProvide(
 		if (!$scope.setting.check_sale){
 		    all_colspan -= 1;
 		}
+
+		if ($scope.setting.hide_tagprice){
+		    all_colspan -= 1;
+		}
+		
+		// if ($scope.setting.hide_sell_style){
+		//     all_colspan -= 1;
+		// }
+		
+		console.log(all_colspan);
 
 		return all_colspan;
 	    }();
@@ -368,6 +386,7 @@ function wsaleUpdateDetailProvide(
 		    add.price5          = inv.price5;
 		    add.total           = inv.amount;
 		    add.path            = inv.path;
+		    add.comment         = inv.comment;
 
 		    // 
 		    add.sell_style      = inv.sell_style;
@@ -375,10 +394,10 @@ function wsaleUpdateDetailProvide(
 		    add.fdiscount       = inv.fdiscount;
 		    add.fprice          = inv.fprice;
 		    add.sell            = inv.sell; 
-
+		    
 		    add.sizes.push(invs[i].size); 
 		    add.colors.push(diablo_find_color(inv.color_id, filterColor));
-		    
+
 		    add.amounts.push({
 			cid:inv.color_id,
 			size:inv.size,
@@ -388,7 +407,6 @@ function wsaleUpdateDetailProvide(
 		} 
 	    }
 
-	    // console.log(sorts);
 	    $scope.old_inventories = sorts;
 
 	    var order_length = sorts.length;
@@ -530,8 +548,7 @@ function wsaleUpdateDetailProvide(
 		    // update
 		    found = true;
 		    
-		    var update_count = parseInt(newAmounts[i].sell_count)
-			- parseInt(oldAmounts[j].sell_count);
+		    var update_count = parseInt(newAmounts[i].sell_count) - parseInt(oldAmounts[j].sell_count);
 		    if ( update_count !== 0 ){
 			changedAmounts.push(
 			    {operation: 'u',
@@ -605,7 +622,8 @@ function wsaleUpdateDetailProvide(
 			// console.log(newInv);
 			// console.log(oldInv);
 			if (parseFloat(newInv.fprice) !== oldInv.fprice
-			    || parseFloat(newInv.fdiscount) !== oldInv.fdiscount){
+			    || parseFloat(newInv.fdiscount) !== oldInv.fdiscount
+			    || diablo_set_string(newInv.comment) !== diablo_set_string(oldInv.comment)){
 			    newInv.operation = 'u';
 			    changedInvs.push(newInv);
 			}
@@ -696,12 +714,12 @@ function wsaleUpdateDetailProvide(
 		fdiscount      : parseInt(add.fdiscount),
 		fprice         : parseFloat(add.fprice),
 		path           : add.path,
+		comment        : add.comment,
 
 		sizes          : add.sizes,
 		s_group        : add.s_group,
 		colors         : add.colors,
-		free           : add.free,
-		
+		free           : add.free, 
 		sell_style     : add.sell_style.id, 
 	    })
 	};
