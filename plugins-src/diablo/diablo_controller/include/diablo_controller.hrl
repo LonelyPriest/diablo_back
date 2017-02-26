@@ -426,6 +426,7 @@
 	  employee_id = -1    :: integer(),
 	  retailer_id = -1    :: integer(),
 	  mtype       = -1    :: integer(), %% merhcant type 0: saler, 1: wholesaler
+	  tablet      = 0     :: integer(),
 	  login_time          :: string()   %% start time of login
 	 }).
 

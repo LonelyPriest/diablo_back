@@ -87,6 +87,7 @@ function employeeConfig (angular){
 
 	$scope.refresh = function(){
 	    employService.list().$promise.then(function(employees){
+		console.log(employees);
 		angular.forEach(employees, function(e){
 		    e.sex = diablo_sex2object[e.sex];
 		});

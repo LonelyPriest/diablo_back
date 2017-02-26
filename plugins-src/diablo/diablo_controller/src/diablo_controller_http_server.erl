@@ -106,7 +106,7 @@ dispatch(Req, DocRoot) ->
 		end;
 	    Method when Method =:= 'POST' ->
 		Payload = Req:recv_body(),
-		%% ?DEBUG("post data ~ts", [Payload]),
+		?DEBUG("post data ~ts", [Payload]),
 		case url_dispatch(Req, ?http_route:url_match(post, Payload)) of
 		    none ->
 			case filelib:is_file(

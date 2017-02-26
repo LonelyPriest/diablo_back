@@ -790,7 +790,7 @@ function wsaleNewDetailProvide(
 	    wsaleService.filter_w_sale_new(
 		$scope.match, search, page_num, items
 	    ).then(function(result){
-		// console.log(result);
+		console.log(result);
 		if (page === 1 && angular.isUndefined(back_page)){
 		    $scope.total_items      = result.total;
 		    $scope.total_amounts    = result.t_amount;

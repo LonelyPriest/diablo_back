@@ -219,7 +219,7 @@ var wretailerDetailProvide = function(
 	$scope.search = search;
 	
 	wretailerService.list_retailer().then(function(data){
-	    // console.log(data);
+	    console.log(data);
 	    $scope.retailers = angular.copy(data);
 	    $scope.total_balance = 0;
 	    angular.forEach($scope.retailers, function(r){

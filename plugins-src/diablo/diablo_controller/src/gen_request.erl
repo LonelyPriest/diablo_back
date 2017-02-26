@@ -56,6 +56,7 @@ action(M, Req, Args) ->
     
 action(M, Req, Args, Payload) ->
     Session = get_session(Req),
+    %% ?DEBUG("payload ~p", [Payload]),
     {struct, P} = mochijson2:decode(Payload),
     %% Session = get_session(Req),
     
