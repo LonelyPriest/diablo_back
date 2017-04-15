@@ -125,6 +125,32 @@ action(Session, Req, {"get_colors"}, Payload) ->
     batch_responed(fun()->?attr:color(w_list, Merchant, ColorIds) end, Req); 
 
 %%
+%% brand
+%%
+action(Session, Req, {"new_w_brand"}, Payload) ->
+    ?DEBUG("new_w_brand with session ~p,  paylaod ~p", [Session, Payload]), 
+    Merchant = ?session:get(merchant, Session),
+    case ?attr:brand(new, Merchant, Payload) of
+	{ok, BrandId} ->
+	    ?utils:respond(200, Req, ?succ(add_color, BrandId), {<<"id">>, BrandId});
+	{error, Error} ->
+	    ?utils:respond(200, Req, Error)
+    end;
+
+%%
+%% good type
+%%
+action(Session, Req, {"new_w_type"}, Payload) ->
+    ?DEBUG("new_w_type with session ~p,  paylaod ~p", [Session, Payload]), 
+    Merchant = ?session:get(merchant, Session),
+    case ?attr:type(new, Merchant, ?v(<<"name">>, Payload)) of
+	{ok, TypeId} ->
+	    ?utils:respond(200, Req, ?succ(add_color, TypeId), {<<"id">>, TypeId});
+	{error, Error} ->
+	    ?utils:respond(200, Req, Error)
+    end;
+
+%%
 %% good
 %%
 action(Session, Req, {"get_w_good"}, Payload) ->
@@ -198,11 +224,22 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 		 [filename:dirname(filename:dirname(Here)),
 		  "hdoc", "image", ?to_s(Merchant)]),
     
-    
     try 
-	{ok, BrandId} =
-	    ?attr:brand(
-	       new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]),
+
+	{ok, BrandId} = 
+	    case ?v(<<"brand_id">>, Good, ?INVALID_INDEX) of
+		?INVALID_INDEX ->
+		    ?attr:brand(
+		       new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]);
+		_BrandId ->
+		    ?attr:brand(
+		       update,
+		       Merchant,
+		       [{<<"bid">>, _BrandId}, {<<"firm">>, Firm}])
+	    end,
+	%% {ok, BrandId} =
+	%%     ?attr:brand(
+	%%        new, Merchant, [{<<"name">>, Brand}, {<<"firm">>,Firm}]),
 
 	case ImageData of
 	    <<>> -> ok;
@@ -221,7 +258,11 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 		ok = file:write_file(ImageFile, base64:decode(ImageData))
 	end, 
 	
-	{ok, TypeId} = ?attr:type(new, Merchant, Type), 
+	{ok, TypeId}  = case ?v(<<"type_id">>, Good, ?INVALID_INDEX) of
+			    ?INVALID_INDEX -> ?attr:type(new, Merchant, Type);
+			    _TypeId -> {ok, _TypeId}
+			end,
+	
 	case ?w_inventory:purchaser_good(
 		new, Merchant,
 		[{<<"brand_id">>, BrandId},

@@ -749,7 +749,7 @@ var wgoodDetailProvide = function(
 	diabloFilter.do_filter($scope.filters, $scope.time, function(search){
 	    wgoodService.filter_purchaser_good(
 		$scope.match, search, page, $scope.items_perpage).then(function(result){
-		    // console.log(result);
+		    console.log(result);
 		    if (page === 1){
 			$scope.total_items      = result.total;
 		    }

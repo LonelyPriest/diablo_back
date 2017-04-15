@@ -90,7 +90,11 @@ handle_call(list_w_color_type, _Form, State) ->
 handle_call({new_w_clolor, Merchant, Attr}, _From, State) ->
     ?DEBUG("new color with merchant ~p, attr ~p ", [Merchant, Attr]),
     Name     = ?v(<<"name">>, Attr),
-    Type     = ?v(<<"type">>, Attr),
+    Type     = case ?v(<<"type">>, Attr) of
+		   undefined -> ?v(<<"tid">>, Attr);
+		   _Tid -> _Tid
+	       end,
+
     Remark   = ?v(<<"remark">>, Attr, "NULL"),
     
     Sql0 = "select id, name from colors"
@@ -257,6 +261,7 @@ handle_call({new_brand, Merchant, Attrs}, _From, State) ->
     ?DEBUG("new_brand with merchant ~p, attrs ~p", [Merchant, Attrs]),
     Name   = ?v(<<"name">>, Attrs),
     Firm   = ?v(<<"firm">>, Attrs, -1),
+    
     Sql = "select id, name, supplier from brands"
 	++ " where name=" ++ "\'" ++ ?to_s(Name) ++ "\'"
 	++ " and supplier=" ++ ?to_s(Firm)
@@ -287,16 +292,34 @@ handle_call({update_brand, Merchant, Attrs}, _From, State) ->
     Name    = ?v(<<"name">>, Attrs),
     Firm    = ?v(<<"firm">>, Attrs),
     
-    Updates = ?utils:v(name, string, Name)
-        ++ ?utils:v(supplier, integer, Firm),
-	Sql = "update brands set "
-        ++ ?utils:to_sqls(proplists, comma, Updates)
-        ++ " where id=" ++ ?to_s(BrandId)
-        ++ " and merchant=" ++ ?to_s(Merchant),
-    Reply = ?sql_utils:execute(write, Sql, BrandId),
-    ?w_user_profile:update(brand, Merchant),
-    {reply, Reply, State};
+    Sql0 = "select id, name, supplier from brands"
+	" where id=" ++ ?to_s(BrandId)
+	++ " and merchant=" ++ ?to_s(Merchant),
+    
+    case ?sql_utils:execute(s_read, Sql0) of
+	{ok, R} ->
+	    case ?v(<<"firm">>, R) =:= Firm of
+		true -> {ok, BrandId} ;
+		false ->
+		    Updates = ?utils:v(name, string, Name)
+			++ ?utils:v(supplier, integer, Firm),
 
+		    Sql = "update brands set "
+			++ ?utils:to_sqls(proplists, comma, Updates)
+			++ " where id=" ++ ?to_s(BrandId)
+			++ " and merchant=" ++ ?to_s(Merchant),
+		    
+		    Reply = ?sql_utils:execute(write, Sql, BrandId),
+		    case Reply of
+			{ok, BrandId} ->
+			    ?w_user_profile:update(brand, Merchant); 
+			_ -> nothing
+		    end, 
+		    {reply, Reply, State}
+	    end;
+	Error ->
+	    {reply, Error, State}
+    end;
 
 handle_call({list_brand, Merchant}, _From, State) ->
     ?DEBUG("list_brand with merchant ~p", [Merchant]),

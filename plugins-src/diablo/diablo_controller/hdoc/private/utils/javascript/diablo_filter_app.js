@@ -628,6 +628,7 @@ function normalFilterProvider(){
 		    return _baseHttp.query(
 			{operation: "list_base_setting"}
 		    ).$promise.then(function(ss){
+			// console.log(ss);
 			_baseSettings = ss.map(function(s){
 			    return {name:s.ename, value:s.value, shop:s.shop}; 
 			});

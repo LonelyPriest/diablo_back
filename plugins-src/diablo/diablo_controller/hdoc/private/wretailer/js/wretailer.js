@@ -17,7 +17,7 @@ var wretailerNewProvide = function(
     $scope.cities    = filterCity;
     // console.log($scope.cities);
     
-    $scope.pattern = {name_address: diabloPattern.ch_name_address,
+    $scope.pattern = {name_address: diabloPattern.name_address,
 		      tel_mobile:   diabloPattern.tel_mobile,
 		      decimal_2:    diabloPattern.decimal_2,
 		      city:         diabloPattern.chinese};

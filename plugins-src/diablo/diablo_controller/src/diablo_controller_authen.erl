@@ -268,6 +268,7 @@ handle_call({authen_action, Action, UserId}, _From,
     %% 		end
     %% 	end,
     PassActions = ?right_init:get_pass_action(),
+    %% ?DEBUG("pass actions ~p", [PassActions]),
 
     case lists:member(?to_b(Action), PassActions) of
 	true  ->

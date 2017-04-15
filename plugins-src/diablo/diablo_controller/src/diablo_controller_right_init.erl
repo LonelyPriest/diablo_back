@@ -803,6 +803,9 @@ pass_action(wholesaler) ->
      <<"list_w_color">>,
      <<"list_color_type">>, 
      <<"list_w_size">>,
+     
+     <<"new_w_brand">>,
+     <<"new_w_type">>,
 
      %% good
      %% <<"list_w_good">>,
@@ -823,6 +826,7 @@ pass_action(wholesaler) ->
      %% inventory new
      <<"get_w_inventory_new">>,
      <<"get_w_inventory_new_amount">>,
+     <<"get_w_inventory_new_info">>,
      <<"filter_w_inventory_new">>,
      <<"filter_w_inventory_new_rsn_group">>,
      <<"w_inventory_new_rsn_detail">>,
@@ -848,6 +852,8 @@ pass_action(wholesaler) ->
      
      %% retailer
      <<"list_w_retailer">>,
+     <<"match_w_retailer">>,
+     <<"get_w_retailer">>,
      
      %% wsale
      %% <<"list_w_sale_new">>,

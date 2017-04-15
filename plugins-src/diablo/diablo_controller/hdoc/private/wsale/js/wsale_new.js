@@ -384,7 +384,7 @@ function wsaleNewProvide(
 	     start_time:$scope.qtime_start($scope.select.shop.id),
 	     qtype: diablo_use_repo}
 	).$promise.then(function(invs){
-	    // console.log(invs);
+	    console.log(invs);
 	    $scope.all_w_inventory = 
 		invs.map(function(inv){
 		    var name = inv.style_number

@@ -313,6 +313,7 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     RealyShop    = realy_shop(Merchant, Shop, SellMode), 
     Sql1  = sql(update_wsale,
 		RSN, Merchant, RealyShop, Datetime, OldDatetime, Inventories),
+    ?DEBUG("sql1 ~p", [Sql1]),
 
     Updates = ?utils:v(employ, string, Employee)
 	++ ?utils:v(retailer, integer, Retailer) 
@@ -526,12 +527,12 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
     CorrectC2 = ?utils:correct_condition(<<"b.">>, C2),
 
     Sql = 
-	"select a.rsn, b.id, b.rsn, b.style_number, b.sell_style"
+	"select a.rsn, b.id, b.style_number, b.sell_style"
 	", b.fdiscount, b.fprice"
 	" from w_sale a, w_sale_detail b"
 	" where a.rsn=b.rsn" ++ ?sql_utils:condition(proplists, C1)
 	++ " and " ++ ?utils:to_sqls(proplists, CorrectC2)
-	++ " order by id desc "
+	++ " order by b.id desc "
 	++ case RPGood of
 	    0 -> "limit 1";
 	    _ -> "limit 2"
@@ -912,6 +913,7 @@ handle_call({filter_rsn_group, Merchant,
 	", b.brand as brand_id, b.type as type_id, b.firm as firm_id"
 	", b.s_group, b.free, b.total, b.fdiscount"
 	", b.fprice, b.path, b.comment, b.entry_date"
+	", b.second"
 	
 	", a.shop as shop_id"
 	", a.retailer as retailer_id"
@@ -1071,6 +1073,7 @@ sql(update_wsale, RSN, Merchant, Shop, Datetime, _OldDatetime, Inventories) ->
     
 
 wsale(update, RSN, DateTime, Merchant, Shop, Inventory) -> 
+    ?DEBUG("wsale update: inventory ~p", [Inventory]),
     StyleNumber    = ?v(<<"style_number">>, Inventory),
     Brand          = ?v(<<"brand">>, Inventory),
     FPrice         = ?v(<<"fprice">>, Inventory),
@@ -1196,6 +1199,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
     
 wsale(delete, RSN, _DateTime, Merchant, Shop, Inventory, Amounts)
   when is_list(Amounts)->
+    ?DEBUG("wsale delete: inventory ~p, amounts ~p", [Inventory, Amounts]),
     %% Shop       = ?v(<<"shop">>, Props),
     %% change repo    
     StyleNumber = ?v(<<"style_number">>, Inventory),
@@ -1455,6 +1459,7 @@ wsale(reject_badrepo, RSN, DateTime, Merchant, {Shop, RealyShop}, Inventory, Amo
 	  end, [], Amounts);
 
 wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) -> 
+    ?DEBUG("wsale action: action ~p, inventory ~p, amounts ~p", [Action, Inventory, Amounts]),
     StyleNumber = ?v(<<"style_number">>, Inventory),
     Second      = ?v(<<"second">>, Inventory, 0),
     Brand       = ?v(<<"brand">>, Inventory),

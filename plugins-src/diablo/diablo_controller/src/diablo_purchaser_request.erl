@@ -32,6 +32,22 @@ action(Session, Req, {"get_w_inventory_new", RSN}) ->
     Merchant = ?session:get(merchant, Session), 
     object_responed(
       fun() -> ?w_inventory:purchaser_inventory(get_new, Merchant, RSN) end, Req);
+
+action(Session, Req, {"get_w_inventory_new_info", RSN}) ->
+    Merchant = ?session:get(merchant, Session),
+    try
+	{ok, Stock} = ?w_inventory:purchaser_inventory(get_new, Merchant, ?to_b(RSN)),
+	{ok, Details} = ?w_inventory:purchaser_inventory(
+			   get_new_amount, Merchant, [{<<"rsn">>, ?to_b(RSN)}]),
+	
+	?utils:respond(200, object, Req,
+		       {[{<<"ecode">>, 0},
+			 {<<"stock">>, {Stock}},
+			 {<<"detail">>, Details}]})
+    catch
+	_:{badmatch, {error, Error}} ->
+	    ?utils:respond(200, Req, Error)
+    end;
     
 action(Session, _Req, Unkown) ->
     ?DEBUG("receive unkown message ~p with session~n~p", [Unkown, Session]).
@@ -212,7 +228,6 @@ action(Session, Req, {"get_w_inventory_new_amount"}, Payload) ->
     	{error, Error} ->
     	    ?utils:respond(200, Req, Error)
     end;
-
     
 %% =============================================================================
 %% reject

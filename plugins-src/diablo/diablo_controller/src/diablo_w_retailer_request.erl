@@ -57,7 +57,13 @@ action(Session, Req, {"del_w_retailer", Id}) ->
 	    ?utils:respond(200, Req, ?succ(delete_w_retailer, RetailerId));
 	{error, Error} ->
 	    ?utils:respond(200, Req, Error)
-    end.
+    end;
+
+action(Session, Req, {"get_w_retailer", RetailerId}) ->
+    ?DEBUG("get_w_retailer with Session ~p, retailerId ~p", [Session, RetailerId]),
+    Merchant = ?session:get(merchant, Session),
+
+    ?utils:respond(object, fun()-> ?w_retailer:retailer(get, Merchant, RetailerId) end, Req).
 
 %%--------------------------------------------------------------------
 %% @desc: POST action
@@ -123,6 +129,12 @@ action(Session, Req, {"update_w_retailer", Id}, Payload) ->
 		    ?utils:respond(200, Req, Error)
 	    end
     end;
+
+action(Session, Req, {"match_w_retailer"}, Payload) ->
+    ?DEBUG("match_w_retailer with Session ~p~npaylaod ~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    ?utils:respond(batch, fun() -> ?w_retailer:match(match, Merchant,  ejson:decode(Payload)) end, Req);
+
 		
 action(Session, Req, {"bill_w_retailer"}, Payload) ->
     ?DEBUG("bill wretailer with session ~p~npaylaod ~p", [Session, Payload]),

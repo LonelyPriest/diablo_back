@@ -22,7 +22,7 @@
 
 -export([retailer/2, retailer/3, retailer/4]).
 -export([province/2, city/2, city/4]).
--export([bill/3, print_trans/2]).
+-export([bill/3, print_trans/2, match/3]).
 
 -define(SERVER, ?MODULE). 
 
@@ -65,6 +65,14 @@ province(list, Merchant) ->
 bill(check, Merchant, Attrs) ->
     Name = ?wpool:get(?MODULE, Merchant),
     gen_server:call(Name, {bill_check, Merchant, Attrs}).
+
+match(match, Merchant, Prompt) ->
+    Name = ?wpool:get(?MODULE, Merchant), 
+    gen_server:call(Name, {match, Merchant, Prompt}).
+
+%% get(retailer, Merchant, RetailerId) ->
+%%     Name = ?wpool:get(?MODULE, Merchant), 
+%%     gen_server:call(Name, {get_retailer, Merchant, RetailerId}).
 
 print_trans(Merchant, Attrs) ->
     Name = ?wpool:get(?MODULE, Merchant),
@@ -210,15 +218,15 @@ handle_call({update_retailer, Merchant, RetailerId, Attrs}, _From, State) ->
 	    {reply, {error, Error}, State}
     end;
 
-handle_call({get_retailer, Merchant, RetailerId}, _From, State) ->
-    ?DEBUG("get_retailer with merchant ~p, retailerId ~p",
-	   [Merchant, RetailerId]),
-    Sql = "select id, name, mobile, province as pid,city as cid"
-	", address, balance, merchant, entry_date"
-	" from w_retailer where id=" ++ ?to_s(RetailerId)
-	++ " and merchant=" ++ ?to_s(Merchant), 
-    Reply = ?sql_utils:execute(write, Sql, RetailerId),
-    {reply, Reply, State};
+%% handle_call({get_retailer, Merchant, RetailerId}, _From, State) ->
+%%     ?DEBUG("get_retailer with merchant ~p, retailerId ~p",
+%% 	   [Merchant, RetailerId]),
+%%     Sql = "select id, name, mobile, province as pid,city as cid"
+%% 	", address, balance, merchant, entry_date"
+%% 	" from w_retailer where id=" ++ ?to_s(RetailerId)
+%% 	++ " and merchant=" ++ ?to_s(Merchant), 
+%%     Reply = ?sql_utils:execute(write, Sql, RetailerId),
+%%     {reply, Reply, State};
 
 handle_call({delete_retailer, Merchant, RetailerId}, _From, State) ->
     ?DEBUG("delete_retailer with merchant ~p, retailerId ~p",
@@ -324,6 +332,27 @@ handle_call({bill_check, Merchant, Attrs}, _From, State) ->
 	Error ->
 	    {reply, Error, State}
     end;
+
+handle_call({match, Merchant, Prompt}, _From, State) ->
+    ?DEBUG("Prompt ~p", [Prompt]),
+    Sql = "select id, name, mobile, balance"
+	" from w_retailer"
+	" where merchant=" ++ ?to_s(Merchant)
+	++ " and name like \'" ++ ?to_s(Prompt) ++ "%\'"
+	++ " and deleted=" ++ ?to_s(?NO),
+    
+    Reply = ?sql_utils:execute(read, Sql),
+    {reply, Reply, State};
+
+handle_call({get_retailer, Merchant, RetailerId}, _From, State) ->
+    Sql = "select id, name, mobile, balance"
+	" from w_retailer"
+	" where merchant=" ++ ?to_s(Merchant)
+	++ " and id="  ++ ?to_s(RetailerId)
+	++ " and deleted=" ++ ?to_s(?NO),
+    
+    Reply = ?sql_utils:execute(s_read, Sql),
+    {reply, Reply, State};
 
 handle_call({print_trans, Merchant, Attrs}, _From, State) ->
     ?DEBUG("print_trans with merchant ~p, attrs ~p", [Merchant, Attrs]),

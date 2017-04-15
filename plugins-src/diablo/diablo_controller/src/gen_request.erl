@@ -57,7 +57,14 @@ action(M, Req, Args) ->
 action(M, Req, Args, Payload) ->
     Session = get_session(Req),
     %% ?DEBUG("payload ~p", [Payload]),
-    {struct, P} = mochijson2:decode(Payload),
+    [Action|_] = erlang:tuple_to_list(Args),
+    P = 
+	case Action of
+	    "match_w_retailer" -> Payload;
+	    _ -> {struct, Decoded} = mochijson2:decode(Payload),
+                 Decoded
+        end,
+    %% {struct, P} = mochijson2:decode(Payload),
     %% Session = get_session(Req),
     
     Fun = fun() -> M:action(Session, Req, Args, P) end, 

@@ -48,6 +48,8 @@
 %% free color
 -define(FREE_COLOR, 0).
 
+-define(INVALID_INDEX, -1).
+
 %% print
 -define(COLUMN, 0).
 -define(ROW, 1).

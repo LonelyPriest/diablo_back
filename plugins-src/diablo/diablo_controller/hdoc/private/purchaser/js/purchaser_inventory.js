@@ -1117,7 +1117,7 @@ var stockDetailProvide =  function(
 	    purchaserService.filter_purchaser_inventory_group(
 		mode, $scope.match, search, page, $scope.items_perpage
 	    ).then(function(result){
-		// console.log(result);
+		console.log(result);
 
 		if (mode === 1){
 		    var labels  = [];

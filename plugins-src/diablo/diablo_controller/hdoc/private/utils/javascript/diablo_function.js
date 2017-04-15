@@ -215,7 +215,7 @@ var diablo_remove_local_storage = function(l){
 
 /*
  * add ordered id
-*/
+ */
 var diablo_order = function(objects, begin){
     // console.log(begin);
     var order_id = 1;
@@ -357,13 +357,13 @@ function diablo_float_add(arg1, arg2) {
 //     } catch(e) {
 // 	r1=0;
 //     }
-    
+
 //     try{
 // 	r2 = arg2.toString().split(".")[1].length;
 //     } catch(e){
 // 	r2 = 0;
 //     }
-    
+
 //     m = Math.pow(10,Math.max(r1,r2));
 //     return (arg1 * m + arg2 * m) / m;
 // };
@@ -622,7 +622,7 @@ var diablo_find_color = function(cid, allColors){
 var diablo_in_colors = function(color, colors){
     for (var i=0, l=colors.length; i<l; i++){
 	if (color.cid === colors[i].id
-	   || color.cid === colors[i].cid){
+	    || color.cid === colors[i].cid){
 	    return true;
 	}
 	
