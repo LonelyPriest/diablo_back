@@ -383,10 +383,25 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 	    LastBalance = 
 		case ?sql_utils:execute(s_read, Sql0) of
 		    {ok, []} -> 
-			Sql01 = "select id, balance from w_retailer where id=" ++ ?to_s(Retailer)
-			    ++ " and merchant=" ++ ?to_s(Merchant),
-			{ok, R} = ?sql_utils:execute(s_read, Sql01),
-			?v(<<"balance">>, R); 
+			Sql01 = "select id, rsn, retailer, shop, merchant, balance"
+			    ", verificate, should_pay, has_pay, e_pay"
+			    " from w_sale"
+			    " where shop=" ++ ?to_s(Shop)
+			    ++ " and merchant=" ++ ?to_s(Merchant)
+			    ++ " and retailer=" ++ ?to_s(Retailer)
+			    ++ " and id>" ++ ?to_s(RSNId)
+			    ++ " order by id limit 1",
+			
+			{ok, LastSaleInW} = ?sql_utils:execute(s_read, Sql01),
+			case LastSaleInW of
+			    [] -> 
+				Sql01 = "select id, balance from w_retailer where id=" ++ ?to_s(Retailer)
+				    ++ " and merchant=" ++ ?to_s(Merchant),
+				{ok, R01} = ?sql_utils:execute(s_read, Sql01),
+				?v(<<"balance">>, R01, 0); 
+			    _ ->
+				?v(<<"balance">>, LastSaleInW, 0)
+			end;
 		    {ok, R}  ->
 			?v(<<"balance">>, R)
 			    + ?v(<<"should_pay">>, R, 0)
