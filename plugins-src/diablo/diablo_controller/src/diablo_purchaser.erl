@@ -811,7 +811,7 @@ handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
     EPayType   = ?v(<<"e_pay_type">>, Props, -1),
     EPay       = ?v(<<"e_pay">>, Props, 0),
     
-    Balance    = ?v(<<"balance">>, Props),
+    %% Balance    = ?v(<<"balance">>, Props),
     Date       = ?v(<<"date">>, Props, ?utils:current_time(localdate)),
     Total      = ?v(<<"total">>, Props, 0),
 
@@ -839,10 +839,11 @@ handle_call({new_inventory, Merchant, Inventories, Props}, _From, State) ->
 		++ ?to_s(Firm) ++ ","
 		++ ?to_s(Shop) ++ ","
 		++ ?to_s(Merchant) ++ ","
-		++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
-		       true -> ?to_s(Balance) ++ ",";
-		       false -> ?to_s(CurrentBalance) ++ ","
-		   end
+		%% ++ case ?to_f(CurrentBalance) =:= ?to_f(Balance) of
+		%%        true -> ?to_s(Balance) ++ ",";
+		%%        false -> ?to_s(CurrentBalance) ++ ","
+		%%    end
+		++ ?to_s(CurrentBalance) ++ ","
 		++ ?to_s(ShouldPay) ++ ","
 		++ ?to_s(HasPay) ++ ","
 		++ ?to_s(Cash) ++ ","
@@ -888,7 +889,7 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     Firm       = ?v(<<"firm">>, Props),
     Employee   = ?v(<<"employee">>, Props),
 
-    Balance    = ?v(<<"balance">>, Props), 
+    %% Balance    = ?v(<<"balance">>, Props), 
     Cash       = ?v(<<"cash">>, Props, 0),
     Card       = ?v(<<"card">>, Props, 0),
     Wire       = ?v(<<"wire">>, Props, 0),
@@ -900,7 +901,7 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
     
 
     OldFirm      = ?v(<<"old_firm">>, Props),
-    OldBalance   = ?v(<<"old_balance">>, Props), 
+    %% OldBalance   = ?v(<<"old_balance">>, Props), 
     OldVerifyPay = ?v(<<"old_verify_pay">>, Props, 0),
     OldShouldPay = ?v(<<"old_should_pay">>, Props),
     OldHasPay    = ?v(<<"old_has_pay">>, Props, 0), 
@@ -939,7 +940,8 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 	    Sql2 = "update w_inventory_new set "
 		++ ?utils:to_sqls(
 		      proplists, comma,
-		      ?utils:v(balance, float, OldBalance) ++ Updates)
+		      %% ?utils:v(balance, float, OldBalance ++ Updates
+		     Updates)
 		++ " where rsn=" ++ "\'" ++ ?to_s(RSN) ++ "\'",
 
 	    case (ShouldPay - HasPay - VerifyPay)
@@ -979,7 +981,11 @@ handle_call({update_inventory, Merchant, Inventories, Props}, _From, State) ->
 
 	    NewBalance = 
 		case ?sql_utils:execute(s_read, Sql0) of
-		    {ok, []}  -> Balance;
+		    {ok, []}  -> 
+			Sql01 = "select id, balance from suppliers where id=" ++ ?to_s(Firm)
+			    ++ " and merchant=" ++ ?to_s(Merchant),
+			{ok, R} = ?sql_utils:execute(s_read, Sql01),
+			?v(<<"balance">>, R);
 		    {ok, R}   ->
 			?v(<<"balance">>, R)
 			    + ?v(<<"should_pay">>, R, 0)

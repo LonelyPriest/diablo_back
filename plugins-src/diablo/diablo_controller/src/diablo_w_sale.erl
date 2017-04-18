@@ -288,7 +288,7 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
     Datetime   = ?v(<<"datetime">>, Props, CurTime),
     Employee   = ?v(<<"employee">>, Props),
 
-    Balance    = ?v(<<"balance">>, Props), 
+    %% Balance    = ?v(<<"balance">>, Props), 
     Cash       = ?v(<<"cash">>, Props, 0),
     Card       = ?v(<<"card">>, Props, 0),
     Wire       = ?v(<<"wire">>, Props, 0),
@@ -382,7 +382,11 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 
 	    LastBalance = 
 		case ?sql_utils:execute(s_read, Sql0) of
-		    {ok, []} -> Balance;
+		    {ok, []} -> 
+			Sql01 = "select id, balance from w_retailer where id=" ++ ?to_s(Retailer)
+			    ++ " and merchant=" ++ ?to_s(Merchant),
+			{ok, R} = ?sql_utils:execute(s_read, Sql01),
+			?v(<<"balance">>, R); 
 		    {ok, R}  ->
 			?v(<<"balance">>, R)
 			    + ?v(<<"should_pay">>, R, 0)
