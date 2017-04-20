@@ -340,8 +340,8 @@ inventory(abstract, Merchant, Shop, [{S1, B1}|T] = _Conditions) ->
 	
 	" left join w_inventory_amount b on"
 	" a.style_number=b.style_number and a.brand_id=b.brand"
-	" and a.shop=b.shop"
-	" and b.merchant";
+	" and a.merchant=b.merchant"
+	" and a.shop=b.shop";
     
     %% "select a.style_number, a.brand as brand_id"
     %% 	", a.color as color_id, a.size, a.total as amount"
