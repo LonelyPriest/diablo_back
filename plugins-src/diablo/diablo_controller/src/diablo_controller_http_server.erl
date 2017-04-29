@@ -208,7 +208,7 @@ url_dispatch(Req, [{Regexp,  Function}|T]) ->
 		    %% case length(string:tokens(Path, "/")) of
 		    %% 	1 ->
 		    case _Error of
-			no_session -> 
+			no_session ->
 			    Req:respond({302, [{"Location", "/"},
 					       {"Content-Type", "text/html; charset=UTF-8"}],
 					 "Redirecting /"});

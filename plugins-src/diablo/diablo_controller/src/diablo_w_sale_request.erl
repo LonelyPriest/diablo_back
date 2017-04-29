@@ -670,32 +670,26 @@ sidebar(Session) ->
 %% internal
 %% =============================================================================
 print(RSN, Merchant, ResponseFun) ->
+    %% ResponseFun(0, [{[{<<"device">>, DeviceId}, {<<"ecode">>, 0}]} || DeviceId <- [1] ]).
     case ?wifi_print:print(RSN, Merchant) of 
-	{Success, []} ->
-	    ResponseFun(0, Success); 
-	{[], Failed} ->
-	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
-		     || {DeviceId, ECode} <- Failed],
-	    ResponseFun(1, PInfo); 
-	{error, {ECode, _EInfo}} ->
-	    ?DEBUG("error, ecode ~p, einfo ~p", [ECode, _EInfo]),
-	    ResponseFun(ECode, []);
-	{_Success, Failed} when is_list(Failed)->
-	    ?DEBUG("Success ~p, Failed ~p", [_Success, Failed]),
-	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
-		     || {DeviceId, ECode} <- Failed],
-	    ResponseFun(2, PInfo)
+    	{Success, []} ->
+	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, 0}]}
+    		     || DeviceId <- Success],
+    	    ResponseFun(0, PInfo); 
+    	{[], Failed} ->
+    	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+    		     || {DeviceId, ECode} <- Failed],
+    	    ResponseFun(1, PInfo); 
+    	{error, {ECode, _EInfo}} ->
+    	    ?DEBUG("error, ecode ~p, einfo ~p", [ECode, _EInfo]),
+    	    ResponseFun(ECode, []);
+    	{_Success, Failed} when is_list(Failed)->
+    	    ?DEBUG("Success ~p, Failed ~p", [_Success, Failed]),
+    	    PInfo = [{[{<<"device">>, DeviceId}, {<<"ecode">>, ECode}]}
+    		     || {DeviceId, ECode} <- Failed],
+    	    ResponseFun(2, PInfo)
     end.
-    %% catch
-    %% 	EType:What ->
-    %% 	    %% ?INFO("failed to print ~p", [What]),
-    %% 	    Report = ["print failed...",
-    %% 		      {type, EType}, {what, What},
-    %% 		      {trace, erlang:get_stacktrace()}],
-    %% 	    ?ERROR("print failed: ~p", [Report]),
-    %% 	    {ECode, _} = ?err(print_unkown_error, RSN),
-    %% 	    ResponseFun(ECode, [])
-    %% end.
+    
 
 
 batch_responed(Fun, Req) ->

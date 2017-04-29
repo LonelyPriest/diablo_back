@@ -56,6 +56,7 @@ action(Req, login) ->
 	_ -> 
 	    action(Req, login, false)
     end;
+
 action(Req, login_force) ->
     Post = Req:parse_post(),
     Tablet   = ?to_i(?v("tablet", Post, 0)),
@@ -262,15 +263,25 @@ tablet_login(Req, ?TABLET) ->
     Post = Req:parse_post(),
     UserName = ?v("user_name", Post, []),
     Passwd   = ?v("user_password", Post, []),
+    Force    = case ?to_i(?v("force", Post, 0)) of
+		   0 -> false;
+		   1 -> true
+	       end,
 
     case ?login:login(UserName, Passwd) of 
 	{ok, UserDetail} ->
 	    StartInfo = 
 		case ?session:get_session(by_user, UserName) of
 		    {ok, []} ->
-			start_force(true, new_user, UserDetail ++ [{<<"tablet">>, 1}]); 
+			start_force(Force,
+				    new_user,
+				    UserDetail ++ [{<<"tablet">>, 1}]); 
 		    {ok, {SessionId, Session}} -> 
-			start_force(true, old_user, SessionId, Session, UserDetail ++ [{<<"tablet">>, 1}]);
+			start_force(Force,
+				    old_user,
+				    SessionId,
+				    Session,
+				    UserDetail ++ [{<<"tablet">>, 1}]);
 		    {error, more_session} ->
 			{error, {1109, more_session}}
 		end,

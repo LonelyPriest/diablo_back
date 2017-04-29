@@ -395,9 +395,9 @@ handle_call({update_sale, Merchant, Inventories, Props}, _From, State) ->
 			{ok, LastSaleInW} = ?sql_utils:execute(s_read, Sql01),
 			case LastSaleInW of
 			    [] -> 
-				Sql01 = "select id, balance from w_retailer where id=" ++ ?to_s(Retailer)
+				Sql02 = "select id, balance from w_retailer where id=" ++ ?to_s(Retailer)
 				    ++ " and merchant=" ++ ?to_s(Merchant),
-				{ok, R01} = ?sql_utils:execute(s_read, Sql01),
+				{ok, R01} = ?sql_utils:execute(s_read, Sql02),
 				?v(<<"balance">>, R01, 0); 
 			    _ ->
 				?v(<<"balance">>, LastSaleInW, 0)
@@ -547,7 +547,7 @@ handle_call({last_sale, Merchant, Conditions}, _From, State) ->
 
     Sql = 
 	"select a.rsn, b.id, b.style_number, b.sell_style"
-	", b.fdiscount, b.fprice"
+	", b.fdiscount, b.fprice, b.second"
 	" from w_sale a, w_sale_detail b"
 	" where a.rsn=b.rsn" ++ ?sql_utils:condition(proplists, C1)
 	++ " and " ++ ?utils:to_sqls(proplists, CorrectC2)
