@@ -298,24 +298,36 @@ handle_call({update_brand, Merchant, Attrs}, _From, State) ->
     
     case ?sql_utils:execute(s_read, Sql0) of
 	{ok, R} ->
-	    case ?v(<<"firm">>, R) =:= Firm of
-		true -> {ok, BrandId} ;
+	    case ?v(<<"supplier">>, R) =:= Firm of
+		true ->
+		    {reply, {ok, BrandId}, State} ;
 		false ->
-		    Updates = ?utils:v(name, string, Name)
-			++ ?utils:v(supplier, integer, Firm),
+		    Sql00 = "select id, name, supplier from brands"
+			" where name=\'" ++ ?to_s(?v(<<"name">>, R)) ++ "\'"
+			++ " and supplier=" ++ ?to_s(Firm),
+		    case ?sql_utils:execute(s_read, Sql00) of
+			{ok, []} -> 
+			    Updates = ?utils:v(name, string, Name)
+				++ ?utils:v(supplier, integer, Firm),
 
-		    Sql = "update brands set "
-			++ ?utils:to_sqls(proplists, comma, Updates)
-			++ " where id=" ++ ?to_s(BrandId)
-			++ " and merchant=" ++ ?to_s(Merchant),
+			    Sql = "update brands set "
+				++ ?utils:to_sqls(proplists, comma, Updates)
+				++ " where id=" ++ ?to_s(BrandId)
+				++ " and merchant=" ++ ?to_s(Merchant),
 		    
-		    Reply = ?sql_utils:execute(write, Sql, BrandId),
-		    case Reply of
-			{ok, BrandId} ->
-			    ?w_user_profile:update(brand, Merchant); 
-			_ -> nothing
-		    end, 
-		    {reply, Reply, State}
+			    Reply = ?sql_utils:execute(write, Sql, BrandId),
+			    case Reply of
+				{ok, BrandId} ->
+				    ?w_user_profile:update(brand, Merchant); 
+				_ -> nothing
+			    end, 
+			    {reply, Reply, State};
+			%% exist, nothing to do
+			{ok, _R0} ->
+			    {reply, {ok, BrandId}, State};
+			Error0 ->
+			    {reply, Error0, State}
+		    end
 	    end;
 	Error ->
 	    {reply, Error, State}
