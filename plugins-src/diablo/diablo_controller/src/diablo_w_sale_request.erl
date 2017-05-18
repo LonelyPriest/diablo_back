@@ -64,6 +64,7 @@ action(Session, Req, {"get_w_print_content", RSN}) ->
 	_:{badmatch, {error, Error}} ->
 	    ?utils:respond(200, Req, Error)
     end;
+
 	    
 action(Session, Req, {"get_w_sale_new", RSN}) ->
     ?DEBUG("get_w_sale_new with session ~p, paylaod~n~p", [Session, RSN]),
@@ -404,6 +405,19 @@ action(Session, Req, {"print_w_sale"}, Payload) ->
 				{<<"pinfo">>, PInfo}])
 	end,
     print(RSN, Merchant, SuccessRespone);
+
+
+action(Session, Req, {"get_w_sale_print_content"}, Payload) ->
+    ?DEBUG("get_w_sale_print_content with session ~p, Payload ~p", [Session, Payload]),
+    Merchant = ?session:get(merchant, Session),
+    RSN      = ?v(<<"rsn">>, Payload),
+    case ?wifi_print:print(get_content, RSN, Merchant) of
+	{ok, Content} ->
+	    ?utils:respond(200, Req, ?succ(print_w_sale, RSN),
+			   [{<<"content">>, ?to_b(Content)}]);
+	{error, Error} ->
+	    ?utils:respond(200, Req, Error)
+    end;
 
 %% =============================================================================
 %% draft

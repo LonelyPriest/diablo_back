@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
 	 terminate/2, code_change/3]).
 
--export([print/4, print/2, call/2, get_printer/2]).
+-export([print/4, print/3, print/2, call/2, get_printer/2]).
 
 -export([server/1,
 	 title/4, address/7, head/8,  body_head/6,
@@ -59,6 +59,8 @@
 
 print(test, Merchant, Shop, PId) ->
     gen_server:call(?SERVER, {print_test, Merchant, Shop, PId}).
+print(get_content, RSN, Merchant) ->
+    gen_server:call(?SERVER, {print_content, RSN, Merchant}).
 
 print(RSn, Merchant) ->
     Self = self(),
@@ -101,6 +103,83 @@ init([]) ->
 handle_call({print_test, Merchant, Shop, PId}, _Form, State) ->
     Reply = diablo_http_print_test:print(Merchant, Shop, PId),
     {reply, Reply, State};
+
+handle_call({print_content, RSN, Merchant}, _Form, State) ->
+    ?DEBUG("print_content with rsn ~p, merchant ~p", [RSN, Merchant]), 
+    try 
+	{ok, Sale} = ?w_sale:sale(get_new, Merchant, RSN),
+	%% ?DEBUG("sale ~p", [Sale]),
+	{ok, Details} = ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}),
+	%% ?DEBUG("details ~p", [Details]),
+
+	NewDetails = [ {D1} || {D1} <- Details, ?v(<<"total">>, D1) < 0 ]  ++
+	    [ {D2} || D2 <- Details, ?v(<<"total">>, D2) >= 0 ],
+	%% ?DEBUG("newdetails ~p", [NewDetails]),
+
+	{ok, Retailer} = ?w_user_profile:get(retailer, Merchant, ?v(<<"retailer_id">>, Sale)),
+	{ok, Employee} = ?w_user_profile:get(employee, Merchant, ?v(<<"employ_id">>, Sale)),
+	{ok, Brands}   = ?w_user_profile:get(brand, Merchant),
+
+	GetBrand =
+	    fun(BrandId)->
+		    case ?w_user_profile:filter(Brands, <<"id">>, BrandId) of
+			[] -> [];
+			FindBrand -> ?v(<<"name">>, FindBrand)
+		    end
+	    end,
+
+	{SortInvs, STotal, RTotal, Pay} =
+	    sort_inventory(Merchant, GetBrand, NewDetails, [], 0, 0, 0),
+	?DEBUG("spay ~p, total ~p, stotal ~p, rtotal ~p, Pay ~p",
+	       [?to_f(?v(<<"should_pay">>, Sale)), ?v(<<"total">>, Sale), STotal, RTotal, Pay]), 
+
+	case STotal + RTotal =/= ?v(<<"total">>, Sale) of
+	    true -> throw(total_not_equal_between_trans_and_note);
+	    false -> ok
+	end,
+
+	case erlang:round(Pay / 100) /= erlang:round(?v(<<"should_pay">>, Sale)) of 
+	    true -> throw(pay_not_equal_between_trans_and_note);
+	    false -> ok
+	end,
+
+	%% ?DEBUG("sorts ~p", [SortInvs]),
+	RSNAttrs = [{<<"shop">>,       ?v(<<"shop_id">>, Sale)},
+		    {<<"datetime">>,   ?v(<<"entry_date">>, Sale)},
+		    {<<"balance">>,    ?v(<<"balance">>, Sale)},
+		    {<<"cash">>,       ?v(<<"cash">>, Sale)},
+		    {<<"card">>,       ?v(<<"card">>, Sale)},
+		    {<<"wire">>,       ?v(<<"wire">>, Sale)},
+		    {<<"verificate">>, ?v(<<"verificate">>, Sale)},
+		    {<<"should_pay">>, ?v(<<"should_pay">>, Sale)},
+		    %% {<<"total">>,      ?v(<<"total">>, Sale)},
+		    {<<"total">>,      STotal + erlang:abs(RTotal)},
+		    {<<"comment">>,    ?v(<<"comment">>, Sale)},
+		    {<<"e_pay_type">>, ?v(<<"e_pay_type">>, Sale)},
+		    {<<"e_pay">>,      ?v(<<"e_pay">>, Sale)},
+		    {<<"direct">>,     ?v(<<"type">>, Sale)},
+		    {<<"stotal">>,     STotal},
+		    {<<"rtotal">>,     RTotal}], 
+
+	%% ?DEBUG("retailer ~p", [Retailer]),
+	%% ?DEBUG("employee ~p", [Employee]),
+	PrintAttrs = [{<<"retailer">>, ?v(<<"name">>, Retailer)},
+		      {<<"retailer_id">>, ?v(<<"retailer_id">>, Sale)},
+		      {<<"employ">>, ?v(<<"name">>, Employee)}],
+
+	Reply = get_print_content(RSN, Merchant, SortInvs, RSNAttrs, PrintAttrs),
+	{reply, {ok, Reply}, State}
+    catch 
+	_:{badmatch, Error} ->
+	    ?WARN("print failed:~n~p", [erlang:get_stacktrace()]),
+	    {reply, Error, State};
+	size_not_include ->
+	    {reply, {error, ?err(print_size_not_include, Merchant)}, State};
+	total_not_equal_between_trans_and_note ->
+	    {reply, {error, ?err(total_not_equal_between_trans_and_note, RSN)}, State};
+	pay_not_equal_between_trans_and_note ->
+	    {reply, {error, ?err(pay_not_equal_between_trans_and_note, RSN)}, State}
+    end;
     
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -426,6 +505,157 @@ call1(print, RSN, Merchant, Invs, Attrs, Print) ->
 	    %% end
     end.
 
+
+get_print_content(RSN, Merchant, Invs, Attrs, Print) ->
+    %% ?DEBUG("print with RSN ~p, merchant ~p~ninventory ~p~nAttrs ~p"
+    %% 	   ", Print  ~p", [RSN, Merchant, Invs, Attrs, Print]),
+    ShopId = ?v(<<"shop">>, Attrs),
+    {Printers, ShopInfo} =
+	case ?w_user_profile:get(shop, Merchant, ShopId) of
+	    {ok, []} -> {[], []};
+	    {ok, [{Shop}]} ->
+		case ?v(<<"repo">>, Shop) of
+		    -1 ->
+			case ?w_user_profile:get(print, Merchant, ShopId) of
+			    {ok, []} -> {[], []};
+			    {ok, [{P1}]} -> 
+				{[[{<<"pshop">>, ShopId}|P1]], Shop};
+			    {ok, Ps} ->
+				%% ?DEBUG("printers of shop ~p", [Ps]),
+				{lists:foldr(
+				   fun({P1}, Acc)->
+					   [[{<<"pshop">>, ShopId}|P1] | Acc]
+				   end, [], Ps), Shop}
+			end;
+		    RepoId ->
+			{[case ?w_user_profile:get(print, Merchant, ShopId) of
+			      {ok, []} -> [];
+			      {ok, [{P1}]} ->
+				  [{<<"pshop">>, ShopId}|P1]
+			  end,
+			  case ?w_user_profile:get(print, Merchant, RepoId) of
+			      {ok, []} -> [];
+			      {ok, [{P2}]} -> [{<<"pshop">>, RepoId}|P2]
+			  end], Shop}
+		end
+	end,
+
+    %% ?DEBUG("printers ~p", [Printers]),
+    VPrinters = [P || P <- Printers, length(P) =/= 0 ],
+    %% ?DEBUG("printers ~p", [VPrinters]),
+    case VPrinters of
+	[] ->
+	    {error, ?err(shop_not_printer, ShopId)};
+	_  ->
+	    %% content info
+	    %% Retailer     = ?v(<<"retailer">>, Print),
+	    RetailerId = ?v(<<"retailer_id">>, Print),
+	    {ok, Retailer}
+		= ?w_user_profile:get(retailer, Merchant, RetailerId),
+	    %% ?DEBUG("retailer  ~p", [Retailer]),
+	    Employee     = ?v(<<"employ">>, Print), 
+	    DateTime     = ?v(<<"datetime">>, Attrs),
+	    Total        = ?v(<<"total">>, Attrs, 0),
+	    Direct       = ?v(<<"direct">>, Attrs, 0),
+	    [Date, _]    = string:tokens(?to_s(DateTime), " "),
+
+	    %% shop info
+	    ShopName = case ?w_sale:direct(Direct) of
+			   wreject ->
+			       ?to_s(?v(<<"name">>, ShopInfo))
+				   ++ "（退货单）";
+			   _       ->
+			       ?v(<<"name">>, ShopInfo)
+		       end,
+
+	    ShopAddr = ?v(<<"address">>, ShopInfo),
+
+	    %% profile
+	    {ok, MerchantInfo} = detail(merchant, Merchant), 
+	    {ok, Banks}        = detail(bank, Merchant),
+	    %% {ok, Setting}      = detail(base_setting, Merchant, ShopId),
+	    %% PrintRetailer      = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
+	    %% PrintTable         = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
+	    %% IsRound            = ?to_i(?v(<<"pround">>, Setting, ?NO)),
+	    Mobile             = ?v(<<"mobile">>, MerchantInfo),
+
+	    %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
+	    %%  [PrintRetailer, PrintTable]), 
+
+	    %% try
+	    PrintContent = 
+		lists:foldr(
+		  fun(P, Acc) ->
+			  %% SN     = ?v(<<"sn">>, P),
+			  %% Key    = ?v(<<"code">>, P),
+			  %% Path   = ?v(<<"server_path">>, P),
+
+			  Brand  = ?v(<<"brand">>, P),
+			  Model  = ?v(<<"model">>, P),
+
+			  Column = ?v(<<"pcolumn">>, P),
+			  %% Height = ?v(<<"pheight">>, P),
+			  PShop  = ?v(<<"pshop">>, P),
+
+			  %% ?DEBUG("P ~p", [P]),
+			  %% Server = server(?v(<<"server_id">>, P)),
+
+			  {Setting, Phones} = detail(base_setting, Merchant, PShop),
+			  PrintRetailer = ?to_i(?v(<<"pretailer">>, Setting, ?NO)),
+			  PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)), 
+			  %% IsRound
+			  %%     = ?to_i(?v(<<"pround">>, Setting, ?NO)),
+
+			  %% ?DEBUG("PrintRetailer ~p, PrintTable ~p",
+			  %% [PrintRetailer, PrintTable]), 
+			  %% ?DEBUG("column ~p", [Column]), 
+
+			  Head = title(Brand, Model, Column, ShopName)
+			      ++ address(Brand, Model, Column, ShopAddr, Setting, Mobile, Phones)
+			      ++ head(Brand, Model, Column, RSN,
+				      PrintRetailer, Retailer, Employee, Date)
+
+			      ++ left_pading(Brand, Model)
+
+			      ++ case PrintTable of
+				     ?TABLE  -> line_space('1/8');
+				     %% ++ line(minus, Column) ++ br(Brand);
+				     ?STRING ->
+					 line(equal, Column) ++ br(Brand)
+				 end,
+			  
+			  ShouldPay = ?v(<<"should_pay">>, Attrs, 0),
+			  IsVip     = ?v(<<"s_customer">>, Setting, 0) =/= RetailerId,
+			  PSecond   = ?to_i(?v(<<"pseconed_good">>, Setting, 0)) =:= 1,
+			  
+			  Body = print_content(
+				   PShop, Brand, Model, Column,
+				   Merchant, Setting, Invs, Total,
+				   ShouldPay, {IsVip, PSecond})
+			      ++ case PrintTable of
+				     ?TABLE  ->
+					 %% line_space(default);
+					 line_space('1/6');
+				     ?STRING ->
+					 []
+				 end ++ br(Brand),
+			  %% ?DEBUG("body ~ts", [?to_b(Body)]),
+
+			  Stastic = body_stastic(
+				      Brand, Model, Column, Setting, Attrs),
+			  Foot = body_foot(
+				   static, Brand, Model, Column,
+				   Banks, Mobile, Setting, Phones),
+			  
+			  Content = Head ++ Body ++ Stastic ++ Foot,
+			  [Content|Acc]
+		  end, [], VPrinters),
+	    
+	    [Content|_] = PrintContent,
+	    ?DEBUG("~ts", [?to_b(Content)]),
+	    Content
+    end.
+
 print_content(_ShopId, PBrand, Model, 33, Merchant, _Setting, Invs, _T, _S, {_IsVip, _PSecond}) ->
     %% DateTime     = ?v(<<"datetime">>, Attrs), 
     %% Retailer     = ?v(<<"retailer">>, Print),
@@ -552,7 +782,9 @@ print_content(_ShopId,
     body_head(Merchant, PBrand, Model, 48) ++ Content;
     
 print_content(
-  Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay, {IsVip, PSecond}) -> 
+  Shop, PBrand, Model, Column, Merchant, Setting, Invs, Total, ShouldPay, {IsVip, PSecond}) ->
+    ?DEBUG("print_content: IsVip ~p, PSecond ~p", [IsVip, PSecond]),
+
     Fields     = detail(print_format, Merchant, Shop),
     PrintModel = ?to_i(?v(<<"pformat">>, Setting, ?COLUMN)),
     PrintTable = ?to_i(?v(<<"ptable">>, Setting, ?STRING)),
@@ -778,7 +1010,7 @@ print_content(
 
 			  FlatternAmounts =
 			      flattern(amount, {PrintTable, Column, length(Sizes),
-						Fields}, SortAmounts),
+						IsVip, PSecond, Fields}, SortAmounts),
 			  %% ?DEBUG("flattern amounts ~ts", [?to_b(FlatternAmounts)]),
 
 			  {true, SizeWidth} = field(size, Fields), 
@@ -979,6 +1211,7 @@ format_row_content(
 		  %% 	  ++ pading(Width - width(latin1, StyleNumber) -2)
 		  %% 	  ++ phd("|");
 		  <<"style_number">> ->
+		      ?DEBUG("IsVip ~p, PSecond ~p, Second ~p", [IsVip, PSecond, Second]),
 		      NewStyleNumber = case IsVip andalso PSecond andalso Second =:= 1 of
 					   true -> ?to_s(StyleNumber) ++ "补";
 					   false -> StyleNumber
@@ -1773,6 +2006,7 @@ combine_with_size([{struct, Inv}|T], Combined) ->
 
     StyleNumber = ?v(<<"style_number">>, Inv),
     Brand       = ?v(<<"brand_name">>, Inv),
+    Second      = ?v(<<"second">>, Inv, 0),
     Type        = ?v(<<"type_name">>, Inv),
     SizeGroup   = ?v(<<"s_group">>, Inv),
     Colors      = ?v(<<"colors">>, Inv),
@@ -1784,6 +2018,7 @@ combine_with_size([{struct, Inv}|T], Combined) ->
     
     A1 = {[{<<"style_number">>, StyleNumber},
 	   {<<"brand">>, Brand},
+	   {<<"second">>, Second},
 	   {<<"type">>, Type},
 	   {<<"comment">>, Comment},
 	   {<<"s_group">>, SizeGroup},

@@ -18,11 +18,11 @@
 flattern(size, {IsTable, Width}, Sizes) ->
     flattern(size, {IsTable, Width}, Sizes, "");
 
-flattern(amount_array, {IsTable, Column, SizeNum, Fields}, Amounts) ->
+flattern(amount_array, {IsTable, Column, SizeNum, IsVip, PSecond, Fields}, Amounts) ->
     flattern(
-      amount_array, {IsTable, Column, SizeNum, Fields}, Amounts, [], 0, 0); 
-flattern(amount, {IsTable, Column, SizeNum, Fields}, Amounts) ->
-    flattern(amount, {IsTable,Column, SizeNum, Fields}, Amounts, [], 0, 0).
+      amount_array, {IsTable, Column, SizeNum, IsVip, PSecond, Fields}, Amounts, [], 0, 0); 
+flattern(amount, {IsTable, Column, SizeNum, IsVip, PSecond, Fields}, Amounts) ->
+    flattern(amount, {IsTable,Column, SizeNum, IsVip, PSecond, Fields}, Amounts, [], 0, 0).
 
 flattern(size, {_IsTable, _Width}, [], Flattern) ->
     Flattern;
@@ -42,26 +42,28 @@ flattern(size, {IsTable, Width}, [Size|T], Flattern) ->
 			Name ++ size_pading(Width, Size, Name) end).
 
 
-flattern(amount, {IsTable, Column, SizeNum, Fields}, [], Flattern, MTotals, MStastic) ->
+flattern(amount, {IsTable, Column, SizeNum, _IsVip, _PSecond, Fields},
+	 [], Flattern, MTotals, MStastic) ->
     Stastic = column(stastic, {IsTable, SizeNum, Fields}, MTotals, MStastic),
     Flattern ++ Stastic
 	++ case IsTable of
 	       ?TABLE -> [];
 	       ?STRING ->[line(minus, Column)] end;
 
-flattern(amount, {IsTable, Column, SizeNum, Fields}, [H|T], Flattern, MTotals, MStastic) ->
+flattern(amount, {IsTable, Column, SizeNum, IsVip, PSecond, Fields}, [H|T],
+	 Flattern, MTotals, MStastic) ->
     {A, Nums} = H,
     try 
 	{true, Width} = field(size, Fields),
 	{FlatternNums, Total} = flattern(nums, {IsTable, Width}, Nums, "", 0),
 	case Total of
-	    0 ->  flattern(amount, {IsTable, Column, SizeNum, Fields},
+	    0 ->  flattern(amount, {IsTable, Column, SizeNum, IsVip, PSecond, Fields},
 			   T, Flattern, MTotals, MStastic);
 	    Total ->
 		FPrice = ?v(<<"fprice">>, A),
 		FDiscount = ?v(<<"fdiscount">>, A),
-		Row = row(IsTable, A, Fields, FlatternNums, Total),
-		flattern(amount, {IsTable, Column, SizeNum, Fields},
+		Row = row(IsTable, A, {IsVip, PSecond, Fields}, FlatternNums, Total),
+		flattern(amount, {IsTable, Column, SizeNum, IsVip, PSecond, Fields},
 			 T,
 			 Flattern ++ [Row],
 			 abs(Total) + MTotals,
@@ -256,10 +258,11 @@ column(stastic, {IsTable, SizeNum, Fields}, Totals, Calcs) ->
 	     ++ pading(WidthCount - length(CleanTotal)) ++ CleanCalc]
     end.
 
-row(?STRING, A, Fields, FlatternNums, Total) ->
+row(?STRING, A, {IsVip, PSecond, Fields}, FlatternNums, Total) ->
     %% ?DEBUG("A ~p", [A]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
+    Second      = ?to_i(?v(<<"second">>, A, 0)),
     Type        = ?v(<<"type">>, A),
     Comment     = ?v(<<"comment">>, A),
     Color       = ?v(<<"color">>, A),
@@ -272,8 +275,14 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
 	  fun({<<"brand">>, _, W}, Acc) ->
 		  ?to_s(Brand) ++ pading(W - width(chinese, Brand)) ++ Acc;
 	     ({<<"style_number">>, _, W}, Acc) ->
-		  ?to_s(StyleNumber)
-		      ++ pading(W - width(latin1, StyleNumber)) ++ Acc;
+		  case IsVip andalso PSecond andalso Second =:= 1 of
+		      true ->
+			  ?to_s(StyleNumber)
+			      ++ pading(W - width(latin1, StyleNumber) - 2) ++ Acc;
+		      false ->
+			  ?to_s(StyleNumber)
+			      ++ pading(W - width(latin1, StyleNumber)) ++ Acc
+		  end;
 	     ({<<"type">>, _, W}, Acc) ->
 		  ?to_s(Type) ++ pading(W - width(chinese, Type)) ++ Acc;
 	     ({<<"color">>, _, W}, Acc) ->
@@ -299,10 +308,11 @@ row(?STRING, A, Fields, FlatternNums, Total) ->
     ?DEBUG("row ~p", [Row]),
     Row;
 
-row(?TABLE, A, Fields, FlatternNums, Total) ->
-    %% ?DEBUG("A ~p", [A]),
+row(?TABLE, A, {IsVip, PSecond, Fields}, FlatternNums, Total) ->
+    ?DEBUG("A ~p, IsVip ~p, PSecond ~p", [A, IsVip, PSecond]),
     Brand       = ?v(<<"brand">>, A),
     StyleNumber = ?v(<<"style_number">>, A),
+    Second      = ?v(<<"second">>, A, 0),
     Type        = ?v(<<"type">>, A),
     Comment     = ?v(<<"comment">>, A), 
     Color       = ?v(<<"color">>, A),
@@ -319,13 +329,24 @@ row(?TABLE, A, Fields, FlatternNums, Total) ->
 		      ++ pading(W - width(chinese, Brand) -2 )
 		      ++ phd("|") ++ Acc;
 	     ({<<"style_number">> = Name, _, W}, Acc) when Name=:=FirstName->
-		  phd("|") ++ ?to_s(StyleNumber)
-		      ++ pading(W - width(latin1, StyleNumber) -2)
+		  phd("|")
+		      ++ ?to_s(StyleNumber) ++ 
+		      case IsVip andalso PSecond andalso Second =:= 1 of
+			  true ->
+			      [232,161,165] ++ pading(W - width(latin1, StyleNumber) - 2 - 2);
+			  false ->
+			      pading(W - width(latin1, StyleNumber) -2)
+		      end
 		      ++ phd("|") ++ Acc;
 	     ({<<"style_number">>, _, W}, Acc)->
-		  ?to_s(StyleNumber)
-		      ++ pading(W - width(latin1, StyleNumber) -1)
-		      ++ phd("|") ++ Acc;
+		  %% ?DEBUG("补 ~p", ["补"]),
+		  ?to_s(StyleNumber) ++
+		      case IsVip andalso PSecond andalso Second =:= 1 of 
+			  true ->
+			      [232,161,165] ++ pading(W - width(latin1, StyleNumber) - 1 - 2);
+			  false ->
+			      pading(W - width(latin1, StyleNumber) -1)
+		      end ++ phd("|") ++ Acc;
 	     ({<<"type">>, _, W}, Acc) ->
 		  ?to_s(Type) ++ pading(W - width(chinese, Type) -1 )
 		      ++ phd("|") ++ Acc;
