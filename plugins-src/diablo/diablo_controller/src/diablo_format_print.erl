@@ -331,7 +331,7 @@ row(?TABLE, A, {IsVip, PSecond, Fields}, FlatternNums, Total) ->
 	     ({<<"style_number">> = Name, _, W}, Acc) when Name=:=FirstName->
 		  phd("|")
 		      ++ ?to_s(StyleNumber) ++ 
-		      case IsVip andalso PSecond andalso Second =:= 1 of
+		      case IsVip andalso PSecond andalso Second =:= 1 andalso Total > 0 of
 			  true ->
 			      [232,161,165] ++ pading(W - width(latin1, StyleNumber) - 2 - 2);
 			  false ->
@@ -339,9 +339,8 @@ row(?TABLE, A, {IsVip, PSecond, Fields}, FlatternNums, Total) ->
 		      end
 		      ++ phd("|") ++ Acc;
 	     ({<<"style_number">>, _, W}, Acc)->
-		  %% ?DEBUG("补 ~p", ["补"]),
 		  ?to_s(StyleNumber) ++
-		      case IsVip andalso PSecond andalso Second =:= 1 of 
+		      case IsVip andalso PSecond andalso Second =:= 1 andalso Total > 0 of 
 			  true ->
 			      [232,161,165] ++ pading(W - width(latin1, StyleNumber) - 1 - 2);
 			  false ->
