@@ -894,7 +894,11 @@ handle_call({total_rsn_group, Merchant, Conditions}, _From, State) ->
 
     	++ ?sql_utils:condition(proplists, CutSConditions)
     	++ " and a.merchant=" ++ ?to_s(Merchant)
-    	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime),
+	++
+	case ?sql_utils:condition(time_with_prfix, StartTime, EndTime) of
+	    [] -> [];
+	    TimeSql -> " and " ++ TimeSql
+	end,
 	
     %% Sql = "select count(*) as total"
     %% 	", SUM(total) as t_amount"
@@ -947,7 +951,10 @@ handle_call({filter_rsn_group, Merchant,
 	
     	++ ?sql_utils:condition(proplists, CutSConditions)
     	++ " and a.merchant=" ++ ?to_s(Merchant)
-    	++ " and " ++ ?sql_utils:condition(time_with_prfix, StartTime, EndTime)
+	++ case ?sql_utils:condition(time_with_prfix, StartTime, EndTime) of
+	    [] -> [];
+	    TimeSql -> " and " ++ TimeSql
+	end
     	++ ?sql_utils:condition(page_desc, CurrentPage, ItemsPerPage),
     	%% ++ ") a",
 	

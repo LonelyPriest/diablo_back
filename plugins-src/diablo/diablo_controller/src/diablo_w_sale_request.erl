@@ -111,7 +111,20 @@ action(Session, Req, {"get_w_sale_new", RSN}) ->
     catch
 	_:{badmatch, {error, Error}} ->
 	    ?utils:respond(200, Req, Error)
-    end; 
+    end;
+
+action(Session, Req, {"get_w_sale_note", RSN}) ->
+    ?DEBUG("get_w_sale_note with session ~p, paylaod~n~p", [Session, RSN]),
+    Merchant = ?session:get(merchant, Session),
+    case ?w_sale:sale(trans_detail, Merchant, {<<"rsn">>, ?to_b(RSN)}) of
+	{ok, Notes} ->
+	    ?utils:respond(
+	       200, object, Req,
+	       {[{<<"ecode">>, 0},
+		 {<<"data">>, Notes}]});
+	Error ->
+	    ?utils:respond(200, Req, Error)
+    end;
 
 action(Session, _Req, Action) ->
     ?DEBUG("receive unkown action ~p with session ~p", [Action, Session]).

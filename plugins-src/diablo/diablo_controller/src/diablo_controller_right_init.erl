@@ -864,6 +864,7 @@ pass_action(wholesaler) ->
 
      <<"filter_w_sale_new">>,
      <<"get_w_sale_new">>,
+     <<"get_w_sale_note">>,
      <<"filter_w_sale_reject">>,
      <<"filter_w_sale_rsn_group">>,
      <<"w_sale_rsn_detail">>,

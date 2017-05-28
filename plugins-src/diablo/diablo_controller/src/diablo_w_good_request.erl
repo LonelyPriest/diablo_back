@@ -46,7 +46,7 @@ action(Session, Req, {"list_w_size"}) ->
     Merchant = ?session:get(merchant, Session),
     %% batch_responed(fun()->?attr:size_group(list, Merchant) end, Req);
     batch_responed(fun()->?w_user_profile:get(size_group, Merchant) end, Req); 
-    
+
 
 action(Session, Req, {"list_color_type"}) ->
     ?DEBUG("list_color_type with session ~p", [Session]), 
@@ -59,7 +59,7 @@ action(Session, Req, {"list_w_color"}) ->
     Merchant = ?session:get(merchant, Session),
     %% batch_responed(fun()->?attr:color(w_list, Merchant) end, Req);
     batch_responed(fun()->?w_user_profile:get(color, Merchant) end, Req); 
-    
+
 
 action(Session, Req, {"list_w_good"}) ->
     ?DEBUG("list_purchaser_good with session ~p", [Session]),
@@ -212,18 +212,18 @@ action(Session, Req, {"new_w_good"}, Payload) ->
     Merchant = ?session:get(merchant, Session),
     {struct, Good} = ?v(<<"good">>, Payload),
     ?DEBUG("new purchaser good with session ~p, good~n~p", [Session, Good]),
-    
+
     Type        = ?v(<<"type">>, Good),
     Brand       = ?v(<<"brand">>, Good),
     Firm        = ?v(<<"firm">>, Good),
     StyleNumber = ?v(<<"style_number">>, Good),
     ImageData   = ?v(<<"image">>, Payload, <<>>),
-    
+
     {file, Here} = code:is_loaded(?MODULE),
     ImageDir = filename:join(
 		 [filename:dirname(filename:dirname(Here)),
 		  "hdoc", "image", ?to_s(Merchant)]),
-    
+
     try 
 
 	{ok, BrandId} = 
@@ -257,12 +257,12 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 		%% ?DEBUG("ImageDir ~p", [ImageDir]), 
 		ok = file:write_file(ImageFile, base64:decode(ImageData))
 	end, 
-	
+
 	{ok, TypeId}  = case ?v(<<"type_id">>, Good, ?INVALID_INDEX) of
 			    ?INVALID_INDEX -> ?attr:type(new, Merchant, Type);
 			    _TypeId -> {ok, _TypeId}
 			end,
-	
+
 	case ?w_inventory:purchaser_good(
 		new, Merchant,
 		[{<<"brand_id">>, BrandId},
@@ -289,8 +289,8 @@ action(Session, Req, {"new_w_good"}, Payload) ->
 	_:{badmatch, {error, DBError}} ->
 	    ?DEBUG("failed to new_w_inventory: ~p", [DBError]),
 	    ?utils:respond(200, Req, DBError)
-	%% EType:EWhat ->
-	%%     ?DEBUG("failed to new_w_inventory: EType ~p, EWhat", [EType, EWhat])
+	    %% EType:EWhat ->
+	    %%     ?DEBUG("failed to new_w_inventory: EType ~p, EWhat", [EType, EWhat])
 	    %% ?utils:respond(200, Req, DBError)
     end;
 
@@ -299,7 +299,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
     {struct, Good} = ?v(<<"good">>, Payload),
     ?DEBUG("update purchaser good with session ~p, good~n~p",
 	   [Session, Good]),
-    
+
     OStyleNumber = ?v(<<"o_style_number">>, Good),
     OBrandId     = ?v(<<"o_brand">>, Good),
     OImagePath   = ?v(<<"o_path">>, Good),
@@ -332,7 +332,7 @@ action(Session, Req, {"update_w_good"}, Payload) ->
                 BId
         end,
 
-    
+
     try
 	TypeId = case ?v(<<"type">>, Good) of
 		     undefined -> undefined;
@@ -360,10 +360,10 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 			 image(path, Merchant, OStyleNumber, BrandId);
 		     {StyleNumber, BrandId}      ->
 			 image(path, Merchant, StyleNumber, BrandId)
-	    end,
+		 end,
 
 	?DEBUG("oldpath ~p, newpath ~p", [OldPath, NewPath]),
-	
+
 	ImagePath =
 	    case ?v(<<"image">>, Payload) of 
 		undefined ->
@@ -428,15 +428,15 @@ action(Session, Req, {"update_w_good"}, Payload) ->
 action(Session, Req, {"filter_w_good"}, Payload) ->
     ?DEBUG("filter_w_good with session ~p~nPayload ~p", [Session, Payload]),
     Merchant  = ?session:get(merchant, Session),
-    
+
     ?pagination:pagination(
-      fun(Match, Conditions) ->
-	      ?w_inventory:filter(total_goods, Match, Merchant, Conditions)
-      end,
-      fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
-	      ?w_inventory:filter(
-		 goods, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
-      end, Req, Payload).
+       fun(Match, Conditions) ->
+	       ?w_inventory:filter(total_goods, Match, Merchant, Conditions)
+       end,
+       fun(Match, CurrentPage, ItemsPerPage, Conditions) ->
+	       ?w_inventory:filter(
+		  goods, Match, Merchant, CurrentPage, ItemsPerPage, Conditions)
+       end, Req, Payload).
 
 
 sidebar(Session) -> 

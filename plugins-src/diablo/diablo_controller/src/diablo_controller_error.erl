@@ -321,6 +321,8 @@ error(size_group_exist, Group) ->
 %% purchaser
 error(purchaser_good_exist, Number) ->
     {2001, "purchaser good of number " ++ ?to_s(Number) ++ " is been exist."};
+error(good_has_been_used, GoodId) ->
+    {2098, "good has been used " ++ ?to_s(GoodId) ++ " has been used."};
 
 %% retailer
 error(retailer_exist, Retailer) ->

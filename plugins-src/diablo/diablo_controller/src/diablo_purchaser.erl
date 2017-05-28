@@ -376,6 +376,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
     SizeGroup      = ?v(<<"s_group">>, Attrs),
     Sizes          = ?v(<<"size">>, Attrs),
     Path           = ?v(<<"path">>, Attrs),
+    Comment        = ?v(<<"comment">>, Attrs),
     
     %% Date     = ?utils:current_time(localdate),
     DateTime = ?utils:current_time(localtime),
@@ -396,6 +397,7 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 	++ ?utils:v(price5, float, P5)
 	++ ?utils:v(discount, integer, Discount)
 	++ ?utils:v(s_group, string, SizeGroup)
+	++ ?utils:v(comment, string, Comment)
 	%% ++ ?utils:v(size, string, Sizes)
 	++ ?utils:v(path, string, Path),
 	%% ++ ?utils:v(change_date, string, DateTime),
@@ -668,9 +670,30 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		
 handle_call({delete_good, Merchant, GoodId}, _Form, State) ->
     ?DEBUG("delete_good with merchant ~p, goodId ~p", [Merchant, GoodId]),
-    Sql = ?w_good_sql:good(delete, Merchant, GoodId), 
-    Reply = ?sql_utils:execute(write, Sql, GoodId),
-    {reply, Reply, State};
+    %% query good
+    Sql0 = "select style_number, brand as brand_id"
+	" from w_inventory_good"
+	" where id=" ++ ?to_s(GoodId),
+    case ?sql_utils:execute(s_read, Sql0) of
+	{ok, Good} ->
+	    StyleNumber = ?v(<<"style_number">>, Good),
+	    Brand = ?v(<<"brand_id">>, Good),
+	    Sql1 = ?w_good_sql:good(used_detail, Merchant, StyleNumber, Brand),
+	    case ?sql_utils:execute(s_read, Sql1) of
+		{ok, []} ->
+		    Sql2 = ?w_good_sql:good(delete, Merchant, GoodId), 
+		    Reply = ?sql_utils:execute(write, Sql2, GoodId),
+		    {reply, Reply, State};
+		{ok, _U} ->
+		    {reply, {error, ?err(good_has_been_used, GoodId)}, State};
+		Error ->
+		    {reply, Error, State} 
+	    end; 
+	Error ->
+	    {reply, Error, State}
+    end;
+	    
+    
 
 handle_call({lookup_good, Merchant}, _Form, State) ->
     ?DEBUG("lookup_good with merchant ~p", [Merchant]),

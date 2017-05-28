@@ -906,8 +906,7 @@ var wgoodDetailProvide = function(
     		    dialog.response(
     			false,
     			"删除货品",
-    			"删除货品失败："
-    			    + wgoodService.error[2098], $scope);
+    			"删除货品失败：" + wgoodService.error[2098], $scope);
     		} else {
     		    var callback = function(){
     			wgoodService.delete_purchaser_good(

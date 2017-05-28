@@ -23,6 +23,7 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
     Colors      = ?v(<<"colors">>, Attrs, [?FREE_COLOR]),
     Path        = ?v(<<"path">>, Attrs, []),
     AlarmDay    = ?v(<<"alarm_day">>, Attrs, 7),
+    Comment     = ?v(<<"comment">>, Attrs, []),
 
     Sizes       = ?v(<<"sizes">>, Attrs, [?FREE_SIZE]), 
     Date        = ?utils:current_time(localdate),
@@ -42,7 +43,7 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 	"(style_number, sex, color, year, season, type"
 	", size, s_group, free, brand, firm"
 	", org_price, tag_price, pkg_price, price3, price4, price5"
-	", discount, path, alarm_day, merchant, change_date, entry_date"
+	", discount, path, alarm_day, comment, merchant, change_date, entry_date"
 	") values("
 	++ "\"" ++ ?to_s(StyleNumber) ++ "\","
 	++ ?to_s(Sex) ++ ","
@@ -64,6 +65,7 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 	++ ?to_s(Discount) ++ ","
 	++ "\"" ++ ?to_s(Path) ++ "\","
 	++ ?to_s(AlarmDay) ++ ","
+	++ "\"" ++ ?to_s(Comment) ++ "\","
 	++ ?to_s(Merchant) ++ ","
 	++ "\"" ++ ?to_s(DateTime) ++ "\","
 	++ "\"" ++ ?to_s(Date) ++ "\");",
@@ -111,7 +113,7 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 	      ", style_number, brand, type, sex, season, amount"
 	      ", firm, s_group, free, year"
 	      ", org_price, tag_price, pkg_price, price3"
-	      ", price4, price5, discount, path, alarm_day"
+	      ", price4, price5, discount, path, alarm_day, comment"
 	      ", shop, merchant, last_sell, change_date, entry_date)"
 	      " values("
 	      ++ "\"" ++ ?to_s(-1) ++ "\","
@@ -136,6 +138,7 @@ good_new(Merchant, UseZero, GetShop, Attrs) ->
 	      ++ ?to_s(Discount) ++ ","
 	      ++ "\"" ++ ?to_s(Path) ++ "\","
 	      ++ ?to_s(AlarmDay) ++ ","
+	      ++ "\"" ++ ?to_s(Comment) ++ "\","
 	      ++ ?to_s(Shop) ++ ","
 	      ++ ?to_s(Merchant) ++ ","
 	      ++ "\"" ++ ?to_s(Date) ++ "\","
@@ -185,7 +188,7 @@ good(detail, Merchant, Conditions) ->
 	", brand as brand_id, firm as firm_id, type as type_id"
 	", sex, color, year, season, size, s_group, free"
 	", org_price, tag_price" ", pkg_price, price3, price4, price5"
-	", discount, path, entry_date"
+	", discount, path, comment, entry_date"
 	" from w_inventory_good"
 	" where "
 	++ ?sql_utils:condition(proplists_suffix, NewConditions)
@@ -270,7 +273,7 @@ good_match(style_number_brand_firm, Merchant, StyleNumber, Firm) ->
 	", a.type as type_id, a.firm as firm_id"
 	", a.sex, a.color, a.year, a.season, a.size, a.s_group, a.free"
 	", a.org_price, a.tag_price, a.pkg_price, a.price3, a.price4, a.price5"
-	", a.discount, a.path, a.alarm_day, a.entry_date" 
+	", a.discount, a.path, a.alarm_day, a.comment, a.entry_date" 
 	", b.name as brand"
 	", c.name as type"
 	" from w_inventory_good a, brands b, inv_types c"
@@ -289,7 +292,7 @@ good_match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
 	", a.type as type_id, a.firm as firm_id"
 	", a.sex, a.color, a.year, a.season, a.size, a.s_group, a.free"
 	", a.org_price, a.tag_price, a.pkg_price, a.price3, a.price4, a.price5"
-	", a.discount, a.path, a.alarm_day, a.entry_date"
+	", a.discount, a.path, a.alarm_day, a.comment, a.entry_date"
 	
 	", b.name as brand"
 	", c.name as type"
@@ -873,7 +876,7 @@ inventory_match(all_inventory, Merchant, Shop, Conditions) ->
     "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
 	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
 	", a.org_price, a.tag_price, a.pkg_price"
-	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day, a.comment"
 
 	", b.name as brand" 
 	", c.name as type"
@@ -896,7 +899,7 @@ inventory_match(Merchant, StyleNumber, Shop, Firm) ->
     "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
 	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
 	", a.org_price, a.tag_price, a.pkg_price"
-	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day, a.comment"
 	
 	", b.name as brand" 
 	", c.name as type"
@@ -924,7 +927,7 @@ inventory_match(all_reject, Merchant, Shop, Firm, StartTime) ->
     "select a.id, a.style_number, a.brand as brand_id, a.type as type_id"
 	", a.sex, a.season, a.firm as firm_id, a.s_group, a.free, a.year"
 	", a.org_price, a.tag_price, a.pkg_price"
-	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day"
+	", a.price3, a.price4, a.price5, a.discount, a.path, a.alarm_day, a.comment"
 
 	", b.name as brand" 
 	", c.name as type"
@@ -1046,7 +1049,8 @@ amount_new(RSN, Merchant, Shop, Firm, Date, CurDateTime, Inv, Amounts) ->
     P5          = ?v(<<"p5">>, Inv),
     Discount    = ?v(<<"discount">>, Inv),
     Path        = ?v(<<"path">>, Inv, []),
-    AlarmDay    = ?v(<<"alarm_day">>, Inv, 7), 
+    AlarmDay    = ?v(<<"alarm_day">>, Inv, 7),
+    Comment     = ?v(<<"comment">>, Inv, []),
 
     %% InventoryExist = ?sql_utils:execute(s_read, Sql0),
 
@@ -1065,7 +1069,7 @@ amount_new(RSN, Merchant, Shop, Firm, Date, CurDateTime, Inv, Amounts) ->
 		 ", style_number, brand, type, sex, season, amount"
 		 ", firm, s_group, free, year"
 		 ", org_price, tag_price, pkg_price, price3"
-		 ", price4, price5, discount, path, alarm_day"
+		 ", price4, price5, discount, path, alarm_day, comment"
 		 ", shop, merchant, last_sell, change_date, entry_date)"
 		 " values("
 		 ++ "\"" ++ ?to_s(-1) ++ "\","
@@ -1090,6 +1094,7 @@ amount_new(RSN, Merchant, Shop, Firm, Date, CurDateTime, Inv, Amounts) ->
 		 ++ ?to_s(Discount) ++ ","
 		 ++ "\"" ++ ?to_s(Path) ++ "\","
 		 ++ ?to_s(AlarmDay) ++ ","
+		 ++ "\"" ++ ?to_s(Comment) ++ "\","
 		 ++ ?to_s(Shop) ++ ","
 		 ++ ?to_s(Merchant) ++ ","
 		 ++ "\"" ++ ?to_s(Date) ++ "\","
