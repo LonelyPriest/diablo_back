@@ -65,6 +65,9 @@
 %% calendar:datetime_to_gregorian_seconds({{1970, 1, 1}, {0,0,0}}).
 -define(SECONDS_BEFOR_1970, 62167219200).
 
+%% second
+-define(ONE_DAY, (24 * 60 * 60)).
+
 %% session
 -define(QZG_DY_SESSION, "qzg_dyty_session").
 
@@ -273,12 +276,19 @@
 
 %% report
 -define(daily_wreport,   ?right_w_report + 1).
--define(weekly_wreport,  ?right_w_report + 2).
--define(monthly_wreport, ?right_w_report + 3).
--define(quarter_wreport, ?right_w_report + 4).
--define(half_wreport,    ?right_w_report + 5).
--define(year_wreport,    ?right_w_report + 6).
+%% -define(weekly_wreport,  ?right_w_report + 2).
+%% -define(monthly_wreport, ?right_w_report + 3).
+%% -define(quarter_wreport, ?right_w_report + 4).
+%% -define(half_wreport,    ?right_w_report + 5).
+%% -define(year_wreport,    ?right_w_report + 6).
 -define(print_wreport,   ?right_w_report + 7).
+
+%% -define(daily_wreport,   ?right_w_report + 1).
+-define(stock_stastic,   ?right_w_report + 2).
+-define(h_daily_wreport, ?right_w_report + 3).
+-define(syn_daily_report, ?right_w_report + 5).
+-define(h_month_wreport, ?right_w_report + 6).
+%% -define(export_month_report, ?right_w_report + 7).
 
 
 %% -----------------------------------------------------------------------------
@@ -385,10 +395,14 @@
 -define(w_transfer_sql, diablo_purchaser_transfer).
 
 %% report
+-define(gen_report, diablo_auto_gen_report).
 -define(w_report_request, diablo_w_report_request).
 -define(w_report, diablo_w_report).
 -define(w_report_sql, diablo_w_report_sql).
 
+-define(w_report2_request, diablo_w_report2_request).
+-define(w_report2, diablo_w_report2).
+-define(w_report2_sql, diablo_w_report2_sql).
 
 %% base setting
 -define(w_base_request, diablo_w_base_request).
@@ -405,6 +419,12 @@
 
 %% wechat
 -define(wechat_request, diablo_wechat_request).
+
+%% cron
+-define(cron_agent, diablo_cron_agent).
+-define(cron_control, diablo_cron_control).
+-define(cron_job_regist, diablo_cron_job_register).
+-define(cron, diablo_cron).
 
 -define(value(Key, Proplists), diablo_controller_utils:value_from_proplists(Key, Proplists)).
 -define(value(Key, Proplists, Default), proplists:get_value(Key, Proplists, Default)).

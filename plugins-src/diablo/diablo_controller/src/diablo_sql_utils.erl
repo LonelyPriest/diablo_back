@@ -6,6 +6,9 @@
 -compile(export_all).
 
 
+cut(non_prefix, Fields) ->
+    cut(fields_no_prifix, Fields);
+
 cut(fields_no_prifix, Fields) ->
     StartTime = ?value(<<"start_time">>, Fields),
     EndTime   = ?value(<<"end_time">>, Fields),

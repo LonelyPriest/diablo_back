@@ -764,6 +764,8 @@ create table w_sale_detail(
     total          INTEGER default 0,
     sell_style     TINYINT default -1,
     second         TINYINT default 0,
+
+    org_price      DECIMAL(10, 2) default 0,
     fdiscount      DECIMAL(3, 0), -- max: 100
     fprice         DECIMAL(10, 2) default 0, -- max: 99999999.99, left blance 
     path           VARCHAR(255) default null, -- the image path
@@ -805,5 +807,51 @@ create table trace_retailer_balance(
     key         dk (merchant, retailer),
     primary key    (id)
 )default charset=utf8;
+
+
+/*
+* daily record
+*/
+create table w_daily_report(
+    id              INTEGER AUTO_INCREMENT,
+
+    merchant        INTEGER not null default -1,
+    shop            INTEGER not null default -1,
+
+    sell            INTEGER not null default -1,
+    sell_cost       DECIMAL(10, 2) not null default 0,
+    should_pay      DECIMAL(10, 2) not null default 0,
+    has_pay         DECIMAL(10, 2) not null default 0,
+    
+    cash            DECIMAL(10, 2) not null default 0,
+    card            DECIMAL(10, 2) not null default 0,
+    wire            DECIMAL(10, 2) not null default 0,
+    veri            DECIMAL(10, 2) not null default 0,
+
+    stockc          INTEGER not null default -1,
+    stock           INTEGER not null default -1,
+    stock_cost      DECIMAL(10, 2) not null default 0,
+
+    stock_in        INTEGER not null default -1,
+    stock_out       INTEGER not null default -1,
+    stock_in_cost   DECIMAL(10, 2) not null default 0,
+    stock_out_cost  DECIMAL(10, 2) not null default 0,
+
+    t_stock_in       INTEGER not null default -1,
+    t_stock_out      INTEGER not null default -1,
+    t_stock_in_cost  DECIMAL(10, 2) not null default 0,
+    t_stock_out_cost DECIMAL(10, 2) not null default 0,
+
+    stock_fix        INTEGER not null default -1,
+    stock_fix_cost   DECIMAL(10, 2) not null default 0,
+
+    day             DATE default 0,
+    entry_date      DATETIME default 0,
+
+    unique key uk (merchant, shop, day),
+    key     dk (merchant, shop),
+    primary key    (id)
+
+) default charset=utf8;
 
 

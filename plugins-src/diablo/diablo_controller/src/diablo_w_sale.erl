@@ -1174,7 +1174,7 @@ wsale(update, RSN, DateTime, Merchant, Shop, Inventory) ->
 		?DEBUG("Attr ~p", [Attr]),
 		Color = ?v(<<"cid">>, Attr),
 		Size  = ?v(<<"size">>, Attr),
-		Count = ?v(<<"count">>, Attr),
+		Count = ?v(<<"count">>, Attr), 
 
 		case ?v(<<"operation">>, Attr) of 
 		    <<"a">> ->
@@ -1542,11 +1542,13 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
      case ?sql_utils:execute(s_read, Sql00) of
 	 {ok, []} ->
 	     "insert into w_sale_detail("
-		 "rsn, style_number, brand, type, s_group, free"
+		 "rsn, merchant, shop, style_number, brand, type, s_group, free"
 		 ", season, firm, year, hand, total, sell_style, second, fdiscount"
 		 ", fprice, path, comment, entry_date)"
 		 " values("
 		 ++ "\"" ++ ?to_s(RSN) ++ "\","
+		 ++ ?to_s(Merchant) ++ ","
+		 ++ ?to_s(Shop) ++ "," 
 		 ++ "\"" ++ ?to_s(StyleNumber) ++ "\","
 		 ++ ?to_s(Brand) ++ "," 
 		 ++ ?to_s(Type) ++ ","
@@ -1601,9 +1603,11 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 		   
 		   case ?sql_utils:execute(s_read, Sql01) of
 		       {ok, []} ->
-			   "insert into w_sale_detail_amount(rsn, style_number"
+			   "insert into w_sale_detail_amount(rsn, merchant, shop, style_number"
 			       ", brand, color, size, total, entry_date) values("
 			       ++ "\"" ++ ?to_s(RSN) ++ "\","
+			       ++ ?to_s(Merchant) ++ ","
+			       ++ ?to_s(Shop) ++ ","
 			       ++ "\"" ++ ?to_s(StyleNumber) ++ "\","
 			       ++ ?to_s(Brand) ++ ","
 			       ++ ?to_s(Color) ++ ","

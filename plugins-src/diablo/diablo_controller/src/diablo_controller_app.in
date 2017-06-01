@@ -24,7 +24,7 @@
      %% about sql
      diablo_pagination,                 diablo_sql_utils,
      diablo_purchaser_sql,              diablo_w_report_sql,
-     diablo_purchaser_transfer,
+     diablo_purchaser_transfer,         diablo_w_report2_sql,
      
      %% model
      diablo_controller_member_request,    diablo_controller_member,
@@ -47,6 +47,13 @@
      diablo_wechat_request,
      %% report
      diablo_w_report_request, diablo_w_report,
+     diablo_w_report2_request, diablo_w_report2,
+
+     diablo_auto_gen_report,
+     %% cron
+     diablo_cron_agent, diablo_cron,
+     diablo_cron_job_register, diablo_cron_control,
+
      %% base
      diablo_w_base_request,    diablo_w_base, 
      

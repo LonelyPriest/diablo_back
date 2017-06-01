@@ -270,3 +270,15 @@ write(Fd, Content) ->
 	{error, Error} ->
 	    throw({error, Error})
     end.
+
+
+-spec epoch_seconds/0 :: () -> diablo_cron:seconds().
+epoch_seconds() -> 
+    {Megasecs, Secs, Microsecs} = os:timestamp(),
+    erlang:trunc((Megasecs * 1000000) + Secs + (Microsecs / 1000000)).
+
+to_utf8(from_latin1, S) ->
+    unicode:characters_to_list(S, utf8).
+to_gbk(from_latin1, S) -> 
+    U8 = to_utf8(from_latin1, S),
+    diablo_iconv:convert("utf-8", "gbk", U8).

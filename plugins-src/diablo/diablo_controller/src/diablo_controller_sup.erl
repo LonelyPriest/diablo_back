@@ -156,11 +156,34 @@ init([]) ->
 	{diablo_w_report,
 	 {diablo_w_report, start_link, []},
 	 Restart, Shutdown, Type, [diablo_w_report]},
+
+    %% wreport
+    WReport2 = 
+	{diablo_w_report2,
+	 {diablo_w_report2, start_link, []},
+	 Restart, Shutdown, Type, [diablo_w_report2]},
+
+     WGenReport =
+        {diablo_auto_gen_report,
+         {diablo_auto_gen_report, start_link, []},
+         Restart, Shutdown, Type, [diablo_auto_gen_report]},
+
+    %% about cron
+    CronRegister =
+        {diablo_cron_job_register,
+         {diablo_cron_job_register, start_link, []},
+         Restart, Shutdown, Type, [diablo_cron_job_register]},
+
+    CronController =
+        {diablo_cron_control,
+         {diablo_cron_control, start_link, []},
+         Restart, Shutdown, Type, [diablo_cron_control]},
     
     %% WholeSale = [WInventory, WRetailer, WSale, WSaleDraft,
     %% 		 WPrint, WBase, WProfile, HttpPrint, WReport],
 
-    WholeSale = [WPrint, WBase, WProfile, HttpPrint, WReport],
+    WholeSale = [WPrint, WBase, WProfile, HttpPrint, WReport, WReport2,
+		 WGenReport, CronRegister, CronController],
 
     WRetailerSup = ?to_a(lists:concat([?w_retailer, "_sup"])),
     WRetailerPoolSup = {
@@ -182,9 +205,15 @@ init([]) ->
     WSaleSup = ?to_a(?to_s(?w_sale) ++ "_sup"), 
     WSalePoolSup = {WSaleSup,
 		    {diablo_work_pool_sup, start_link, [?w_sale]},
-		    Restart, Shutdown, supervisor, [WSaleSup]}, 
+		    Restart, Shutdown, supervisor, [WSaleSup]},
+
+    CronSup = ?to_a(?to_s(?cron_agent) ++ "_sup"),
+    CronPoolSup = {CronSup,
+                   {diablo_work_pool_sup, start_link, [?cron_agent]},
+                   Restart, Shutdown, supervisor, [CronSup]},
     
-    PoolSup = [WRetailerPoolSup, WInvPoolSup, WSalePoolSup],
+    
+    PoolSup = [WRetailerPoolSup, WInvPoolSup, WSalePoolSup, CronPoolSup],
 
     {ok, {SupFlags, [IConv, Mysql, Employ, Merchant,
     		     Shop, Right, Supplier,

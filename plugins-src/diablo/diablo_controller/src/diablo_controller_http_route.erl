@@ -45,6 +45,7 @@ url_match(get) ->
     %% wgood
 	++ register_e(wgood,      ?w_good_request)
 	++ register_e(wreport,    ?w_report_request)
+	++ register_e(wreport2,   ?w_report2_request)
     %% base setting
 	++ register_e(wbase,      ?w_base_request)
     %% wechat
@@ -69,6 +70,7 @@ url_match(delete) ->
 	++ register_e(wprint,     ?w_print_request) 
 	++ register_e(wgood,      ?w_good_request)
 	++ register_e(wreport,    ?w_report_request)
+	++ register_e(wreport2,   ?w_report2_request)
     %% base setting
 	++ register_e(wbase,      ?w_base_request)
 	.
@@ -93,6 +95,7 @@ url_match(post, Payload) ->
 	++ register_e(wprint,     ?w_print_request, Payload) 
 	++ register_e(wgood,      ?w_good_request, Payload)
 	++ register_e(wreport,    ?w_report_request, Payload)
+	++ register_e(wreport2,   ?w_report2_request, Payload)
     %% base setting
 	++ register_e(wbase,       ?w_base_request, Payload)
 	.

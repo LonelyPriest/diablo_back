@@ -23,6 +23,9 @@ start(normal, _StartArgs) ->
 	    %% ok = diablo_controller_mq_handler:connect(),
 	    ok = diablo_controller_http_server:start(),
 
+	    %% report
+            ok = diablo_auto_gen_report:report(stastic_per_shop, {2, 0, am}),
+
 	    %% init right data
 	    %% ok = diablo_controller_right_init:init(),
 	    {ok, Pid};

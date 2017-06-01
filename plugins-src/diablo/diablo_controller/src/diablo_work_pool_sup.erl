@@ -17,7 +17,7 @@
 -export([start_link/1, get/2, terminate/2]).
 
 %% Supervisor callbacks
--export([init/1]).
+-export([init/1, add_cron_job/2]).
 
 -define(SERVER, ?MODULE).
 
@@ -56,6 +56,11 @@ terminate(M, Merchant) ->
 			  [Module, Error])
 	    end
     end.
+
+add_cron_job(JobRef, Job) -> 
+    Sup = ?to_a( "diablo_cron_agent" ++ "_sup"),
+    {ok, _PId} = supervisor:start_child(Sup, [JobRef, Job]),
+    JobRef.
 
 %%%===================================================================
 %%% Supervisor callbacks
