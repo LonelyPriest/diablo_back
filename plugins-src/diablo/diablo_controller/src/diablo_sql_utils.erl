@@ -102,6 +102,14 @@ time_condition(Time, TimeField, le) ->
 	undefined -> [];
 	Time ->
 	    ?to_s(TimeField) ++ "<\"" ++ ?to_s(Time) ++ "\""
+    end;
+
+time_condition(Time, TimeField, less) ->
+    case Time of
+        undefined ->
+	    [];
+	Time ->
+	    ?to_s(TimeField) ++ "<\"" ++ ?to_s(Time) ++ "\""
     end.
 
 count_table(Table, Merchant, Conditions) ->

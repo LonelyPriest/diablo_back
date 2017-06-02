@@ -370,19 +370,19 @@ init([]) ->
 
     WReport =
 	[{?daily_wreport,
-	  <<"日报表">>,   <<"daily_wreport">>, ?right_w_report},
-	 {?weekly_wreport,
-	  <<"周报表">>,   <<"weekly_wreport">>, ?right_w_report},
-	 {?monthly_wreport,
-	  <<"月报表">>,   <<"monthly_wreport">>, ?right_w_report},
-	 {?quarter_wreport,
-	  <<"季度报表">>, <<"quarter_wreport">>, ?right_w_report},
-	 {?half_wreport,
-	  <<"年中报表">>, <<"half_wreport">>, ?right_w_report},
-	 {?year_wreport,
-	  <<"年报表">>,  <<"year_wreport">>, ?right_w_report},
-	 {?print_wreport,
-	  <<"报表打印">>, <<"print_wreport">>, ?right_w_report} 
+	  <<"日报表">>,   <<"daily_wreport">>, ?right_w_report}
+	 %% {?weekly_wreport,
+	 %%  <<"周报表">>,   <<"weekly_wreport">>, ?right_w_report},
+	 %% {?monthly_wreport,
+	 %%  <<"月报表">>,   <<"monthly_wreport">>, ?right_w_report},
+	 %% {?quarter_wreport,
+	 %%  <<"季度报表">>, <<"quarter_wreport">>, ?right_w_report},
+	 %% {?half_wreport,
+	 %%  <<"年中报表">>, <<"half_wreport">>, ?right_w_report},
+	 %% {?year_wreport,
+	 %%  <<"年报表">>,  <<"year_wreport">>, ?right_w_report},
+	 %% {?print_wreport,
+	 %%  <<"报表打印">>, <<"print_wreport">>, ?right_w_report} 
 	],
     
     %% rainbow
@@ -900,7 +900,10 @@ pass_action(wholesaler) ->
 	 
      <<"delete_expire_data">>,
 
-     <<"daily_bill">>
+     <<"daily_bill">>,
      %% shop
      %% <<"list_repo">>
+	 
+     %% report
+     <<"h_daily_wreport">>
     ].
