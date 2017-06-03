@@ -188,6 +188,8 @@ success(add_wprinter_format_to_shop, Shop) ->
 %% report
 success(print_wreport, _None) ->
     {0, "Success to print report."};
+success(syn_daily_report, Merchant) ->
+    {0, "Success to syn daily report or merchant ~p " ++ ?to_s(Merchant)};
 
 %% base
 success(base_new_card, CardNo) ->

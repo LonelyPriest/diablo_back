@@ -905,5 +905,6 @@ pass_action(wholesaler) ->
      %% <<"list_repo">>
 	 
      %% report
-     <<"h_daily_wreport">>
+     <<"h_daily_wreport">>,
+     <<"syn_daily_report">>
     ].

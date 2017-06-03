@@ -92,7 +92,15 @@ handle_call({syn_stastic_per_shop, Merchant, Conditions}, _From, State) ->
     ?DEBUG("syn_stastic_per_shop: merchant ~p, conditions ~p", [Merchant, Conditions]),
     StartTime = ?v(<<"start_time">>, Conditions),
     EndTime = ?v(<<"end_time">>, Conditions),
-    Shops = ?v(<<"shop">>, Conditions),
+    Shops = case ?v(<<"shop">>, Conditions) of
+		undefined ->
+		    {ok, AllShops} = ?w_user_profile:get(shop, Merchant),
+		    lists:foldr(fun({Shop}, Acc) ->
+					[?v(<<"id">>, Shop)|Acc]
+				end, [], AllShops);
+		_Shops ->
+		    _Shops
+	    end,
 
     StartDays = calendar:date_to_gregorian_days(?utils:to_date(datetime, StartTime)),
     EndDays = calendar:date_to_gregorian_days(?utils:to_date(datetime, EndTime)),
@@ -160,7 +168,7 @@ code_change(_OldVsn, State, _Extra) ->
 syn_stastic_per_shop(_Merchant, _Shop, StartDay, EndDay) when StartDay >= EndDay -> 
     ok;
 syn_stastic_per_shop(Merchant, Shop, StartDay, EndDay) ->
-    {ok, BaseSetting} = ?wifi_print:detail(base_setting, Merchant, Shop),
+    {BaseSetting, _} = ?wifi_print:detail(base_setting, Merchant, Shop),
     Date = calendar:gregorian_days_to_date(StartDay),
     {BeginOfDay, EndOfDay} = day(begin_to_end, Date),
     
@@ -181,10 +189,14 @@ syn_stastic_per_shop(Merchant, Shop, StartDay, EndDay) ->
     %% LastStockTotal = stock(last_stock, LastStockInfo),
 
     {ok, SaleInfo} = ?w_report2:stastic(stock_sale, Merchant, Conditions),
+    ?DEBUG("SaleInfo ~p", [SaleInfo]),
     {ok, SaleProfit} = ?w_report2:stastic(stock_profit, Merchant, Conditions),
+    ?DEBUG("SaleProfit ~p", [SaleProfit]),
 
     {ok, StockIn}  = ?w_report2:stastic(stock_in, Merchant, Conditions),
+    ?DEBUG("StockIn ~p", [StockIn]),
     {ok, StockOut} = ?w_report2:stastic(stock_out, Merchant, Conditions),
+    ?DEBUG("StockOut ~p", [StockOut]),
 
     %% {ok, StockTransferIn} = ?w_report2:stastic(stock_transfer_in, Merchant, Conditions),
     %% {ok, StockTransferOut} = ?w_report2:stastic(stock_transfer_out, Merchant, Conditions),

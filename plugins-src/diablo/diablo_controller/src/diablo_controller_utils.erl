@@ -45,6 +45,51 @@ current_time(db) ->
 current_time(db_unix_timestamp) ->
     "UNIX_TIMESTAMP()".
 
+
+correct_datetime(datetime, Datetime) ->
+    
+    {{Year, Month, Date}, {Hour, Minute, Second}} = calendar:now_to_local_time(erlang:now()),
+    case Datetime of
+        undefined ->
+	    Time = lists:flatten(
+		     io_lib:format("~4..0w-~2..0w-~2..0w ~2..0w:~2..0w:~2..0w",
+				   [Year, Month, Date, Hour, Minute, Second])),
+	    %% ?DEBUG("time ~p", [Time]),
+	    Time;
+	Datetime ->
+	    Time = ?to_b(
+                      lists:flatten(
+                        io_lib:format("~2..0w:~2..0w:~2..0w", [Hour, Minute, Second]))),
+            <<YYMMDD:10/binary, _/binary>> = Datetime,
+            <<YYMMDD/binary, <<" ">>/binary, Time/binary>>
+    end.
+
+
+-spec to_date/2::(atom(), binary()|string()) -> calendar:date().
+to_date(datetime, Datetime) when is_list(Datetime)-> 
+    <<YYMMDD:10/binary, _/binary>> = ?to_b(Datetime),
+    to_date(date, YYMMDD);
+
+to_date(datetime, Datetime) ->
+    <<YYMMDD:10/binary, _/binary>> = Datetime,
+    to_date(date, YYMMDD);
+
+to_date(date, Date) ->
+    SDate = ?to_s(Date),
+    [Y, M, D] = string:tokens(SDate, "-"),
+    {?to_i(Y), ?to_i(M), ?to_i(D)}.
+
+
+datetime2seconds(Datetime) when is_binary(Datetime)->
+    <<YY:4/binary, "-",  MM:2/binary, "-", DD:2/binary, " ",
+      HH:2/binary, ":", MMM:2/binary, ":", SS:2/binary>> = Datetime,
+
+    calendar:datetime_to_gregorian_seconds({{?to_i(YY), ?to_i(MM), ?to_i(DD)},
+                                            {?to_i(HH), ?to_i(MMM), ?to_i(SS)}});
+datetime2seconds(Datetime) ->
+    datetime2seconds(?to_b(Datetime)).
+
+
 respond(batch, Fun, Req) ->
     case Fun() of
 	{ok, Values} ->
