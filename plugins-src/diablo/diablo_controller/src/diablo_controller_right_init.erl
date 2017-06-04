@@ -906,5 +906,6 @@ pass_action(wholesaler) ->
 	 
      %% report
      <<"h_daily_wreport">>,
+     <<"h_month_wreport">>,
      <<"syn_daily_report">>
     ].

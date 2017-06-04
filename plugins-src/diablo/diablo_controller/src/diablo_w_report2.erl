@@ -298,7 +298,13 @@ handle_call({by_good, Merchant, CurrentPage, ItemsPerPage, Conditions},
 handle_call({stock_sale_detail, Merchant, Conditions}, _From, State)->
     ?DEBUG("stock_sale_detail: merchant ~p, Conditions ~p", [Merchant, Conditions]),
     {StartTime, EndTime, NewConditions} = ?sql_utils:cut(non_prefix, Conditions),
-    Sql = "select style_number, brand as brand_id, merchant, shop as shop_id, firm as firm_id"
+    Sql = "select style_number"
+	", brand as brand_id"
+	", merchant"
+	", shop as shop_id"
+	", firm as firm_id"
+	", type as type_id"
+	
 	", sum(total) as total"
 	" from w_sale_detail"
 	" where merchant=" ++ ?to_s(Merchant)
@@ -506,7 +512,9 @@ handle_call({month_report_by_shop, Merchant, Conditions}, _From, State) ->
     Sql = "select merchant, shop as shop_id"
 	", SUM(sell) as sell"
 	", SUM(sell_cost) as sell_cost"
-	", SUM(balance) as balance"
+	", SUM(should_pay) as should_pay"
+	", SUM(has_pay) as has_pay"
+	
 	", SUM(cash) as cash"
 	", SUM(card) as card"
 	", SUM(wire) as wire"
