@@ -575,7 +575,7 @@ function wsaleNewProvide(
 	add.season       = src.season;
 	add.year         = src.year;
 
-	// add.org_price    = good.org_price;
+	add.org_price    = src.org_price;
 	add.tag_price    = src.tag_price;
 	add.pkg_price    = src.pkg_price;
 	add.price3       = src.price3;
@@ -865,6 +865,7 @@ function wsaleNewProvide(
 		year        : add.year,
 		sell_total  : parseInt(add.sell),
 		hand        : amount_info.hand,
+		org_price   : add.org_price,
 		fdiscount   : seti(add.fdiscount),
 		fprice      : setv(add.fprice),
 		path        : sets(add.path),

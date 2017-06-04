@@ -1490,6 +1490,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
     Second      = ?v(<<"second">>, Inventory, 0),
     Brand       = ?v(<<"brand">>, Inventory),
     Type        = ?v(<<"type">>, Inventory),
+    OrgPrice    = ?v(<<"org_price">>, Inventory, 0),
     FDiscount   = ?v(<<"fdiscount">>, Inventory, 100), 
     FPrice      = ?v(<<"fprice">>, Inventory),
     Firm        = ?v(<<"firm">>, Inventory),
@@ -1543,7 +1544,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 	 {ok, []} ->
 	     "insert into w_sale_detail("
 		 "rsn, merchant, shop, style_number, brand, type, s_group, free"
-		 ", season, firm, year, hand, total, sell_style, second, fdiscount"
+		 ", season, firm, year, hand, total, sell_style, second, org_price, fdiscount"
 		 ", fprice, path, comment, entry_date)"
 		 " values("
 		 ++ "\"" ++ ?to_s(RSN) ++ "\","
@@ -1563,6 +1564,7 @@ wsale(Action, RSN, DateTime, Merchant, Shop, Inventory, Amounts) ->
 		 ++ ?to_s(Total) ++ ","
 		 ++ ?to_s(SellStyle) ++ ","
 		 ++ ?to_s(Second) ++ ","
+		 ++ ?to_s(OrgPrice) ++ ","
 		 ++ ?to_s(FDiscount) ++ ","
 		 ++ ?to_s(FPrice) ++ ","
 		 ++ "\"" ++ ?to_s(Path) ++ "\","

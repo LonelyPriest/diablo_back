@@ -648,7 +648,9 @@ handle_call({update_good, Merchant, Attrs}, _Form, State) ->
 		    [ "update w_sale_detail set "
 		      ++ ?utils:to_sqls(
 			    proplists, comma,
-			    Update2 ++ ?utils:v(path, string, Path))
+			    Update2
+			    ++ ?utils:v(path, string, Path)
+			    ++ ?utils:v(org_price, float, OrgPrice))
 		      ++ " where "
 		      ++ RC(OrgStyleNumber, OrgBrand),
 
