@@ -344,6 +344,12 @@ var version_update = function(){
 		content += s + c + e;
 	    }
 
+	    var apk = "<div class='update-content'>"
+                + "<a type='button' href='/qzg-release2017-10-13_23-29-06.apk' download=''>"
+                + "<h5 class='text-center fg-pink'>钱掌柜批发云平台(安卓版)下载</h5>"
+                + "</a>"
+                + "</div>"
+            $('body').append(apk); 
 	    $('body').append(content);
 		// .append("<div class='copyright'><span> 2015-2025 &copy;&nbsp钱掌柜&nbsp&nbsp&nbsp&nbsp</span>"
 		// 			     + "<span><i class='glyphicon glyphicon-star'></i>"
