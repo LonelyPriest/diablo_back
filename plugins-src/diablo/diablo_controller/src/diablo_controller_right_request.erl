@@ -580,6 +580,7 @@ login_user(shop, Session) ->
 	      fun({AShop}, Acc) ->
 		      [{[{<<"shop_id">>, ?v(<<"id">>,   AShop)},
 			 {<<"name">>,    ?v(<<"name">>, AShop)},
+			 {<<"address">>, ?v(<<"address">>, AShop)},
 			 {<<"repo_id">>, ?v(<<"repo">>, AShop)},
 			 {<<"type">>,    ?v(<<"type">>, AShop)},
 			 {<<"func_id">>,
