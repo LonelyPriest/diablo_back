@@ -600,7 +600,7 @@ handle_call({lookup_role_right, Condition}, _From, State) ->
 handle_call({lookup_role_shop, Condition}, _From, State) ->
     ?DEBUG("lookup_role_shop with Condition ~p", [Condition]),
     CorrectCondition = ?utils:correct_condition(<<"a.">>, Condition),
-    Sql = "select a.func_id, a.shop_id, b.name, b.type, b.repo as repo_id"
+    Sql = "select a.func_id, a.shop_id, b.name, b.address, b.type, b.repo as repo_id"
 	++" from role_to_shop a, shops b"
 	++" where "  ++ ?utils:to_sqls(proplists, CorrectCondition)
 	++" and a.shop_id = b.id and a.deleted=" ++ ?to_s(?NO) ++ ";",
