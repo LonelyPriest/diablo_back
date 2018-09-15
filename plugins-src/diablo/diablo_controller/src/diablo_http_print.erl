@@ -2107,7 +2107,7 @@ start_print(rcloud, Brand, Model, Height, SN, Key, Path, {IsPage, Body})  ->
     
     try 
 	%% query state 
-	{ok, SN} = get_printer_state(Path, SN, Key, CureentTimeTicks), 
+	%% {ok, SN} = get_printer_state(Path, SN, Key, CureentTimeTicks), 
 
 	%% GBKBodys = 
 	%%     lists:foldr(
