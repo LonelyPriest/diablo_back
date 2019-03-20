@@ -1,34 +1,150 @@
 <div class="row">
-  
-  <div x-ng-if="pbase.pstyle===1" class="print-font text-center">
-    <h4><strong>{{p_shop.name}}</strong></h4>
-    <h5><strong>{{p_shop.address}}</strong></h5>
+  <div class="col-md-12">
+    <div class="portlet box purple table-panel">
 
-    <p>单号：{{p_sale.rsn}}&nbsp;&nbsp;&nbsp;&nbsp;客户：{{p_sale.retailer}}&nbsp;&nbsp;&nbsp;&nbsp;
-      店员：{{p_sale.employee}}&nbsp;&nbsp;&nbsp;&nbsp;日期：{{p_sale.entry_date}}</p>
+      <div class="portlet-title">
+        <div class="caption">
+          <i class="glyphicon glyphicon-menu-hamburger"></i>销售单打印</div>
 
-    <table class="table table-bordered table-striped table-condensed table-advanced">
-      <thead>
-	<tr>
-	  <th class="text-center" x-ng-if="p.p_brand">品牌</th>
-	  <th class="text-center" x-ng-if="p.style_number">款号</th>
-	  <th class="text-center" x-ng-if="p.type">类型</th>
-	  <th class="text-center" x-ng-if="p.color">颜色</th>
-	  <th class="text-center" x-ng-if="p.size" x-ng-repeat="s in [1,2,3]">
-	    {{s}}
-	  </th>
-	  <!-- <th class="text-center" x-ng-if="p.size">尺码</th> -->
-	  <th class="text-center" x-ng-if="p.price">单价</th>
-	  <th class="text-center" x-ng-if="p.discount">折扣</th>
-	  <th class="text-center" x-ng-if="p.dprice">折后价</th>
-	  <th class="text-center" x-ng-if="p.count">数量</th>
-	  <th class="text-center" x-ng-if="p.calc">小计</th>
-	</tr>
-      </thead>
-    </table>
+        <div class="actions">
+          <button class="btn red" type="button"
+                  x-ng-click="go_back()">返回
+            <i class="glyphicon glyphicon-circle-arrow-left"></i></button>
 
+          <button class="btn green" type="button"
+                  x-ng-click="print()">打印
+            <i class="glyphicon glyphicon-print"></i></button>
+	  
+        </div>
+      </div>
 
+      <div id="saleNew" class="portlet-body">
+	<h2 style="text-align:center">
+	  <span x-ng-bind="sale.shop.name"></span>
+	</h2>
+
+	<h3>
+	  <div style="text-align:center">
+            <span x-ng-bind="sale.shop.addr"></span>
+	  </div>
+	</h3>
+
+	<div style="margin-top:-5px; text-align:center">
+	  <span x-ng-repeat="p in phones">
+            <span><strong>{{p.phone}}</strong></span>
+            <span x-ng-if="p.remark">
+              <span>(</span>
+              <span>{{p.remark}}</span>
+              <span>)</span>
+            </span>
+	  </span>
+	</div>
+
+	<!-- <div> -->
+	<!--   <span x-ng-repeat="p in phones2"> -->
+        <!--     <span>&nbsp;&nbsp;&nbsp;&nbsp;{{p.value}}</span> -->
+        <!--     <span x-ng-if="p.remark"> -->
+        <!--       <span>(</span> -->
+        <!--       <span>{{p.remark}}</span> -->
+        <!--       <span>)</span> -->
+        <!--     </span> -->
+	<!--   </span> -->
+	<!-- </div> -->
+
+	<div style="text-align:center; margin-top:5px">
+	  <span>单号：</span><span x-ng-bind="sale.rsn"></span>
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span>日期：</span><span x-ng-bind="sale.entry_date"></span>
+	</div>
+
+	<div style="text-align:center">
+	  <span>客户：</span><span x-ng-bind="sale.retailer.name"></span>
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span>店员：</span><span x-ng-bind="sale.employee.name"></span>
+	</div>
+
+	<div class="table-responsive" style="margin-top:5px">
+	  <table class="table table-bordered table-striped" style="margin-bottom:5px">
+            <thead>
+              <tr>
+		<th class="text-center">序号</th>
+		<th class="text-center">品牌</th>
+		<th class="text-center">货号</th>
+		<th class="text-center">数量</th>
+		<th class="text-center">单价</th>
+		<th class="text-center">小计</th>
+		<th class="text-center">备注</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr x-ng-repeat="s in notes">
+		<td class="text-center" x-ng-bind="s.order_id"></td>
+		<td class="text-center" x-ng-bind="s.brand.name"></td>
+		<td class="text-center" x-ng-bind="s.style_number"></td>
+		<td class="text-center" x-ng-bind="s.total"></td>
+		<td class="text-center" x-ng-bind="s.fprice"></td>
+		<td class="text-center" x-ng-bind="s.calc"></td>
+		<td class="text-center" x-ng-bind="s.comment"></td>
+              </tr>
+              <tr>
+		<td colspan="3"></td>
+		<td style="text-align:center" x-ng-bind="sale.total"></td>
+		<td></td>
+		<td style="text-align:center" x-ng-bind="sale.should_pay"></td>
+		<td></td>
+              </tr>
+            </tbody>
+
+            <tfoot>
+
+            </tfoot>
+	  </table> <!--END table-->
+	</div>
+
+	<div style="text-align:center">
+	  <span>合计：</span><strong style="font-size:20px;">{{sale.total}}</strong>
+	  &nbsp;&nbsp;<span>售：</span><span style="font-size:20px;">{{sale.sellTotal}}</span>
+	  <span>退：</span><span style="font-size:20px;">{{sale.rejectTotal}}</span>
+	  &nbsp;&nbsp;<span>金额：</span><strong style="font-size:24px;">{{sale.should_pay}}</strong>
+	  &nbsp;&nbsp;<span>备注：</span><span x-ng-bind="sale.comment"></span>
+	</div>
+
+	<div style="text-align:center">
+	  <span>实付：</span><strong style="font-size:24px;">{{sale.has_pay}}</strong>
+	  <span x-ng-if="sale.cash!=0">
+            &nbsp;&nbsp;<span>现金：</span><strong style="font-size:24px;">{{sale.cash}}</strong>
+	  </span>
+	  <span x-ng-if="sale.card!=0">
+            &nbsp;&nbsp;<span>刷卡：</span><strong style="font-size:24px;">{{sale.card}}</strong>
+	  </span>
+	  <span x-ng-if="sale.wire!=0">
+            &nbsp;&nbsp;<span>汇款：</span><strong style="font-size:24px;">{{sale.wire}}</strong>
+	  </span> 
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span>上欠：</span><strong style="font-size:24px;">{{sale.balance}}</strong>
+	  &nbsp;&nbsp;<span>本欠：</span><strong style="font-size:24px;">{{sale.curBalance}}</strong>
+	  <span>累欠：</span><strong style="font-size:24px;">{{sale.accBalance}}</strong>
+	</div>
+
+	<div style="margin-top:15px; text-align:center">
+	  <div x-ng-repeat="c in bankCards">
+            <span>{{c.name}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span>{{c.bank}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span><strong>{{c.no}}</strong></span>
+	  </div>
+	</div>
+
+	<div style="margin-top:15px">
+	  <div><strong style="font-size:18px;">顾客说明：</strong></div>
+	  <span x-ng-repeat="c in comments">
+            <span><strong>{{c.order}}：</strong></span><span>{{c.comment}}</span>
+	  </span>
+	</div>
+
+	<div>
+
+	</div>
+
+      </div>
+      
+    </div>
   </div>
-  
-  
 </div>

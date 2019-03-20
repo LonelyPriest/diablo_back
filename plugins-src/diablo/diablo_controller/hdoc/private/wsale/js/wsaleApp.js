@@ -70,6 +70,9 @@ function wsaleConfg (angular) {
     	var s_group = {"filterSizeGroup": function(diabloFilter){
     	    return diabloFilter.get_size_group()}};
 
+	var bank = {"filterBank": function(diabloFilter){
+    	    return diabloFilter.get_bank()}};
+
     	var base = {"base": function(diabloNormalFilter){
     	    return diabloNormalFilter.get_base_setting()}};
 	
@@ -115,7 +118,7 @@ function wsaleConfg (angular) {
     	    when('/wsale_print_preview/:rsn?', {
     		templateUrl: '/private/wsale/html/wsale_print_preview.html',
     		controller: 'wsalePrintPreviewCtrl',
-    		resolve: angular.extend({}, retailer, s_group, base) 
+    		resolve: angular.extend({}, user, retailer, employee, brand, type, s_group, bank, base) 
     	    }).
     	    // when('/wsale/reject_wsale_detail', {
     	    //     templateUrl: '/private/wsale/html/reject_wsale_detail.html',
@@ -712,6 +715,8 @@ function wsaleNewDetailProvide(
 		"se_pagination", -1, base, parseInt, diablo_no)
     }();
 
+    $scope.print_tooth = wsaleUtils.print_tooth(base);
+
     // console.log($scope.time);
 
     /*
@@ -874,32 +879,36 @@ function wsaleNewDetailProvide(
     var dialog = diabloUtilsService;
     $scope.print = function(r){
 	// $scope.disable_print = true;
-	wsaleService.print_w_sale(r.rsn).then(function(result){
-	    console.log(result);
-	    // $scope.disable_print = false; 
-	    if (result.ecode == 0){
-		var msg = "";
-		if (result.pcode == 0){
-		    msg = "销售单打印成功！！单号：" + result.rsn + "，请等待服务器打印";
-		    dialog.response(true, "销售单打印", msg, $scope); 
-		} else {
-		    if (result.pinfo.length === 0){
-			msg += wsaleService.error[result.pcode]
+	if ($scope.print_tooth === 2) {
+	    diablo_goto_page("#/wsale_print_preview/" + r.rsn);
+	} else {
+	    wsaleService.print_w_sale(r.rsn).then(function(result){
+		console.log(result);
+		// $scope.disable_print = false; 
+		if (result.ecode == 0){
+		    var msg = "";
+		    if (result.pcode == 0){
+			msg = "销售单打印成功！！单号：" + result.rsn + "，请等待服务器打印";
+			dialog.response(true, "销售单打印", msg, $scope); 
 		    } else {
-			angular.forEach(result.pinfo, function(p){
-			    msg += "[" + p.device + "] " + wsaleService.error[p.ecode]
-			})
-		    };
-		    msg = "销售单打印失败！！单号：" + result.rsn + "，打印失败：" + msg;
-		    dialog.response(false, "销售单打印", msg, $scope); 
+			if (result.pinfo.length === 0){
+			    msg += wsaleService.error[result.pcode]
+			} else {
+			    angular.forEach(result.pinfo, function(p){
+				msg += "[" + p.device + "] " + wsaleService.error[p.ecode]
+			    })
+			};
+			msg = "销售单打印失败！！单号：" + result.rsn + "，打印失败：" + msg;
+			dialog.response(false, "销售单打印", msg, $scope); 
+		    }
+		    
+		} else{
+	    	    dialog.response(
+	    		false, "销售单打印",
+			"销售单打印失败：" + wsaleService.error[result.ecode]);
 		}
-		
-	    } else{
-	    	dialog.response(
-	    	    false, "销售单打印",
-		    "销售单打印失败：" + wsaleService.error[result.ecode]);
-	    }
-	})
+	    })
+	} 
     };
 
     $scope.update_detail = function(r){

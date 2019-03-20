@@ -64,7 +64,15 @@ var wsaleUtils = function(){
 	sys_customer: function(base){
 	    return diablo_base_setting(
 		"s_customer", -1, base, parseInt, 0); 
-	} 
+	},
+
+	print_tooth: function(base) {
+	    return diablo_base_setting("bluetooth", -1, base, parseInt, 0); 
+	},
+
+	print_server: function(base) {
+	    return diablo_base_setting("prn_server", -1, base, function(s) {return s}, ""); 
+	}
     }
 
 }();

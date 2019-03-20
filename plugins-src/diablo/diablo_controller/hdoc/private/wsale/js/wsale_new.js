@@ -22,6 +22,7 @@
 
 define (["wsaleApp"], function(app){
     app.controller("wsaleNewCtrl", wsaleNewProvide);
+    app.controller("wsalePrintPreviewCtrl", wsalePrintPreviewCtrlProvide);
     // return {wsaleNewPr:wsaleNewProvide};
 });
 
@@ -160,9 +161,16 @@ function wsaleNewProvide(
 	$scope.setting.hide_sell_style = wsaleUtils.hide_sell_style($scope.select.shop.id, base);
 	$scope.setting.hide_tagprice   = wsaleUtils.hide_tagprice($scope.select.shop.id, base);
 	$scope.setting.head_amount     = wsaleUtils.head_amount($scope.select.shop.id, base);
-
+	$scope.setting.print_tooth     = wsaleUtils.print_tooth(base);
+	$scope.setting.print_server    = wsaleUtils.print_server(base);
 	// console.log($scope.setting);
     };
+
+    // if ($scope.setting.print_tooth === 2) {
+    // 	if (needCLodop()) {
+    // 	    loadCLodop($scope.setting.print_server, 0);
+    // 	}
+    // }
 
     
     // shops
@@ -1616,3 +1624,115 @@ function wsaleNewProvide(
     };
 };
 // );
+
+
+function wsalePrintPreviewCtrlProvide(
+    $scope, $routeParams, diabloUtilsService, wsaleService,
+    filterRetailer, filterEmployee, filterBrand, filterType, filterSizeGroup, filterBank, user, base) {
+    var rsn = $routeParams.rsn;
+    
+    $scope.shops = user.sortShops;
+    $scope.bankCards = filterBank;
+    // console.log($scope.bankCards);
+    loadCLodop(wsaleUtils.print_server(base));
+
+    function startWith(start, s) {
+	var reg = new RegExp("^" + start);     
+	return reg.test(s);     
+    };
+
+    function to_decimal(dight){
+       var d = Math.round(dight * Math.pow(10,2)) / Math.pow(10,2);
+       return d;
+    };
+    
+    // comment
+    $scope.comments = [];
+    $scope.phones   = [];
+    var order = 1;
+    for (var i=0, l=base.length; i<l; i++) {
+	if (startWith("comment", base[i].name)) {
+	    if (base[i].value) {
+		$scope.comments.push({order:order, comment:base[i].value});
+		order++;
+	    }
+	}
+
+	if (startWith("phone", base[i].name)) {
+	    if (base[i].value)
+		$scope.phones.push({phone:base[i].value, remark:base[i].remark});
+	}
+    }
+
+
+    var pageWidth = diablo_base_setting("prn_width", -1, base, parseFloat, 21.3);
+    var pageHeight = 14;
+    
+    wsaleService.get_w_sale_new(rsn).then(function(result){
+        console.log(result);
+        if (result.ecode === 0){
+	    var sale = result.sale;
+    	    sale.employee = diablo_get_object(sale.employ_id, filterEmployee);
+	    sale.shop = diablo_get_object(sale.shop_id, $scope.shops);
+	    sale.retailer = diablo_get_object(sale.retailer_id, filterRetailer);
+	    if (0 === sale.type) {
+		sale.accBalance = to_decimal(sale.balance + sale.should_pay + sale.e_pay - sale.verificate - sale.has_pay);
+	    } else {
+		sale.accBalance = to_decimal(sale.balance - sale.should_pay - sale.e_pay - sale.verificate);
+	    }
+
+	    sale.curBalance = to_decimal(sale.should_pay - sale.has_pay); 
+	    $scope.sale = sale;
+
+	    $scope.notes  = [];
+            $scope.total  = 0; 
+            $scope.amount = 0;
+
+            order = 1;
+            angular.forEach(result.detail, function(n) {
+                n.order_id = order;
+                // n.calc = bsaleUtils.to_decimal(n.rprice * n.total);
+		n.calc = to_decimal(n.fprice * n.total);
+		n.brand = diablo_get_object(n.brand_id, filterBrand);
+                // n.mdiscount = bsaleUtils.to_decimal(n.fdiscount * n.rdiscount / 100);
+                $scope.total_fprice = to_decimal($scope.total_fprice + n.calc);
+                // $scope.total_virprice =
+                //     bsaleUtils.to_decimal($scope.total_virprice + n.vir_price * n.total); 
+                $scope.total += n.total;
+                $scope.notes.push(n); 
+                order++;
+            });
+        } else {
+	    diabloUtilsService.response(
+                false,
+                "销售单打印",
+                "销售单打印失败：获取采购单失败，请核对后再打印！！");
+	}
+    });
+
+
+    var strBodyStyle="<style>"
+        + ".table-response {min-height: .01%; overflow-x:auto;}"
+        + "table {border-spacing:0; border-collapse:collapse; width:100%}"
+        + "td,th {padding:0; border:1 solid #000000; text-align:center;}"
+        + ".table-bordered {border:1 solid #000000;}"
+        + "</style>";
+    $scope.print = function() {
+        if (angular.isUndefined(LODOP)) {
+            LODOP = getLodop();
+        }
+
+        if (LODOP.CVERSION) {
+            LODOP.PRINT_INIT("task_print_sale_new");
+            LODOP.SET_PRINTER_INDEX(-1);
+            LODOP.SET_PRINT_PAGESIZE(0, pageWidth * 100, pageHeight * 100, "");
+            LODOP.SET_PRINT_MODE("PROGRAM_CONTENT_BYVAR", true);
+
+            LODOP.ADD_PRINT_HTM(
+                "5%", "5%",  "90%", "BottomMargin:15mm",
+                strBodyStyle + "<body>" + document.getElementById("saleNew").innerHTML + "</body>"); 
+
+            LODOP.PREVIEW();
+        }
+    };
+}

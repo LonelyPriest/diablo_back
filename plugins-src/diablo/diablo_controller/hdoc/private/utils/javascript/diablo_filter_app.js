@@ -63,6 +63,7 @@ function filterProvider(){
     var _employees = [];
     var _colorTyes = [];
     var _sizeGroups = [];
+    var _banks     = [];
     
     this.$get = function($resource, dateFilter, wgoodService){
 	
@@ -466,32 +467,54 @@ function filterProvider(){
 	    },
 	    
 	    get_wretailer: function(){
-		if (_retailers.length !== 0 ){
-		    return _retailers;
-		} else {
-		    var http =
-			$resource("/wretailer/:operation",
-				  {operation: '@operation'});
-		    
-		    return http.query(
-			{operation: 'list_w_retailer'}
-		    ).$promise.then(function(retailers){
-			// console.log(retailers); 
-			_retailers =  retailers.map(function(r){
-			    return {name:r.name,
-				    id:r.id,
-				    py:diablo_pinyin(r.name),
-				    balance:r.balance}
-			})
+		// if (_retailers.length !== 0 ){
+		//     return _retailers;
+		// } else {
+		var http =
+		    $resource("/wretailer/:operation",
+			      {operation: '@operation'});
+		
+		return http.query(
+		    {operation: 'list_w_retailer'}
+		).$promise.then(function(retailers){
+		    // console.log(retailers); 
+		    _retailers =  retailers.map(function(r){
+			return {name:r.name,
+				id:r.id,
+				py:diablo_pinyin(r.name),
+				balance:r.balance}
+		    })
 
-			return _retailers;
-		    });    
-		} 
+		    return _retailers;
+		});
 	    },
 
 	    reset_retailer: function(){
 		console.log("reset_retailer");
 		_retailers = [];
+	    },
+
+	    get_bank: function() {
+		var cached = user_get_from_storage(cookie, "bank");
+		if (angular.isArray(cached) && cached.length !== 0)
+		    return cached;
+		else {
+		    var bankHttp = $resource(
+			"/wbase/:operation/:id", {operation: '@operation'},
+			{query_by_post: {method: 'POST', isArray: true}});
+		    return bankHttp.query({operation: 'list_w_bank_card'}).$promise.then(function(banks) {
+			console.log(banks);
+			_banks = banks.map(function(k) {
+			    return {
+				name: k.name,
+				bank: k.bank,
+				no:   k.no
+			    } 
+			});
+			user_set_storage(cookie, "bank", _banks); 
+			return _banks;
+		    }); 
+		} 
 	    }
 
 	    // 
