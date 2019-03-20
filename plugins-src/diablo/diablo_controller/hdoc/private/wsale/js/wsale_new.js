@@ -979,10 +979,15 @@ function wsaleNewProvide(
 		    show_dialog("销售开单", show_message); 
 		} else{
 		    var yes_callback = function(){
-			wsaleService.print_w_sale(rsn).then(function(result){
-			    var show_message = "销售单打印" + print(result);
-			    show_dialog("销售单打印", show_message); 
-			})
+			if ($scope.setting.print_tooth === 2) {
+			    diablo_goto_page("#/wsale_print_preview/" + rsn + "/0");   
+			} else {
+			    wsaleService.print_w_sale(rsn).then(function(result){
+				var show_message = "销售单打印" + print(result);
+				show_dialog("销售单打印", show_message); 
+			    })
+			}
+			
 		    };
 		    
 		    dialog.request(
@@ -1630,6 +1635,7 @@ function wsalePrintPreviewCtrlProvide(
     $scope, $routeParams, diabloUtilsService, wsaleService,
     filterRetailer, filterEmployee, filterBrand, filterType, filterSizeGroup, filterBank, user, base) {
     var rsn = $routeParams.rsn;
+    var from = diablo_set_integer($routeParams.from);
     
     $scope.shops = user.sortShops;
     $scope.bankCards = filterBank;
@@ -1734,5 +1740,12 @@ function wsalePrintPreviewCtrlProvide(
 
             LODOP.PREVIEW();
         }
+    };
+
+    $scope.go_back = function() {
+	if (angular.isDefined(from) && from === 1)
+	    diablo_goto_page("#/new_wsale_detail");
+	else
+	    diablo_goto_page("#/new_wsale");
     };
 }

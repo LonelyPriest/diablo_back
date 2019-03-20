@@ -115,7 +115,7 @@ function wsaleConfg (angular) {
     		controller: 'wsaleRejectUpdateCtrl',
     		resolve: angular.extend({}, user, retailer, employee, s_group, brand, color, type, base)
     	    }). 
-    	    when('/wsale_print_preview/:rsn?', {
+    	    when('/wsale_print_preview/:rsn?/:from?', {
     		templateUrl: '/private/wsale/html/wsale_print_preview.html',
     		controller: 'wsalePrintPreviewCtrl',
     		resolve: angular.extend({}, user, retailer, employee, brand, type, s_group, bank, base) 
@@ -880,7 +880,7 @@ function wsaleNewDetailProvide(
     $scope.print = function(r){
 	// $scope.disable_print = true;
 	if ($scope.print_tooth === 2) {
-	    diablo_goto_page("#/wsale_print_preview/" + r.rsn);
+	    diablo_goto_page("#/wsale_print_preview/" + r.rsn + "/1");
 	} else {
 	    wsaleService.print_w_sale(r.rsn).then(function(result){
 		console.log(result);
