@@ -68,6 +68,7 @@
 		<th class="text-center">序号</th>
 		<th class="text-center">品牌</th>
 		<th class="text-center">货号</th>
+		<th class="text-center">品类</th>
 		<th class="text-center">数量</th>
 		<th class="text-center">单价</th>
 		<th class="text-center">小计</th>
@@ -80,13 +81,14 @@
 		<td class="text-center" x-ng-bind="s.order_id"></td>
 		<td class="text-center" x-ng-bind="s.brand.name"></td>
 		<td class="text-center" x-ng-bind="s.style_number"></td>
+		<td class="text-center" x-ng-bind="s.type.name"></td>
 		<td class="text-center" x-ng-bind="s.total"></td>
 		<td class="text-center" x-ng-bind="s.fprice"></td>
 		<td class="text-center" x-ng-bind="s.calc"></td>
 		<td class="text-center" x-ng-bind="s.comment"></td>
               </tr>
               <tr>
-		<td colspan="3"></td>
+		<td colspan="4"></td>
 		<td style="text-align:center" x-ng-bind="sale.total"></td>
 		<td></td>
 		<td style="text-align:center" x-ng-bind="sale.should_pay"></td>

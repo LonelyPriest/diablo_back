@@ -677,9 +677,7 @@ function normalFilterProvider(){
 		if (_shops.length !== 0){
 		    return _shops;
 		} else {
-		    return _shopHttp.query(
-			{operation: "list_shop"}
-		    ).$promise.then(function(shops){
+		    return _shopHttp.query({operation: "list_shop"}).$promise.then(function(shops){
 			// console.log(shops);
 			_shops = shops.map(function(s){
 			    return {id: s.id,
@@ -688,8 +686,7 @@ function normalFilterProvider(){
 				    py:diablo_pinyin(s.name)};
 			});
 
-			return _shops;
-			
+			return _shops; 
 		    })
 		}
 	    }

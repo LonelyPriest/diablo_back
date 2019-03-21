@@ -1693,13 +1693,20 @@ function wsalePrintPreviewCtrlProvide(
 	    $scope.notes  = [];
             $scope.total  = 0; 
             $scope.amount = 0;
+	    $scope.sale.sellTotal = 0;
+	    $scope.sale.rejectTotal = 0;
 
-            order = 1;
+            order = 1; 
             angular.forEach(result.detail, function(n) {
                 n.order_id = order;
                 // n.calc = bsaleUtils.to_decimal(n.rprice * n.total);
 		n.calc = to_decimal(n.fprice * n.total);
 		n.brand = diablo_get_object(n.brand_id, filterBrand);
+		n.type = diablo_get_object(n.type_id, filterType);
+		if (n.total < 0)
+		    $scope.sale.rejectTotal += Math.abs(n.total);
+		else
+		    $scope.sale.sellTotal += n.total;
                 // n.mdiscount = bsaleUtils.to_decimal(n.fdiscount * n.rdiscount / 100);
                 $scope.total_fprice = to_decimal($scope.total_fprice + n.calc);
                 // $scope.total_virprice =

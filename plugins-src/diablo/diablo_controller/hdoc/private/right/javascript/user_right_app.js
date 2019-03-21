@@ -116,7 +116,8 @@ userApp.factory("userService", function($resource, $q){
 		    var shop = {id:  s.shop_id,
 				name:s.name,
 				repo:s.repo_id,
-				py:diablo_pinyin(s.name)};
+				py:diablo_pinyin(s.name),
+				addr:s.address};
 		    if (s.type === 0 && !in_array(sort, shop)){
 			if (shop.id === _loginShop){
 			    sort.splice(0, 0, shop);
@@ -135,7 +136,8 @@ userApp.factory("userService", function($resource, $q){
 		    var repo = {id:  s.shop_id,
 				name:s.name,
 				repo:s.repo_id,
-				py:diablo_pinyin(s.name)};
+				py:diablo_pinyin(s.name),
+				addr: s.address};
 		    if (s.type === 1 && !in_array(sort, repo)){
 			sort.push(repo); 
 		    }
@@ -149,7 +151,8 @@ userApp.factory("userService", function($resource, $q){
 		    var shop = {id:  s.shop_id,
 				name:s.name,
 				repo:s.repo_id,
-				py:diablo_pinyin(s.name)};
+				py:diablo_pinyin(s.name),
+				addr: s.address};
 		    if (s.type === 2 && !in_array(sort, shop)){
 			sort.push(shop); 
 		    }
@@ -165,7 +168,8 @@ userApp.factory("userService", function($resource, $q){
 		    var repo = {id:  s.shop_id,
 				name:s.name,
 				repo:s.repo_id,
-				py:diablo_pinyin(s.name)};
+				py:diablo_pinyin(s.name),
+				addr:s.address};
 
 		    if ( ((s.type === 0 && s.repo_id === -1) || s.type === 1)
 			 && !in_array(sort, repo)){
