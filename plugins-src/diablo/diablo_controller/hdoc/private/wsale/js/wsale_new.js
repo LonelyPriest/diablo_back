@@ -1638,7 +1638,16 @@ function wsalePrintPreviewCtrlProvide(
     var from = diablo_set_integer($routeParams.from);
     
     $scope.shops = user.sortShops;
-    $scope.bankCards = filterBank;
+    $scope.bankCards1 = [];
+    $scope.bankCards2 = [];
+
+    angular.forEach(filterBank, function(k) {
+	if ($scope.bankCards1.length === 2)
+	    $scope.bankCards2.push(k);
+	else
+	    $scope.bankCards1.push(k);
+    });
+    
     // console.log($scope.bankCards);
     loadCLodop(wsaleUtils.print_server(base));
 
@@ -1670,7 +1679,6 @@ function wsalePrintPreviewCtrlProvide(
 	}
     }
 
-
     var pageWidth = diablo_base_setting("prn_width", -1, base, parseFloat, 21.3);
     var pageHeight = 14;
     
@@ -1684,7 +1692,7 @@ function wsalePrintPreviewCtrlProvide(
 	    if (0 === sale.type) {
 		sale.accBalance = to_decimal(sale.balance + sale.should_pay + sale.e_pay - sale.verificate - sale.has_pay);
 	    } else {
-		sale.accBalance = to_decimal(sale.balance - sale.should_pay - sale.e_pay - sale.verificate);
+		sale.accBalance = to_decimal(sale.balance + sale.should_pay + sale.e_pay);
 	    }
 
 	    sale.curBalance = to_decimal(sale.should_pay - sale.has_pay); 

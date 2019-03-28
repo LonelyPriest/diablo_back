@@ -19,17 +19,19 @@
       </div>
 
       <div id="saleNew" class="portlet-body">
-	<h2 style="text-align:center">
-	  <span x-ng-bind="sale.shop.name"></span>
+	<h2 style="text-align:center;margin-top:-5px">
+	  <span x-ng-bind="sale.shop.name"></span><span>-</span>
+	  <span style="font-size:18px" x-ng-bind="sale.shop.addr"></span>
 	</h2>
 
-	<h3>
-	  <div style="text-align:center">
-            <span x-ng-bind="sale.shop.addr"></span>
-	  </div>
-	</h3>
+	<!-- <h3> -->
+	<!--   <div style="text-align:center"> -->
+        <!--     <span x-ng-bind="sale.shop.addr"></span> -->
+	<!--   </div> -->
+	<!-- </h3> -->
 
 	<div style="margin-top:-5px; text-align:center">
+	  <span>联系方式：</span>
 	  <span x-ng-repeat="p in phones">
             <span><strong>{{p.phone}}</strong></span>
             <span x-ng-if="p.remark">
@@ -54,12 +56,14 @@
 	<div style="text-align:center; margin-top:5px">
 	  <span>单号：</span><span x-ng-bind="sale.rsn"></span>
 	  &nbsp;&nbsp;&nbsp;&nbsp;<span>日期：</span><span x-ng-bind="sale.entry_date"></span>
-	</div>
-
-	<div style="text-align:center">
-	  <span>客户：</span><span x-ng-bind="sale.retailer.name"></span>
+	  &nbsp;&nbsp<span>客户：</span><span x-ng-bind="sale.retailer.name"></span>
 	  &nbsp;&nbsp;&nbsp;&nbsp;<span>店员：</span><span x-ng-bind="sale.employee.name"></span>
 	</div>
+
+	<!-- <div style="text-align:center"> -->
+	<!--   <span>客户：</span><span x-ng-bind="sale.retailer.name"></span> -->
+	<!--   &nbsp;&nbsp;&nbsp;&nbsp;<span>店员：</span><span x-ng-bind="sale.employee.name"></span> -->
+	<!-- </div> -->
 
 	<div class="table-responsive" style="margin-top:5px">
 	  <table class="table table-bordered table-striped" style="margin-bottom:5px">
@@ -107,6 +111,8 @@
 	  &nbsp;&nbsp;<span>售：</span><span style="font-size:20px;">{{sale.sellTotal}}</span>
 	  <span>退：</span><span style="font-size:20px;">{{sale.rejectTotal}}</span>
 	  &nbsp;&nbsp;<span>金额：</span><strong style="font-size:24px;">{{sale.should_pay}}</strong>
+	  &nbsp;&nbsp;<span>核销：</span><strong style="font-size:24px;">{{sale.verificate}}</strong>
+	  &nbsp;&nbsp;<span>费用：</span><strong style="font-size:24px;">{{sale.e_pay}}</strong>
 	  &nbsp;&nbsp;<span>备注：</span><span x-ng-bind="sale.comment"></span>
 	</div>
 
@@ -126,12 +132,20 @@
 	  <span>累欠：</span><strong style="font-size:24px;">{{sale.accBalance}}</strong>
 	</div>
 
-	<div style="margin-top:15px; text-align:center">
-	  <div x-ng-repeat="c in bankCards">
-            <span>{{c.name}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>{{c.bank}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+	<div style="margin-top:15px">
+	  <span x-ng-repeat="c in bankCards1">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span>{{c.name}}</span>&nbsp;&nbsp;
+            <span>{{c.bank}}</span>&nbsp;&nbsp;
             <span><strong>{{c.no}}</strong></span>
-	  </div>
+	  </span>
+	</div>
+
+	<div style="text-align:left">
+	  <span x-ng-repeat="c in bankCards2">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span>{{c.name}}</span>&nbsp;&nbsp;
+            <span>{{c.bank}}</span>&nbsp;&nbsp;
+            <span><strong>{{c.no}}</strong></span>
+	  </span>
 	</div>
 
 	<div style="margin-top:15px">
