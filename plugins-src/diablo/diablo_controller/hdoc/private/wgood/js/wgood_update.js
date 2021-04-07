@@ -149,7 +149,7 @@ var wgoodUpdateProvide = function(
 	$scope.disable_select_size = function(){
 	    // console.log(good);
 	    // var select_groups = good.s_group.split(",");
-	    return $scope.good.free === 0 || select_groups.length >= 2;
+	    return $scope.good.free === 0 || select_groups.length >= 3;
 	}
     });
     

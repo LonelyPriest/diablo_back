@@ -137,6 +137,9 @@ function filterProvider(){
 		} else if (name === 'tshop'){
 		    _filter.fields.push({name:"tshop", chinese:"调入店铺"});
 		    _prompt.tshop = promptValues;
+		} else if (name='season') {
+		    _filter.fields.push({name:"season", chinese:"季节"});
+		    _prompt.season = promptValues
 		}
 
 		return _filter;

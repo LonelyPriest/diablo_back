@@ -1025,10 +1025,14 @@ var stockDetailProvide =  function(
     diabloFilter.add_field("brand", filterBrand);
     diabloFilter.add_field("type", filterType);
     diabloFilter.add_field("year", diablo_full_year);
+    diabloFilter.add_field("season", diablo_season2objects);
     diabloFilter.add_field("shop", $scope.shops);
 
     $scope.filter = diabloFilter.get_filter();
     $scope.prompt = diabloFilter.get_prompt();
+
+    console.log($scope.filter);
+    console.log($scope.prompt);
 
     var now = $.now();
     var storage = localStorageService.get(diablo_key_inventory_detail);

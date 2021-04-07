@@ -154,7 +154,7 @@ match(all_style_number_brand_firm, Merchant, StartTime, Firm) ->
 %% match inventory 
 match(inventory, all_inventory, Merchant, Shop, Conditions) ->
     Name = ?wpool:get(?MODULE, Merchant), 
-    gen_server:call(Name, {match_all_inventory, Merchant, Shop, Conditions});
+    gen_server:call(Name, {match_all_inventory, Merchant, Shop, Conditions}, 30 * 1000);
 
 match(inventory, QType, Merchant, StyleNumber, Shop) ->
     Name = ?wpool:get(?MODULE, Merchant), 

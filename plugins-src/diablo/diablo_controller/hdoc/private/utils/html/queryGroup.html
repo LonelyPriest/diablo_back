@@ -110,10 +110,11 @@
 	  </span>
 
 	  <span x-ng-switch-when="season">
-	    <input type="text" class="form-control" placeholder="请输入季节"
-		   x-ng-model="f.value"
-		   typeahead-editable="false"
-	  	   typeahead="s as s.name for s in prompt.season|filter:$viewValue|limitTo:8"/>
+	    <select type="text" class="form-control"
+                    x-ng-model="f.value"
+                    x-ng-options="s as s.name for s in prompt.season"
+                    x-ng-init="f.value=f.value ? f.value : prompt.season[0]">
+            </select> 
 	  </span>
 
 	  <span x-ng-switch-when="size">
