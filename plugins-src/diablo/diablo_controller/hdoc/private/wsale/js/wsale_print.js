@@ -1,16 +1,14 @@
 wsaleApp.controller('wsalePrintPreviewCtrl', function(
     $scope, $routeParams, filterSizeGroup, wsaleService){
-
     $scope.p = {};
-    $scope.pbase  = {};
-
+    $scope.pbase  = {}; 
     var rsn = $routeParams.rsn;
 
     var print_field = function() {
 	for(var i=0,l=$scope.p_format.length; i<l; i++){
-	    var is = $scope.p_format[i].print;
+	    var im = $scope.p_format[i].print;
 	    var name = $scope.p_format[i].name;
-	    $scope.p[name] = is === 1 ? true:false;
+	    $scope.p[name] = im === 1 ? true:false;
 	}
     };
 

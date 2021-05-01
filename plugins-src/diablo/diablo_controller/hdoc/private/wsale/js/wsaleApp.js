@@ -879,36 +879,7 @@ function wsaleNewDetailProvide(
     var dialog = diabloUtilsService;
     $scope.print = function(r){
 	// $scope.disable_print = true;
-	if ($scope.print_tooth === 2) {
-	    diablo_goto_page("#/wsale_print_preview/" + r.rsn + "/1");
-	} else {
-	    wsaleService.print_w_sale(r.rsn).then(function(result){
-		console.log(result);
-		// $scope.disable_print = false; 
-		if (result.ecode == 0){
-		    var msg = "";
-		    if (result.pcode == 0){
-			msg = "销售单打印成功！！单号：" + result.rsn + "，请等待服务器打印";
-			dialog.response(true, "销售单打印", msg, $scope); 
-		    } else {
-			if (result.pinfo.length === 0){
-			    msg += wsaleService.error[result.pcode]
-			} else {
-			    angular.forEach(result.pinfo, function(p){
-				msg += "[" + p.device + "] " + wsaleService.error[p.ecode]
-			    })
-			};
-			msg = "销售单打印失败！！单号：" + result.rsn + "，打印失败：" + msg;
-			dialog.response(false, "销售单打印", msg, $scope); 
-		    }
-		    
-		} else{
-	    	    dialog.response(
-	    		false, "销售单打印",
-			"销售单打印失败：" + wsaleService.error[result.ecode]);
-		}
-	    })
-	} 
+	diablo_goto_page("#/wsale_print_preview/" + r.rsn + "/1"); 
     };
 
     $scope.update_detail = function(r){

@@ -23,13 +23,7 @@
 	  <span x-ng-bind="sale.shop.name"></span><span>-</span>
 	  <span style="font-size:18px" x-ng-bind="sale.shop.addr"></span>
 	</h2>
-
-	<!-- <h3> -->
-	<!--   <div style="text-align:center"> -->
-        <!--     <span x-ng-bind="sale.shop.addr"></span> -->
-	<!--   </div> -->
-	<!-- </h3> -->
-
+	
 	<div style="margin-top:-5px; text-align:center">
 	  <span>联系方式：</span>
 	  <span x-ng-repeat="p in phones">
@@ -41,30 +35,14 @@
             </span>
 	  </span>
 	</div>
-
-	<!-- <div> -->
-	<!--   <span x-ng-repeat="p in phones2"> -->
-        <!--     <span>&nbsp;&nbsp;&nbsp;&nbsp;{{p.value}}</span> -->
-        <!--     <span x-ng-if="p.remark"> -->
-        <!--       <span>(</span> -->
-        <!--       <span>{{p.remark}}</span> -->
-        <!--       <span>)</span> -->
-        <!--     </span> -->
-	<!--   </span> -->
-	<!-- </div> -->
-
+	
 	<div style="text-align:center; margin-top:5px">
 	  <span>单号：</span><span x-ng-bind="sale.rsn"></span>
 	  &nbsp;&nbsp;&nbsp;&nbsp;<span>日期：</span><span x-ng-bind="sale.entry_date"></span>
 	  &nbsp;&nbsp<span>客户：</span><span x-ng-bind="sale.retailer.name"></span>
 	  &nbsp;&nbsp;&nbsp;&nbsp;<span>店员：</span><span x-ng-bind="sale.employee.name"></span>
 	</div>
-
-	<!-- <div style="text-align:center"> -->
-	<!--   <span>客户：</span><span x-ng-bind="sale.retailer.name"></span> -->
-	<!--   &nbsp;&nbsp;&nbsp;&nbsp;<span>店员：</span><span x-ng-bind="sale.employee.name"></span> -->
-	<!-- </div> -->
-
+	
 	<div class="table-responsive" style="margin-top:5px">
 	  <table class="table table-bordered table-striped" style="margin-bottom:5px">
             <thead>

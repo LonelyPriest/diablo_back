@@ -940,27 +940,27 @@ function wsaleNewProvide(
 	    console.log(result);
 	    var rsn = result.rsn;
 
-	    var print = function(result){
-		var messsage = "";
-		if (result.pcode == 0){
-		    messsage = "成功！！单号：" + rsn + "，请等待服务器打印";
-		} else {
-		    if (result.pinfo.length === 0){
-			messsage += wsaleService.error[result.pcode]
-		    } else {
-			angular.forEach(result.pinfo, function(p){
-			    messsage += "[" + p.device + "] " + wsaleService.error[p.ecode]
-			})
-		    };
-		    messsage = "成功！！单号：" + rsn + "，打印失败：" + messsage;
-		}
+	    // var print = function(result){
+	    // 	var messsage = "";
+	    // 	if (result.pcode == 0){
+	    // 	    messsage = "成功！！单号：" + rsn + "，请等待服务器打印";
+	    // 	} else {
+	    // 	    if (result.pinfo.length === 0){
+	    // 		messsage += wsaleService.error[result.pcode]
+	    // 	    } else {
+	    // 		angular.forEach(result.pinfo, function(p){
+	    // 		    messsage += "[" + p.device + "] " + wsaleService.error[p.ecode]
+	    // 		})
+	    // 	    };
+	    // 	    messsage = "成功！！单号：" + rsn + "，打印失败：" + messsage;
+	    // 	}
 
-		return messsage;
-	    };
+	    // 	return messsage;
+	    // };
 
-	    var show_dialog = function(title, message){
-		dialog.response(true, title, message, undefined)
-	    };
+	    // var show_dialog = function(title, message){
+	    // 	dialog.response(true, title, message, undefined)
+	    // };
 	    
 	    if (result.ecode == 0){
 		// clear local storage
@@ -975,19 +975,20 @@ function wsaleNewProvide(
 		}
 		
 		if (im_print === diablo_yes){
-		    var show_message = "开单" + print(result);
-		    show_dialog("销售开单", show_message); 
+		    // var show_message = "开单" + print(result);
+		    // show_dialog("销售开单", show_message);
+		    diablo_goto_page("#/wsale_print_preview/" + rsn + "/0");
 		} else{
 		    var yes_callback = function(){
-			if ($scope.setting.print_tooth === 2) {
-			    diablo_goto_page("#/wsale_print_preview/" + rsn + "/0");   
-			} else {
-			    wsaleService.print_w_sale(rsn).then(function(result){
-				var show_message = "销售单打印" + print(result);
-				show_dialog("销售单打印", show_message); 
-			    })
-			}
-			
+			diablo_goto_page("#/wsale_print_preview/" + rsn + "/0");
+			// if ($scope.setting.print_tooth === 2) {
+			//     diablo_goto_page("#/wsale_print_preview/" + rsn + "/0");   
+			// } else {
+			//     wsaleService.print_w_sale(rsn).then(function(result){
+			// 	var show_message = "销售单打印" + print(result);
+			// 	show_dialog("销售单打印", show_message); 
+			//     })
+			// } 
 		    };
 		    
 		    dialog.request(
